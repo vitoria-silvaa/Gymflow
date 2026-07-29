@@ -1,27 +1,33 @@
 <?php
-require_once __DIR__ . '/../../../config/conexao.php';
+
+// 1. Conexão com o banco de dados
+include '../../../config/conexao.php';
+
+$erro = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    
+
     $nome        = $_POST['nome'] ?? '';
     $cnpj        = $_POST['cnpj'] ?? '';
     $telefone    = $_POST['telefone'] ?? '';
     $responsavel = $_POST['responsavel'] ?? '';
-    $status      = 'Ativa'; 
+    $company_id  = 1; // ID da empresa padrão no banco
+    $ativo       = 1; // 1 = Ativo (coluna BOOLEAN no banco)
 
     if (!empty($nome) && !empty($cnpj) && !empty($responsavel)) {
-        
-        $sql = "INSERT INTO filiais (nome, cnpj, telefone, responsavel, status) 
-                VALUES (:nome, :cnpj, :telefone, :responsavel, :status)";
-        
+
+        $sql = "INSERT INTO filiais (company_id, nome, cnpj, telefone, responsavel, ativo) 
+                VALUES (:company_id, :nome, :cnpj, :telefone, :responsavel, :ativo)";
+
         $stmt = $pdo->prepare($sql);
-        
+
         $stmt->execute([
+            ':company_id'  => $company_id,
             ':nome'        => $nome,
             ':cnpj'        => $cnpj,
             ':telefone'    => $telefone,
             ':responsavel' => $responsavel,
-            ':status'      => $status
+            ':ativo'       => $ativo
         ]);
 
         header("Location: ./index.php");
