@@ -8,7 +8,7 @@
 
     <ul>
         <li>
-            <a href="../portal_aluno/index.php">
+            <a href="../portal_aluno/aluno.php">
                 Inicio
             </a>
         </li>

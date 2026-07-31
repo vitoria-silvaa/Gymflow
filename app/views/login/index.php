@@ -17,7 +17,7 @@
             <!-- Lado esquerdo-->
             <div>
 
-                <a href="../portfolio/index.php">
+               <a href="/Gymflow/index.php">
                     ← Voltar para o site
                 </a>
 
