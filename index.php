@@ -26,7 +26,7 @@ include 'app/views/shared/portfolio_header.php';
 
       <!--planos-->
     <hr>
-    <section id="planos">
+    <section id="planos"> <!--puxar dados de planos existentes no banco de dados-->
          <h3>Nossos Planos</h3>
          <h1>Escolha o plano ideal para sua evolução</h1>
         <h2>Sem fidelidade obrigatória. Cancele quando quiser.</h2>
