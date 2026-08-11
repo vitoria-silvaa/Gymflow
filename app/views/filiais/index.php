@@ -1,23 +1,13 @@
 <?php
-require_once __DIR__ . '/../../../config/conexao.php';
-
-$statusFiltro = $_GET['status'] ?? '';
-
-if (!empty($statusFiltro)) {
-    $sql = "SELECT * FROM filiais WHERE status = :status ORDER BY id DESC";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([':status' => $statusFiltro]);
-} else {
-    $sql = "SELECT * FROM filiais ORDER BY id DESC";
-    $stmt = $pdo->query($sql);
+if (!isset($filiais)) {
+    header("Location: /Gymflow/app/controllers/FilialController.php?acao=listar");
+    exit;
 }
+/** @var array $filiais */
+/** @var string $statusFiltro */
 
-$filiais = $stmt->fetchAll(); 
-?>
-
-<?php
 $tituloPagina = "Filiais";
-include '../shared/header.php';
+include __DIR__ . '/../shared/header.php';
 ?>
 
 <div>
@@ -26,7 +16,8 @@ include '../shared/header.php';
 </div>
 
 <div>
-    <form method="GET" action="./index.php" style="display: inline-block;">
+    <form method="GET" action="/Gymflow/app/controllers/FilialController.php" style="display: inline-block;">
+        <input type="hidden" name="acao" value="listar">
         <select name="status" onchange="this.form.submit()">
             <option value="" <?= $statusFiltro === '' ? 'selected' : '' ?>>Todos</option>
             <option value="Ativa" <?= $statusFiltro === 'Ativa' ? 'selected' : '' ?>>Ativo</option>
@@ -34,7 +25,7 @@ include '../shared/header.php';
         </select>
     </form>
 
-    <a href="../filiais/cadastrar.php">Criar Filial</a>
+    <a href="/Gymflow/app/controllers/FilialController.php?acao=cadastrar">Criar Filial</a>
 </div>
 <div class="cards-container">
     <?php if (empty($filiais)): ?>
@@ -46,8 +37,8 @@ include '../shared/header.php';
             <div class="card-filial">
                 <div class="card-header">
                     <h2><?= htmlspecialchars($filial['nome']) ?></h2>
-                    <span class="badge <?= strtolower($filial['status'] ?? 'ativa') ?>">
-                        <?= htmlspecialchars($filial['status'] ?? 'Ativa') ?>
+                    <span class="badge <?= $filial['ativo'] ? 'ativa' : 'inativa' ?>">
+                        <?= $filial['ativo'] ? 'Ativa' : 'Inativa' ?>
                     </span>
                 </div>
 
@@ -58,7 +49,7 @@ include '../shared/header.php';
                 </div>
 
                 <div class="card-footer">
-                    <a href="./editar.php?id=<?= $filial['id'] ?>">Editar</a>
+                    <a href="/Gymflow/app/controllers/FilialController.php?acao=editar&id=<?= $filial['id'] ?>">Editar</a>
                     <button type="button">Inativar</button>
                     <a href="#">Histórico</a>
                 </div>
@@ -69,6 +60,6 @@ include '../shared/header.php';
     <?php endif; ?>
 </div>
 
-<?php include '../shared/sidebar.php'; ?>
+<?php include __DIR__ . '/../shared/sidebar.php'; ?>
 
-<?php include '../shared/footer.php'; ?>
+<?php include __DIR__ . '/../shared/footer.php'; ?>

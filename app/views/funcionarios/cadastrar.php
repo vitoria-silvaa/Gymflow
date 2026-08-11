@@ -1,67 +1,14 @@
 <?php
-// 1. Conexão com o banco de dados
-include '../../../config/conexao.php';
-
-$erro = "";
-
-// 2. Processar o formulário quando enviado via POST
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nome = trim($_POST['nome'] ?? '');
-    $email = trim($_POST['email'] ?? '');
-    $senha = $_POST['senha'] ?? '';
-    $role = $_POST['role'] ?? '';
-    $id_filial = $_POST['id_filial'] ?? '';
-
-    // Validação básica dos campos obrigatórios
-    if (empty($nome) || empty($email) || empty($senha) || empty($role) || empty($id_filial)) {
-        $erro = "Por favor, preencha todos os campos obrigatórios (*).";
-    } else {
-        // Verificar se o E-mail já está cadastrado na tabela users
-        $stmt_check = $pdo->prepare("SELECT id FROM users WHERE email = :email");
-        $stmt_check->execute([':email' => $email]);
-        
-        if ($stmt_check->fetch()) {
-            $erro = "Este e-mail já está cadastrado.";
-        } else {
-            // Criptografar a senha usando bcrypt
-            $senha_hash = password_hash($senha, PASSWORD_BCRYPT);
-
-            // 1. Inserir na tabela de usuários (users)
-            $sql_user = "INSERT INTO users (name, email, password, role) VALUES (:name, :email, :password, :role)";
-            $stmt_user = $pdo->prepare($sql_user);
-            $stmt_user->execute([
-                ':name'     => $nome,
-                ':email'    => $email,
-                ':password' => $senha_hash,
-                ':role'     => $role
-            ]);
-
-            // Pega o ID do usuário que acabou de ser inserido
-            $user_id = $pdo->lastInsertId();
-
-            // 2. Inserir o vínculo com a filial na tabela user_filiais
-            $sql_filial = "INSERT INTO user_filiais (user_id, filial_id) VALUES (:user_id, :filial_id)";
-            $stmt_filial = $pdo->prepare($sql_filial);
-            $stmt_filial->execute([
-                ':user_id'   => $user_id,
-                ':filial_id' => $id_filial
-            ]);
-
-            // Redireciona para a lista de funcionários
-            header("Location: index.php");
-            exit;
-        }
-    }
+if (!isset($filiais)) {
+    header("Location: /Gymflow/app/controllers/FuncionarioController.php?acao=cadastrar");
+    exit;
 }
+/** @var array $filiais */
+/** @var string $erro */
 
-// 3. Buscar as filiais cadastradas para popular o campo select dinamicamente
-$stmt_filiais = $pdo->query("SELECT id, nome FROM filiais WHERE ativo = 1 ORDER BY nome");
-$filiais = $stmt_filiais->fetchAll();
-
-// 4. Inclusão do cabeçalho e menu lateral
 $tituloPagina = "Cadastrar Funcionário";
-include '../shared/header.php';
-include '../shared/sidebar.php';
+include __DIR__ . '/../shared/header.php';
+include __DIR__ . '/../shared/sidebar.php';
 ?>
 
 <!-- Título principal -->
@@ -74,7 +21,7 @@ include '../shared/sidebar.php';
     </div>
 <?php endif; ?>
 
-<form action="" method="POST">
+<form action="/Gymflow/app/controllers/FuncionarioController.php?acao=cadastrar" method="POST">
     
     <!-- Dados do Colaborador -->
     <h3>Dados do Colaborador</h3>
@@ -117,8 +64,8 @@ include '../shared/sidebar.php';
     <br><br>
 
     <button type="submit">Salvar Cadastro</button>
-    <a href="index.php">Cancelar</a>
+    <a href="/Gymflow/app/controllers/FuncionarioController.php?acao=listar">Cancelar</a>
 
 </form>
 
-<?php include '../shared/footer.php'; ?>
+<?php include __DIR__ . '/../shared/footer.php'; ?>

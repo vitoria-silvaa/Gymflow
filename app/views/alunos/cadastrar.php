@@ -1,155 +1,130 @@
 <?php
-// 1. Conexão com o banco de dados
-include '../../../config/conexao.php';
 
-$erro = "";
-
-// 2. Processar o formulário quando enviado via POST
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nome = trim($_POST['nome'] ?? '');
-    $cpf = trim($_POST['cpf'] ?? '');
-    $rg = trim($_POST['rg'] ?? '');
-    $sexo = $_POST['sexo'] ?? '';
-    $nascimento = $_POST['data_nascimento'] ?? '';
-    $email = trim($_POST['email'] ?? '');
-    $telefone = trim($_POST['telefone'] ?? '');
-    $id_filial = $_POST['id_filial'] ?? '';
-    
-    $cep = trim($_POST['cep'] ?? '');
-    $logradouro = trim($_POST['logradouro'] ?? '');
-    $endereco = "";
-    if ($logradouro !== '' || $cep !== '') {
-        $endereco = $logradouro . ($cep !== '' ? ", CEP: " . $cep : "");
-    }
-    
-    // Validação básica dos campos obrigatórios
-    if (empty($nome) || empty($cpf) || empty($nascimento) || empty($sexo) || empty($email) || empty($telefone) || empty($id_filial)) {
-        $erro = "Por favor, preencha todos os campos obrigatórios (*).";
-    } else {
-        // Verificar se o CPF já está cadastrado
-        $stmt_check = $pdo->prepare("SELECT id FROM alunos WHERE cpf = :cpf");
-        $stmt_check->execute([':cpf' => $cpf]);
-        
-        if ($stmt_check->fetch()) {
-            $erro = "Este CPF já está cadastrado para outro aluno.";
-        } else {
-            // Inserir o novo aluno no banco de dados
-            $sql = "INSERT INTO alunos (filial_id, nome, cpf, rg, sexo, nascimento, email, telefone, endereco, status) 
-                    VALUES (:filial_id, :nome, :cpf, :rg, :sexo, :nascimento, :email, :telefone, :endereco, 'Ativo')";
-            
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([
-                ':filial_id'  => $id_filial,
-                ':nome'       => $nome,
-                ':cpf'        => $cpf,
-                ':rg'         => !empty($rg) ? $rg : null,
-                ':sexo'       => $sexo,
-                ':nascimento' => $nascimento,
-                ':email'      => $email,
-                ':telefone'   => $telefone,
-                ':endereco'   => !empty($endereco) ? $endereco : null
-            ]);
-            
-            // Redireciona para a lista de alunos
-            header("Location: index.php");
-            exit;
-        }
-    }
-}
-
-// 3. Buscar as filiais cadastradas para popular o campo select dinamicamente
-$stmt_filiais = $pdo->query("SELECT id, nome FROM filiais WHERE ativo = 1 ORDER BY nome");
-$filiais = $stmt_filiais->fetchAll();
-
-// 4. Inclusão do cabeçalho e menu lateral
-$tituloPagina = "Cadastrar Aluno";
-include '../shared/header.php';
-include '../shared/sidebar.php';
+/** @var array<string, mixed> $dados */
+/** @var array<int, array<string, mixed>> $filiais */
+/** @var string $erro */
+/** @var string $baseUrl */
+include __DIR__ . '/../shared/header.php';
+include __DIR__ . '/../shared/sidebar.php';
 ?>
 
-<!-- Título principal -->
-<h1>Cadastrar Novo Aluno</h1>
+<h1>Cadastrar Aluno</h1>
 
-<!-- Exibição de mensagens de erro -->
-<?php if (!empty($erro)): ?>
-    <div style="color: red; font-weight: bold; margin-bottom: 15px;">
-        <?php echo htmlspecialchars($erro); ?>
-    </div>
+<?php if ($erro !== ''): ?>
+    <p style="color: red; font-weight: bold;">
+        <?= htmlspecialchars($erro) ?>
+    </p>
 <?php endif; ?>
 
-<form action="" method="POST">
-    
-    <!-- Seção 1: Dados Pessoais -->
-    <h3>Dados Pessoais</h3>
-    
-    <label>Nome Completo *:</label>
-    <input type="text" name="nome" value="<?php echo htmlspecialchars($_POST['nome'] ?? ''); ?>" required>
+<form action="<?= $baseUrl ?>?acao=cadastrar" method="POST">
+    <label>Nome *:</label>
+    <input
+        type="text"
+        name="nome"
+        value="<?= htmlspecialchars($dados['nome'] ?? '') ?>"
+        required>
     <br><br>
 
     <label>CPF *:</label>
-    <input type="text" name="cpf" placeholder="000.000.000-00" value="<?php echo htmlspecialchars($_POST['cpf'] ?? ''); ?>" required>
+    <input
+        type="text"
+        name="cpf"
+        value="<?= htmlspecialchars($dados['cpf'] ?? '') ?>"
+        required>
     <br><br>
 
     <label>RG:</label>
-    <input type="text" name="rg" value="<?php echo htmlspecialchars($_POST['rg'] ?? ''); ?>">
+    <input
+        type="text"
+        name="rg"
+        value="<?= htmlspecialchars($dados['rg'] ?? '') ?>">
     <br><br>
 
     <label>Sexo *:</label>
     <select name="sexo" required>
-        <option value="">Selecione...</option>
-        <option value="Masculino" <?php if(($_POST['sexo'] ?? '') === 'Masculino') echo 'selected'; ?>>Masculino</option>
-        <option value="Feminino" <?php if(($_POST['sexo'] ?? '') === 'Feminino') echo 'selected'; ?>>Feminino</option>
-        <option value="Outro" <?php if(($_POST['sexo'] ?? '') === 'Outro') echo 'selected'; ?>>Outro</option>
+        <option value="">Selecione</option>
+        <option
+            value="Masculino"
+            <?= ($dados['sexo'] ?? '') === 'Masculino'
+                ? 'selected'
+                : '' ?>>
+            Masculino
+        </option>
+        <option
+            value="Feminino"
+            <?= ($dados['sexo'] ?? '') === 'Feminino'
+                ? 'selected'
+                : '' ?>>
+            Feminino
+        </option>
+        <option
+            value="Outro"
+            <?= ($dados['sexo'] ?? '') === 'Outro'
+                ? 'selected'
+                : '' ?>>
+            Outro
+        </option>
     </select>
     <br><br>
-    
+
     <label>Data de Nascimento *:</label>
-    <input type="date" name="data_nascimento" value="<?php echo htmlspecialchars($_POST['data_nascimento'] ?? ''); ?>" required>
+    <input
+        type="date"
+        name="nascimento"
+        value="<?= htmlspecialchars($dados['nascimento'] ?? '') ?>"
+        required>
     <br><br>
 
-    <!-- Seção de Contatos -->
-    <h3>Contatos</h3>
-    
     <label>E-mail *:</label>
-    <input type="email" name="email" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>" required>
+    <input
+        type="email"
+        name="email"
+        value="<?= htmlspecialchars($dados['email'] ?? '') ?>"
+        required>
     <br><br>
 
     <label>Telefone *:</label>
-    <input type="text" name="telefone" placeholder="(00) 00000-0000" value="<?php echo htmlspecialchars($_POST['telefone'] ?? ''); ?>" required>
-    <br><br>
-    
-    <hr>
-
-    <!-- Seção 2: Endereço -->
-    <h3>Endereço</h3>
-    
-    <label>CEP:</label>
-    <input type="text" name="cep" placeholder="00000-000" value="<?php echo htmlspecialchars($_POST['cep'] ?? ''); ?>">
+    <input
+        type="text"
+        name="telefone"
+        value="<?= htmlspecialchars($dados['telefone'] ?? '') ?>"
+        required>
     <br><br>
 
-    <label>Logradouro:</label>
-    <input type="text" name="logradouro" placeholder="Rua, número, bairro" value="<?php echo htmlspecialchars($_POST['logradouro'] ?? ''); ?>">
+    <label>Endereço:</label>
+    <input
+        type="text"
+        name="endereco"
+        value="<?= htmlspecialchars($dados['endereco'] ?? '') ?>">
     <br><br>
 
-    <hr>
+    <label>Filial *:</label>
+    <select name="filial_id" required>
+        <option value="">Selecione</option>
 
-    <!-- Seção 3: Vínculo de Unidade -->
-    <h3>Vínculo de Unidade</h3>
-    
-    <label>Selecione a Unidade (Filial) *:</label>
-    <select name="id_filial" required>
-        <option value="">Selecione uma filial...</option>
         <?php foreach ($filiais as $filial): ?>
-            <option value="<?php echo $filial['id']; ?>" <?php if(($_POST['id_filial'] ?? '') == $filial['id']) echo 'selected'; ?>>
-                <?php echo htmlspecialchars($filial['nome']); ?> (ID: <?php echo $filial['id']; ?>)
+            <option
+                value="<?= $filial['id'] ?>"
+                <?= ($dados['filial_id'] ?? '') == $filial['id']
+                    ? 'selected'
+                    : '' ?>>
+                <?= htmlspecialchars($filial['nome']) ?>
             </option>
         <?php endforeach; ?>
     </select>
     <br><br>
 
-    <button type="submit">Salvar Cadastro</button>
-    <a href="index.php">Cancelar</a>
+    <label>Senha *:</label>
+    <input
+        type="password"
+        name="senha"
+        minlength="6"
+        required>
+    <br><br>
 
+    <button type="submit">Cadastrar</button>
+
+    <a href="<?= $baseUrl ?>?acao=listar">Cancelar</a>
 </form>
 
-<?php include '../shared/footer.php'; ?>
+<?php include __DIR__ . '/../shared/footer.php'; ?>

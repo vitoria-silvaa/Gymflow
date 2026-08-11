@@ -1,3 +1,9 @@
+<?php
+if (!isset($erro)) {
+    header("Location: /Gymflow/app/controllers/LoginController.php?acao=login");
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -5,7 +11,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - GymCore</title>
-
 </head>
 
 <body>
@@ -17,7 +22,7 @@
             <!-- Lado esquerdo-->
             <div>
 
-               <a href="/Gymflow/index.php">
+                <a href="/Gymflow/index.php">
                     ← Voltar para o site
                 </a>
 
@@ -47,7 +52,14 @@
                         Acesse o painel da sua rede.
                     </p>
 
-                    <form>
+                    <!-- Exibição de Erros de Autenticação -->
+                    <?php if (!empty($erro)): ?>
+                        <div style="color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-weight: bold;">
+                            <?php echo htmlspecialchars($erro); ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <form action="" method="POST">
 
                         <div>
 
@@ -59,7 +71,9 @@
                                 type="email"
                                 class="form-control"
                                 id="email"
-                                name="email">
+                                name="email"
+                                value="<?php echo htmlspecialchars($email ?? ''); ?>"
+                                required>
 
                         </div>
 
@@ -72,7 +86,8 @@
                             <input
                                 type="password"
                                 id="senha"
-                                name="senha">
+                                name="senha"
+                                required>
 
                         </div>
 
@@ -92,7 +107,6 @@
         </div>
 
     </main>
-
 
 </body>
 

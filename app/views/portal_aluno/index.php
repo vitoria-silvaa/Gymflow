@@ -1,8 +1,6 @@
 <?php
-$tituloPagina = "Portal do Aluno";
-include '../shared/header.php';
-?>
+// app/views/portal_aluno/index.php
 
-<?php include '../shared/sidebar.php'; ?>
-
-<?php include '../shared/footer.php'; ?>
+// Redireciona o acesso direto para o controlador correspondente (MVC)
+header("Location: /Gymflow/app/controllers/PortalAlunoController.php?acao=aluno");
+exit;

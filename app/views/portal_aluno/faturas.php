@@ -1,81 +1,76 @@
 <?php
+if (!isset($todas_contas)) {
+    header("Location: /Gymflow/app/controllers/PortalAlunoController.php?acao=faturas");
+    exit;
+}
+/** @var array $todas_contas */
+/** @var array $a_vencer */
+/** @var array $em_atraso */
+/** @var array $pagas */
+/** @var string $aba */
+/** @var string $hoje */
 
 $tituloPagina = "Faturas";
-
-include '../shared/navbar.php';
-
-$aba = $_GET['aba'] ?? 'vencer';
-
 ?>
+
+<?php include __DIR__ . '/../shared/navbar.php'; ?>
 
 <main>
 
     <h1>Faturas</h1>
 
-    <p>Pague suas mensalidades direto pelo app.</p>
+    <p>Acompanhe o histórico de pagamentos da sua mensalidade.</p>
 
     <nav>
-
-        <a href="?aba=vencer">A vencer (1)</a>
-
-        <a href="?aba=atraso">Em atraso (1)</a>
-
-        <a href="?aba=pagas">Pagas (1)</a>
-
+        <a href="/Gymflow/app/controllers/PortalAlunoController.php?acao=faturas&aba=vencer">A vencer (<?php echo count($a_vencer); ?>)</a>
+        <a href="/Gymflow/app/controllers/PortalAlunoController.php?acao=faturas&aba=atraso">Em atraso (<?php echo count($em_atraso); ?>)</a>
+        <a href="/Gymflow/app/controllers/PortalAlunoController.php?acao=faturas&aba=pagas">Pagas (<?php echo count($pagas); ?>)</a>
     </nav>
 
     <br>
 
-    <?php if ($aba == "vencer"): ?>
+    <?php
+    $lista = match ($aba) {
+        'atraso' => $em_atraso,
+        'pagas'  => $pagas,
+        default  => $a_vencer
+    };
+    ?>
 
-        <section>
+    <?php if (empty($lista)): ?>
 
-            <h2>R$ 269,90</h2>
+        <p>Nenhuma fatura encontrada nesta categoria.</p>
 
-            <p>Vence: 2026-08-05</p>
+    <?php else: ?>
 
-            <button type="button">Boleto</button>
-            <button type="button">Pix</button>
-            <button type="button">Cartão</button>
+        <?php foreach ($lista as $conta): ?>
 
-            <p><strong>Status:</strong> Aberto</p>
+            <section>
 
-        </section>
+                <h2>R$ <?php echo number_format($conta['valor'], 2, ',', '.'); ?></h2>
 
-    <?php elseif ($aba == "atraso"): ?>
+                <p>Vencimento: <?php echo date('d/m/Y', strtotime($conta['vencimento'])); ?></p>
 
-        <section>
+                <?php if ($conta['status'] === 'Pago'): ?>
 
-            <h2>R$ 269,90</h2>
+                    <p>Pago em: <?php echo date('d/m/Y', strtotime($conta['pago_em'])); ?></p>
+                    <p>Forma: <?php echo htmlspecialchars($conta['forma_pagamento'] ?? '—'); ?></p>
+                    <button type="button">Baixar recibo</button>
 
-            <p>Vence: 2026-07-21</p>
+                <?php else: ?>
 
-            <button type="button">Boleto</button>
-            <button type="button">Pix</button>
-            <button type="button">Cartão</button>
+                    <p><strong>Status:</strong>
+                        <?php echo $conta['vencimento'] < $hoje ? 'Em atraso' : 'Aberto'; ?>
+                    </p>
 
-            <p><strong>Status:</strong> Atrasado</p>
+                <?php endif; ?>
 
-        </section>
+            </section>
 
-    <?php elseif ($aba == "pagas"): ?>
-
-        <section>
-
-            <h2>R$ 269,90</h2>
-
-            <p>Vence: 2026-07-01</p>
-
-            <p>Pago em: 2026-07-01</p>
-
-            <button type="button">Baixar recibo</button>
-
-            <p><strong>Status:</strong> Pago</p>
-
-        </section>
+        <?php endforeach; ?>
 
     <?php endif; ?>
 
 </main>
 
-<?php include '../shared/footer.php'; ?>
+<?php include __DIR__ . '/../shared/footer.php'; ?>

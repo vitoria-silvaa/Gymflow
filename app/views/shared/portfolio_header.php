@@ -27,8 +27,8 @@
     </nav>
 
     <div>
-        <a href="app/views/login/index.php">Entrar</a>
-        <a href="app/views/portfolio/checkout.php">Matricule-se</a>
+        <a href="/Gymflow/app/controllers/LoginController.php?acao=login">Entrar</a>
+        <a href="/Gymflow/app/views/portfolio/checkout.php">Matricule-se</a>
     </div>
 
 </header>

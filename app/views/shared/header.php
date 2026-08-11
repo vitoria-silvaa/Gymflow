@@ -14,7 +14,7 @@
 
     <h2><?= $tituloPagina ?? 'Dashboard'; ?></h2>
 
-    <a href="../portal_aluno/index.php">Portal do Aluno</a>
+    <a href="/Gymflow/app/controllers/PortalAlunoController.php?acao=aluno">Portal do Aluno</a>
 
     <span>Administrador Geral</span>
 </header>

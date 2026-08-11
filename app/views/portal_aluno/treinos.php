@@ -1,147 +1,96 @@
 <?php
+if (!isset($fichas)) {
+    header("Location: /Gymflow/app/controllers/PortalAlunoController.php?acao=treinos");
+    exit;
+}
+/** @var array $fichas */
+/** @var array $itens */
+/** @var array|null $ficha_atual */
+/** @var mixed $ficha_id_selecionada */
 
 $tituloPagina = "Treinos";
-
-include '../shared/navbar.php';
-
-$treinos = [
-    "A" => [
-        "versao" => "v1",
-        "exercicios" => [
-            [
-                "nome" => "Supino Reto",
-                "series" => 4,
-                "reps" => 10,
-                "descanso" => 60,
-                "carga" => "60kg"
-            ],
-            [
-                "nome" => "Crucifixo Inclinado",
-                "series" => 3,
-                "reps" => 12,
-                "descanso" => 45,
-                "carga" => "20kg"
-            ],
-            [
-                "nome" => "Tríceps Pulley",
-                "series" => 3,
-                "reps" => 12,
-                "descanso" => 45,
-                "carga" => "25kg"
-            ]
-        ]
-    ],
-
-    "B" => [
-        "versao" => "v2",
-        "exercicios" => [
-            [
-                "nome" => "Puxada Frontal",
-                "series" => 4,
-                "reps" => 10,
-                "descanso" => 60,
-                "carga" => "55kg"
-            ],
-            [
-                "nome" => "Remada Curvada",
-                "series" => 4,
-                "reps" => 10,
-                "descanso" => 60,
-                "carga" => "45kg"
-            ],
-            [
-                "nome" => "Rosca Direta",
-                "series" => 3,
-                "reps" => 12,
-                "descanso" => 45,
-                "carga" => "14kg"
-            ]
-        ]
-    ],
-
-    "C" => [
-        "versao" => "v3",
-        "exercicios" => [
-            [
-                "nome" => "Agachamento Livre",
-                "series" => 4,
-                "reps" => 8,
-                "descanso" => 90,
-                "carga" => "80kg"
-            ],
-            [
-                "nome" => "Leg Press 45°",
-                "series" => 4,
-                "reps" => 12,
-                "descanso" => 60,
-                "carga" => "120kg"
-            ],
-            [
-                "nome" => "Desenvolvimento Militar",
-                "series" => 3,
-                "reps" => 10,
-                "descanso" => 60,
-                "carga" => "30kg"
-            ]
-        ]
-    ]
-];
-
-$treinoAtual = $_GET['treino'] ?? 'A';
-
 ?>
+
+<?php include __DIR__ . '/../shared/navbar.php'; ?>
 
 <main>
 
     <h1>Treinos</h1>
 
-    <p>Escolha o treino do dia e marque cada exercício.</p>
+    <p>Escolha a ficha do dia e execute cada exercício.</p>
 
-    <nav>
-        <a href="?treino=A">Treino A</a>
-        <a href="?treino=B">Treino B</a>
-        <a href="?treino=C">Treino C</a>
-    </nav>
-
-    <br>
-
-    <span>Hipertrofia</span>
-    <span><?php echo $treinos[$treinoAtual]['versao']; ?></span>
-
-    <hr>
-
-    <?php foreach ($treinos[$treinoAtual]['exercicios'] as $exercicio): ?>
+    <?php if (empty($fichas)): ?>
 
         <section>
+            <p>Você ainda não possui nenhuma ficha de treino cadastrada.</p>
+            <p>Solicite ao seu professor para criar uma ficha personalizada para você.</p>
+        </section>
 
-            <input type="checkbox">
+    <?php else: ?>
 
-            <h2>
-                <?php echo $exercicio['nome']; ?>
-            </h2>
+        <!-- Seleção de Ficha -->
+        <nav>
+            <?php foreach ($fichas as $ficha): ?>
+                <a href="/Gymflow/app/controllers/PortalAlunoController.php?acao=treinos&ficha=<?php echo $ficha['id']; ?>">
+                    <?php echo htmlspecialchars($ficha['objetivo']); ?>
+                    (v<?php echo $ficha['versao']; ?>)
+                </a>
+            <?php endforeach; ?>
+        </nav>
 
-            <p>
-                <?php echo $exercicio['series']; ?> séries ×
-                <?php echo $exercicio['reps']; ?> reps •
-                descanso <?php echo $exercicio['descanso']; ?>s
-            </p>
+        <br>
 
-            <label>Carga</label>
-            <br>
+        <?php if ($ficha_atual): ?>
 
-            <input
-                type="text"
-                value="<?php echo $exercicio['carga']; ?>"
-            >
-
-            <button type="button">Iniciar pausa</button>
+            <span><?php echo htmlspecialchars($ficha_atual['objetivo']); ?></span>
+            <span>Versão <?php echo $ficha_atual['versao']; ?></span>
+            <span>Prof. <?php echo htmlspecialchars($ficha_atual['nome_professor']); ?></span>
+            <span>Criada em: <?php echo date('d/m/Y', strtotime($ficha_atual['criada_em'])); ?></span>
 
             <hr>
 
-        </section>
+            <?php if (empty($itens)): ?>
+                <p>Esta ficha ainda não possui exercícios cadastrados.</p>
+            <?php else: ?>
+                <?php foreach ($itens as $item): ?>
 
-    <?php endforeach; ?>
+                    <section>
+
+                        <input type="checkbox">
+
+                        <h2><?php echo htmlspecialchars($item['nome_exercicio']); ?></h2>
+
+                        <p><?php echo htmlspecialchars($item['grupo']); ?></p>
+
+                        <p>
+                            <?php echo $item['series']; ?> séries ×
+                            <?php echo htmlspecialchars($item['repeticoes']); ?> reps
+                            <?php if ($item['intervalo']): ?>
+                                • descanso <?php echo htmlspecialchars($item['intervalo']); ?>
+                            <?php endif; ?>
+                        </p>
+
+                        <label>Carga</label>
+                        <br>
+
+                        <input
+                            type="text"
+                            value="<?php echo htmlspecialchars($item['carga'] ?? '—'); ?>"
+                        >
+
+                        <button type="button">Iniciar pausa</button>
+
+                        <hr>
+
+                    </section>
+
+                <?php endforeach; ?>
+            <?php endif; ?>
+
+        <?php endif; ?>
+
+    <?php endif; ?>
 
 </main>
 
-<?php include '../shared/footer.php'; ?>
+<?php include __DIR__ . '/../shared/footer.php'; ?>
