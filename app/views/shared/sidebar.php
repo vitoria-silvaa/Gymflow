@@ -8,7 +8,6 @@
         <li><a href="/Gymflow/app/controllers/FinanceiroController.php">Financeiro</a></li>
         <li><a href="/Gymflow/app/controllers/CrmController.php">CRM Leads</a></li>
         <li><a href="/Gymflow/app/controllers/TreinoController.php">Treinos</a></li>
-        <li><a href="/Gymflow/app/controllers/PortalAlunoController.php?acao=aluno">Portal Aluno</a></li>
         <li><a href="/Gymflow/app/controllers/PortfolioController.php">Portfólio</a></li>
         <li><a href="/Gymflow/app/controllers/LoginController.php?acao=logout">Sair</a></li>
     </ul>

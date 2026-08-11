@@ -8,11 +8,7 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/../../config/sessao.php';
 
 // Apenas funcionários autorizados acessam o painel administrativo
-verificarLogado();
-if ($_SESSION['usuario_role'] === 'Aluno') {
-    header("Location: /Gymflow/app/controllers/PortalAlunoController.php?acao=aluno");
-    exit;
-}
+verificarRole(['Admin', 'Professor', 'Recepcao']);
 
 $tituloPagina = "Dashboard";
 require __DIR__ . '/../views/dashboard/index.php';

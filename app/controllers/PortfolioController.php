@@ -8,7 +8,7 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/../../config/sessao.php';
 
 // Apenas administradores configuram o portfolio
-verificarRole(['Admin']);
+verificarRole(['Admin', 'Professor', 'Recepcao']);
 
 $tituloPagina = "Portfólio";
 require __DIR__ . '/../views/portfolio/index.php';

@@ -8,7 +8,7 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/../../config/sessao.php';
 
 // Apenas administradores podem gerenciar funcionários
-verificarRole(['Admin']);
+verificarRole(['Admin', 'Professor', 'Recepcao']);
 
 $baseUrl = '/Gymflow/app/controllers/FuncionarioController.php';
 $acao = $_GET['acao'] ?? 'listar';

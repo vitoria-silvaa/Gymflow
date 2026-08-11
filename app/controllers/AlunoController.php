@@ -5,7 +5,7 @@ ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 require_once __DIR__ . '/../../config/sessao.php';
 
-verificarLogado();
+verificarRole(['Admin', 'Professor', 'Recepcao']);
 
 $baseUrl = '/Gymflow/app/controllers/AlunoController.php';
 $acao = $_GET['acao'] ?? 'listar';

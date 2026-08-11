@@ -8,7 +8,7 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/../../config/sessao.php';
 
 // Apenas funcionários autorizados podem gerenciar filiais
-verificarRole(['Admin', 'Recepcao']);
+verificarRole(['Admin', 'Professor', 'Recepcao']);
 
 $baseUrl = '/Gymflow/app/controllers/FilialController.php';
 $acao = $_GET['acao'] ?? 'listar';

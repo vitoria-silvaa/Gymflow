@@ -7,7 +7,7 @@ error_reporting(E_ALL);
 
 require_once __DIR__ . '/../../config/sessao.php';
 
-verificarRole(['Admin', 'Professor']);
+verificarRole(['Admin', 'Professor', 'Recepcao']);
 
 $tituloPagina = "Treinos";
 require __DIR__ . '/../views/treinos/index.php';
