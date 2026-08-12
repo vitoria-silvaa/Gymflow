@@ -8,6 +8,9 @@
         <li><a href="/Gymflow/app/controllers/FinanceiroController.php">Financeiro</a></li>
         <li><a href="/Gymflow/app/controllers/CrmController.php">CRM Leads</a></li>
         <li><a href="/Gymflow/app/controllers/LoginController.php?acao=logout">Fluxo de caixa</a></li>
+        <li><a href="/Gymflow/app/controllers/LoginController.php?acao=logout">Minha marca</a></li>
+
+        <li><a href="/Gymflow/app/controllers/LoginController.php?acao=logout">Ficha de treino</a></li>
         <li><a href="/Gymflow/app/controllers/LoginController.php?acao=logout">Sair</a></li>
     </ul>
 </nav>
