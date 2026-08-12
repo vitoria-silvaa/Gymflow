@@ -7,8 +7,7 @@
         <li><a href="/Gymflow/app/controllers/PlanoController.php?acao=listar">Planos</a></li>
         <li><a href="/Gymflow/app/controllers/FinanceiroController.php">Financeiro</a></li>
         <li><a href="/Gymflow/app/controllers/CrmController.php">CRM Leads</a></li>
-        <li><a href="/Gymflow/app/controllers/TreinoController.php">Treinos</a></li>
-        <li><a href="/Gymflow/app/controllers/PortfolioController.php">Portfólio</a></li>
+        <li><a href="/Gymflow/app/controllers/LoginController.php?acao=logout">Fluxo de caixa</a></li>
         <li><a href="/Gymflow/app/controllers/LoginController.php?acao=logout">Sair</a></li>
     </ul>
 </nav>
