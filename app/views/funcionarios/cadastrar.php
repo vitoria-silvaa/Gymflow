@@ -22,7 +22,7 @@ include __DIR__ . '/../shared/sidebar.php';
 <?php endif; ?>
 
 <form action="/Gymflow/app/controllers/FuncionarioController.php?acao=cadastrar" method="POST">
-    
+
     <!-- Dados do Colaborador -->
     <h3>Dados do Colaborador</h3>
 

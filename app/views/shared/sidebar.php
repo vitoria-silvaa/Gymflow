@@ -10,6 +10,7 @@
         <li><a href="/Gymflow/app/controllers/LoginController.php?acao=logout">Fluxo de caixa</a></li>
         <li><a href="/Gymflow/app/controllers/LoginController.php?acao=logout">Minha marca</a></li>
 
+        <li><a href="/Gymflow/app/controllers/LoginController.php?acao=logout">Biblioteca de exerciciods</a></li>
         <li><a href="/Gymflow/app/controllers/LoginController.php?acao=logout">Ficha de treino</a></li>
         <li><a href="/Gymflow/app/controllers/LoginController.php?acao=logout">Sair</a></li>
     </ul>
