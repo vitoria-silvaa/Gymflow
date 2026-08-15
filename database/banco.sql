@@ -73,6 +73,7 @@ CREATE TABLE alunos (
     telefone VARCHAR(15) NOT NULL,
     endereco TEXT,
     status VARCHAR(20) NOT NULL DEFAULT 'Ativo', 
+    criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (filial_id) REFERENCES filiais(id) ON DELETE RESTRICT
 );
 

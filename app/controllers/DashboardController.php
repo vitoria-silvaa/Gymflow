@@ -40,5 +40,8 @@ $cards = [
     ]
 ];
 
+// Dados dos novos alunos cadastrados por mês no ano atual
+$dadosGraficoNovosAlunos = $novosAlunosPorMes ?? [];
+
 $tituloPagina = "Dashboard";
 require __DIR__ . '/../views/dashboard/index.php';

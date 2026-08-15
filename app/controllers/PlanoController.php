@@ -26,7 +26,7 @@ if ($acao === 'listar') {
 elseif ($acao === 'cadastrar') {
     $erro = '';
 
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         $dados = [];
         $dados['nome'] = trim($_POST['nome'] ?? '');
         $dados['categoria'] = trim($_POST['categoria'] ?? '');
@@ -75,7 +75,7 @@ elseif ($acao === 'editar') {
 
     $erro = '';
 
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         $dados = [];
         $dados['nome'] = trim($_POST['nome'] ?? '');
         $dados['categoria'] = trim($_POST['categoria'] ?? '');

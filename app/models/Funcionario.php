@@ -3,131 +3,137 @@
 
 require_once __DIR__ . '/Database.php';
 
-/** @var PDO $pdo */
-/** @var string $operacao */
-/** @var string $email */
-/** @var string $nome */
-/** @var string $role */
-/** @var string $senha */
-/** @var int $id */
-/** @var int $id_filial */
-/** @var string $nome_busca */
-/** @var string $role_busca */
-
 $operacao = $operacao ?? '';
+$erroModel = '';
+$dados = $dados ?? [];
+$senha = $senha ?? '';
 
-/* BUSCAR USUÁRIO POR EMAIL (Login / Validação) */
+/* 1. BUSCAR USUÁRIO POR E-MAIL (Login e Validações) */
 if ($operacao === 'buscar_por_email') {
+    $email = trim($dados['email'] ?? $email ?? '');
     $stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email LIMIT 1");
     $stmt->execute([':email' => $email]);
-    $usuario = $stmt->fetch();
+    $usuario = $stmt->fetch() ?: null;
 }
 
-/* VERIFICAR EMAIL JÁ EXISTENTE */
-elseif ($operacao === 'verificar_email') {
-    $sql = "SELECT id FROM users WHERE email = :email";
-    $parametros = [':email' => $email];
-    if (!empty($id)) {
-        $sql .= " AND id != :id";
-        $parametros[':id'] = $id;
-    }
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($parametros);
-    $emailExiste = (bool)$stmt->fetch();
-}
-
-/* LISTAR FUNCIONÁRIOS */
+/* 2. LISTAR FUNCIONÁRIOS */
 elseif ($operacao === 'listar') {
+    $nome_busca = trim($nome_busca ?? '');
+    $role_busca = trim($role_busca ?? '');
+
     $sql = "SELECT id, name, email, role FROM users WHERE role != 'Aluno'";
     $parametros = [];
 
-    if (!empty($nome_busca)) {
+    if ($nome_busca !== '') {
         $sql .= " AND name LIKE :nome";
         $parametros[':nome'] = "%$nome_busca%";
     }
-
-    if (!empty($role_busca)) {
+    if ($role_busca !== '') {
         $sql .= " AND role = :role";
         $parametros[':role'] = $role_busca;
     }
 
     $sql .= " ORDER BY id DESC";
-
     $stmt = $pdo->prepare($sql);
     $stmt->execute($parametros);
     $funcionarios = $stmt->fetchAll();
 }
 
-/* CADASTRAR FUNCIONÁRIO */
+/* 3. BUSCAR FUNCIONÁRIO COM SUA FILIAL */
+elseif ($operacao === 'buscar') {
+    $id = (int) ($id ?? 0);
+    $stmt = $pdo->prepare("
+        SELECT u.*, f.id AS filial_id, f.nome AS filial_nome, f.cnpj AS filial_cnpj 
+        FROM users u 
+        LEFT JOIN user_filiais uf ON uf.user_id = u.id 
+        LEFT JOIN filiais f ON f.id = uf.filial_id 
+        WHERE u.id = :id AND u.role != 'Aluno'
+    ");
+    $stmt->execute([':id' => $id]);
+    $funcionario = $stmt->fetch() ?: null;
+
+    if ($funcionario) {
+        $filial_vinculada = !empty($funcionario['filial_id']) ? [
+            'id'   => $funcionario['filial_id'],
+            'nome' => $funcionario['filial_nome'],
+            'cnpj' => $funcionario['filial_cnpj'] ?? ''
+        ] : null;
+    } else {
+        $filial_vinculada = null;
+    }
+}
+
+/* 4. CADASTRAR FUNCIONÁRIO */
 elseif ($operacao === 'cadastrar') {
-    $erroModel = '';
+    $email = trim($dados['email'] ?? $email ?? '');
+    $senha = $dados['senha'] ?? $senha ?? '';
+
     try {
+        if ($senha === '') {
+            throw new Exception('A senha é obrigatória.');
+        }
+
+        // Valida e-mail duplicado
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE email = :email");
+        $stmt->execute([':email' => $email]);
+        if ($stmt->fetch()) {
+            throw new Exception('Este e-mail já está cadastrado.');
+        }
+
         $pdo->beginTransaction();
 
-        $senha_hash = password_hash($senha, PASSWORD_BCRYPT);
-        $sql_user = "INSERT INTO users (name, email, password, role) VALUES (:name, :email, :password, :role)";
-        $stmt_user = $pdo->prepare($sql_user);
-        $stmt_user->execute([
-            ':name'     => $nome,
+        $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
+        $stmt = $pdo->prepare("INSERT INTO users (name, email, password, role) VALUES (:name, :email, :password, :role)");
+        $stmt->execute([
+            ':name'     => trim($dados['nome'] ?? $nome ?? ''),
             ':email'    => $email,
-            ':password' => $senha_hash,
-            ':role'     => $role
+            ':password' => $senhaHash,
+            ':role'     => $dados['role'] ?? $role ?? 'Recepcao'
         ]);
 
-        $novoUserId = $pdo->lastInsertId();
+        $novoUserId = (int) $pdo->lastInsertId();
+        $idFilial = (int) ($dados['id_filial'] ?? $id_filial ?? 0);
 
-        $sql_filial = "INSERT INTO user_filiais (user_id, filial_id) VALUES (:user_id, :filial_id)";
-        $stmt_filial = $pdo->prepare($sql_filial);
-        $stmt_filial->execute([
-            ':user_id'   => $novoUserId,
-            ':filial_id' => $id_filial
-        ]);
+        if ($idFilial > 0) {
+            $stmt = $pdo->prepare("INSERT INTO user_filiais (user_id, filial_id) VALUES (:user_id, :filial_id)");
+            $stmt->execute([':user_id' => $novoUserId, ':filial_id' => $idFilial]);
+        }
 
         $pdo->commit();
     } catch (Throwable $e) {
         if ($pdo->inTransaction()) {
             $pdo->rollBack();
         }
-        $erroModel = 'Erro ao cadastrar funcionário: ' . $e->getMessage();
+        $erroModel = $e->getMessage();
     }
 }
 
-/* BUSCAR DETALHES DE UM FUNCIONÁRIO */
-elseif ($operacao === 'buscar') {
-    // Busca os dados do usuário
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE id = :id AND role != 'Aluno'");
-    $stmt->execute([':id' => $id]);
-    $funcionario = $stmt->fetch();
-
-    if ($funcionario) {
-        // Busca a filial vinculada
-        $stmt_filial = $pdo->prepare("
-            SELECT f.* 
-            FROM filiais f
-            JOIN user_filiais uf ON f.id = uf.filial_id
-            WHERE uf.user_id = :user_id
-            LIMIT 1
-        ");
-        $stmt_filial->execute([':user_id' => $id]);
-        $filial_vinculada = $stmt_filial->fetch();
-    } else {
-        $filial_vinculada = null;
-    }
-}
-
-/* ATUALIZAR FUNCIONÁRIO */
+/* 5. ATUALIZAR FUNCIONÁRIO */
 elseif ($operacao === 'atualizar') {
-    $erroModel = '';
+    $id = (int) ($id ?? 0);
+    $email = trim($dados['email'] ?? $email ?? '');
+    $novaSenha = $dados['senha'] ?? $senha ?? '';
+
     try {
+        // Valida e-mail duplicado ignorando o próprio funcionário
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE email = :email AND id != :id");
+        $stmt->execute([':email' => $email, ':id' => $id]);
+        if ($stmt->fetch()) {
+            throw new Exception('Este e-mail pertence a outro usuário.');
+        }
+
         $pdo->beginTransaction();
 
-        if (!empty($senha)) {
-            $senha_hash = password_hash($senha, PASSWORD_BCRYPT);
+        $nome = trim($dados['nome'] ?? $nome ?? '');
+        $role = $dados['role'] ?? $role ?? 'Recepcao';
+
+        if (!empty($novaSenha)) {
+            $senhaHash = password_hash($novaSenha, PASSWORD_DEFAULT);
             $stmt = $pdo->prepare("UPDATE users SET name = :name, email = :email, password = :password, role = :role WHERE id = :id");
             $stmt->execute([
                 ':name'     => $nome,
                 ':email'    => $email,
-                ':password' => $senha_hash,
+                ':password' => $senhaHash,
                 ':role'     => $role,
                 ':id'       => $id
             ]);
@@ -141,21 +147,20 @@ elseif ($operacao === 'atualizar') {
             ]);
         }
 
-        // Atualiza a filial vinculada
-        $stmt_del = $pdo->prepare("DELETE FROM user_filiais WHERE user_id = :user_id");
-        $stmt_del->execute([':user_id' => $id]);
+        $idFilial = (int) ($dados['id_filial'] ?? $id_filial ?? 0);
+        $stmt = $pdo->prepare("DELETE FROM user_filiais WHERE user_id = :user_id");
+        $stmt->execute([':user_id' => $id]);
 
-        $stmt_ins = $pdo->prepare("INSERT INTO user_filiais (user_id, filial_id) VALUES (:user_id, :filial_id)");
-        $stmt_ins->execute([
-            ':user_id'   => $id,
-            ':filial_id' => $id_filial
-        ]);
+        if ($idFilial > 0) {
+            $stmt = $pdo->prepare("INSERT INTO user_filiais (user_id, filial_id) VALUES (:user_id, :filial_id)");
+            $stmt->execute([':user_id' => $id, ':filial_id' => $idFilial]);
+        }
 
         $pdo->commit();
     } catch (Throwable $e) {
         if ($pdo->inTransaction()) {
             $pdo->rollBack();
         }
-        $erroModel = 'Erro ao atualizar funcionário: ' . $e->getMessage();
+        $erroModel = $e->getMessage();
     }
 }

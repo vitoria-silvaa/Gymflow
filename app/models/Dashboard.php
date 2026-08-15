@@ -32,4 +32,14 @@ if ($operacao === 'metricas_executivas') {
     $totalContasVencidas = (int) $pdo->query("
         SELECT COUNT(*) FROM contas WHERE vencimento < CURDATE()
     ")->fetchColumn();
+
+    // 5. Novos Alunos agrupados por mês no ano atual
+    $stmtNovosAlunos = $pdo->query("
+        SELECT MONTH(criado_em) AS mes, COUNT(*) AS total
+        FROM alunos
+        WHERE YEAR(criado_em) = YEAR(CURDATE())
+        GROUP BY MONTH(criado_em)
+        ORDER BY MONTH(criado_em)
+    ");
+    $novosAlunosPorMes = $stmtNovosAlunos->fetchAll(PDO::FETCH_ASSOC);
 }

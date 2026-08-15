@@ -8,6 +8,7 @@ if (!isset($filiais)) {
 
 $tituloPagina = "Filiais";
 include __DIR__ . '/../shared/header.php';
+include __DIR__ . '/../shared/sidebar.php';
 ?>
 
 <div>
@@ -59,7 +60,5 @@ include __DIR__ . '/../shared/header.php';
         
     <?php endif; ?>
 </div>
-
-<?php include __DIR__ . '/../shared/sidebar.php'; ?>
 
 <?php include __DIR__ . '/../shared/footer.php'; ?>

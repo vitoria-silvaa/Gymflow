@@ -4,6 +4,7 @@ if (!isset($tituloPagina)) {
     exit;
 }
 /** @var array $cards */
+/** @var array $dadosGraficoNovosAlunos */
 
 $tituloPagina = "Dashboard";
 include __DIR__ . '/../shared/header.php';
@@ -28,4 +29,48 @@ include __DIR__ . '/../shared/sidebar.php';
     </div>
 </section>
 
+<section>
+    <h2>Novos Alunos</h2>
+    <div style="max-width: 800px; margin-top: 15px;">
+        <canvas id="graficoAlunos"></canvas>
+    </div>
+</section>
+
+<!-- Inclusão do Chart.js via CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const dadosAlunos = <?= json_encode($dadosGraficoNovosAlunos ?? []) ?>;
+
+    const meses = [
+        'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
+        'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
+    ];
+
+    const valores = Array(12).fill(0);
+
+    dadosAlunos.forEach(item => {
+        valores[item.mes - 1] = Number(item.total);
+    });
+
+    new Chart(document.getElementById('graficoAlunos'), {
+        type: 'line',
+
+        data: {
+            labels: meses,
+            datasets: [{
+                label: 'Novos Alunos',
+                data: valores
+            }]
+        },
+
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
 <?php include __DIR__ . '/../shared/footer.php'; ?>

@@ -22,8 +22,12 @@ include __DIR__ . '/../shared/sidebar.php';
     <p><strong>Nome Completo:</strong> <?php echo htmlspecialchars($funcionario['name']); ?></p>
     <p><strong>E-mail:</strong> <?php echo htmlspecialchars($funcionario['email']); ?></p>
     <p><strong>Perfil de Acesso (Cargo):</strong> <?php echo htmlspecialchars($funcionario['role']); ?></p>
-    <p><strong>Unidade Vinculada:</strong> 
-        <?php echo $filial_vinculada ? htmlspecialchars($filial_vinculada['nome']) . ' (CNPJ: ' . htmlspecialchars($filial_vinculada['cnpj']) . ')' : 'Nenhuma'; ?>
+        <?php if ($filial_vinculada): ?>
+            <?= htmlspecialchars($filial_vinculada['nome']) ?>
+            <?= !empty($filial_vinculada['cnpj']) ? '(CNPJ: ' . htmlspecialchars($filial_vinculada['cnpj']) . ')' : '' ?>
+        <?php else: ?>
+            Nenhuma
+        <?php endif; ?>
     </p>
 </section>
 
