@@ -23,8 +23,7 @@ if ($operacao === 'listar_fichas_aluno') {
     $fichas = $stmt_fichas->fetchAll();
 }
 
-/* BUSCAR ITENS DA FICHA */
-elseif ($operacao === 'buscar_itens_ficha') {
+/* BUSCAR ITENS DA FICHA */ elseif ($operacao === 'buscar_itens_ficha') {
     $stmt_itens = $pdo->prepare(
         "SELECT fi.ordem, fi.series, fi.repeticoes, fi.carga, fi.intervalo,
                 e.nome AS nome_exercicio, e.grupo
