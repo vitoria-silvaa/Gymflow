@@ -9,6 +9,9 @@ if (!isset($filiais)) {
 $tituloPagina = "Filiais";
 include __DIR__ . '/../shared/header.php';
 include __DIR__ . '/../shared/sidebar.php';
+
+$tituloPagina = "Fichas de treino";
+
 ?>
 
 <div>
@@ -32,9 +35,9 @@ include __DIR__ . '/../shared/sidebar.php';
     <?php if (empty($filiais)): ?>
         <p>Nenhuma filial encontrada no banco de dados.</p>
     <?php else: ?>
-        
+
         <?php foreach ($filiais as $filial): ?>
-            
+
             <div class="card-filial">
                 <div class="card-header">
                     <h2><?= htmlspecialchars($filial['nome']) ?></h2>
@@ -57,7 +60,7 @@ include __DIR__ . '/../shared/sidebar.php';
             </div>
 
         <?php endforeach; ?>
-        
+
     <?php endif; ?>
 </div>
 
