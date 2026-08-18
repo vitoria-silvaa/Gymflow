@@ -12,7 +12,7 @@
 <header>
 
     <div>
-        <h1>GymCore</h1>
+        <h1><?= htmlspecialchars($tituloPagina ?? "GymCore") ?></h1>
     </div>
 
     <nav>

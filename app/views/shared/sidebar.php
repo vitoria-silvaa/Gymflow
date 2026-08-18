@@ -12,6 +12,7 @@
 
         <li><a href="/Gymflow/app/controllers/LoginController.php?acao=logout">Biblioteca de exerciciods</a></li>
         <li><a href="/Gymflow/app/controllers/LoginController.php?acao=logout">Ficha de treino</a></li>
+        <li><a href="/Gymflow/app/controllers/PortfolioController.php">Site / Portfólio</a></li>
         <li><a href="/Gymflow/app/controllers/LoginController.php?acao=logout">Sair</a></li>
     </ul>
 </nav>
