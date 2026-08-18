@@ -113,6 +113,8 @@ elseif ($operacao === 'baixar_pagamento') {
 
 elseif ($operacao === 'listar_faturas_aluno') {
 
+    $aluno_id = (int) ($aluno_id ?? $alunoId ?? $_SESSION['aluno_id'] ?? 0);
+
     $stmt = $pdo->prepare("
         SELECT
             id,
