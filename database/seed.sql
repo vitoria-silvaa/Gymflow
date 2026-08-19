@@ -46,11 +46,11 @@ INSERT INTO alunos (id, filial_id, nome, cpf, rg, sexo, nascimento, email, telef
 -- 4. USERS
 -- Senha padrão para todos: 'admin'  |  Hash bcrypt válido gerado com password_hash('admin', PASSWORD_BCRYPT)
 INSERT INTO users (id, name, email, password, role, aluno_id) VALUES
-(1, 'Administrador Principal', 'admin@gymflow.com',         '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Admin',     NULL),
-(2, 'Professor Marcelo',       'marcelo.treino@gymflow.com','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Professor', NULL),
-(3, 'Professora Juliana',      'juliana.fit@gymflow.com',   '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Professor', NULL),
-(4, 'Ana Oliveira',            'ana.oliveira@email.com',    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Aluno',     1),
-(5, 'Bruno Souza',             'bruno.souza@email.com',     '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Aluno',     2);
+(1, 'Administrador Principal', 'admin@gymflow.com',         '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Admin',     NULL),
+(2, 'Professor Marcelo',       'marcelo.treino@gymflow.com','$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Professor', NULL),
+(3, 'Professora Juliana',      'juliana.fit@gymflow.com',   '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Professor', NULL),
+(4, 'Ana Oliveira',            'ana.oliveira@email.com',    '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Aluno',     1),
+(5, 'Bruno Souza',             'bruno.souza@email.com',     '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Aluno',     2);
 
 -- 5. USER_FILIAIS
 INSERT INTO user_filiais (user_id, filial_id) VALUES
