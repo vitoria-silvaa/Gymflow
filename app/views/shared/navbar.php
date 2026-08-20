@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal do Aluno | GymCore</title>
+    <link rel="stylesheet" href="/Gymflow/assets/css/css/global.css">
 </head>
 
 <body>

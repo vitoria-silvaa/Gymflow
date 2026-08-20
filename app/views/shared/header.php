@@ -45,6 +45,7 @@
         <?= htmlspecialchars($tituloPagina ?? 'Dashboard'); ?>
     </title>
 
+    <link rel="stylesheet" href="/Gymflow/assets/css/css/global.css">
 
     <!-- CSS TEMPORÁRIO PARA TESTAR O MINHA MARCA -->
 
