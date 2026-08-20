@@ -7,8 +7,10 @@
         <li><a href="/Gymflow/app/controllers/PlanoController.php?acao=listar">Planos</a></li>
         <li><a href="/Gymflow/app/controllers/FinanceiroController.php">Financeiro</a></li>
         <li><a href="/Gymflow/app/controllers/CrmController.php">CRM Leads</a></li>
+
         <li><a href="/Gymflow/app/controllers/FluxoCaixaController.php">Fluxo de caixa</a></li>
-        <li><a href="/Gymflow/app/controllers/LoginController.php?acao=logout">Minha marca</a></li>
+
+        <li><a href="/Gymflow/app/controllers/MinhaMarcaController.php">Minha marca</a></li>
 
         <li><a href="/Gymflow/app/controllers/LoginController.php?acao=logout">Biblioteca de exerciciods</a></li>
         <li><a href="/Gymflow/app/controllers/LoginController.php?acao=logout">Ficha de treino</a></li>
