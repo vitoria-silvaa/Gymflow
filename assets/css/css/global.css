@@ -1,224 +1,122 @@
-/* ==========================================================================
-   GYMFLOW - CSS GLOBAL & FUNDAÇÃO VISUAL
-   Identidade visual compartilhada, variáveis de design system e estilos-base.
-   ========================================================================== */
+/* ========================================
+   GYMFLOW - ESTILOS GERAIS
+   ======================================== */
 
-/* ==========================================================================
-   1. VARIÁVEIS GLOBAIS (:root)
-   Compatível com o módulo Minha Marca e temas customizáveis.
-   ========================================================================== */
 :root {
-    /* Cores Primárias (Identidade Visual Gymflow / SaaS) */
     --cor-primaria: #10b981;
     --cor-primaria-hover: #059669;
-    --cor-primaria-clara: #ecfdf5;
-    --cor-primaria-escura: #047857;
 
-    /* Superfícies e Fundos */
     --cor-fundo: #f4f8fa;
-    --cor-superficie: #ffffff;
-    --cor-superficie-alt: #f8fafc;
+    --cor-branca: #ffffff;
 
-    /* Tipografia e Cores de Texto */
     --cor-texto: #111827;
     --cor-texto-secundario: #64748b;
-    --cor-texto-mutado: #94a3b8;
 
-    /* Bordas e Divisores */
     --cor-borda: #e2e8f0;
-    --cor-borda-foco: #cbd5e1;
 
-    /* Cores Semânticas / Feedback */
     --cor-sucesso: #10b981;
     --cor-aviso: #f59e0b;
     --cor-perigo: #ef4444;
-    --cor-info: #3b82f6;
-
-    /* Raios de Arredondamento (Border Radius) */
-    --radius-sm: 6px;
-    --radius-md: 10px;
-    --radius-lg: 14px;
-    --radius-full: 9999px;
-
-    /* Sombras Discretas */
-    --sombra-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --sombra-suave: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.08);
-    --sombra-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-
-    /* Transições */
-    --transicao-padrao: 0.2s ease;
-
-    /* Fonte Padrão do Sistema */
-    --fonte-padrao: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
-/* ==========================================================================
-   2. RESET E BASE
-   Normalização leve e consistente sem interferir em bibliotecas externas.
-   ========================================================================== */
-*,
-*::before,
-*::after {
+
+/* CONFIGURAÇÃO GERAL */
+
+* {
     box-sizing: border-box;
-}
-
-html {
-    scroll-behavior: smooth;
-    -webkit-text-size-adjust: 100%;
 }
 
 body {
     margin: 0;
+
     min-height: 100vh;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+
     background-color: var(--cor-fundo);
     color: var(--cor-texto);
-    font-family: var(--fonte-padrao);
-    font-size: 15px;
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
 }
 
-img,
-svg,
-picture {
-    max-width: 100%;
-    height: auto;
-    display: inline-block;
-    vertical-align: middle;
-}
 
-hr {
-    border: 0;
-    border-top: 1px solid var(--cor-borda);
-    margin: 1.5rem 0;
-}
+/* TÍTULOS */
 
-/* ==========================================================================
-   3. TIPOGRAFIA
-   Hierarquia neutra e legível para títulos, parágrafos e ênfases.
-   ========================================================================== */
 h1,
 h2,
 h3,
-h4,
-h5,
-h6 {
+h4 {
     margin-top: 0;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    line-height: 1.25;
     color: var(--cor-texto);
 }
 
 h1 {
-    font-size: 1.75rem;
+    font-size: 28px;
 }
 
 h2 {
-    font-size: 1.35rem;
+    font-size: 22px;
 }
 
 h3 {
-    font-size: 1.15rem;
+    font-size: 18px;
 }
 
 h4 {
-    font-size: 1rem;
+    font-size: 16px;
 }
 
+
+/* TEXTOS */
+
 p {
-    margin-top: 0;
-    margin-bottom: 1rem;
-    color: inherit;
+    line-height: 1.5;
 }
 
 small {
-    font-size: 0.85em;
     color: var(--cor-texto-secundario);
 }
 
-strong,
-b {
-    font-weight: 600;
-}
 
-/* ==========================================================================
-   4. LINKS
-   Comportamento neutro e estados acessíveis.
-   ========================================================================== */
+/* LINKS */
+
 a {
     color: var(--cor-primaria);
     text-decoration: none;
-    transition: color var(--transicao-padrao), opacity var(--transicao-padrao);
 }
 
 a:hover {
     color: var(--cor-primaria-hover);
-    text-decoration: underline;
 }
 
-a:focus-visible {
-    outline: 2px solid var(--cor-primaria);
-    outline-offset: 2px;
-    border-radius: var(--radius-sm);
-}
 
-/* ==========================================================================
-   5. FORMULÁRIOS
-   Base consistente para inputs, selects, textareas e labels.
-   ========================================================================== */
+/* FORMULÁRIOS */
+
 label {
-    display: inline-block;
-    margin-bottom: 0.35rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--cor-texto);
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="number"],
-input[type="date"],
-input[type="tel"],
-input[type="url"],
-input[type="search"],
+input,
 select,
 textarea {
-    display: block;
     width: 100%;
-    padding: 0.6rem 0.85rem;
-    font-family: inherit;
-    font-size: 0.925rem;
-    line-height: 1.4;
-    color: var(--cor-texto);
-    background-color: var(--cor-superficie);
-    border: 1px solid var(--cor-borda);
-    border-radius: var(--radius-sm);
-    transition: border-color var(--transicao-padrao), box-shadow var(--transicao-padrao);
-}
 
-select {
-    appearance: none;
-    -webkit-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 0.75rem center;
-    background-size: 1rem;
-    padding-right: 2.25rem;
-    cursor: pointer;
+    padding: 10px;
+
+    font-family: inherit;
+    font-size: 14px;
+
+    color: var(--cor-texto);
+    background-color: var(--cor-branca);
+
+    border: 1px solid var(--cor-borda);
+    border-radius: 6px;
 }
 
 textarea {
-    resize: vertical;
     min-height: 80px;
-}
-
-input::placeholder,
-textarea::placeholder {
-    color: var(--cor-texto-mutado);
-    opacity: 1;
+    resize: vertical;
 }
 
 input:focus,
@@ -226,41 +124,27 @@ select:focus,
 textarea:focus {
     outline: none;
     border-color: var(--cor-primaria);
-    box-shadow: 0 0 0 3px var(--cor-primaria-clara);
 }
 
-input[type="checkbox"],
-input[type="radio"] {
-    accent-color: var(--cor-primaria);
-    cursor: pointer;
-}
 
-/* ==========================================================================
-   6. BOTÕES / COMPONENTES GLOBAIS
-   Botões padronizados e tabelas compartilhadas.
-   ========================================================================== */
+/* BOTÕES */
+
 button,
 input[type="submit"],
 input[type="button"],
-input[type="reset"],
 .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    font-family: inherit;
-    font-size: 0.925rem;
-    font-weight: 500;
-    line-height: 1.4;
-    padding: 0.6rem 1.15rem;
-    border: 1px solid transparent;
-    border-radius: var(--radius-sm);
+    padding: 10px 18px;
+
+    border: none;
+    border-radius: 6px;
+
     background-color: var(--cor-primaria);
-    color: #ffffff;
+    color: white;
+
+    font-family: inherit;
+    font-size: 14px;
+
     cursor: pointer;
-    text-decoration: none;
-    transition: background-color var(--transicao-padrao), border-color var(--transicao-padrao), box-shadow var(--transicao-padrao), transform 0.1s ease;
-    white-space: nowrap;
 }
 
 button:hover,
@@ -268,89 +152,26 @@ input[type="submit"]:hover,
 input[type="button"]:hover,
 .btn:hover {
     background-color: var(--cor-primaria-hover);
-    color: #ffffff;
-    text-decoration: none;
 }
 
-button:active,
-input[type="submit"]:active,
-input[type="button"]:active,
-.btn:active {
-    transform: translateY(1px);
-}
 
-button:focus-visible,
-input[type="submit"]:focus-visible,
-input[type="button"]:focus-visible,
-.btn:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 3px var(--cor-primaria-clara);
-}
+/* TABELAS */
 
-button:disabled,
-input[type="submit"]:disabled,
-.btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-}
-
-/* Tabela Base Compartilhada */
 table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.9rem;
-    color: var(--cor-texto);
-    background-color: var(--cor-superficie);
-    border-radius: var(--radius-sm);
-    overflow: hidden;
+    background-color: white;
 }
 
 th,
 td {
-    padding: 0.75rem 1rem;
+    padding: 10px;
+
     text-align: left;
+
     border-bottom: 1px solid var(--cor-borda);
 }
 
 th {
-    font-weight: 600;
-    color: var(--cor-texto-secundario);
-    background-color: var(--cor-superficie-alt);
-}
-
-/* ==========================================================================
-   7. UTILITÁRIOS GLOBAIS
-   Classes utilitárias genéricas e universais.
-   ========================================================================== */
-.text-muted {
-    color: var(--cor-texto-secundario);
-}
-
-.text-primary {
-    color: var(--cor-primaria);
-}
-
-.bg-surface {
-    background-color: var(--cor-superficie);
-}
-
-.rounded {
-    border-radius: var(--radius-md);
-}
-
-.shadow-sm {
-    box-shadow: var(--sombra-suave);
-}
-
-.d-none {
-    display: none;
-}
-
-.d-flex {
-    display: flex;
-}
-
-.d-grid {
-    display: grid;
+    background-color: #f8fafc;
 }

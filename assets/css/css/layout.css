@@ -1,3 +1,140 @@
-body{
-    
+body {
+    margin-left: 240px;
+}
+/* SIDEBAR */
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    width: 240px;
+    height: 100%;
+
+    padding: 20px;
+
+    background-color: white;
+    border-right: 1px solid #dddddd;
+}
+
+
+/* NOME GYMFLOW */
+
+.sidebar h2 {
+    margin-bottom: 25px;
+}
+
+
+/* LISTA */
+
+.sidebar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+
+/* ESPAÇO ENTRE AS GAVETAS */
+
+.sidebar li {
+    margin-bottom: 4px;
+}
+
+
+/* GAVETAS */
+
+.sidebar nav a {
+    display: block;
+
+    padding: 10px;
+
+    border-radius: 8px;
+
+    color: #111;
+    text-decoration: none;
+}
+
+
+/* QUANDO PASSAR O MOUSE */
+
+.sidebar nav a:hover {
+    background-color: #eeeeee;
+}
+
+
+/* BOTÃO SAIR */
+
+.sidebar .sair {
+    display: block;
+
+    margin-top: 25px;
+    padding: 10px;
+
+    border-top: 1px solid #dddddd;
+
+    color: red;
+    text-decoration: none;
+}
+
+/* HEADER */
+
+.header {
+    height: 70px;
+    padding: 0 25px;
+
+    background-color: white;
+    border-bottom: 1px solid #dddddd;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+/* LADO ESQUERDO */
+
+.header-esquerda {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.header-esquerda h1 {
+    margin: 0;
+    font-size: 17px;
+}
+
+.header-esquerda span {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+
+/* LADO DIREITO */
+
+.header-direita {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.header-direita span {
+    font-size: 14px;
+}
+
+
+/* PORTAL DO ALUNO */
+
+.header-direita a {
+    padding: 8px 12px;
+
+    border: 1px solid #dddddd;
+    border-radius: 6px;
+
+    color: black;
+    text-decoration: none;
+}
+
+.header-direita a:hover {
+    background-color: #eeeeee;
 }
