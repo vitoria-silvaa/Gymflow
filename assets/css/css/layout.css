@@ -1,31 +1,54 @@
-body {
-    margin-left: 240px;
-}
-/* SIDEBAR */
+/* ========================================
+   GYMFLOW - LAYOUT & ESTRUTURA
+   ======================================== */
 
+body {
+    margin: 0;
+    margin-left: 240px;
+    background-color: #f8fafc;
+    color: #111827;
+    font-family: Arial, Helvetica, sans-serif;
+    min-height: 100vh;
+}
+
+/* ÁREA DE CONTEÚDO */
+main,
+.conteudo,
+.main-content {
+    padding: 25px 30px;
+    box-sizing: border-box;
+}
+
+/* SIDEBAR */
 .sidebar {
     position: fixed;
     top: 0;
     left: 0;
-
     width: 240px;
     height: 100%;
-
     padding: 20px;
-
-    background-color: white;
-    border-right: 1px solid #dddddd;
+    box-sizing: border-box;
+    background-color: #ffffff;
+    border-right: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
 }
 
-
-/* NOME GYMFLOW */
-
+/* TÍTULO / LOGO SIDEBAR */
+.sidebar h1,
 .sidebar h2 {
-    margin-bottom: 25px;
+    margin: 0 0 25px 0;
+    font-size: 20px;
+    font-weight: bold;
+    color: #111827;
 }
 
-
-/* LISTA */
+/* NAVEGAÇÃO SIDEBAR */
+.sidebar nav {
+    flex: 1;
+    overflow-y: auto;
+}
 
 .sidebar ul {
     list-style: none;
@@ -33,66 +56,61 @@ body {
     padding: 0;
 }
 
-
-/* ESPAÇO ENTRE AS GAVETAS */
-
+/* ESPAÇO ENTRE ITENS */
 .sidebar li {
     margin-bottom: 4px;
 }
 
-
-/* GAVETAS */
-
+/* GAVETAS / LINKS */
 .sidebar nav a {
     display: block;
-
-    padding: 10px;
-
+    padding: 10px 12px;
     border-radius: 8px;
-
-    color: #111;
+    color: #374151;
     text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-
-/* QUANDO PASSAR O MOUSE */
-
+/* HOVER MENU */
 .sidebar nav a:hover {
-    background-color: #eeeeee;
+    background-color: #f1f5f9;
+    color: #10b981;
 }
-
 
 /* BOTÃO SAIR */
-
 .sidebar .sair {
     display: block;
-
-    margin-top: 25px;
-    padding: 10px;
-
-    border-top: 1px solid #dddddd;
-
-    color: red;
+    margin-top: auto;
+    padding: 12px;
+    border-top: 1px solid #e2e8f0;
+    color: #ef4444;
     text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.sidebar .sair:hover {
+    background-color: #fef2f2;
+    color: #dc2626;
+    border-radius: 6px;
 }
 
 /* HEADER */
-
 .header {
     height: 70px;
-    padding: 0 25px;
-
-    background-color: white;
-    border-bottom: 1px solid #dddddd;
-
+    padding: 0 30px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    box-sizing: border-box;
 }
 
-
-/* LADO ESQUERDO */
-
+/* LADO ESQUERDO DO HEADER */
 .header-esquerda {
     display: flex;
     align-items: center;
@@ -101,7 +119,9 @@ body {
 
 .header-esquerda h1 {
     margin: 0;
-    font-size: 17px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
 }
 
 .header-esquerda span {
@@ -109,9 +129,7 @@ body {
     font-weight: bold;
 }
 
-
-/* LADO DIREITO */
-
+/* LADO DIREITO DO HEADER */
 .header-direita {
     display: flex;
     align-items: center;
@@ -120,21 +138,85 @@ body {
 
 .header-direita span {
     font-size: 14px;
+    color: #64748b;
 }
 
-
 /* PORTAL DO ALUNO */
-
 .header-direita a {
-    padding: 8px 12px;
-
-    border: 1px solid #dddddd;
+    padding: 8px 14px;
+    border: 1px solid #e2e8f0;
     border-radius: 6px;
-
-    color: black;
+    color: #374151;
     text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .header-direita a:hover {
-    background-color: #eeeeee;
+    background-color: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+/* DASHBOARD */
+.painel-executivo {
+    margin-top: 30px;
+}
+
+.dashboard-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.dashboard-card {
+    flex: 1 1 calc(25% - 20px);
+    min-width: 220px;
+    padding: 20px;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-sizing: border-box;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-card h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.dashboard-card-valor {
+    font-size: 26px;
+    font-weight: bold;
+    color: #111827;
+    margin: 10px 0;
+}
+
+.dashboard-card small {
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+/* SEÇÃO DO GRÁFICO */
+.painel-grafico {
+    margin-top: 35px;
+}
+
+.grafico-container {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 20px;
+    box-sizing: border-box;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }

@@ -1,7 +1,6 @@
 <?php
 $nomePainel = $_SESSION['nome_painel'] ?? 'Gymflow';
 ?>
-<link rel="stylesheet" href="/Gymflow/assets/css/css/layout.css">
 
 <aside class="sidebar">
 
