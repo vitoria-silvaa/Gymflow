@@ -24,14 +24,34 @@ if ($operacao === 'listar_fichas_aluno') {
 }
 
 /* BUSCAR ITENS DA FICHA */ elseif ($operacao === 'buscar_itens_ficha') {
-    $stmt_itens = $pdo->prepare(
-        "SELECT fi.ordem, fi.series, fi.repeticoes, fi.carga, fi.intervalo,
-                e.nome AS nome_exercicio, e.grupo
-         FROM ficha_itens fi
-         JOIN exercicios e ON fi.exercicio_id = e.id
-         WHERE fi.ficha_id = :ficha_id
-         ORDER BY fi.ordem ASC"
-    );
-    $stmt_itens->execute([':ficha_id' => $ficha_id]);
+
+    $stmt_itens = $pdo->prepare("
+        SELECT
+            fi.ordem,
+            fi.series,
+            fi.repeticoes,
+            fi.carga,
+            fi.intervalo,
+            e.nome AS nome_exercicio,
+            e.grupo
+        FROM ficha_itens fi
+
+        JOIN exercicios e
+            ON fi.exercicio_id = e.id
+
+        JOIN fichas_treino ft
+            ON ft.id = fi.ficha_id
+
+        WHERE fi.ficha_id = :ficha_id
+          AND ft.aluno_id = :aluno_id
+
+        ORDER BY fi.ordem ASC
+    ");
+
+    $stmt_itens->execute([
+        ':ficha_id' => $ficha_id,
+        ':aluno_id' => $aluno_id
+    ]);
+
     $itens = $stmt_itens->fetchAll();
 }
