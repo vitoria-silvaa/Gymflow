@@ -17,7 +17,7 @@ $nomePainel = $_SESSION['nome_painel'] ?? 'Gymflow';
             <li><a href="/Gymflow/app/controllers/CrmController.php">CRM Leads</a></li>
             <li><a href="/Gymflow/app/controllers/FluxoCaixaController.php">Fluxo de caixa</a></li>
             <li><a href="/Gymflow/app/controllers/MinhaMarcaController.php">Minha marca</a></li>
-            <li><a href="#">Biblioteca de exercícios</a></li>
+            <li><a href="/Gymflow/app/controllers/ExercicioController.php">Biblioteca de exercícios</a></li>
             <li><a href="#">Ficha de treino</a></li>
             <li><a href="/Gymflow/app/controllers/PortfolioController.php">Site / Portfólio</a></li>
         </ul>
