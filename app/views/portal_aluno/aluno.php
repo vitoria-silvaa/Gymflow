@@ -8,6 +8,10 @@ if (!isset($aluno)) {
 /** @var int $frequencia */
 /** @var int $faturas_abertas */
 
+$matricula = $matricula ?? false;
+$frequencia = $frequencia ?? 0;
+$faturas_abertas = $faturas_abertas ?? 0;
+
 $tituloPagina = "Portal do Aluno";
 ?>
 
@@ -23,7 +27,7 @@ $tituloPagina = "Portal do Aluno";
     <section>
         <h2>Meu Plano</h2>
 
-        <?php if ($matricula): ?>
+        <?php if (!empty($matricula)): ?>
             <h3><?php echo htmlspecialchars($matricula['nome_plano']); ?></h3>
             <p>Plano ativo</p>
             <p>Expira em: <?php echo date('d/m/Y', strtotime($matricula['fim'])); ?></p>
