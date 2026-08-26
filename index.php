@@ -12,14 +12,20 @@ $config = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$config) {
     $config = [
         'app_name' => 'GymCore',
+
+        'primary_color' => '#C9A227',
+        'secondary_color' => '#000000',
+
         'hero_title' => 'Transforme seu corpo.',
         'hero_subtitle' => '...',
         'hero_cta' => 'Matricule-se',
+
         'about_text' => '...',
         'about_image' => '',
         'company_values' => '',
         'company_competencies' => ''
     ];
+
 }
 
 // Planos
@@ -37,46 +43,196 @@ $stmtModais = $pdo->prepare("SELECT * FROM portfolio_modalities");
 $stmtModais->execute();
 $modalidades = $stmtModais->fetchAll(PDO::FETCH_ASSOC);
 
+// Slides do carrossel
+$stmtSlides = $pdo->prepare("
+    SELECT *
+    FROM portfolio_slides
+    WHERE company_id = ?
+    AND ativo = 1
+    ORDER BY ordem ASC, id ASC
+");
+
+$stmtSlides->execute([$company_id]);
+$slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC);
+
 $tituloPagina = $config['app_name'] ?? "GymCore";
 include 'app/views/shared/portfolio_header.php';
 ?>
 
 <main>
-    <section id="inicio">
-        <!--hero-->
-        <h1><?= htmlspecialchars($config['hero_title']) ?></h1>
-        <p><?= htmlspecialchars($config['hero_subtitle']) ?></p>
+   <section id="inicio" class="portfolio-hero">
 
-        <a href="#planos">
-            <?= htmlspecialchars($config['hero_cta']) ?>
-        </a>
-        <a href="#unidades">
-           Encontrar unidade
-        </a>
-    </section>
+    <!-- IMAGENS DO CARROSSEL -->
+    <div class="hero-carrossel">
 
-    <!-- Modalidades -->
-    <hr>
-    <section id="modalidades">
-        <h3>Nossas Modalidades</h3>
-        <h1>Tudo o que você precisa em um só lugar</h1>
-        
-        <?php if(empty($modalidades)): ?>
-            <p>Nenhuma modalidade cadastrada no momento.</p>
-        <?php else: ?>
-            <?php foreach($modalidades as $mod): ?>
-            <article>
-                <h3><?= htmlspecialchars($mod['name']) ?></h3>
-                <?php if(!empty($mod['image_url'])): ?>
-                    <img src="<?= htmlspecialchars($mod['image_url']) ?>" alt="<?= htmlspecialchars($mod['name']) ?>" width="300">
-                <?php endif; ?>
-                <p><?= htmlspecialchars($mod['description']) ?></p>
-            </article>
-            <br>
+        <?php if (!empty($slides)): ?>
+
+            <?php foreach ($slides as $index => $slide): ?>
+
+                <div class="hero-slide <?= $index === 0 ? 'ativo' : '' ?>">
+
+                    <img
+                        src="<?= htmlspecialchars($slide['image_url']) ?>"
+                        alt="Imagem do portfólio"
+                    >
+
+                </div>
+
             <?php endforeach; ?>
-        <?php endif; ?>
-    </section>
 
+        <?php else: ?>
+
+            <!-- caso o Admin ainda não tenha cadastrado imagens -->
+            <div class="hero-slide ativo hero-slide-vazio"></div>
+
+        <?php endif; ?>
+
+    </div>
+
+
+    <!-- escurecimento da imagem carrossel -->
+    <div class="hero-overlay"></div>
+
+
+    <!-- conteudo -->
+    <div class="hero-conteudo">
+
+        <h1>
+            <?= htmlspecialchars($config['hero_title']) ?>
+        </h1>
+
+        <p class="hero-subtitulo">
+            <?= htmlspecialchars($config['hero_subtitle']) ?>
+        </p>
+
+        <div class="hero-acoes">
+
+            <a class="hero-btn hero-btn-principal" href="#planos">
+                <?= htmlspecialchars($config['hero_cta']) ?>
+            </a>
+
+            <a class="hero-btn hero-btn-secundario" href="#unidades">
+                Encontrar unidade
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <?php if (count($slides) > 1): ?>
+
+        <!-- setas -->
+        <button
+            type="button"
+            class="hero-seta hero-seta-anterior"
+            aria-label="Imagem anterior"
+        >
+            &#10094;
+        </button>
+
+        <button
+            type="button"
+            class="hero-seta hero-seta-proxima"
+            aria-label="Próxima imagem"
+        >
+            &#10095;
+        </button>
+
+
+        <!-- bolinhas -->
+        <div class="hero-indicadores">
+
+            <?php foreach ($slides as $index => $slide): ?>
+
+                <button
+                    type="button"
+                    class="hero-indicador <?= $index === 0 ? 'ativo' : '' ?>"
+                    data-slide="<?= $index ?>"
+                    aria-label="Ir para imagem <?= $index + 1 ?>"
+                ></button>
+
+            <?php endforeach; ?>
+
+        </div>
+
+    <?php endif; ?>
+
+</section>
+
+   <!-- modalidades -->
+
+<section id="modalidades" class="portfolio-modalidades">
+
+    <div class="modalidades-cabecalho">
+
+        <span class="secao-destaque">
+            Nossas Modalidades
+        </span>
+
+        <h2>
+            Tudo o que você precisa em um só lugar
+        </h2>
+
+        <p>
+            Encontre a modalidade ideal para você
+        </p>
+
+    </div>
+
+
+    <?php if (empty($modalidades)): ?>
+
+        <p class="mensagem-vazia">
+            Nenhuma modalidade cadastrada no momento.
+        </p>
+
+    <?php else: ?>
+
+        <div class="modalidades-grid">
+
+            <?php foreach ($modalidades as $mod): ?>
+
+                <article class="modalidade-card">
+
+                    <?php if (!empty($mod['image_url'])): ?>
+
+                        <div class="modalidade-imagem">
+
+                            <img
+                                src="<?= htmlspecialchars($mod['image_url']) ?>"
+                                alt="<?= htmlspecialchars($mod['name']) ?>"
+                            >
+
+                        </div>
+
+                    <?php endif; ?>
+
+
+                    <div class="modalidade-conteudo">
+
+                        <h3>
+                            <?= htmlspecialchars($mod['name']) ?>
+                        </h3>
+
+                        <p>
+                            <?= htmlspecialchars($mod['description']) ?>
+                        </p>
+                         <a href="#" class="modalidade-saiba-mais">
+                                                      Saiba mais →
+                                                              </a>
+
+                    </div>
+
+                </article>
+
+            <?php endforeach; ?>
+
+        </div>
+
+    <?php endif; ?>
+
+</section>
     <!--planos-->
     <hr>
     <section id="planos">
@@ -131,7 +287,7 @@ include 'app/views/shared/portfolio_header.php';
 
     </section>
 
-    <!-- Sobre Nos -->
+    <!-- sobre Nos -->
     <hr>
     <section id="sobre">
         <h3>Sobre Nós</h3>
@@ -148,5 +304,68 @@ include 'app/views/shared/portfolio_header.php';
     </section>
 
 </main>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const slides = document.querySelectorAll('.hero-slide');
+    const indicadores = document.querySelectorAll('.hero-indicador');
+    const btnAnterior = document.querySelector('.hero-seta-anterior');
+    const btnProxima = document.querySelector('.hero-seta-proxima');
+
+   if (slides.length <= 1) {
+    return;
+}
+
+let slideAtual = 0;
+let intervalo;
+
+function mostrarSlide(index) {
+    slides.forEach(slide => slide.classList.remove('ativo'));
+    indicadores.forEach(indicador => indicador.classList.remove('ativo'));
+
+    if (index >= slides.length) {
+        slideAtual = 0;
+    } else if (index < 0) {
+        slideAtual = slides.length - 1;
+    } else {
+        slideAtual = index;
+    }
+
+    slides[slideAtual].classList.add('ativo');
+
+    if (indicadores[slideAtual]) {
+        indicadores[slideAtual].classList.add('ativo');
+    }
+}
+
+function iniciarAutomatico() {
+    intervalo = setInterval(function () {
+        mostrarSlide(slideAtual + 1);
+    }, 5000);
+}
+
+if (btnProxima) {
+    btnProxima.addEventListener('click', function () {
+        mostrarSlide(slideAtual + 1);
+    });
+}
+
+if (btnAnterior) {
+    btnAnterior.addEventListener('click', function () {
+        mostrarSlide(slideAtual - 1);
+    });
+}
+
+indicadores.forEach((indicador, index) => {
+    indicador.addEventListener('click', function () {
+        mostrarSlide(index);
+    });
+});
+
+iniciarAutomatico();
+
+});
+
+</script>
 
 <?php include 'app/views/shared/footer.php'; ?>

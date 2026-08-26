@@ -31,9 +31,10 @@ include __DIR__ . '/../shared/header.php';
                 <nav>
                     <ul style="display: flex; gap: 10px; list-style: none; padding: 0;">
                         <li><button type="button" class="tab-btn" data-target="tab-design" style="padding: 10px;">Design</button></li>
-                        <li><button type="button" class="tab-btn" data-target="tab-conteudo" style="padding: 10px;">Conteúdo</button></li>
-                        <li><button type="button" class="tab-btn" data-target="tab-planos" style="padding: 10px;">Planos</button></li>
-                        <li><button type="button" class="tab-btn" data-target="tab-unidades" style="padding: 10px;">Unidades</button></li>
+<li><button type="button" class="tab-btn" data-target="tab-conteudo" style="padding: 10px;">Conteúdo</button></li>
+<li><button type="button" class="tab-btn" data-target="tab-carrossel" style="padding: 10px;">Carrossel</button></li>
+<li><button type="button" class="tab-btn" data-target="tab-planos" style="padding: 10px;">Planos</button></li>
+<li><button type="button" class="tab-btn" data-target="tab-unidades" style="padding: 10px;">Unidades</button></li>
                     </ul>
                 </nav>
 
@@ -103,7 +104,92 @@ include __DIR__ . '/../shared/header.php';
                         <?php endforeach; ?>
                     </div>
                 </div>
+                <!-- ================= CARROSSEL ================= -->
+<div id="tab-carrossel" class="tab-content" style="display: none;">
 
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+            <h2>Carrossel de Imagens</h2>
+            <p>Adicione as imagens que serão exibidas no início do site.</p>
+        </div>
+
+        <button type="button" onclick="adicionarItem('slides')">
+            + Adicionar imagem
+        </button>
+    </div>
+
+    <div id="container-slides">
+
+        <?php foreach($slides as $slide): ?>
+
+            <fieldset
+                style="margin-bottom: 15px; border: 1px solid #ddd; padding: 10px;"
+                id="slide_<?= $slide['id'] ?>"
+            >
+
+                <div style="text-align: right;">
+                    <button
+                        type="button"
+                        style="color:red;"
+                        onclick="removerItem('slide_<?= $slide['id'] ?>', 'slides', <?= $slide['id'] ?>)"
+                    >
+                        X Remover
+                    </button>
+                </div>
+
+                <input
+                    type="hidden"
+                    name="slides[<?= $slide['id'] ?>][id]"
+                    value="<?= $slide['id'] ?>"
+                >
+
+                <div>
+                    <label>URL da imagem:</label>
+
+                    <input
+                        type="url"
+                        name="slides[<?= $slide['id'] ?>][image_url]"
+                        value="<?= htmlspecialchars($slide['image_url']) ?>"
+                        style="width: 100%;"
+                        required
+                    >
+                </div>
+
+                <div>
+                    <label>Ordem:</label>
+
+                    <input
+                        type="number"
+                        name="slides[<?= $slide['id'] ?>][ordem]"
+                        value="<?= (int)$slide['ordem'] ?>"
+                        min="0"
+                    >
+                </div>
+
+               <div style="margin-top: 15px;">
+
+    <label style="display: flex; align-items: center; gap: 8px; width: fit-content; cursor: pointer;">
+
+        <input
+            type="checkbox"
+            name="slides[<?= $slide['id'] ?>][ativo]"
+            value="1"
+            <?= $slide['ativo'] ? 'checked' : '' ?>
+            style="width: auto; margin: 0;"
+        >
+
+        <span>Exibir no carrossel</span>
+
+    </label>
+
+</div>
+            </fieldset>
+
+        <?php endforeach; ?>
+
+    </div>
+
+</div>
                 <!-- ================= PLANOS ================= -->
                 <div id="tab-planos" class="tab-content" style="display: none;">
                     <header style="display:flex; justify-content:space-between; align-items:center;">
@@ -195,7 +281,12 @@ include __DIR__ . '/../shared/header.php';
     });
 
     // CRUD Dinâmico Front-end
-    let counters = { planos: 0, filiais: 0, modalidades: 0 };
+    let counters = {
+        planos: 0,
+        filiais: 0,
+        modalidades: 0,
+        slides: 0
+    };
 
     function adicionarItem(tipo) {
         counters[tipo]++;
@@ -225,6 +316,40 @@ include __DIR__ . '/../shared/header.php';
                 <div><label>Nome:</label><input type="text" name="modalidades[${newId}][name]" required style="width: 100%;"></div>
                 <div><label>Descrição:</label><textarea name="modalidades[${newId}][description]" style="width: 100%;"></textarea></div>
                 <div><label>Imagem URL:</label><input type="url" name="modalidades[${newId}][image_url]" style="width: 100%;"></div>
+            </fieldset>`;
+        } else if (tipo === 'slides') {
+            html = `<fieldset style="margin-bottom: 15px; border: 1px solid #C9A227; padding: 10px;" id="slide_${newId}">
+                <div style="text-align: right;">
+                    <button type="button" style="color:red;" onclick="removerItem('slide_${newId}', 'slides', null)">X Cancelar</button>
+                </div>
+
+                <div>
+                    <label>URL da imagem:</label>
+                    <input type="url" name="slides[${newId}][image_url]" required style="width: 100%;">
+                </div>
+
+                <div>
+                    <label>Ordem:</label>
+                    <input type="number" name="slides[${newId}][ordem]" value="0" min="0">
+                </div>
+
+              <div style="margin-top: 15px;">
+
+    <label style="display: flex; align-items: center; gap: 8px; width: fit-content; cursor: pointer;">
+
+        <input
+            type="checkbox"
+            name="slides[${newId}][ativo]"
+            value="1"
+            checked
+            style="width: auto; margin: 0;"
+        >
+
+        <span>Exibir no carrossel</span>
+
+    </label>
+
+</div>
             </fieldset>`;
         }
 

@@ -6,6 +6,7 @@
 USE gymcore_db;
 
 -- Limpa os dados em ordem reversa de dependência das FKs para evitar conflitos ao re-executar
+DELETE FROM portfolio_slides;
 DELETE FROM portfolio_modalities;
 DELETE FROM portfolio_config;
 DELETE FROM trancamentos;
@@ -126,7 +127,7 @@ INSERT INTO trancamentos (id, aluno_id, inicio, fim, justificativa, taxa) VALUES
 
 -- 17. PORTFOLIO_CONFIG
 INSERT INTO portfolio_config (company_id, app_name, theme_mode, primary_color, secondary_color, logo_url, hero_title, hero_subtitle, hero_cta, about_text, about_image, company_values, company_competencies) VALUES
-(1, 'GymFlow Ecosystem', 'dark', '#ff0055', '#1a1a1a', 'https://example.com/logo.png', 'Transforme seu corpo e sua mente', 'O melhor ecossistema de academias para gerenciar seus treinos e metas.', 'Matricule-se Já', 'Focados em entregar alta performance com conforto e tecnologia.', 'https://example.com/about.jpg', 'Foco, Disciplina, Resultado', 'Musculação Avançada, Acompanhamento Nutricional');
+(1, 'GymFlow Ecosystem', 'dark', '#C9A227', '#000000', 'https://example.com/logo.png', 'Transforme seu corpo e sua mente', 'O melhor ecossistema de academias para gerenciar seus treinos e metas.', 'Matricule-se Já', 'Focados em entregar alta performance com conforto e tecnologia.', 'https://example.com/about.jpg', 'Foco, Disciplina, Resultado', 'Musculação Avançada, Acompanhamento Nutricional');
 
 -- 18. PORTFOLIO_MODALITIES
 INSERT INTO portfolio_modalities (id, filial_id, name, description, image_url) VALUES

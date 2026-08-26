@@ -192,7 +192,7 @@ CREATE TABLE portfolio_config (
     company_id INT PRIMARY KEY,
     app_name VARCHAR(50) NOT NULL DEFAULT 'GymCore',
     theme_mode VARCHAR(10) NOT NULL DEFAULT 'light',
-    primary_color VARCHAR(20) NOT NULL DEFAULT '#00ff00',
+    primary_color VARCHAR(20) NOT NULL DEFAULT '#C9A227',
     secondary_color VARCHAR(20) NOT NULL DEFAULT '#000000',
     logo_url TEXT,
     hero_title VARCHAR(150) NOT NULL,
@@ -221,6 +221,18 @@ CREATE TABLE portfolio_modalities (
     description TEXT,
     image_url TEXT,
     FOREIGN KEY (filial_id) REFERENCES filiais(id) ON DELETE CASCADE
+);
+-- ---------- 14. CARROSSEL DO PORTFÓLIO --------------------------------
+
+CREATE TABLE portfolio_slides (
+
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    company_id INT NOT NULL,
+    image_url TEXT NOT NULL,
+    ordem INT NOT NULL DEFAULT 0,
+    ativo BOOLEAN NOT NULL DEFAULT TRUE,
+    FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+
 );
 -- ---------- ÍNDICES DE PERFORMANCE ---------
 CREATE INDEX idx_alunos_filial_status ON alunos(filial_id, status);
