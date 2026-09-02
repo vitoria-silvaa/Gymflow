@@ -25,18 +25,18 @@
 
     <nav class="portfolio-nav">
         <ul>
-            <li><a href="#inicio">Início</a></li>
-            <li><a href="#planos">Planos</a></li>
-            <li><a href="#unidades">Unidades</a></li>
-            <li><a href="#modalidades">Modalidades</a></li>
-            <li><a href="#sobre">Sobre Nós</a></li>
-            <li><a href="#contato">Contato</a></li>
+            <li><a href="/Gymflow/index.php#inicio">Início</a></li>
+            <li><a href="/Gymflow/index.php#planos">Planos</a></li>
+            <li><a href="/Gymflow/index.php#unidades">Unidades</a></li>
+            <li><a href="/Gymflow/index.php#modalidades">Modalidades</a></li>
+            <li><a href="/Gymflow/index.php#sobre">Sobre Nós</a></li>
+            <li><a href="/Gymflow/index.php#contato">Contato</a></li>
         </ul>
     </nav>
 
     <div class="portfolio-acoes">
         <a href="/Gymflow/app/controllers/LoginController.php?acao=login">Entrar</a>
-        <a href="/Gymflow/app/views/portfolio/checkout.php">Matricule-se</a>
+        <a href="/Gymflow/app/controllers/MatriculaController.php">Matricule-se</a>
     </div>
 
 </header>

@@ -1,8 +1,9 @@
 <?php
 // app/views/portfolio/checkout.php
+// Redireciona de forma compatível e transparente para o fluxo de matrícula oficial
 
-// Tela de Checkout/Matrícula do Site Público - Reservado para futuras implementações de pagamentos online.
-?>
-<h1>Página de Checkout</h1>
-<p>Esta página simula a tela de pagamento do plano escolhido no portfólio.</p>
-<a href="/Gymflow/index.php">Voltar para o Início</a>
+$planoId = isset($_GET['plano_id']) ? (int) $_GET['plano_id'] : 0;
+$destino = '/Gymflow/app/controllers/MatriculaController.php' . ($planoId > 0 ? '?plano_id=' . $planoId : '');
+
+header("Location: $destino");
+exit;
