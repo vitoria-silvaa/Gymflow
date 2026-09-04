@@ -7,7 +7,7 @@ error_reporting(E_ALL);
 
 require_once __DIR__ . '/../../config/sessao.php';
 
-// Permissões para configurar o portfólio no painel administrativo
+// Apenas Admin pode configurar o portfólio
 verificarRole(['Admin']);
 
 $tituloPagina = "Portfólio";
@@ -20,10 +20,15 @@ $company_id = 1;
 if ($acao === 'salvar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $operacao = 'salvar';
     $dadosPost = $_POST;
+    $dadosFiles = $_FILES;
 
     require __DIR__ . '/../models/Portfolio.php';
 
-    // Redireciona com status de sucesso
+    if (!empty($erroModel)) {
+        header("Location: /Gymflow/app/controllers/PortfolioController.php?status=erro");
+        exit;
+    }
+
     header("Location: /Gymflow/app/controllers/PortfolioController.php?status=sucesso");
     exit;
 }

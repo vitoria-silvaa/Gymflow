@@ -137,27 +137,86 @@ include __DIR__ . '/app/views/shared/portfolio_header.php';
         <?php endif; ?>
     </section>
 
+   
     <!-- planos -->
-    <hr>
-    <section id="planos">
-        <h3>Nossos Planos</h3>
-        <h1>Escolha o plano ideal para sua evolução</h1>
-        <h2>Sem fidelidade obrigatória. Cancele quando quiser.</h2>
+<section id="planos" class="portfolio-planos">
 
-        <?php if (empty($planos)): ?>
-            <p>Nenhum plano disponível no momento.</p>
-        <?php else: ?>
+    <div class="planos-cabecalho">
+
+        <span class="secao-destaque">
+            Nossos Planos
+        </span>
+
+        <h2>
+            Escolha o plano ideal para sua evolução
+        </h2>
+
+        <p>
+            Encontre a opção que mais combina com seus objetivos.
+        </p>
+
+    </div>
+
+    <?php if (empty($planos)): ?>
+
+        <p class="mensagem-vazia">
+            Nenhum plano disponível no momento.
+        </p>
+
+    <?php else: ?>
+
+        <div class="planos-grid">
+
             <?php foreach ($planos as $plano): ?>
-                <article>
-                    <h3><?= htmlspecialchars($plano['nome'] ?? '') ?></h3>
-                    <h4>R$ <?= number_format((float)($plano['valor'] ?? 0), 2, ',', '.') ?> / <?= htmlspecialchars($plano['duracao'] ?? '') ?></h4>
-                    <p>Categoria: <?= htmlspecialchars($plano['categoria'] ?? '') ?></p>
-                    <a href="/Gymflow/app/controllers/MatriculaController.php?plano_id=<?= (int)($plano['id'] ?? 0) ?>">Matricule-se agora</a>
+
+                <article class="plano-card">
+                    <?php if (($plano['id'] ?? 0) == ($planos[1]['id'] ?? 0)): ?>
+                    <span class="plano-destaque">Mais escolhido</span>
+                    <?php endif; ?>
+
+                    <span class="plano-categoria">
+                        <?= htmlspecialchars($plano['categoria'] ?? '') ?>
+                    </span>
+
+                    <h3>
+                        <?= htmlspecialchars($plano['nome'] ?? '') ?>
+                    </h3>
+
+                    <div class="plano-preco">
+                        <span>R$</span>
+
+                        <strong>
+                            <?= number_format(
+                                (float)($plano['valor'] ?? 0),
+                                2,
+                                ',',
+                                '.'
+                            ) ?>
+                        </strong>
+                    </div>
+
+                    <p class="plano-duracao">
+                        <?= htmlspecialchars($plano['duracao'] ?? '') ?>
+                    </p>
+
+                    <div class="plano-separador"></div>
+
+                    <a
+                        class="plano-btn"
+                        href="/Gymflow/app/controllers/MatriculaController.php?plano_id=<?= (int)($plano['id'] ?? 0) ?>"
+                    >
+                        Matricule-se agora
+                    </a>
+
                 </article>
-                <br>
+
             <?php endforeach; ?>
-        <?php endif; ?>
-    </section> 
+
+        </div>
+
+    <?php endif; ?>
+
+</section>
 
     <!-- unidades -->
     <hr>

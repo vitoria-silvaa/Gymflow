@@ -1,4 +1,4 @@
-<?php
+   <?php
 if (!isset($tituloPagina)) {
     header("Location: /Gymflow/app/controllers/PortfolioController.php");
     exit;
@@ -17,14 +17,39 @@ include __DIR__ . '/../shared/header.php';
 <?php include __DIR__ . '/../shared/sidebar.php'; ?>
 
 <main>
-    <form method="POST" action="/Gymflow/app/controllers/PortfolioController.php?acao=salvar" id="portfolioForm">
+    <form
+        method="POST"
+        action="/Gymflow/app/controllers/PortfolioController.php?acao=salvar"
+        id="portfolioForm"
+        enctype="multipart/form-data"
+    >
         <header>
             <div>
                 <h1>Site / Portfólio Público</h1>
                 <p>Edições refletem no preview em tempo real</p>
-                <?php if (isset($_GET['status']) && $_GET['status'] == 'sucesso'): ?>
-                    <p style="color: green; font-weight: bold;">Configurações salvas com sucesso!</p>
-                <?php endif; ?>
+               <?php if (isset($_GET['status']) && $_GET['status'] === 'sucesso'): ?>
+
+    <div class="mensagem-status mensagem-sucesso">
+        <div class="mensagem-icone">✓</div>
+
+        <div>
+            <strong>Alterações salvas!</strong>
+            <p>As configurações do portfólio foram atualizadas com sucesso.</p>
+        </div>
+    </div>
+
+<?php elseif (isset($_GET['status']) && $_GET['status'] === 'erro'): ?>
+
+    <div class="mensagem-status mensagem-erro">
+        <div class="mensagem-icone">!</div>
+
+        <div>
+            <strong>Não foi possível salvar</strong>
+            <p>Confira os dados e a imagem selecionada e tente novamente.</p>
+        </div>
+    </div>
+
+<?php endif; ?>
             </div>
             <div>
                 <button type="submit" style="background-color: #10b981; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 5px; font-weight: bold;">Salvar Alterações</button>
@@ -57,8 +82,29 @@ include __DIR__ . '/../shared/header.php';
                         <input type="color" id="corSecundaria" name="corSecundaria" value="<?= htmlspecialchars($config['secondary_color'] ?? '#000000') ?>">
                     </div>
                     <div>
-                        <label>URL do Logótipo</label>
-                        <input type="url" name="urlLogotipo" value="<?= htmlspecialchars($config['logo_url'] ?? '') ?>" style="width: 100%;">
+                        <label>Logótipo:</label>
+
+                        <input
+                            type="file"
+                            name="logo_arquivo"
+                            accept="image/png, image/jpeg, image/webp"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="urlLogotipo"
+                            value="<?= htmlspecialchars($config['logo_url'] ?? '') ?>"
+                        >
+
+                        <?php if (!empty($config['logo_url'])): ?>
+                            <div style="margin-top: 10px;">
+                                <img
+                                    src="<?= htmlspecialchars($config['logo_url']) ?>"
+                                    alt="Logótipo atual"
+                                    style="width: 180px; max-height: 100px; object-fit: contain; border-radius: 6px;"
+                                >
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -82,8 +128,29 @@ include __DIR__ . '/../shared/header.php';
                         <textarea name="sobreNos" style="width: 100%; height: 60px;"><?= htmlspecialchars($config['about_text'] ?? '') ?></textarea>
                     </div>
                     <div>
-                        <label>URL da imagem (Sobre)</label>
-                        <input type="url" name="urlImagemSobre" value="<?= htmlspecialchars($config['about_image'] ?? '') ?>" style="width: 100%;">
+                        <label>Imagem do Sobre Nós:</label>
+
+                        <input
+                            type="file"
+                            name="sobre_arquivo"
+                            accept="image/png, image/jpeg, image/webp"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="urlImagemSobre"
+                            value="<?= htmlspecialchars($config['about_image'] ?? '') ?>"
+                        >
+
+                        <?php if (!empty($config['about_image'])): ?>
+                            <div style="margin-top: 10px;">
+                                <img
+                                    src="<?= htmlspecialchars($config['about_image']) ?>"
+                                    alt="Imagem atual do Sobre Nós"
+                                    style="width: 220px; max-height: 140px; object-fit: cover; border-radius: 6px;"
+                                >
+                            </div>
+                        <?php endif; ?>
                     </div>
                     <div>
                         <label>Nossos Valores</label>
@@ -106,7 +173,31 @@ include __DIR__ . '/../shared/header.php';
                                 <input type="hidden" name="modalidades[<?= htmlspecialchars((string)($mod['id'] ?? '')) ?>][id]" value="<?= htmlspecialchars((string)($mod['id'] ?? '')) ?>">
                                 <div><label>Nome:</label><input type="text" name="modalidades[<?= htmlspecialchars((string)($mod['id'] ?? '')) ?>][name]" value="<?= htmlspecialchars($mod['name'] ?? '') ?>" style="width: 100%;"></div>
                                 <div><label>Descrição:</label><textarea name="modalidades[<?= htmlspecialchars((string)($mod['id'] ?? '')) ?>][description]" style="width: 100%;"><?= htmlspecialchars($mod['description'] ?? '') ?></textarea></div>
-                                <div><label>Imagem URL:</label><input type="url" name="modalidades[<?= htmlspecialchars((string)($mod['id'] ?? '')) ?>][image_url]" value="<?= htmlspecialchars($mod['image_url'] ?? '') ?>" style="width: 100%;"></div>
+                                <div>
+                                    <label>Imagem:</label>
+
+                                    <input
+                                        type="file"
+                                        name="modalidades_arquivo[<?= htmlspecialchars((string)($mod['id'] ?? '')) ?>]"
+                                        accept="image/png, image/jpeg, image/webp"
+                                    >
+
+                                    <input
+                                        type="hidden"
+                                        name="modalidades[<?= htmlspecialchars((string)($mod['id'] ?? '')) ?>][image_url]"
+                                        value="<?= htmlspecialchars($mod['image_url'] ?? '') ?>"
+                                    >
+
+                                    <?php if (!empty($mod['image_url'])): ?>
+                                        <div style="margin-top: 10px;">
+                                            <img
+                                                src="<?= htmlspecialchars($mod['image_url']) ?>"
+                                                alt="<?= htmlspecialchars($mod['name'] ?? 'Modalidade') ?>"
+                                                style="width: 220px; max-height: 130px; object-fit: cover; border-radius: 6px;"
+                                            >
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
                             </fieldset>
                         <?php endforeach; ?>
                     </div>
@@ -146,14 +237,29 @@ include __DIR__ . '/../shared/header.php';
                                     value="<?= htmlspecialchars((string)($slide['id'] ?? '')) ?>">
 
                                 <div>
-                                    <label>URL da imagem:</label>
+                                    <label>Imagem:</label>
 
                                     <input
-                                        type="url"
+                                        type="file"
+                                        name="slides_arquivo[<?= htmlspecialchars((string)($slide['id'] ?? '')) ?>]"
+                                        accept="image/png, image/jpeg, image/webp"
+                                    >
+
+                                    <input
+                                        type="hidden"
                                         name="slides[<?= htmlspecialchars((string)($slide['id'] ?? '')) ?>][image_url]"
                                         value="<?= htmlspecialchars($slide['image_url'] ?? '') ?>"
-                                        style="width: 100%;"
-                                        required>
+                                    >
+
+                                    <?php if (!empty($slide['image_url'])): ?>
+                                        <div style="margin-top: 10px;">
+                                            <img
+                                                src="<?= htmlspecialchars($slide['image_url']) ?>"
+                                                alt="Imagem atual"
+                                                style="width: 220px; max-height: 130px; object-fit: cover; border-radius: 6px;"
+                                            >
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
 
                                 <div>
@@ -301,47 +407,143 @@ include __DIR__ . '/../shared/header.php';
 
     function adicionarItem(tipo) {
         counters[tipo]++;
+
         const newId = 'new_' + counters[tipo];
         const container = document.getElementById('container-' + tipo);
+
         let html = '';
 
         if (tipo === 'planos') {
             html = `<fieldset style="margin-bottom: 15px; border: 1px solid #4CAF50; padding: 10px;" id="plano_${newId}">
-                <div style="text-align: right;"><button type="button" style="color:red;" onclick="removerItem('plano_${newId}', 'planos', null)">X Cancelar</button></div>
-                <div><label>Nome:</label><input type="text" name="planos[${newId}][nome]" required style="width: 100%;"></div>
-                <div><label>Valor (R$):</label><input type="number" step="0.01" name="planos[${newId}][valor]" required style="width: 100%;"></div>
-                <div><label>Categoria:</label><input type="text" name="planos[${newId}][categoria]" required style="width: 100%;"></div>
-                <div><label>Duração (Ex: 1 Mês):</label><input type="text" name="planos[${newId}][duracao]" required style="width: 100%;"></div>
-            </fieldset>`;
-        } else if (tipo === 'filiais') {
-            html = `<fieldset style="margin-bottom: 15px; border: 1px solid #4CAF50; padding: 10px;" id="filial_${newId}">
-                <div style="text-align: right;"><button type="button" style="color:red;" onclick="removerItem('filial_${newId}', 'filiais', null)">X Cancelar</button></div>
-                <div><label>Nome:</label><input type="text" name="filiais[${newId}][nome]" required style="width: 100%;"></div>
-                <div><label>CNPJ:</label><input type="text" name="filiais[${newId}][cnpj]" required style="width: 100%;"></div>
-                <div><label>Telefone:</label><input type="text" name="filiais[${newId}][telefone]" required style="width: 100%;"></div>
-                <div><label>Responsável:</label><input type="text" name="filiais[${newId}][responsavel]" required style="width: 100%;"></div>
-            </fieldset>`;
-        } else if (tipo === 'modalidades') {
-            html = `<fieldset style="margin-bottom: 15px; border: 1px solid #4CAF50; padding: 10px;" id="mod_${newId}">
-                <div style="text-align: right;"><button type="button" style="color:red;" onclick="removerItem('mod_${newId}', 'modalidades', null)">X Cancelar</button></div>
-                <div><label>Nome:</label><input type="text" name="modalidades[${newId}][name]" required style="width: 100%;"></div>
-                <div><label>Descrição:</label><textarea name="modalidades[${newId}][description]" style="width: 100%;"></textarea></div>
-                <div><label>Imagem URL:</label><input type="url" name="modalidades[${newId}][image_url]" style="width: 100%;"></div>
-            </fieldset>`;
-        } else if (tipo === 'slides') {
-            html = `<fieldset style="margin-bottom: 15px; border: 1px solid #C9A227; padding: 10px;" id="slide_${newId}">
                 <div style="text-align: right;">
-                    <button type="button" style="color:red;" onclick="removerItem('slide_${newId}', 'slides', null)">X Cancelar</button>
+                    <button type="button" style="color:red;" onclick="removerItem('plano_${newId}', 'planos', null)">
+                        X Cancelar
+                    </button>
                 </div>
 
                 <div>
-                    <label>URL da imagem:</label>
-                    <input type="url" name="slides[${newId}][image_url]" required style="width: 100%;">
+                    <label>Nome:</label>
+                    <input type="text" name="planos[${newId}][nome]" required style="width: 100%;">
+                </div>
+
+                <div>
+                    <label>Valor (R$):</label>
+                    <input type="number" step="0.01" name="planos[${newId}][valor]" required style="width: 100%;">
+                </div>
+
+                <div>
+                    <label>Categoria:</label>
+                    <input type="text" name="planos[${newId}][categoria]" required style="width: 100%;">
+                </div>
+
+                <div>
+                    <label>Duração (Ex: 1 Mês):</label>
+                    <input type="text" name="planos[${newId}][duracao]" required style="width: 100%;">
+                </div>
+            </fieldset>`;
+
+        } else if (tipo === 'filiais') {
+            html = `<fieldset style="margin-bottom: 15px; border: 1px solid #4CAF50; padding: 10px;" id="filial_${newId}">
+                <div style="text-align: right;">
+                    <button type="button" style="color:red;" onclick="removerItem('filial_${newId}', 'filiais', null)">
+                        X Cancelar
+                    </button>
+                </div>
+
+                <div>
+                    <label>Nome:</label>
+                    <input type="text" name="filiais[${newId}][nome]" required style="width: 100%;">
+                </div>
+
+                <div>
+                    <label>CNPJ:</label>
+                    <input type="text" name="filiais[${newId}][cnpj]" required style="width: 100%;">
+                </div>
+
+                <div>
+                    <label>Telefone:</label>
+                    <input type="text" name="filiais[${newId}][telefone]" required style="width: 100%;">
+                </div>
+
+                <div>
+                    <label>Responsável:</label>
+                    <input type="text" name="filiais[${newId}][responsavel]" required style="width: 100%;">
+                </div>
+            </fieldset>`;
+
+        } else if (tipo === 'modalidades') {
+            html = `<fieldset style="margin-bottom: 15px; border: 1px solid #4CAF50; padding: 10px;" id="mod_${newId}">
+                <div style="text-align: right;">
+                    <button type="button" style="color:red;" onclick="removerItem('mod_${newId}', 'modalidades', null)">
+                        X Cancelar
+                    </button>
+                </div>
+
+                <div>
+                    <label>Nome:</label>
+                    <input type="text" name="modalidades[${newId}][name]" required style="width: 100%;">
+                </div>
+
+                <div>
+                    <label>Descrição:</label>
+                    <textarea name="modalidades[${newId}][description]" style="width: 100%;"></textarea>
+                </div>
+
+                <div>
+                    <label>Imagem:</label>
+
+                    <input
+                        type="file"
+                        name="modalidades_arquivo[${newId}]"
+                        accept="image/png, image/jpeg, image/webp"
+                    >
+
+                    <input
+                        type="hidden"
+                        name="modalidades[${newId}][image_url]"
+                        value=""
+                    >
+                </div>
+            </fieldset>`;
+
+        } else if (tipo === 'slides') {
+            html = `<fieldset style="margin-bottom: 15px; border: 1px solid #C9A227; padding: 10px;" id="slide_${newId}">
+                <div style="text-align: right;">
+                    <button
+                        type="button"
+                        style="color:red;"
+                        onclick="removerItem('slide_${newId}', 'slides', null)"
+                    >
+                        X Cancelar
+                    </button>
+                </div>
+
+                <div>
+                    <label>Imagem:</label>
+
+                    <input
+                        type="file"
+                        name="slides_arquivo[${newId}]"
+                        accept="image/png, image/jpeg, image/webp"
+                        required
+                    >
+
+                    <input
+                        type="hidden"
+                        name="slides[${newId}][image_url]"
+                        value=""
+                    >
                 </div>
 
                 <div>
                     <label>Ordem:</label>
-                    <input type="number" name="slides[${newId}][ordem]" value="0" min="0">
+
+                    <input
+                        type="number"
+                        name="slides[${newId}][ordem]"
+                        value="0"
+                        min="0"
+                    >
                 </div>
 
                 <div style="margin-top: 15px;">
@@ -351,14 +553,18 @@ include __DIR__ . '/../shared/header.php';
                             name="slides[${newId}][ativo]"
                             value="1"
                             checked
-                            style="width: auto; margin: 0;">
+                            style="width: auto; margin: 0;"
+                        >
+
                         <span>Exibir no carrossel</span>
                     </label>
                 </div>
             </fieldset>`;
         }
 
-        container.insertAdjacentHTML('beforeend', html);
+        if (container && html) {
+            container.insertAdjacentHTML('beforeend', html);
+        }
     }
 
     function removerItem(elementId, tipo, dbId) {

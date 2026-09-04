@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $tituloPagina ?? "GymCore"; ?></title>
-  <link rel="stylesheet" href="/Gymflow/assets/css/css/global.css">
-<link rel="stylesheet" href="/Gymflow/assets/css/css/portifolio.css">
+ <link rel="stylesheet" href="/Gymflow/assets/css/css/global.css">
+<link rel="stylesheet" href="/Gymflow/assets/css/css/portifolio.css?v=2">
 <style>
     :root {
         --portfolio-primary: <?= htmlspecialchars($config['primary_color'] ?? '#C9A227') ?>;

@@ -126,19 +126,106 @@ elseif ($operacao === 'buscar_admin') {
 // ======================================================
 elseif ($operacao === 'salvar') {
     $dadosPost = $dadosPost ?? $_POST;
+    $dadosFiles = $dadosFiles ?? $_FILES;
 
     try {
+        // ======================================================
+        // UPLOAD DE IMAGENS
+        // ======================================================
+        $raizProjeto = dirname(__DIR__, 2);
+        $pastaUploads = $raizProjeto . '/assets/uploads/portfolio/';
+        $urlBaseUploads = '/Gymflow/assets/uploads/portfolio/';
+
+        if (!is_dir($pastaUploads)) {
+            if (!mkdir($pastaUploads, 0775, true) && !is_dir($pastaUploads)) {
+                throw new RuntimeException('Não foi possível criar a pasta de uploads do portfólio.');
+            }
+        }
+
+        // Recebe um arquivo individual e devolve a URL salva no projeto.
+        $salvarImagem = function (array $arquivo, string $prefixo) use ($pastaUploads, $urlBaseUploads): ?string {
+            $erro = $arquivo['error'] ?? UPLOAD_ERR_NO_FILE;
+
+            // Nenhum arquivo novo foi escolhido: mantém a imagem antiga.
+            if ($erro === UPLOAD_ERR_NO_FILE) {
+                return null;
+            }
+
+            if ($erro !== UPLOAD_ERR_OK) {
+                throw new RuntimeException('Ocorreu um erro ao enviar uma das imagens.');
+            }
+
+            $tamanho = (int) ($arquivo['size'] ?? 0);
+            if ($tamanho <= 0 || $tamanho > 5 * 1024 * 1024) {
+                throw new RuntimeException('A imagem deve ter no máximo 5 MB.');
+            }
+
+            $tmpName = $arquivo['tmp_name'] ?? '';
+            $infoImagem = $tmpName !== '' ? @getimagesize($tmpName) : false;
+            $mime = is_array($infoImagem) ? ($infoImagem['mime'] ?? '') : '';
+
+            $extensoesPermitidas = [
+                'image/jpeg' => 'jpg',
+                'image/png'  => 'png',
+                'image/webp' => 'webp'
+            ];
+
+            if (!isset($extensoesPermitidas[$mime])) {
+                throw new RuntimeException('Formato de imagem inválido. Use JPG, PNG ou WEBP.');
+            }
+
+            $extensao = $extensoesPermitidas[$mime];
+            $nomeArquivo = $prefixo . '_' . bin2hex(random_bytes(8)) . '.' . $extensao;
+            $destino = $pastaUploads . $nomeArquivo;
+
+            if (!move_uploaded_file($tmpName, $destino)) {
+                throw new RuntimeException('Não foi possível salvar a imagem no projeto.');
+            }
+
+            return $urlBaseUploads . $nomeArquivo;
+        };
+
+        // Converte um campo múltiplo de $_FILES em um arquivo individual.
+        $obterArquivoDaLista = function (array $grupo, string $chave): ?array {
+            if (!isset($grupo['error'][$chave])) {
+                return null;
+            }
+
+            return [
+                'name'     => $grupo['name'][$chave] ?? '',
+                'type'     => $grupo['type'][$chave] ?? '',
+                'tmp_name' => $grupo['tmp_name'][$chave] ?? '',
+                'error'    => $grupo['error'][$chave] ?? UPLOAD_ERR_NO_FILE,
+                'size'     => $grupo['size'][$chave] ?? 0
+            ];
+        };
+
         // 3.1 Configurações gerais
-        $corPrimaria        = $dadosPost['corPrimaria'] ?? '#C9A227';
-        $corSecundaria      = $dadosPost['corSecundaria'] ?? '#000000';
-        $urlLogotipo        = $dadosPost['urlLogotipo'] ?? '';
+        $corPrimaria   = $dadosPost['corPrimaria'] ?? '#C9A227';
+        $corSecundaria = $dadosPost['corSecundaria'] ?? '#000000';
 
-        $tituloHero         = $dadosPost['tituloHero'] ?? '';
-        $subtituloHero      = $dadosPost['subtituloHero'] ?? '';
-        $textoBotao         = $dadosPost['textoBotao'] ?? '';
+        $urlLogotipo = $dadosPost['urlLogotipo'] ?? '';
+        if (!empty($dadosFiles['logo_arquivo']) && is_array($dadosFiles['logo_arquivo'])) {
+            $novaLogo = $salvarImagem($dadosFiles['logo_arquivo'], 'logo');
+            if ($novaLogo !== null) {
+                $urlLogotipo = $novaLogo;
+            }
+        }
 
-        $sobreNos           = $dadosPost['sobreNos'] ?? '';
-        $urlImagemSobre     = $dadosPost['urlImagemSobre'] ?? '';
+        $tituloHero    = $dadosPost['tituloHero'] ?? '';
+        $subtituloHero = $dadosPost['subtituloHero'] ?? '';
+        $textoBotao    = $dadosPost['textoBotao'] ?? '';
+
+        $sobreNos = $dadosPost['sobreNos'] ?? '';
+
+        $urlImagemSobre = $dadosPost['urlImagemSobre'] ?? '';
+        if (!empty($dadosFiles['sobre_arquivo']) && is_array($dadosFiles['sobre_arquivo'])) {
+            $novaImagemSobre = $salvarImagem($dadosFiles['sobre_arquivo'], 'sobre');
+            if ($novaImagemSobre !== null) {
+                $urlImagemSobre = $novaImagemSobre;
+            }
+        }
+
         $nossosValores      = $dadosPost['nossosValores'] ?? '';
         $nossasCompetencias = $dadosPost['nossasCompetencias'] ?? '';
 
@@ -294,6 +381,21 @@ elseif ($operacao === 'salvar') {
                 $description = trim($data['description'] ?? '');
                 $imageUrl = trim($data['image_url'] ?? '');
 
+                if (!empty($dadosFiles['modalidades_arquivo']) && is_array($dadosFiles['modalidades_arquivo'])) {
+                    $arquivoModalidade = $obterArquivoDaLista(
+                        $dadosFiles['modalidades_arquivo'],
+                        (string)$id
+                    );
+
+                    if ($arquivoModalidade !== null) {
+                        $novaImagemModalidade = $salvarImagem($arquivoModalidade, 'modalidade');
+
+                        if ($novaImagemModalidade !== null) {
+                            $imageUrl = $novaImagemModalidade;
+                        }
+                    }
+                }
+
                 if (strpos((string)$id, 'new_') === 0) {
                     $stmtInsert->execute([$name, $description, $imageUrl]);
                 } else {
@@ -321,7 +423,26 @@ elseif ($operacao === 'salvar') {
                 $ordem = (int) ($data['ordem'] ?? 0);
                 $ativo = isset($data['ativo']) ? 1 : 0;
 
+                if (!empty($dadosFiles['slides_arquivo']) && is_array($dadosFiles['slides_arquivo'])) {
+                    $arquivoSlide = $obterArquivoDaLista(
+                        $dadosFiles['slides_arquivo'],
+                        (string)$id
+                    );
+
+                    if ($arquivoSlide !== null) {
+                        $novaImagemSlide = $salvarImagem($arquivoSlide, 'slide');
+
+                        if ($novaImagemSlide !== null) {
+                            $imageUrl = $novaImagemSlide;
+                        }
+                    }
+                }
+
                 if (strpos((string)$id, 'new_') === 0) {
+                    if ($imageUrl === '') {
+                        throw new RuntimeException('Selecione uma imagem para o novo slide.');
+                    }
+
                     $stmtInsert->execute([$company_id, $imageUrl, $ordem, $ativo]);
                 } else {
                     $stmtUpdate->execute([$imageUrl, $ordem, $ativo, (int)$id, $company_id]);
