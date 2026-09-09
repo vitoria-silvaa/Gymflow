@@ -1,228 +1,136 @@
--- 1. APAGA o banco antigo de testes para não dar conflito de tipos (TEXT vs INT)
-DROP DATABASE IF EXISTS gymcore_db;
--- 2. Cria o banco de dados do zero, totalmente limpo
-CREATE DATABASE gymcore_db;
--- 3. Ativa o banco de dados para ser usado
+-- =====================================================================
+-- GymCore - Massa de Dados de Teste (Mock / Seed)
+-- =====================================================================
+
+-- Garante que estamos usando o banco correto               
 USE gymcore_db;
--- =====================================================================
--- GymCore - Banco de Dados 100% MySQL (Otimizado para XAMPP e PHP)
--- =====================================================================
--- ---------- 1. MULTI-TENANT & REDES ----------------------------------
-CREATE TABLE companies (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL,
-    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
--- ---------- 2. FILIAIS --------------------------------------------------
-CREATE TABLE filiais (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    company_id INT NOT NULL,
-    nome VARCHAR(100) NOT NULL,
-    cnpj VARCHAR(18) NOT NULL,
-    telefone VARCHAR(15) NOT NULL,
-    responsavel VARCHAR(100) NOT NULL,
-    ativo BOOLEAN NOT NULL DEFAULT TRUE,
-    CONSTRAINT uq_filiais_cnpj UNIQUE (company_id, cnpj),
-    FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
-);
--- ---------- 3. USUÁRIOS E PERMISSÕES ---------------------------------
-CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    role VARCHAR(30) NOT NULL,
-    aluno_id INT DEFAULT NULL
-);
-CREATE TABLE user_filiais (
-    user_id INT NOT NULL,
-    filial_id INT NOT NULL,
-    PRIMARY KEY (user_id, filial_id),
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (filial_id) REFERENCES filiais(id) ON DELETE CASCADE
-);
--- ---------- 4. PLANOS DA ACADEMIA ------------------------------------
-CREATE TABLE planos (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    company_id INT NOT NULL,
-    nome VARCHAR(100) NOT NULL,
-    categoria VARCHAR(50) NOT NULL,
-    valor NUMERIC(10, 2) NOT NULL CHECK (valor >= 0),
-    duracao VARCHAR(20) NOT NULL,
-    FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
-);
--- ---------- 5. ALUNOS ---------------------------------------------------
-CREATE TABLE alunos (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    filial_id INT NOT NULL,
-    nome VARCHAR(100) NOT NULL,
-    cpf VARCHAR(14) NOT NULL UNIQUE,
-    rg VARCHAR(20),
-    sexo VARCHAR(15) NOT NULL,
-    nascimento DATE NOT NULL,
-    email VARCHAR(100) NOT NULL,
-    telefone VARCHAR(15) NOT NULL,
-    endereco TEXT,
-    status VARCHAR(20) NOT NULL DEFAULT 'Ativo',
-    criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (filial_id) REFERENCES filiais(id) ON DELETE RESTRICT
-);
--- Vinculando a chave estrangeira de usuários/alunos de forma segura para o MySQL
-ALTER TABLE users
-ADD CONSTRAINT fk_users_aluno FOREIGN KEY (aluno_id) REFERENCES alunos(id) ON DELETE
-SET NULL;
--- ---------- 6. MATRÍCULAS ----------------------------------------------
-CREATE TABLE matriculas (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    aluno_id INT NOT NULL,
-    plano_id INT NOT NULL,
-    inicio DATE NOT NULL,
-    fim DATE NOT NULL,
-    valor NUMERIC(10, 2) NOT NULL CHECK (valor >= 0),
-    desconto NUMERIC(10, 2) NOT NULL DEFAULT 0.00 CHECK (desconto >= 0),
-    ativa BOOLEAN NOT NULL DEFAULT TRUE,
-    CHECK (fim >= inicio),
-    FOREIGN KEY (aluno_id) REFERENCES alunos(id) ON DELETE CASCADE,
-    FOREIGN KEY (plano_id) REFERENCES planos(id) ON DELETE RESTRICT
-);
--- ---------- 7. CONTAS A RECEBER (FINANCEIRO) -------------------------
-CREATE TABLE contas (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    aluno_id INT NOT NULL,
-    matricula_id INT NOT NULL,
-    vencimento DATE NOT NULL,
-    valor NUMERIC(10, 2) NOT NULL CHECK (valor >= 0),
-    status VARCHAR(20) NOT NULL DEFAULT 'Aberto',
-    forma_pagamento VARCHAR(30),
-    pago_em TIMESTAMP NULL DEFAULT NULL,
-    FOREIGN KEY (aluno_id) REFERENCES alunos(id) ON DELETE CASCADE,
-    FOREIGN KEY (matricula_id) REFERENCES matriculas(id) ON DELETE CASCADE
-);
--- ---------- 8. CRM / LEADS ---------------------------------------------
-CREATE TABLE leads (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    filial_id INT NOT NULL,
-    nome VARCHAR(100) NOT NULL,
-    telefone VARCHAR(15) NOT NULL,
-    objetivo VARCHAR(100),
-    campanha VARCHAR(100),
-    status VARCHAR(30) NOT NULL DEFAULT 'Novo',
-    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (filial_id) REFERENCES filiais(id) ON DELETE CASCADE
-);
--- ---------- 9. FLUXO DE CAIXA (CUSTOS) ---------------------------------
-CREATE TABLE custos (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    filial_id INT NOT NULL,
-    descricao VARCHAR(255) NOT NULL,
-    categoria VARCHAR(50) NOT NULL,
-    valor NUMERIC(10, 2) NOT NULL CHECK (valor >= 0),
-    data DATE NOT NULL,
-    FOREIGN KEY (filial_id) REFERENCES filiais(id) ON DELETE CASCADE
-);
--- ---------- 10. BIBLIOTECA DE EXERCÍCIOS & TREINOS --------------------
-CREATE TABLE exercicios (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL,
-    grupo VARCHAR(30) NOT NULL,
-    midia TEXT,
-    tipo_midia VARCHAR(10) NOT NULL DEFAULT 'imagem'
-);
-CREATE TABLE fichas_treino (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    aluno_id INT NOT NULL,
-    professor_id INT NOT NULL,
-    objetivo VARCHAR(50) NOT NULL,
-    criada_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    versao INT NOT NULL DEFAULT 1,
-    FOREIGN KEY (aluno_id) REFERENCES alunos(id) ON DELETE CASCADE,
-    FOREIGN KEY (professor_id) REFERENCES users(id) ON DELETE RESTRICT
-);
-CREATE TABLE ficha_itens (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    ficha_id INT NOT NULL,
-    exercicio_id INT NOT NULL,
-    ordem INT NOT NULL DEFAULT 0,
-    series INT NOT NULL CHECK (series > 0),
-    repeticoes VARCHAR(30) NOT NULL,
-    carga VARCHAR(20),
-    intervalo VARCHAR(20),
-    FOREIGN KEY (ficha_id) REFERENCES fichas_treino(id) ON DELETE CASCADE,
-    FOREIGN KEY (exercicio_id) REFERENCES exercicios(id) ON DELETE RESTRICT
-);
--- ---------- 11. AVALIAÇÕES FÍSICAS ----------------------------------
-CREATE TABLE avaliacoes (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    aluno_id INT NOT NULL,
-    data DATE NOT NULL,
-    peso NUMERIC(5, 2) NOT NULL,
-    altura NUMERIC(3, 2) NOT NULL,
-    gordura NUMERIC(4, 2) NOT NULL,
-    massa_magra NUMERIC(5, 2) NOT NULL,
-    braco NUMERIC(4, 1),
-    peitoral NUMERIC(4, 1),
-    abdomen NUMERIC(4, 1),
-    cintura NUMERIC(4, 1),
-    quadril NUMERIC(4, 1),
-    coxa NUMERIC(4, 1),
-    panturrilha NUMERIC(4, 1),
-    FOREIGN KEY (aluno_id) REFERENCES alunos(id) ON DELETE CASCADE
-);
--- ---------- 12. PORTARIA, TRANCAMENTOS & ADICIONAIS -----------------
-CREATE TABLE checkins (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    aluno_id INT NOT NULL,
-    data TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    ficha_id INT DEFAULT NULL,
-    FOREIGN KEY (aluno_id) REFERENCES alunos(id) ON DELETE CASCADE,
-    FOREIGN KEY (ficha_id) REFERENCES fichas_treino(id) ON DELETE
-    SET NULL
-);
-CREATE TABLE trancamentos (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    aluno_id INT NOT NULL,
-    inicio DATE NOT NULL,
-    fim DATE NOT NULL,
-    justificativa TEXT,
-    taxa NUMERIC(10, 2) NOT NULL DEFAULT 0.00,
-    FOREIGN KEY (aluno_id) REFERENCES alunos(id) ON DELETE CASCADE
-);
--- ---------- 13. PORTFÓLIO & BRANDING UNIFICADO (WHITE LABEL) --------
-CREATE TABLE portfolio_config (
-    company_id INT PRIMARY KEY,
-    app_name VARCHAR(50) NOT NULL DEFAULT 'GymCore',
-    theme_mode VARCHAR(10) NOT NULL DEFAULT 'light',
-    primary_color VARCHAR(20) NOT NULL DEFAULT '#00ff00',
-    secondary_color VARCHAR(20) NOT NULL DEFAULT '#000000',
-    logo_url TEXT,
-    hero_title VARCHAR(150) NOT NULL,
-    hero_subtitle TEXT NOT NULL,
-    hero_cta VARCHAR(50) NOT NULL,
-    about_text TEXT NOT NULL,
-    about_image TEXT,
-    company_values TEXT,
-    company_competencies TEXT,
-    FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
-);
-CREATE TABLE preferencias_usuario (
-    user_id INT PRIMARY KEY,
-    nome_painel VARCHAR(100) NOT NULL DEFAULT 'Gymflow',
-    tema VARCHAR(10) NOT NULL DEFAULT 'light',
-    cor_primaria VARCHAR(20) NOT NULL DEFAULT '#ffb000',
-    cor_secundaria VARCHAR(20) NOT NULL DEFAULT '#000000',
-    tema_predefinido VARCHAR(30) NOT NULL DEFAULT 'padrao',
-    logo_url TEXT DEFAULT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-CREATE TABLE portfolio_modalities (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    filial_id INT NOT NULL,
-    name VARCHAR(100) NOT NULL,
-    description TEXT,
-    image_url TEXT,
-    FOREIGN KEY (filial_id) REFERENCES filiais(id) ON DELETE CASCADE
-);
--- ---------- ÍNDICES DE PERFORMANCE ---------
-CREATE INDEX idx_alunos_filial_status ON alunos(filial_id, status);
-CREATE INDEX idx_contas_vencimento ON contas(status, vencimento);
-CREATE INDEX idx_ficha_itens_vinculo ON ficha_itens(ficha_id);
+
+-- Limpa os dados em ordem reversa de dependência das FKs para evitar conflitos ao re-executar
+DELETE FROM portfolio_slides;
+DELETE FROM portfolio_modalities;
+DELETE FROM portfolio_config;
+DELETE FROM trancamentos;
+DELETE FROM checkins;
+DELETE FROM avaliacoes;
+DELETE FROM ficha_itens;
+DELETE FROM fichas_treino;
+DELETE FROM exercicios;
+DELETE FROM custos;
+DELETE FROM leads;
+DELETE FROM contas;
+DELETE FROM matriculas;
+DELETE FROM planos;
+DELETE FROM user_filiais;
+DELETE FROM users;
+DELETE FROM alunos;
+DELETE FROM filiais;
+DELETE FROM companies;
+
+-- 1. COMPANIES
+INSERT INTO companies (id, nome) VALUES 
+(1, 'GymFlow Corporation'), 
+(2, 'FitLife Group');
+
+-- 2. FILIAIS
+INSERT INTO filiais (id, company_id, nome, cnpj, telefone, responsavel, ativo) VALUES
+(1, 1, 'GymFlow Central', '12.345.678/0001-90', '(11) 98765-4321', 'Jorge Silva', TRUE),
+(2, 1, 'GymFlow Zona Sul', '12.345.678/0002-70', '(11) 98765-4322', 'Mariana Costa', TRUE),
+(3, 2, 'FitLife Centro', '98.765.432/0001-10', '(21) 99999-8888', 'Carlos Santos', TRUE);
+
+-- 3. ALUNOS
+INSERT INTO alunos (id, filial_id, nome, cpf, rg, sexo, nascimento, email, telefone, endereco, status) VALUES
+(1, 1, 'Ana Oliveira', '111.222.333-44', '12.345.678-9', 'Feminino', '1995-03-15', 'ana.oliveira@email.com', '(11) 91111-1111', 'Rua A, 123 - São Paulo', 'Ativo'),
+(2, 1, 'Bruno Souza', '222.333.444-55', '98.765.432-1', 'Masculino', '1988-07-20', 'bruno.souza@email.com', '(11) 92222-2222', 'Av. B, 456 - São Paulo', 'Ativo'),
+(3, 1, 'Camila Lima', '333.444.555-66', '45.678.901-2', 'Feminino', '2000-11-05', 'camila.lima@email.com', '(11) 93333-3333', 'Rua C, 789 - São Paulo', 'Inativo'),
+(4, 3, 'Diego Rocha', '444.555.666-77', '34.567.890-3', 'Masculino', '1992-05-10', 'diego.rocha@email.com', '(21) 94444-4444', 'Rua D, 101 - Rio de Janeiro', 'Ativo');
+
+-- 4. USERS
+-- Senha padrão para todos: 'admin'  |  Hash bcrypt válido gerado com password_hash('admin', PASSWORD_BCRYPT)
+INSERT INTO users (id, name, email, password, role, aluno_id) VALUES
+(1, 'Administrador Principal', 'admin@gymflow.com',         '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Admin',     NULL),
+(2, 'Professor Marcelo',       'marcelo.treino@gymflow.com','$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Professor', NULL),
+(3, 'Professora Juliana',      'juliana.fit@gymflow.com',   '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Professor', NULL),
+(4, 'Ana Oliveira',            'ana.oliveira@email.com',    '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Aluno',     1),
+(5, 'Bruno Souza',             'bruno.souza@email.com',     '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Aluno',     2);
+
+-- 5. USER_FILIAIS
+INSERT INTO user_filiais (user_id, filial_id) VALUES
+(1, 1), -- Admin na Filial 1
+(1, 2), -- Admin na Filial 2
+(2, 1), -- Professor Marcelo na Filial 1
+(3, 3); -- Professora Juliana na Filial 3
+
+-- 6. PLANOS
+INSERT INTO planos (id, company_id, nome, categoria, valor, duracao) VALUES
+(1, 1, 'Plano Mensal Gold', 'Musculação', 99.90, '1 Mês'),
+(2, 1, 'Plano Semestral Platinum', 'Musculação + Aulas', 499.00, '6 Meses'),
+(3, 1, 'Plano Anual Black', 'Livre Acesso', 899.00, '1 Ano'),
+(4, 2, 'Plano Standard', 'Básico', 79.90, '1 Mês');
+
+-- 7. MATRÍCULAS
+INSERT INTO matriculas (id, aluno_id, plano_id, inicio, fim, valor, desconto, ativa) VALUES
+(1, 1, 1, '2026-07-01', '2026-08-01', 99.90, 0.00, TRUE),   -- Ana ativa no Mensal Gold
+(2, 2, 2, '2026-01-15', '2026-07-15', 499.00, 50.00, FALSE), -- Bruno inativo (vencido)
+(3, 4, 4, '2026-06-01', '2026-07-01', 79.90, 0.00, TRUE);     -- Diego ativo no Standard
+
+-- 8. CONTAS
+INSERT INTO contas (id, aluno_id, matricula_id, vencimento, valor, status, forma_pagamento, pago_em) VALUES
+(1, 1, 1, '2026-07-01', 99.90, 'Pago', 'Cartão de Crédito', '2026-07-01 10:00:00'),
+(2, 2, 2, '2026-01-15', 449.00, 'Pago', 'Dinheiro', '2026-01-15 14:30:00'),
+(3, 4, 3, '2026-06-01', 79.90, 'Aberto', NULL, NULL);
+
+-- 9. LEADS
+INSERT INTO leads (id, filial_id, nome, telefone, objetivo, campanha, status, criado_em) VALUES
+(1, 1, 'Carlos Eduardo', '(11) 95555-5555', 'Hipertrofia', 'Instagram Ads', 'Novo', '2026-07-15 08:30:00'),
+(2, 1, 'Fernanda Mello', '(11) 96666-6666', 'Emagrecimento', 'Indicação', 'Em Atendimento', '2026-07-14 11:00:00'),
+(3, 2, 'Gabriela Santos', '(11) 97777-7777', 'Condicionamento Físico', 'Google Search', 'Convertido', '2026-07-12 15:45:00');
+
+-- 10. CUSTOS
+INSERT INTO custos (id, filial_id, descricao, categoria, valor, data) VALUES
+(1, 1, 'Aluguel do imóvel', 'Infraestrutura', 3500.00, '2026-07-05'),
+(2, 1, 'Manutenção de esteiras', 'Equipamentos', 450.00, '2026-07-10'),
+(3, 3, 'Energia Elétrica', 'Contas de Consumo', 850.00, '2026-07-08');
+
+-- 11. EXERCICIOS
+INSERT INTO exercicios (id, nome, grupo, midia, tipo_midia) VALUES
+(1, 'Supino Reto', 'Peito', 'https://example.com/supino.gif', 'imagem'),
+(2, 'Agachamento Livre', 'Pernas', 'https://example.com/agachamento.gif', 'imagem'),
+(3, 'Puxada no Pulley', 'Costas', 'https://example.com/puxada.gif', 'imagem'),
+(4, 'Rosca Direta', 'Bíceps', 'https://example.com/rosca.gif', 'imagem'),
+(5, 'Tríceps Corda', 'Tríceps', 'https://example.com/triceps.gif', 'imagem');
+
+-- 12. FICHAS_TREINO
+INSERT INTO fichas_treino (id, aluno_id, professor_id, objetivo, criada_em, versao) VALUES
+(1, 1, 2, 'Hipertrofia Muscular', '2026-07-02 10:00:00', 1),
+(2, 2, 2, 'Resistência Muscular', '2026-01-20 09:00:00', 1);
+
+-- 13. FICHA_ITENS
+INSERT INTO ficha_itens (id, ficha_id, exercicio_id, ordem, series, repeticoes, carga, intervalo) VALUES
+(1, 1, 1, 1, 4, '10 a 12', '20kg cada lado', '60s'),
+(2, 1, 4, 2, 3, '12', '10kg', '45s'),
+(3, 2, 2, 1, 4, '15', 'Sem peso adicional', '30s');
+
+-- 14. AVALIACOES
+INSERT INTO avaliacoes (id, aluno_id, data, peso, altura, gordura, massa_magra, braco, peitoral, abdomen, cintura, quadril, coxa, panturrilha) VALUES
+(1, 1, '2026-07-02', 65.50, 1.68, 22.40, 50.80, 28.5, 90.0, 78.0, 72.0, 95.0, 52.0, 34.0),
+(2, 2, '2026-01-16', 82.00, 1.80, 18.50, 66.80, 35.0, 102.0, 88.0, 84.0, 100.0, 58.0, 38.0);
+
+-- 15. CHECKINS
+INSERT INTO checkins (id, aluno_id, data, ficha_id) VALUES
+(1, 1, '2026-07-15 07:15:00', 1),
+(2, 1, '2026-07-16 07:20:00', 1),
+(3, 2, '2026-07-10 18:30:00', 2);
+
+-- 16. TRANCAMENTOS
+INSERT INTO trancamentos (id, aluno_id, inicio, fim, justificativa, taxa) VALUES
+(1, 3, '2026-07-01', '2026-08-01', 'Viagem a trabalho', 30.00);
+
+-- 17. PORTFOLIO_CONFIG
+INSERT INTO portfolio_config (company_id, app_name, theme_mode, primary_color, secondary_color, logo_url, hero_title, hero_subtitle, hero_cta, about_text, about_image, company_values, company_competencies) VALUES
+(1, 'GymFlow Ecosystem', 'dark', '#C9A227', '#000000', 'https://example.com/logo.png', 'Transforme seu corpo e sua mente', 'O melhor ecossistema de academias para gerenciar seus treinos e metas.', 'Matricule-se Já', 'Focados em entregar alta performance com conforto e tecnologia.', 'https://example.com/about.jpg', 'Foco, Disciplina, Resultado', 'Musculação Avançada, Acompanhamento Nutricional');
+
+-- 18. PORTFOLIO_MODALITIES
+INSERT INTO portfolio_modalities (id, filial_id, name, description, image_url) VALUES
+(1, 1, 'CrossFit', 'Treinamento funcional de alta intensidade.', 'https://example.com/crossfit.jpg'),
+(2, 1, 'Pilates', 'Aulas focadas em postura, flexibilidade e core.', 'https://example.com/pilates.jpg'),
+(3, 2, 'Muay Thai', 'Arte marcial tailandesa de alta queima calórica.', 'https://example.com/muaythai.jpg');

@@ -1,51 +1,114 @@
+<?php
+
+$nomePainel = $_SESSION['nome_painel'] ?? 'Gymflow';
+$titulo = $tituloPagina ?? 'Portal do Aluno';
+$usuario = $_SESSION['usuario_nome'] ?? 'Aluno';
+
+?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal do Aluno | GymCore</title>
-    <link rel="stylesheet" href="/Gymflow/assets/css/css/global.css">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>
+        <?= htmlspecialchars($nomePainel) ?> |
+        <?= htmlspecialchars($titulo) ?>
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/Gymflow/assets/css/css/global.css">
+
+    <link
+        rel="stylesheet"
+        href="/Gymflow/assets/css/css/layout.css">
+
+    <link
+        rel="stylesheet"
+        href="/Gymflow/assets/css/css/portal.css">
+
 </head>
 
 <body>
 
-<nav>
 
-    <div>
-        <h2>Portal do aluno</h2>
-    </div>
+    <aside class="sidebar">
 
-    <ul>
-        <li>
-            <a href="/Gymflow/app/controllers/PortalAlunoController.php?acao=aluno">
-                Início
-            </a>
-        </li>
+        <h1>
+            <?= htmlspecialchars($nomePainel) ?>
+        </h1>
 
-        <li>
-            <a href="/Gymflow/app/controllers/PortalAlunoController.php?acao=treinos">
-                Treinos
-            </a>
-        </li>
 
-        <li>
-            <a href="/Gymflow/app/controllers/PortalAlunoController.php?acao=faturas">
-                Faturas
-            </a>
-        </li>
+        <nav>
 
-        <li>
-            <a href="#">
-                Contratos
-            </a>
-        </li>
+            <ul>
 
-        <li>
-            <a href="/Gymflow/app/controllers/LoginController.php?acao=logout">
-                Sair
-            </a>
-        </li>
-    </ul>
+                <li>
+                    <a href="/Gymflow/app/controllers/PortalAlunoController.php?acao=aluno">
+                        Início
+                    </a>
+                </li>
 
-</nav>
+
+                <li>
+                    <a href="/Gymflow/app/controllers/PortalAlunoController.php?acao=treinos">
+                        Treinos
+                    </a>
+                </li>
+
+
+                <li>
+                    <a href="/Gymflow/app/controllers/PortalAlunoController.php?acao=faturas">
+                        Faturas
+                    </a>
+                </li>
+
+
+                <li>
+                    <a href="#">
+                        Contratos
+                    </a>
+                </li>
+
+            </ul>
+
+        </nav>
+
+
+        <a
+            class="sair"
+            href="/Gymflow/app/controllers/LoginController.php?acao=logout">
+            Sair
+        </a>
+
+    </aside>
+
+
+    <header class="header">
+
+        <div class="header-esquerda">
+
+            <h1>
+                <?= htmlspecialchars($titulo) ?>
+            </h1>
+
+        </div>
+
+
+        <div class="header-direita">
+
+            <span>
+                <?= htmlspecialchars($usuario) ?>
+                (Aluno)
+            </span>
+
+        </div>
+
+    </header>

@@ -1,7 +1,11 @@
 <?php
 
 if (!isset($aluno)) {
-    header("Location: /Gymflow/app/controllers/PortalAlunoController.php?acao=aluno");
+
+    header(
+        "Location: /Gymflow/app/controllers/PortalAlunoController.php?acao=aluno"
+    );
+
     exit;
 }
 
@@ -15,12 +19,15 @@ include __DIR__ . '/../shared/navbar.php';
 
 ?>
 
-<main>
 
-    <section>
+<main class="portal-conteudo">
+
+
+    <section class="portal-boas-vindas">
 
         <h1>
-            Olá, <?= htmlspecialchars($aluno['nome'] ?? 'Aluno'); ?>!
+            Olá,
+            <?= htmlspecialchars($aluno['nome'] ?? 'Aluno'); ?>!
         </h1>
 
         <p>
@@ -30,105 +37,117 @@ include __DIR__ . '/../shared/navbar.php';
     </section>
 
 
-    <hr>
+    <section class="portal-cards">
 
 
-    <section>
+        <article class="portal-card">
 
-        <h2>Meu Plano</h2>
+            <h2>Meu Plano</h2>
 
-        <?php if (!empty($matricula)): ?>
 
-            <p>
-                <strong>Plano:</strong>
-                <?= htmlspecialchars($matricula['nome_plano']); ?>
+            <?php if (!empty($matricula)): ?>
+
+                <p class="portal-destaque">
+                    <?= htmlspecialchars($matricula['nome_plano']); ?>
+                </p>
+
+                <p>
+                    <strong>Status:</strong>
+                    Ativo
+                </p>
+
+                <p>
+                    <strong>Validade:</strong>
+
+                    <?= date(
+                        'd/m/Y',
+                        strtotime($matricula['fim'])
+                    ); ?>
+                </p>
+
+
+            <?php else: ?>
+
+                <p>
+                    Você não possui um plano ativo no momento.
+                </p>
+
+            <?php endif; ?>
+
+        </article>
+
+
+        <article class="portal-card">
+
+            <h2>Minha Frequência</h2>
+
+            <p class="portal-destaque">
+                <?= (int) $frequencia; ?>
             </p>
 
             <p>
-                <strong>Status:</strong>
-                Ativo
+                dia<?= $frequencia != 1 ? 's' : ''; ?>
+                treinado<?= $frequencia != 1 ? 's' : ''; ?>
+                neste mês.
             </p>
+
+        </article>
+
+
+        <article class="portal-card">
+
+            <h2>Minhas Faturas</h2>
+
+            <p class="portal-destaque">
+                <?= (int) $faturas_abertas; ?>
+            </p>
+
+
+            <?php if ($faturas_abertas > 0): ?>
+
+                <p>
+                    Fatura<?= $faturas_abertas > 1 ? 's' : ''; ?>
+                    em aberto.
+                </p>
+
+            <?php else: ?>
+
+                <p>
+                    Nenhuma fatura em aberto.
+                </p>
+
+            <?php endif; ?>
+
+
+            <a
+                class="portal-link"
+                href="/Gymflow/app/controllers/PortalAlunoController.php?acao=faturas">
+                Ver minhas faturas
+            </a>
+
+        </article>
+
+
+        <article class="portal-card">
+
+            <h2>Meus Treinos</h2>
 
             <p>
-                <strong>Validade:</strong>
-                <?= date('d/m/Y', strtotime($matricula['fim'])); ?>
+                Consulte sua ficha de treino e os exercícios
+                cadastrados pelo professor.
             </p>
 
-        <?php else: ?>
+            <a
+                class="portal-link"
+                href="/Gymflow/app/controllers/PortalAlunoController.php?acao=treinos">
+                Ver meus treinos
+            </a>
 
-            <p>
-                Você não possui um plano ativo no momento.
-            </p>
+        </article>
 
-        <?php endif; ?>
 
     </section>
 
-
-    <hr>
-
-
-    <section>
-
-        <h2>Minha Frequência</h2>
-
-        <p>
-            Você treinou
-            <strong><?= (int) $frequencia; ?></strong>
-            vez<?= $frequencia != 1 ? 'es' : ''; ?>
-            neste mês.
-        </p>
-
-    </section>
-
-
-    <hr>
-
-
-    <section>
-
-        <h2>Minhas Faturas</h2>
-
-        <?php if ($faturas_abertas > 0): ?>
-
-            <p>
-                Você possui
-                <strong><?= (int) $faturas_abertas; ?></strong>
-                fatura<?= $faturas_abertas > 1 ? 's' : ''; ?>
-                em aberto.
-            </p>
-
-        <?php else: ?>
-
-            <p>
-                Nenhuma fatura em aberto.
-            </p>
-
-        <?php endif; ?>
-
-        <a href="/Gymflow/app/controllers/PortalAlunoController.php?acao=faturas">
-            Ver minhas faturas
-        </a>
-
-    </section>
-
-
-    <hr>
-
-
-    <section>
-
-        <h2>Meus Treinos</h2>
-
-        <p>
-            Consulte sua ficha de treino e os exercícios cadastrados pelo professor.
-        </p>
-
-        <a href="/Gymflow/app/controllers/PortalAlunoController.php?acao=treinos">
-            Ver meus treinos
-        </a>
-
-    </section>
 
 </main>
 
