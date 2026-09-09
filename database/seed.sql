@@ -94,7 +94,7 @@ INSERT INTO custos (id, filial_id, descricao, categoria, valor, data) VALUES
 -- 11. EXERCICIOS
 INSERT INTO exercicios (id, nome, grupo, midia, tipo_midia) VALUES
 (1, 'Supino Reto', 'Peito', 'https://example.com/supino.gif', 'imagem'),
-(2, 'Agachamento Livre', 'Pernas', 'https://example.com/agachamento.gif', 'imagem'),
+(2, 'Agachamento Livre', 'Quadríceps', 'https://example.com/agachamento.gif', 'imagem'),
 (3, 'Puxada no Pulley', 'Costas', 'https://example.com/puxada.gif', 'imagem'),
 (4, 'Rosca Direta', 'Bíceps', 'https://example.com/rosca.gif', 'imagem'),
 (5, 'Tríceps Corda', 'Tríceps', 'https://example.com/triceps.gif', 'imagem');

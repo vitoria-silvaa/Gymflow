@@ -63,9 +63,9 @@
                             Todos
                         </option>
 
-                        <option value="Peito"
-                            <?= ($grupo ?? '') === 'Peito' ? 'selected' : '' ?>>
-                            Peito
+                        <option value="Bíceps"
+                            <?= ($grupo ?? '') === 'Bíceps' ? 'selected' : '' ?>>
+                            Bíceps
                         </option>
 
                         <option value="Costas"
@@ -73,34 +73,24 @@
                             Costas
                         </option>
 
-                        <option value="Pernas"
-                            <?= ($grupo ?? '') === 'Pernas' ? 'selected' : '' ?>>
-                            Pernas
+                        <option value="Glúteo"
+                            <?= ($grupo ?? '') === 'Glúteo' ? 'selected' : '' ?>>
+                            Glúteo
                         </option>
 
-                        <option value="Ombros"
-                            <?= ($grupo ?? '') === 'Ombros' ? 'selected' : '' ?>>
-                            Ombros
+                        <option value="Ombro"
+                            <?= ($grupo ?? '') === 'Ombro' ? 'selected' : '' ?>>
+                            Ombro
                         </option>
 
-                        <option value="Bíceps"
-                            <?= ($grupo ?? '') === 'Bíceps' ? 'selected' : '' ?>>
-                            Bíceps
+                        <option value="Peito"
+                            <?= ($grupo ?? '') === 'Peito' ? 'selected' : '' ?>>
+                            Peito
                         </option>
 
-                        <option value="Tríceps"
-                            <?= ($grupo ?? '') === 'Tríceps' ? 'selected' : '' ?>>
-                            Tríceps
-                        </option>
-
-                        <option value="Abdômen"
-                            <?= ($grupo ?? '') === 'Abdômen' ? 'selected' : '' ?>>
-                            Abdômen
-                        </option>
-
-                        <option value="Glúteos"
-                            <?= ($grupo ?? '') === 'Glúteos' ? 'selected' : '' ?>>
-                            Glúteos
+                        <option value="Posterior de coxa"
+                            <?= ($grupo ?? '') === 'Posterior de coxa' ? 'selected' : '' ?>>
+                            Posterior de coxa
                         </option>
 
                         <option value="Quadríceps"
@@ -108,9 +98,9 @@
                             Quadríceps
                         </option>
 
-                        <option value="Posterior de coxa"
-                            <?= ($grupo ?? '') === 'Posterior de coxa' ? 'selected' : '' ?>>
-                            Posterior de coxa
+                        <option value="Tríceps"
+                            <?= ($grupo ?? '') === 'Tríceps' ? 'selected' : '' ?>>
+                            Tríceps
                         </option>
 
                     </select>
@@ -215,23 +205,23 @@
                     </div>
 
 
-                   <!-- AÇÕES -->
+                    <!-- AÇÕES -->
 
                     <div class="exercicio-acoes">
 
-                      <a
-                        href="/Gymflow/app/controllers/ExercicioController.php?acao=editar&id=<?= (int) $exercicio['id'] ?>"
-                      >
-                        Editar
-                      </a>
+                        <a
+                            href="/Gymflow/app/controllers/ExercicioController.php?acao=editar&id=<?= (int) $exercicio['id'] ?>"
+                        >
+                            Editar
+                        </a>
 
-                      <a
-                        href="/Gymflow/app/controllers/ExercicioController.php?acao=excluir&id=<?= (int) $exercicio['id'] ?>"
-                        class="excluir"
-                        onclick="return confirm('Tem certeza que deseja excluir este exercício?');"
-                      >
-                        Excluir
-                      </a>
+                        <a
+                            href="/Gymflow/app/controllers/ExercicioController.php?acao=excluir&id=<?= (int) $exercicio['id'] ?>"
+                            class="excluir"
+                            onclick="return confirm('Tem certeza que deseja excluir este exercício?');"
+                        >
+                            Excluir
+                        </a>
 
                     </div>
 

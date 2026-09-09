@@ -68,20 +68,16 @@
                         Bíceps
                     </option>
 
-                    <option value="Tríceps">
-                        Tríceps
-                    </option>
-
                     <option value="Costas">
                         Costas
                     </option>
 
-                    <option value="Glúteos">
-                        Glúteos
+                    <option value="Glúteo">
+                        Glúteo
                     </option>
 
-                    <option value="Ombros">
-                        Ombros
+                    <option value="Ombro">
+                        Ombro
                     </option>
 
                     <option value="Peito">
@@ -94,6 +90,10 @@
 
                     <option value="Quadríceps">
                         Quadríceps
+                    </option>
+
+                    <option value="Tríceps">
+                        Tríceps
                     </option>
 
                 </select>
