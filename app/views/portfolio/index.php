@@ -324,6 +324,50 @@ include __DIR__ . '/../shared/header.php';
                                 <div><label>CNPJ:</label><input type="text" name="filiais[<?= htmlspecialchars((string)($filial['id'] ?? '')) ?>][cnpj]" value="<?= htmlspecialchars($filial['cnpj'] ?? '') ?>" style="width: 100%;"></div>
                                 <div><label>Telefone:</label><input type="text" name="filiais[<?= htmlspecialchars((string)($filial['id'] ?? '')) ?>][telefone]" value="<?= htmlspecialchars($filial['telefone'] ?? '') ?>" style="width: 100%;"></div>
                                 <div><label>Responsável:</label><input type="text" name="filiais[<?= htmlspecialchars((string)($filial['id'] ?? '')) ?>][responsavel]" value="<?= htmlspecialchars($filial['responsavel'] ?? '') ?>" style="width: 100%;"></div>
+                                <div>
+    <label>Latitude:</label>
+    <input
+        type="number"
+        step="0.00000001"
+        name="filiais[<?= htmlspecialchars((string)($filial['id'] ?? '')) ?>][latitude]"
+        value="<?= htmlspecialchars((string)($filial['latitude'] ?? '')) ?>"
+        style="width: 100%;"
+    >
+</div>
+
+<div>
+    <label>Longitude:</label>
+    <input
+        type="number"
+        step="0.00000001"
+        name="filiais[<?= htmlspecialchars((string)($filial['id'] ?? '')) ?>][longitude]"
+        value="<?= htmlspecialchars((string)($filial['longitude'] ?? '')) ?>"
+        style="width: 100%;"
+    >
+</div>
+
+<div>
+    <label>Imagem da unidade:</label>
+    <input
+        type="file"
+        name="filiais_arquivo[<?= htmlspecialchars((string)($filial['id'] ?? '')) ?>]"
+        accept="image/png, image/jpeg, image/webp"
+    >
+    <input
+        type="hidden"
+        name="filiais[<?= htmlspecialchars((string)($filial['id'] ?? '')) ?>][image_url]"
+        value="<?= htmlspecialchars($filial['image_url'] ?? '') ?>"
+    >
+    <?php if (!empty($filial['image_url'])): ?>
+        <div style="margin-top: 10px;">
+            <img
+                src="<?= htmlspecialchars($filial['image_url']) ?>"
+                alt="<?= htmlspecialchars($filial['nome'] ?? 'Unidade') ?>"
+                style="width: 220px; max-height: 130px; object-fit: cover; border-radius: 6px;"
+            >
+        </div>
+    <?php endif; ?>
+</div>
                             </fieldset>
                         <?php endforeach; ?>
                     </div>
@@ -468,6 +512,40 @@ include __DIR__ . '/../shared/header.php';
                 <div>
                     <label>Responsável:</label>
                     <input type="text" name="filiais[${newId}][responsavel]" required style="width: 100%;">
+                </div>
+
+                <div>
+                    <label>Latitude:</label>
+                    <input
+                        type="number"
+                        step="0.00000001"
+                        name="filiais[${newId}][latitude]"
+                        style="width: 100%;"
+                    >
+                </div>
+
+                <div>
+                    <label>Longitude:</label>
+                    <input
+                        type="number"
+                        step="0.00000001"
+                        name="filiais[${newId}][longitude]"
+                        style="width: 100%;"
+                    >
+                </div>
+
+                <div>
+                    <label>Imagem da unidade:</label>
+                    <input
+                        type="file"
+                        name="filiais_arquivo[${newId}]"
+                        accept="image/png, image/jpeg, image/webp"
+                    >
+                    <input
+                        type="hidden"
+                        name="filiais[${newId}][image_url]"
+                        value=""
+                    >
                 </div>
             </fieldset>`;
 

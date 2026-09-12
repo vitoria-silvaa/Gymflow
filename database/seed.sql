@@ -32,10 +32,10 @@ INSERT INTO companies (id, nome) VALUES
 (2, 'FitLife Group');
 
 -- 2. FILIAIS
-INSERT INTO filiais (id, company_id, nome, cnpj, telefone, responsavel, ativo) VALUES
-(1, 1, 'GymFlow Central', '12.345.678/0001-90', '(11) 98765-4321', 'Jorge Silva', TRUE),
-(2, 1, 'GymFlow Zona Sul', '12.345.678/0002-70', '(11) 98765-4322', 'Mariana Costa', TRUE),
-(3, 2, 'FitLife Centro', '98.765.432/0001-10', '(21) 99999-8888', 'Carlos Santos', TRUE);
+INSERT INTO filiais (id, company_id, nome, cnpj, telefone, responsavel, ativo, latitude, longitude) VALUES
+(1, 1, 'GymFlow Central', '12.345.678/0001-90', '(11) 98765-4321', 'Jorge Silva', TRUE, -23.55052000, -46.63330800),
+(2, 1, 'GymFlow Zona Sul', '12.345.678/0002-70', '(11) 98765-4322', 'Mariana Costa', TRUE, -23.65000000, -46.65000000),
+(3, 1, 'GymFlow Zona Leste', '12.345.678/0003-50', '(11) 98765-4323', 'Maria Fernanda', TRUE, -23.54000000, -46.47000000);
 
 -- 3. ALUNOS
 INSERT INTO alunos (id, filial_id, nome, cpf, rg, sexo, nascimento, email, telefone, endereco, status) VALUES

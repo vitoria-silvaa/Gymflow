@@ -40,8 +40,19 @@ if ($operacao === 'buscar_publico' || $operacao === 'buscar') {
         $stmtPlanos->execute([$company_id]);
         $planos = $stmtPlanos->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
-        // Filiais ativas
-        $stmtFiliais = $pdo->prepare("SELECT * FROM filiais WHERE company_id = ? AND ativo = 1 ORDER BY id ASC");
+        // Filiais ativas + imagem de apresentação do portfólio
+        $stmtFiliais = $pdo->prepare("
+            SELECT
+                f.*,
+                pfi.image_url AS image_url
+            FROM filiais f
+            LEFT JOIN portfolio_filial_images pfi
+                ON pfi.filial_id = f.id
+                AND pfi.company_id = f.company_id
+            WHERE f.company_id = ?
+            AND f.ativo = 1
+            ORDER BY f.id ASC
+        ");
         $stmtFiliais->execute([$company_id]);
         $filiais = $stmtFiliais->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
@@ -89,8 +100,19 @@ elseif ($operacao === 'buscar_admin') {
         $stmtPlanos->execute([$company_id]);
         $planos = $stmtPlanos->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
-        // Filiais
-        $stmtFiliais = $pdo->prepare("SELECT * FROM filiais WHERE company_id = ? AND ativo = 1 ORDER BY id ASC");
+        // Filiais + imagem de apresentação do portfólio
+        $stmtFiliais = $pdo->prepare("
+            SELECT
+                f.*,
+                pfi.image_url AS image_url
+            FROM filiais f
+            LEFT JOIN portfolio_filial_images pfi
+                ON pfi.filial_id = f.id
+                AND pfi.company_id = f.company_id
+            WHERE f.company_id = ?
+            AND f.ativo = 1
+            ORDER BY f.id ASC
+        ");
         $stmtFiliais->execute([$company_id]);
         $filiais = $stmtFiliais->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
@@ -335,17 +357,29 @@ elseif ($operacao === 'salvar') {
         }
 
         // 3.7 Atualizar / Inserir Filiais
+        // A foto da unidade NÃO fica na tabela filiais.
+        // Ela é salva fisicamente em assets/uploads/portfolio/
+        // e a URL é registrada em portfolio_filial_images.
         if (isset($dadosPost['filiais']) && is_array($dadosPost['filiais'])) {
             $stmtUpdate = $pdo->prepare("
                 UPDATE filiais
-                SET nome = ?, telefone = ?, cnpj = ?, responsavel = ?
+                SET nome = ?, telefone = ?, cnpj = ?, responsavel = ?, latitude = ?, longitude = ?
                 WHERE id = ? AND company_id = ?
             ");
 
             $stmtInsert = $pdo->prepare("
                 INSERT INTO filiais
-                (company_id, nome, cnpj, telefone, responsavel, ativo)
-                VALUES (?, ?, ?, ?, ?, 1)
+                (company_id, nome, cnpj, telefone, responsavel, ativo, latitude, longitude)
+                VALUES (?, ?, ?, ?, ?, 1, ?, ?)
+            ");
+
+            $stmtImagemFilial = $pdo->prepare("
+                INSERT INTO portfolio_filial_images
+                    (company_id, filial_id, image_url)
+                VALUES (?, ?, ?)
+                ON DUPLICATE KEY UPDATE
+                    company_id = VALUES(company_id),
+                    image_url = VALUES(image_url)
             ");
 
             foreach ($dadosPost['filiais'] as $id => $data) {
@@ -354,10 +388,69 @@ elseif ($operacao === 'salvar') {
                 $telefone = trim($data['telefone'] ?? '');
                 $responsavel = trim($data['responsavel'] ?? '');
 
+                $latitude =
+                    isset($data['latitude']) && $data['latitude'] !== ''
+                    ? (float) str_replace(',', '.', (string)$data['latitude'])
+                    : null;
+
+                $longitude =
+                    isset($data['longitude']) && $data['longitude'] !== ''
+                    ? (float) str_replace(',', '.', (string)$data['longitude'])
+                    : null;
+
+                // URL atual da imagem de apresentação, vinda da tabela separada.
+                $imageUrl = trim($data['image_url'] ?? '');
+
+                // Se o Admin selecionar uma nova imagem, salva no projeto.
+                if (!empty($dadosFiles['filiais_arquivo']) && is_array($dadosFiles['filiais_arquivo'])) {
+                    $arquivoFilial = $obterArquivoDaLista(
+                        $dadosFiles['filiais_arquivo'],
+                        (string)$id
+                    );
+
+                    if ($arquivoFilial !== null) {
+                        $novaImagemFilial = $salvarImagem($arquivoFilial, 'filial');
+
+                        if ($novaImagemFilial !== null) {
+                            $imageUrl = $novaImagemFilial;
+                        }
+                    }
+                }
+
                 if (strpos((string)$id, 'new_') === 0) {
-                    $stmtInsert->execute([$company_id, $nome, $cnpj, $telefone, $responsavel]);
+                    $stmtInsert->execute([
+                        $company_id,
+                        $nome,
+                        $cnpj,
+                        $telefone,
+                        $responsavel,
+                        $latitude,
+                        $longitude
+                    ]);
+
+                    $filialId = (int)$pdo->lastInsertId();
                 } else {
-                    $stmtUpdate->execute([$nome, $telefone, $cnpj, $responsavel, (int)$id, $company_id]);
+                    $filialId = (int)$id;
+
+                    $stmtUpdate->execute([
+                        $nome,
+                        $telefone,
+                        $cnpj,
+                        $responsavel,
+                        $latitude,
+                        $longitude,
+                        $filialId,
+                        $company_id
+                    ]);
+                }
+
+                // Só cria/atualiza o registro da imagem se houver uma imagem definida.
+                if ($imageUrl !== '') {
+                    $stmtImagemFilial->execute([
+                        $company_id,
+                        $filialId,
+                        $imageUrl
+                    ]);
                 }
             }
         }

@@ -216,54 +216,353 @@ include __DIR__ . '/app/views/shared/portfolio_header.php';
 
     <?php endif; ?>
 
+    <!-- parceiros dos planos -->
+    <div class="portfolio-parceiros" aria-labelledby="parceiros-titulo">
+        <div class="parceiros-conteudo">
+            <div class="parceiros-texto">
+                <span class="secao-destaque">Benefícios</span>
+                <h2 id="parceiros-titulo">Nossas unidades aceitam</h2>
+                <p>Use seu benefício fitness e treine com a gente.</p>
+            </div>
+
+            <div class="parceiros-marcas">
+                <div class="parceiro-marca">
+                    <span class="parceiro-icone parceiro-icone-wellhub" aria-hidden="true">✦</span>
+                    <div>
+                        <strong>Wellhub</strong>
+                        <small>(Gympass)</small>
+                    </div>
+                </div>
+
+                <span class="parceiro-divisor" aria-hidden="true"></span>
+
+                <div class="parceiro-marca">
+                    <span class="parceiro-icone parceiro-icone-totalpass" aria-hidden="true">TP</span>
+                    <div>
+                        <strong>TotalPass</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </section>
 
     <!-- unidades -->
-    <hr>
-    <section id="unidades">
-        <h3>Nossas Unidades</h3>
-        <h1>Encontre a unidade mais próxima</h1>
+<section id="unidades" class="portfolio-unidades">
 
-        <?php if (empty($filiais)): ?>
-            <p>Nenhuma unidade cadastrada no momento.</p>
-        <?php else: ?>
+    <div class="unidades-cabecalho">
+        <span class="secao-destaque">Nossas Unidades</span>
+
+        <h2>
+            Conheça nossas unidades
+        </h2>
+
+        <p>
+            Encontre a unidade ideal para treinar com conforto, estrutura e qualidade.
+        </p>
+    </div>
+
+    <?php if (empty($filiais)): ?>
+
+        <p class="mensagem-vazia">
+            Nenhuma unidade cadastrada no momento.
+        </p>
+
+    <?php else: ?>
+
+        <div class="unidades-grid">
+
             <?php foreach ($filiais as $filial): ?>
-                <article>
-                    <h3><?= htmlspecialchars($filial['nome'] ?? '') ?></h3>
-                    <p>Telefone: <?= htmlspecialchars($filial['telefone'] ?? '') ?></p>
-                    <p>Responsável: <?= htmlspecialchars($filial['responsavel'] ?? '') ?></p>
-                    <a href="#">Saiba mais</a>
+
+                <article class="unidade-card">
+
+                    <div class="unidade-imagem">
+                        <?php if (!empty($filial['image_url'])): ?>
+                            <img
+                                src="<?= htmlspecialchars($filial['image_url']) ?>"
+                                alt="<?= htmlspecialchars($filial['nome'] ?? 'Unidade') ?>"
+                                style="width: 100%; height: 100%; object-fit: cover; display: block;"
+                            >
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="unidade-conteudo">
+
+                        <h3>
+                            <?= htmlspecialchars($filial['nome'] ?? '') ?>
+                        </h3>
+
+                        <ul class="unidade-info">
+                            <li>
+                                <span>📍</span>
+                                <span>São Paulo, SP</span>
+                            </li>
+
+                            <li>
+                                <span>🕒</span>
+                                <span>24 Horas</span>
+                            </li>
+
+                            <li>
+                                <span>🏋</span>
+                                <span>Responsável: <?= htmlspecialchars($filial['responsavel'] ?? '') ?></span>
+                            </li>
+                        </ul>
+
+                        <a class="unidade-btn" href="#">
+                            Saiba mais
+                        </a>
+
+                    </div>
+
                 </article>
-                <br>
+
             <?php endforeach; ?>
-        <?php endif; ?>
 
-        <br><br>
+        </div>
 
-        <section>
-            <h3>Mapa das Unidades</h3>
-            <p>
-                Nesta área será exibido o mapa com a localização das unidades
-                disponíveis.
-            </p>
-        </section>
-    </section>
+        <div class="unidades-acao">
+            <span class="unidades-texto-geral">
+                Conheça todas as nossas unidades
+            </span>
+        </div>
+
+        <div class="unidades-mapa">
+            <div class="unidades-mapa-conteudo">
+                <div class="unidades-mapa-texto">
+                    <h3>Veja a mais próxima de você</h3>
+                    <p>
+                        Use nosso mapa e descubra a unidade mais perto de você.
+                    </p>
+
+                    <button type="button" class="unidades-mapa-btn" id="abrir-mapa-completo">
+                        <span class="unidades-mapa-btn-icone" aria-hidden="true">⌖</span>
+                        Ver mapa completo
+                    </button>
+                </div>
+
+                <div
+                    class="unidades-mapa-box"
+                    id="mapa-unidades"
+                    aria-label="Mapa com as unidades da GymFlow"
+                ></div>
+            </div>
+        </div>
+
+    <?php endif; ?>
+
+</section>
+
+<div class="mapa-modal" id="mapa-modal" aria-hidden="true">
+    <div class="mapa-modal-overlay" data-fechar-mapa></div>
+
+    <div class="mapa-modal-conteudo" role="dialog" aria-modal="true" aria-labelledby="mapa-modal-titulo">
+        <div class="mapa-modal-topo">
+            <div>
+                <span class="mapa-modal-destaque">Nossas Unidades</span>
+                <h2 id="mapa-modal-titulo">Mapa completo</h2>
+            </div>
+
+            <button
+                type="button"
+                class="mapa-modal-fechar"
+                id="fechar-mapa-completo"
+                aria-label="Fechar mapa"
+            >
+                ×
+            </button>
+        </div>
+
+        <div id="mapa-unidades-completo" aria-label="Mapa completo com as unidades da GymFlow"></div>
+    </div>
+</div>
+
+<style>
+.mapa-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+}
+.mapa-modal.ativo {
+    display: flex;
+}
+.mapa-modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,.84);
+    backdrop-filter: blur(7px);
+}
+.mapa-modal-conteudo {
+    width: min(1180px, 96vw);
+    height: min(760px, 88vh);
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: #070707;
+    border: 1px solid rgba(255,255,255,.28);
+    border-radius: 22px;
+    box-shadow: 0 28px 80px rgba(0,0,0,.58);
+}
+.mapa-modal-topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 22px 26px;
+    background: #090909;
+    border-bottom: 1px solid rgba(255,255,255,.1);
+}
+.mapa-modal-destaque {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--portfolio-primary);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .11em;
+}
+.mapa-modal-topo h2 {
+    margin: 0;
+    color: #fff;
+    font-size: clamp(22px, 3vw, 34px);
+    line-height: 1.1;
+}
+.mapa-modal-fechar {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,.28);
+    border-radius: 50%;
+    font-size: 27px;
+    line-height: 1;
+    cursor: pointer;
+    transition: .25s ease;
+}
+.mapa-modal-fechar:hover {
+    color: #000;
+    background: var(--portfolio-primary);
+    border-color: var(--portfolio-primary);
+    transform: rotate(90deg);
+}
+#mapa-unidades-completo {
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    background: #050505;
+}
+#mapa-unidades-completo .leaflet-tile-pane {
+    filter: grayscale(1) invert(1) sepia(.18) saturate(.75) brightness(.38) contrast(1.42);
+}
+#mapa-unidades-completo .leaflet-popup-content-wrapper,
+#mapa-unidades-completo .leaflet-popup-tip {
+    background: #111;
+    color: #fff;
+}
+#mapa-unidades-completo .leaflet-popup-content strong {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--portfolio-primary);
+}
+#mapa-unidades-completo .leaflet-control-attribution {
+    padding: 1px 5px;
+    color: #8f8f8f;
+    background: rgba(0,0,0,.72);
+    font-size: 8px;
+}
+#mapa-unidades-completo .leaflet-control-attribution a {
+    color: #b7b7b7;
+}
+body.mapa-modal-aberto {
+    overflow: hidden;
+}
+@media (max-width: 700px) {
+    .mapa-modal {
+        padding: 14px;
+    }
+    .mapa-modal-conteudo {
+        width: 100%;
+        height: 88vh;
+        border-radius: 16px;
+    }
+    .mapa-modal-topo {
+        padding: 18px;
+    }
+}
+</style>
+
 
     <!-- sobre Nós -->
-    <hr>
-    <section id="sobre">
-        <h3>Sobre Nós</h3>
-        <p><?= htmlspecialchars($config['about_text'] ?? '') ?></p>
-        <?php if (!empty($config['about_image'])): ?>
-            <img src="<?= htmlspecialchars($config['about_image']) ?>" alt="Sobre nós" width="400">
-        <?php endif; ?>
+    <section id="sobre" class="portfolio-sobre">
+        <div class="sobre-principal">
+            <div class="sobre-texto">
+                <span class="secao-destaque">Sobre nós</span>
 
-        <h4>Nossos Valores</h4>
-        <p><?= htmlspecialchars($config['company_values'] ?? '') ?></p>
+                <h2>
+                    Mais que uma academia.<br>
+                    <span>Um espaço para evoluir.</span>
+                </h2>
 
-        <h4>Nossas Competências</h4>
-        <p><?= htmlspecialchars($config['company_competencies'] ?? '') ?></p>
+                <p class="sobre-descricao">
+                    <?= nl2br(htmlspecialchars($config['about_text'] ?? '')) ?>
+                </p>
+
+                <div class="sobre-linha"></div>
+
+                <p class="sobre-frase">
+                    Movimento, estrutura e acompanhamento para transformar cada etapa da sua jornada.
+                </p>
+            </div>
+
+            <div class="sobre-imagem-wrap">
+                <?php if (!empty($config['about_image'])): ?>
+                    <img
+                        src="<?= htmlspecialchars($config['about_image']) ?>"
+                        alt="Ambiente da academia"
+                        class="sobre-imagem"
+                    >
+                <?php else: ?>
+                    <div class="sobre-imagem-vazia">
+                        Adicione uma imagem no Admin
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <div class="sobre-essencia">
+            <div class="sobre-essencia-cabecalho">
+                <span class="secao-destaque">Nossa essência</span>
+                <h3>O que guia a GymFlow todos os dias</h3>
+            </div>
+
+            <div class="sobre-cards">
+                <article class="sobre-card">
+                    <div class="sobre-card-icone" aria-hidden="true">♡</div>
+                    <h4>Nossos Valores</h4>
+                    <p><?= nl2br(htmlspecialchars($config['company_values'] ?? '')) ?></p>
+                </article>
+
+                <article class="sobre-card">
+                    <div class="sobre-card-icone" aria-hidden="true">✦</div>
+                    <h4>Nossas Competências</h4>
+                    <p><?= nl2br(htmlspecialchars($config['company_competencies'] ?? '')) ?></p>
+                </article>
+            </div>
+        </div>
     </section>
+
+
 </main>
 
 <script>
@@ -324,6 +623,290 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     iniciarAutomatico();
+});
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const mapaElemento = document.getElementById('mapa-unidades');
+
+    if (!mapaElemento || typeof L === 'undefined') {
+        return;
+    }
+
+    const unidades = <?= json_encode(
+        $filiais ?? [],
+        JSON_UNESCAPED_UNICODE |
+        JSON_UNESCAPED_SLASHES |
+        JSON_HEX_TAG |
+        JSON_HEX_AMP |
+        JSON_HEX_APOS |
+        JSON_HEX_QUOT
+    ) ?>;
+
+    const unidadesComCoordenadas = unidades.filter(function (unidade) {
+        const latitude = parseFloat(unidade.latitude);
+        const longitude = parseFloat(unidade.longitude);
+
+        return Number.isFinite(latitude) && Number.isFinite(longitude);
+    });
+
+    if (unidadesComCoordenadas.length === 0) {
+        mapaElemento.textContent = 'Nenhuma unidade possui coordenadas cadastradas.';
+        mapaElemento.style.display = 'flex';
+        mapaElemento.style.alignItems = 'center';
+        mapaElemento.style.justifyContent = 'center';
+        return;
+    }
+
+    const mapa = L.map('mapa-unidades', {
+        scrollWheelZoom: false,
+        zoomControl: false
+    });
+
+    L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }
+    ).addTo(mapa);
+
+    const corPrimaria =
+        getComputedStyle(document.documentElement)
+            .getPropertyValue('--portfolio-primary')
+            .trim() || '#C9A227';
+
+    const limites = [];
+
+    unidadesComCoordenadas.forEach(function (unidade) {
+        const latitude = parseFloat(unidade.latitude);
+        const longitude = parseFloat(unidade.longitude);
+
+        const iconeUnidade = L.divIcon({
+            className: 'gymflow-marker-wrap',
+            html: '<div class="gymflow-pin" style="--pin-color:' + corPrimaria + '"></div>',
+            iconSize: [34, 40],
+            iconAnchor: [17, 38],
+            popupAnchor: [0, -34]
+        });
+
+        const marcador = L.marker(
+            [latitude, longitude],
+            { icon: iconeUnidade }
+        ).addTo(mapa);
+
+        const popup = document.createElement('div');
+
+        const titulo = document.createElement('strong');
+        titulo.textContent = unidade.nome || 'Unidade';
+        popup.appendChild(titulo);
+
+        if (unidade.responsavel) {
+            const responsavel = document.createElement('div');
+            responsavel.textContent = 'Responsável: ' + unidade.responsavel;
+            popup.appendChild(responsavel);
+        }
+
+        if (unidade.telefone) {
+            const telefone = document.createElement('div');
+            telefone.textContent = 'Telefone: ' + unidade.telefone;
+            popup.appendChild(telefone);
+        }
+
+        marcador.bindPopup(popup);
+
+        marcador.on('mouseover', function () {
+            this.openPopup();
+        });
+
+        marcador.on('mouseout', function () {
+            this.closePopup();
+        });
+
+        limites.push([latitude, longitude]);
+    });
+
+    if (limites.length > 1) {
+        L.polyline(limites, {
+            color: corPrimaria,
+            weight: 1.4,
+            opacity: 0.42,
+            dashArray: '4, 7',
+            interactive: false
+        }).addTo(mapa);
+    }
+
+    if (limites.length === 1) {
+        mapa.setView(limites[0], 13);
+    } else {
+        mapa.fitBounds(limites, {
+            padding: [28, 28],
+            maxZoom: 12
+        });
+    }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const abrirMapa = document.getElementById('abrir-mapa-completo');
+    const fecharMapa = document.getElementById('fechar-mapa-completo');
+    const modalMapa = document.getElementById('mapa-modal');
+    const overlayMapa = modalMapa ? modalMapa.querySelector('[data-fechar-mapa]') : null;
+
+    if (!abrirMapa || !modalMapa || typeof L === 'undefined') {
+        return;
+    }
+
+    const unidadesModal = <?= json_encode(
+        $filiais ?? [],
+        JSON_UNESCAPED_UNICODE |
+        JSON_UNESCAPED_SLASHES |
+        JSON_HEX_TAG |
+        JSON_HEX_AMP |
+        JSON_HEX_APOS |
+        JSON_HEX_QUOT
+    ) ?>;
+
+    const unidadesModalComCoordenadas = unidadesModal.filter(function (unidade) {
+        const latitude = parseFloat(unidade.latitude);
+        const longitude = parseFloat(unidade.longitude);
+
+        return Number.isFinite(latitude) && Number.isFinite(longitude);
+    });
+
+    let mapaCompleto = null;
+
+    function criarMapaCompleto() {
+        if (mapaCompleto || unidadesModalComCoordenadas.length === 0) {
+            return;
+        }
+
+        mapaCompleto = L.map('mapa-unidades-completo', {
+            scrollWheelZoom: true,
+            zoomControl: true
+        });
+
+        L.tileLayer(
+            'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors'
+            }
+        ).addTo(mapaCompleto);
+
+        const corPrimaria =
+            getComputedStyle(document.documentElement)
+                .getPropertyValue('--portfolio-primary')
+                .trim() || '#C9A227';
+
+        const limitesModal = [];
+
+        unidadesModalComCoordenadas.forEach(function (unidade) {
+            const latitude = parseFloat(unidade.latitude);
+            const longitude = parseFloat(unidade.longitude);
+
+            const iconeUnidade = L.divIcon({
+                className: 'gymflow-marker-wrap',
+                html: '<div class="gymflow-pin" style="--pin-color:' + corPrimaria + '"></div>',
+                iconSize: [34, 40],
+                iconAnchor: [17, 38],
+                popupAnchor: [0, -34]
+            });
+
+            const marcador = L.marker(
+                [latitude, longitude],
+                { icon: iconeUnidade }
+            ).addTo(mapaCompleto);
+
+            const popup = document.createElement('div');
+
+            const titulo = document.createElement('strong');
+            titulo.textContent = unidade.nome || 'Unidade';
+            popup.appendChild(titulo);
+
+            if (unidade.responsavel) {
+                const responsavel = document.createElement('div');
+                responsavel.textContent = 'Responsável: ' + unidade.responsavel;
+                popup.appendChild(responsavel);
+            }
+
+            if (unidade.telefone) {
+                const telefone = document.createElement('div');
+                telefone.textContent = 'Telefone: ' + unidade.telefone;
+                popup.appendChild(telefone);
+            }
+
+            marcador.bindPopup(popup);
+
+            marcador.on('mouseover', function () {
+                this.openPopup();
+            });
+
+            marcador.on('mouseout', function () {
+                this.closePopup();
+            });
+
+            limitesModal.push([latitude, longitude]);
+        });
+
+        if (limitesModal.length > 1) {
+            L.polyline(limitesModal, {
+                color: corPrimaria,
+                weight: 1.5,
+                opacity: 0.42,
+                dashArray: '4, 7',
+                interactive: false
+            }).addTo(mapaCompleto);
+        }
+
+        if (limitesModal.length === 1) {
+            mapaCompleto.setView(limitesModal[0], 14);
+        } else if (limitesModal.length > 1) {
+            mapaCompleto.fitBounds(limitesModal, {
+                padding: [55, 55],
+                maxZoom: 13
+            });
+        }
+    }
+
+    function abrirModalMapa() {
+        modalMapa.classList.add('ativo');
+        modalMapa.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('mapa-modal-aberto');
+
+        criarMapaCompleto();
+
+        window.setTimeout(function () {
+            if (mapaCompleto) {
+                mapaCompleto.invalidateSize();
+            }
+        }, 80);
+    }
+
+    function fecharModalMapa() {
+        modalMapa.classList.remove('ativo');
+        modalMapa.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('mapa-modal-aberto');
+    }
+
+    abrirMapa.addEventListener('click', abrirModalMapa);
+
+    if (fecharMapa) {
+        fecharMapa.addEventListener('click', fecharModalMapa);
+    }
+
+    if (overlayMapa) {
+        overlayMapa.addEventListener('click', fecharModalMapa);
+    }
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && modalMapa.classList.contains('ativo')) {
+            fecharModalMapa();
+        }
+    });
 });
 </script>
 
