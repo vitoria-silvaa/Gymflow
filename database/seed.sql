@@ -2,11 +2,13 @@
 -- GymCore - Massa de Dados de Teste (Mock / Seed)
 -- =====================================================================
 
--- Garante que estamos usando o banco correto               
+-- Garante que estamos usando o banco correto
 USE gymcore_db;
 
 -- Limpa os dados em ordem reversa de dependência das FKs para evitar conflitos ao re-executar
 DELETE FROM portfolio_slides;
+DELETE FROM portfolio_filial_images;
+DELETE FROM portfolio_feedbacks;
 DELETE FROM portfolio_modalities;
 DELETE FROM portfolio_config;
 DELETE FROM trancamentos;
@@ -45,20 +47,20 @@ INSERT INTO alunos (id, filial_id, nome, cpf, rg, sexo, nascimento, email, telef
 (4, 3, 'Diego Rocha', '444.555.666-77', '34.567.890-3', 'Masculino', '1992-05-10', 'diego.rocha@email.com', '(21) 94444-4444', 'Rua D, 101 - Rio de Janeiro', 'Ativo');
 
 -- 4. USERS
--- Senha padrão para todos: 'admin'  |  Hash bcrypt válido gerado com password_hash('admin', PASSWORD_BCRYPT)
+-- Senha padrão para todos: 'admin' | Hash bcrypt válido gerado com password_hash('admin', PASSWORD_BCRYPT)
 INSERT INTO users (id, name, email, password, role, aluno_id) VALUES
-(1, 'Administrador Principal', 'admin@gymflow.com',         '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Admin',     NULL),
-(2, 'Professor Marcelo',       'marcelo.treino@gymflow.com','$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Professor', NULL),
-(3, 'Professora Juliana',      'juliana.fit@gymflow.com',   '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Professor', NULL),
-(4, 'Ana Oliveira',            'ana.oliveira@email.com',    '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Aluno',     1),
-(5, 'Bruno Souza',             'bruno.souza@email.com',     '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Aluno',     2);
+(1, 'Administrador Principal', 'admin@gymflow.com', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Admin', NULL),
+(2, 'Professor Marcelo', 'marcelo.treino@gymflow.com', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Professor', NULL),
+(3, 'Professora Juliana', 'juliana.fit@gymflow.com', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Professor', NULL),
+(4, 'Ana Oliveira', 'ana.oliveira@email.com', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Aluno', 1),
+(5, 'Bruno Souza', 'bruno.souza@email.com', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Aluno', 2);
 
 -- 5. USER_FILIAIS
 INSERT INTO user_filiais (user_id, filial_id) VALUES
-(1, 1), -- Admin na Filial 1
-(1, 2), -- Admin na Filial 2
-(2, 1), -- Professor Marcelo na Filial 1
-(3, 3); -- Professora Juliana na Filial 3
+(1, 1),
+(1, 2),
+(2, 1),
+(3, 3);
 
 -- 6. PLANOS
 INSERT INTO planos (id, company_id, nome, categoria, valor, duracao) VALUES
@@ -69,9 +71,9 @@ INSERT INTO planos (id, company_id, nome, categoria, valor, duracao) VALUES
 
 -- 7. MATRÍCULAS
 INSERT INTO matriculas (id, aluno_id, plano_id, inicio, fim, valor, desconto, ativa) VALUES
-(1, 1, 1, '2026-07-01', '2026-08-01', 99.90, 0.00, TRUE),   -- Ana ativa no Mensal Gold
-(2, 2, 2, '2026-01-15', '2026-07-15', 499.00, 50.00, FALSE), -- Bruno inativo (vencido)
-(3, 4, 4, '2026-06-01', '2026-07-01', 79.90, 0.00, TRUE);     -- Diego ativo no Standard
+(1, 1, 1, '2026-07-01', '2026-08-01', 99.90, 0.00, TRUE),
+(2, 2, 2, '2026-01-15', '2026-07-15', 499.00, 50.00, FALSE),
+(3, 4, 4, '2026-06-01', '2026-07-01', 79.90, 0.00, TRUE);
 
 -- 8. CONTAS
 INSERT INTO contas (id, aluno_id, matricula_id, vencimento, valor, status, forma_pagamento, pago_em) VALUES
@@ -126,11 +128,100 @@ INSERT INTO trancamentos (id, aluno_id, inicio, fim, justificativa, taxa) VALUES
 (1, 3, '2026-07-01', '2026-08-01', 'Viagem a trabalho', 30.00);
 
 -- 17. PORTFOLIO_CONFIG
-INSERT INTO portfolio_config (company_id, app_name, theme_mode, primary_color, secondary_color, logo_url, hero_title, hero_subtitle, hero_cta, about_text, about_image, company_values, company_competencies) VALUES
-(1, 'GymFlow Ecosystem', 'dark', '#C9A227', '#000000', 'https://example.com/logo.png', 'Transforme seu corpo e sua mente', 'O melhor ecossistema de academias para gerenciar seus treinos e metas.', 'Matricule-se Já', 'Focados em entregar alta performance com conforto e tecnologia.', 'https://example.com/about.jpg', 'Foco, Disciplina, Resultado', 'Musculação Avançada, Acompanhamento Nutricional');
+INSERT INTO portfolio_config (
+    company_id,
+    app_name,
+    theme_mode,
+    primary_color,
+    secondary_color,
+    logo_url,
+    hero_title,
+    hero_subtitle,
+    hero_cta,
+    about_text,
+    about_image,
+    company_values,
+    company_competencies,
+    contact_title,
+    contact_subtitle,
+    contact_form_title,
+    contact_email,
+    contact_phone,
+    contact_hours,
+    contact_image,
+    instagram_url,
+    facebook_url,
+    tiktok_url,
+    whatsapp_url,
+    feedback_title,
+    feedback_subtitle,
+    feedback_image
+) VALUES (
+    1,
+    'GymFlow Ecosystem',
+    'dark',
+    '#C9A227',
+    '#000000',
+    'https://example.com/logo.png',
+    'Transforme seu corpo e sua mente',
+    'O melhor ecossistema de academias para gerenciar seus treinos e metas.',
+    'Matricule-se Já',
+    'Focados em entregar alta performance com conforto e tecnologia.',
+    'https://example.com/about.jpg',
+    'Foco, Disciplina, Resultado',
+    'Musculação Avançada, Acompanhamento Nutricional',
+    'Entre em contato conosco',
+    'Nossa equipe está pronta para ajudar você.',
+    'Ficaremos felizes em te atender!',
+    'contato@gymflow.com',
+    '(11) 98765-4321',
+    'Segunda a sexta: 06h às 22h | Sábado: 08h às 18h | Domingo: 08h às 14h',
+    NULL,
+    '',
+    '',
+    '',
+    '',
+    'Como foi sua experiência?',
+    'Envie seu feedback e nos ajude a melhorar sua experiência.',
+    NULL
+);
 
 -- 18. PORTFOLIO_MODALITIES
 INSERT INTO portfolio_modalities (id, filial_id, name, description, image_url) VALUES
 (1, 1, 'CrossFit', 'Treinamento funcional de alta intensidade.', 'https://example.com/crossfit.jpg'),
 (2, 1, 'Pilates', 'Aulas focadas em postura, flexibilidade e core.', 'https://example.com/pilates.jpg'),
 (3, 2, 'Muay Thai', 'Arte marcial tailandesa de alta queima calórica.', 'https://example.com/muaythai.jpg');
+
+-- 19. PORTFOLIO_FEEDBACKS
+INSERT INTO portfolio_feedbacks (
+    company_id,
+    nome,
+    nota,
+    mensagem,
+    criado_em,
+    ativo
+) VALUES
+(
+    1,
+    'Ana Paula',
+    5,
+    'Excelente atendimento e ótimos equipamentos!',
+    '2026-05-22 10:00:00',
+    TRUE
+),
+(
+    1,
+    'Ricardo S.',
+    4,
+    'Ambiente limpo e organizado. Recomendo!',
+    '2026-04-19 14:30:00',
+    TRUE
+),
+(
+    1,
+    'Mariana C.',
+    5,
+    'Professores atenciosos e aulas incríveis!',
+    '2026-03-06 09:15:00',
+    TRUE
+);

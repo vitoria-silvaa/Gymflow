@@ -160,6 +160,171 @@ include __DIR__ . '/../shared/header.php';
                         <label>Nossas Competências</label>
                         <textarea name="nossasCompetencias" style="width: 100%; height: 60px;"><?= htmlspecialchars($config['company_competencies'] ?? '') ?></textarea>
                     </div>
+                         <h3 style="margin-top: 30px;">Contato</h3>
+
+<div>
+    <label>Título da seção de contato</label>
+    <input
+        type="text"
+        name="tituloContato"
+        value="<?= htmlspecialchars($config['contact_title'] ?? '') ?>"
+        style="width: 100%;"
+    >
+</div>
+
+<div>
+    <label>Subtítulo da seção de contato</label>
+    <textarea
+        name="subtituloContato"
+        style="width: 100%; height: 60px;"
+    ><?= htmlspecialchars($config['contact_subtitle'] ?? '') ?></textarea>
+</div>
+
+<div>
+    <label>E-mail de contato</label>
+    <input
+        type="email"
+        name="emailContato"
+        value="<?= htmlspecialchars($config['contact_email'] ?? '') ?>"
+        style="width: 100%;"
+    >
+</div>
+
+<div>
+    <label>Telefone / WhatsApp</label>
+    <input
+        type="text"
+        name="telefoneContato"
+        value="<?= htmlspecialchars($config['contact_phone'] ?? '') ?>"
+        style="width: 100%;"
+    >
+</div>
+
+<div>
+    <label>Horário de atendimento</label>
+    <textarea
+        name="horarioContato"
+        style="width: 100%; height: 60px;"
+    ><?= htmlspecialchars($config['contact_hours'] ?? '') ?></textarea>
+</div>
+
+<div>
+    <label>Imagem da seção de contato:</label>
+
+    <input
+        type="file"
+        name="contato_arquivo"
+        accept="image/png, image/jpeg, image/webp"
+    >
+
+    <input
+        type="hidden"
+        name="urlImagemContato"
+        value="<?= htmlspecialchars($config['contact_image'] ?? '') ?>"
+    >
+
+    <?php if (!empty($config['contact_image'])): ?>
+        <div style="margin-top: 10px;">
+            <img
+                src="<?= htmlspecialchars($config['contact_image']) ?>"
+                alt="Imagem atual do Contato"
+                style="width: 220px; max-height: 140px; object-fit: cover; border-radius: 6px;"
+            >
+        </div>
+    <?php endif; ?>
+</div>
+
+<h4 style="margin-top: 25px;">Redes Sociais</h4>
+
+<div>
+    <label>Instagram</label>
+    <input
+        type="text"
+        name="instagramUrl"
+        value="<?= htmlspecialchars($config['instagram_url'] ?? '') ?>"
+        placeholder="https://instagram.com/..."
+        style="width: 100%;"
+    >
+</div>
+
+<div>
+    <label>Facebook</label>
+    <input
+        type="text"
+        name="facebookUrl"
+        value="<?= htmlspecialchars($config['facebook_url'] ?? '') ?>"
+        placeholder="https://facebook.com/..."
+        style="width: 100%;"
+    >
+</div>
+
+<div>
+    <label>TikTok</label>
+    <input
+        type="text"
+        name="tiktokUrl"
+        value="<?= htmlspecialchars($config['tiktok_url'] ?? '') ?>"
+        placeholder="https://tiktok.com/@..."
+        style="width: 100%;"
+    >
+</div>
+
+<div>
+    <label>WhatsApp</label>
+    <input
+        type="text"
+        name="whatsappUrl"
+        value="<?= htmlspecialchars($config['whatsapp_url'] ?? '') ?>"
+        placeholder="https://wa.me/..."
+        style="width: 100%;"
+    >
+</div>
+
+<h3 style="margin-top: 30px;">Feedback</h3>
+
+<div>
+    <label>Título da seção de feedback</label>
+    <input
+        type="text"
+        name="tituloFeedback"
+        value="<?= htmlspecialchars($config['feedback_title'] ?? '') ?>"
+        style="width: 100%;"
+    >
+</div>
+
+<div>
+    <label>Subtítulo da seção de feedback</label>
+    <textarea
+        name="subtituloFeedback"
+        style="width: 100%; height: 60px;"
+    ><?= htmlspecialchars($config['feedback_subtitle'] ?? '') ?></textarea>
+</div>
+
+<div>
+    <label>Imagem da seção de feedback:</label>
+
+    <input
+        type="file"
+        name="feedback_arquivo"
+        accept="image/png, image/jpeg, image/webp"
+    >
+
+    <input
+        type="hidden"
+        name="urlImagemFeedback"
+        value="<?= htmlspecialchars($config['feedback_image'] ?? '') ?>"
+    >
+
+    <?php if (!empty($config['feedback_image'])): ?>
+        <div style="margin-top: 10px;">
+            <img
+                src="<?= htmlspecialchars($config['feedback_image']) ?>"
+                alt="Imagem atual do Feedback"
+                style="width: 220px; max-height: 140px; object-fit: cover; border-radius: 6px;"
+            >
+        </div>
+    <?php endif; ?>
+</div>
 
                     <hr>
                     <div style="display:flex; justify-content:space-between; align-items:center;">

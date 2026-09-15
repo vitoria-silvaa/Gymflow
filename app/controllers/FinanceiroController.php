@@ -7,7 +7,7 @@ error_reporting(E_ALL);
 
 require_once __DIR__ . '/../../config/sessao.php';
 
-verificarRole(['Admin', 'Professor', 'Recepcao']);
+verificarRole(['Admin']);
 
 $acao = $_GET['acao'] ?? 'listar';
 
@@ -26,7 +26,7 @@ if ($acao === 'listar') {
 if ($acao === 'baixar') {
 
     $conta_id = (int) ($_GET['id'] ?? 0);
-
+  
     if ($conta_id <= 0) {
         header("Location: /Gymflow/app/controllers/FinanceiroController.php");
         exit;

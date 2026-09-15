@@ -562,6 +562,271 @@ body.mapa-modal-aberto {
         </div>
     </section>
 
+    <!-- contato -->
+    <section id="contato" class="portfolio-contato">
+        <div class="contato-cabecalho">
+            <span class="secao-destaque">Fale conosco</span>
+
+            <h2>
+                <?= htmlspecialchars($config['contact_title'] ?? '') ?>
+            </h2>
+
+            <p>
+                <?= nl2br(htmlspecialchars($config['contact_subtitle'] ?? '')) ?>
+            </p>
+        </div>
+
+        <div class="contato-conteudo">
+            <div class="contato-informacoes">
+                <div class="contato-imagem-wrap">
+                    <?php if (!empty($config['contact_image'])): ?>
+                        <img
+                            src="<?= htmlspecialchars($config['contact_image']) ?>"
+                            alt="Atendimento GymFlow"
+                            class="contato-imagem"
+                        >
+                    <?php else: ?>
+                        <div class="contato-imagem-vazia">
+                            Adicione uma imagem no Admin
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <div class="contato-dados">
+                    <?php if (!empty($config['contact_email'])): ?>
+                        <article class="contato-dado">
+                            <span class="contato-dado-icone" aria-hidden="true">✉</span>
+                            <div>
+                                <strong>E-mail</strong>
+                                <p><?= htmlspecialchars($config['contact_email']) ?></p>
+                            </div>
+                        </article>
+                    <?php endif; ?>
+
+                    <?php if (!empty($config['contact_phone'])): ?>
+                        <article class="contato-dado">
+                            <span class="contato-dado-icone" aria-hidden="true">☎</span>
+                            <div>
+                                <strong>Telefone / WhatsApp</strong>
+                                <p><?= htmlspecialchars($config['contact_phone']) ?></p>
+                            </div>
+                        </article>
+                    <?php endif; ?>
+
+                    <?php if (!empty($config['contact_hours'])): ?>
+                        <article class="contato-dado">
+                            <span class="contato-dado-icone" aria-hidden="true">◷</span>
+                            <div>
+                                <strong>Horário de atendimento</strong>
+                                <p><?= nl2br(htmlspecialchars($config['contact_hours'])) ?></p>
+                            </div>
+                        </article>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <div class="contato-formulario-wrap">
+                <h3>
+                    <?= htmlspecialchars($config['contact_form_title'] ?? '') ?>
+                </h3>
+
+                <form class="contato-formulario" onsubmit="return false;">
+                    <div class="contato-campo">
+                        <label for="contato-nome">Nome</label>
+                        <input
+                            type="text"
+                            id="contato-nome"
+                            name="nome"
+                            placeholder="Digite seu nome"
+                        >
+                    </div>
+
+                    <div class="contato-campo">
+                        <label for="contato-email">E-mail</label>
+                        <input
+                            type="email"
+                            id="contato-email"
+                            name="email"
+                            placeholder="Digite seu e-mail"
+                        >
+                    </div>
+
+                    <div class="contato-campo">
+                        <label for="contato-telefone">Telefone</label>
+                        <input
+                            type="text"
+                            id="contato-telefone"
+                            name="telefone"
+                            placeholder="(11) 99999-9999"
+                        >
+                    </div>
+
+                    <div class="contato-campo">
+                        <label for="contato-unidade">Unidade desejada</label>
+                        <select id="contato-unidade" name="filial_id">
+                            <option value="">Selecione uma unidade</option>
+
+                            <?php foreach (($filiais ?? []) as $filial): ?>
+                                <option value="<?= (int)($filial['id'] ?? 0) ?>">
+                                    <?= htmlspecialchars($filial['nome'] ?? '') ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="contato-campo">
+                        <label for="contato-mensagem">Mensagem</label>
+                        <textarea
+                            id="contato-mensagem"
+                            name="mensagem"
+                            rows="5"
+                            placeholder="Como podemos ajudar?"
+                        ></textarea>
+                    </div>
+
+                    <button type="button" class="contato-btn">
+                        Enviar mensagem
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- feedback -->
+    <section id="feedback" class="portfolio-feedback">
+        <div class="feedback-topo">
+            <div class="feedback-formulario-area">
+                <span class="secao-destaque">Sua opinião importa</span>
+
+                <h2>
+                    <?= htmlspecialchars($config['feedback_title'] ?? '') ?>
+                </h2>
+
+                <p>
+                    <?= nl2br(htmlspecialchars($config['feedback_subtitle'] ?? '')) ?>
+                </p>
+
+                <?php if (($_GET['feedback'] ?? '') === 'sucesso'): ?>
+                    <div class="feedback-status feedback-status-sucesso">
+                        Feedback enviado com sucesso! Obrigado pela sua avaliação.
+                    </div>
+                <?php elseif (($_GET['feedback'] ?? '') === 'erro'): ?>
+                    <div class="feedback-status feedback-status-erro">
+                        Escolha uma nota de 1 a 5 estrelas e escreva uma mensagem.
+                    </div>
+                <?php endif; ?>
+
+                <form
+                    class="feedback-formulario"
+                    method="POST"
+                    action="/Gymflow/app/controllers/FeedbackController.php"
+                >
+                    <div class="feedback-avaliacao">
+                        <span class="feedback-avaliacao-label">Sua avaliação</span>
+
+                        <div class="feedback-estrelas" role="radiogroup" aria-label="Escolha uma nota de 1 a 5 estrelas">
+                            <?php for ($estrela = 1; $estrela <= 5; $estrela++): ?>
+                                <button
+                                    type="button"
+                                    class="feedback-estrela"
+                                    data-nota="<?= $estrela ?>"
+                                    aria-label="<?= $estrela ?> estrela<?= $estrela > 1 ? 's' : '' ?>"
+                                >☆</button>
+                            <?php endfor; ?>
+                        </div>
+
+                        <input type="hidden" name="nota" id="feedback-nota" value="">
+                    </div>
+
+                    <div class="feedback-campo">
+                        <label for="feedback-mensagem">Mensagem</label>
+                        <textarea
+                            id="feedback-mensagem"
+                            name="mensagem"
+                            rows="5"
+                            placeholder="Conte pra gente como foi sua experiência..."
+                        ></textarea>
+                    </div>
+
+                    <button type="submit" class="feedback-btn">
+                        Enviar feedback
+                    </button>
+                </form>
+            </div>
+
+            <div class="feedback-imagem-wrap">
+                <?php if (!empty($config['feedback_image'])): ?>
+                    <img
+                        src="<?= htmlspecialchars($config['feedback_image']) ?>"
+                        alt="Experiência na GymFlow"
+                        class="feedback-imagem"
+                    >
+                <?php else: ?>
+                    <div class="feedback-imagem-vazia">
+                        Adicione uma imagem no Admin
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <div class="feedback-recentes">
+            <div class="feedback-lista-cabecalho">
+                <span class="secao-destaque">Feedbacks recentes</span>
+                <h3>O que estão dizendo sobre a GymFlow</h3>
+            </div>
+
+            <?php if (empty($feedbacks)): ?>
+                <div class="feedback-vazio">
+                    Ainda não há feedbacks publicados.
+                </div>
+            <?php else: ?>
+                <div class="feedback-lista">
+                    <?php foreach ($feedbacks as $feedback): ?>
+                        <?php
+                            $nomeFeedback = trim($feedback['nome'] ?? 'Visitante');
+                            $notaFeedback = max(1, min(5, (int)($feedback['nota'] ?? 0)));
+                            $dataFeedback = !empty($feedback['criado_em'])
+                                ? date('d/m/Y', strtotime($feedback['criado_em']))
+                                : '';
+                            $inicialFeedback = function_exists('mb_substr')
+                                ? mb_strtoupper(mb_substr($nomeFeedback, 0, 1, 'UTF-8'), 'UTF-8')
+                                : strtoupper(substr($nomeFeedback, 0, 1));
+                        ?>
+
+                        <article class="feedback-card">
+                            <div class="feedback-autor">
+                                <div class="feedback-avatar">
+                                    <?= htmlspecialchars($inicialFeedback) ?>
+                                </div>
+
+                                <div class="feedback-autor-info">
+                                    <strong><?= htmlspecialchars($nomeFeedback) ?></strong>
+
+                                    <?php if ($dataFeedback !== ''): ?>
+                                        <span><?= htmlspecialchars($dataFeedback) ?></span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+
+                            <div
+                                class="feedback-card-estrelas"
+                                aria-label="<?= $notaFeedback ?> de 5 estrelas"
+                            >
+                                <?php for ($estrela = 1; $estrela <= 5; $estrela++): ?>
+                                    <span class="<?= $estrela <= $notaFeedback ? 'ativa' : '' ?>">★</span>
+                                <?php endfor; ?>
+                            </div>
+
+                            <p>
+                                <?= nl2br(htmlspecialchars($feedback['mensagem'] ?? '')) ?>
+                            </p>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </div>
+    </section>
 
 </main>
 
@@ -910,4 +1175,61 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
-<?php include __DIR__ . '/app/views/shared/footer.php'; ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const estrelas = document.querySelectorAll('.feedback-estrela');
+    const campoNota = document.getElementById('feedback-nota');
+
+    if (!estrelas.length || !campoNota) {
+        return;
+    }
+
+    let notaSelecionada = 0;
+
+    function atualizarEstrelas(nota) {
+        estrelas.forEach(function (estrela) {
+            const valor = Number(estrela.dataset.nota);
+            const ativa = valor <= nota;
+
+            estrela.textContent = ativa ? '★' : '☆';
+            estrela.classList.toggle('ativa', ativa);
+        });
+    }
+
+    estrelas.forEach(function (estrela) {
+        estrela.addEventListener('mouseenter', function () {
+            atualizarEstrelas(Number(estrela.dataset.nota));
+        });
+
+        estrela.addEventListener('focus', function () {
+            atualizarEstrelas(Number(estrela.dataset.nota));
+        });
+
+        estrela.addEventListener('click', function () {
+            notaSelecionada = Number(estrela.dataset.nota);
+            campoNota.value = String(notaSelecionada);
+            atualizarEstrelas(notaSelecionada);
+        });
+    });
+
+    const grupoEstrelas = document.querySelector('.feedback-estrelas');
+
+    if (grupoEstrelas) {
+        grupoEstrelas.addEventListener('mouseleave', function () {
+            atualizarEstrelas(notaSelecionada);
+        });
+
+        grupoEstrelas.addEventListener('focusout', function () {
+            window.setTimeout(function () {
+                if (!grupoEstrelas.contains(document.activeElement)) {
+                    atualizarEstrelas(notaSelecionada);
+                }
+            }, 0);
+        });
+    }
+});
+</script>
+
+
+<?php include __DIR__ . '/app/views/shared/portfolio_footer.php'; ?>

@@ -238,6 +238,20 @@ CREATE TABLE portfolio_config (
     about_image TEXT,
     company_values TEXT,
     company_competencies TEXT,
+    contact_title VARCHAR(150),
+    contact_subtitle TEXT,
+    contact_form_title VARCHAR(150),
+    contact_email VARCHAR(120),
+    contact_phone VARCHAR(30),
+    contact_hours TEXT,
+    contact_image TEXT,
+    instagram_url TEXT,
+    facebook_url TEXT,
+    tiktok_url TEXT,
+    whatsapp_url TEXT,
+    feedback_title VARCHAR(150),
+    feedback_subtitle TEXT,
+    feedback_image TEXT,
     FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
 );
 
@@ -284,7 +298,23 @@ CREATE TABLE portfolio_slides (
     CONSTRAINT uq_portfolio_slides_company_ordem UNIQUE (company_id, ordem),
     FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
 );
+-- ---------- 15. FEEDBACKS DO PORTFÓLIO -------------------------------
 
+CREATE TABLE portfolio_feedbacks (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    company_id INT NOT NULL,
+    nome VARCHAR(100) NOT NULL DEFAULT 'Visitante',
+    nota TINYINT NOT NULL,
+    mensagem TEXT NOT NULL,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    ativo BOOLEAN NOT NULL DEFAULT TRUE,
+
+    CHECK (nota BETWEEN 1 AND 5),
+
+    FOREIGN KEY (company_id)
+        REFERENCES companies(id)
+        ON DELETE CASCADE
+);
 -- ---------- ÍNDICES DE PERFORMANCE ---------
 
 CREATE INDEX idx_alunos_filial_status ON alunos(filial_id, status);

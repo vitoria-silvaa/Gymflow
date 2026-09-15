@@ -21,7 +21,21 @@ $configPadrao = [
     'about_text'           => '...',
     'about_image'          => '',
     'company_values'       => '',
-    'company_competencies' => ''
+    'company_competencies' => '',
+    'contact_title'        => 'Entre em contato conosco',
+    'contact_subtitle'     => 'Nossa equipe está pronta para ajudar você.',
+    'contact_form_title'   => 'Ficaremos felizes em te atender!',
+    'contact_email'        => 'contato@gymflow.com',
+    'contact_phone'        => '(11) 98765-4321',
+    'contact_hours'        => 'Segunda a sexta: 06h às 22h | Sábado: 08h às 18h | Domingo: 08h às 14h',
+    'contact_image'        => '',
+    'instagram_url'        => '',
+    'facebook_url'         => '',
+    'tiktok_url'           => '',
+    'whatsapp_url'         => '',
+    'feedback_title'       => 'Como foi sua experiência?',
+    'feedback_subtitle'    => 'Envie seu feedback e nos ajude a melhorar sua experiência.',
+    'feedback_image'       => ''
 ];
 
 // ======================================================
@@ -72,6 +86,18 @@ if ($operacao === 'buscar_publico' || $operacao === 'buscar') {
         $stmtSlides->execute([$company_id]);
         $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
+        // Feedbacks ativos mais recentes
+        $stmtFeedbacks = $pdo->prepare("
+            SELECT *
+            FROM portfolio_feedbacks
+            WHERE company_id = ?
+            AND ativo = 1
+            ORDER BY criado_em DESC, id DESC
+            LIMIT 3
+        ");
+        $stmtFeedbacks->execute([$company_id]);
+        $feedbacks = $stmtFeedbacks->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
         $tituloPagina = $config['app_name'] ?? 'GymCore';
     } catch (Throwable $e) {
         $erroModel = $e->getMessage();
@@ -80,6 +106,7 @@ if ($operacao === 'buscar_publico' || $operacao === 'buscar') {
         $filiais = [];
         $modalidades = [];
         $slides = [];
+        $feedbacks = [];
         $tituloPagina = 'GymCore';
     }
 }
@@ -131,6 +158,16 @@ elseif ($operacao === 'buscar_admin') {
         $stmtSlides->execute([$company_id]);
         $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
+        // Feedbacks cadastrados
+        $stmtFeedbacks = $pdo->prepare("
+            SELECT *
+            FROM portfolio_feedbacks
+            WHERE company_id = ?
+            ORDER BY criado_em DESC, id DESC
+        ");
+        $stmtFeedbacks->execute([$company_id]);
+        $feedbacks = $stmtFeedbacks->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
         $tituloPagina = "Portfólio";
     } catch (Throwable $e) {
         $erroModel = $e->getMessage();
@@ -139,6 +176,7 @@ elseif ($operacao === 'buscar_admin') {
         $filiais = [];
         $modalidades = [];
         $slides = [];
+        $feedbacks = [];
         $tituloPagina = "Portfólio";
     }
 }
@@ -251,12 +289,76 @@ elseif ($operacao === 'salvar') {
         $nossosValores      = $dadosPost['nossosValores'] ?? '';
         $nossasCompetencias = $dadosPost['nossasCompetencias'] ?? '';
 
+        // Dados da seção de Contato
+        $tituloContato = trim($dadosPost['tituloContato'] ?? '');
+        $subtituloContato = trim($dadosPost['subtituloContato'] ?? '');
+        $tituloFormularioContato = trim($dadosPost['tituloFormularioContato'] ?? '');
+        $emailContato = trim($dadosPost['emailContato'] ?? '');
+        $telefoneContato = trim($dadosPost['telefoneContato'] ?? '');
+        $horarioContato = trim($dadosPost['horarioContato'] ?? '');
+
+        // Redes sociais
+        $instagramUrl = trim($dadosPost['instagramUrl'] ?? '');
+        $facebookUrl = trim($dadosPost['facebookUrl'] ?? '');
+        $tiktokUrl = trim($dadosPost['tiktokUrl'] ?? '');
+        $whatsappUrl = trim($dadosPost['whatsappUrl'] ?? '');
+
+        // Imagem da seção de Contato
+        $urlImagemContato = $dadosPost['urlImagemContato'] ?? '';
+
+        if (!empty($dadosFiles['contato_arquivo']) && is_array($dadosFiles['contato_arquivo'])) {
+            $novaImagemContato = $salvarImagem($dadosFiles['contato_arquivo'], 'contato');
+
+            if ($novaImagemContato !== null) {
+                $urlImagemContato = $novaImagemContato;
+            }
+        }
+
+        // Dados da seção de Feedback
+        $tituloFeedback = trim($dadosPost['tituloFeedback'] ?? '');
+        $subtituloFeedback = trim($dadosPost['subtituloFeedback'] ?? '');
+        $urlImagemFeedback = $dadosPost['urlImagemFeedback'] ?? '';
+
+        if (!empty($dadosFiles['feedback_arquivo']) && is_array($dadosFiles['feedback_arquivo'])) {
+            $novaImagemFeedback = $salvarImagem($dadosFiles['feedback_arquivo'], 'feedback');
+
+            if ($novaImagemFeedback !== null) {
+                $urlImagemFeedback = $novaImagemFeedback;
+            }
+        }
+
         $stmt = $pdo->prepare("
             INSERT INTO portfolio_config (
-                company_id, primary_color, secondary_color, logo_url,
-                hero_title, hero_subtitle, hero_cta,
-                about_text, about_image, company_values, company_competencies
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                company_id,
+                primary_color,
+                secondary_color,
+                logo_url,
+                hero_title,
+                hero_subtitle,
+                hero_cta,
+                about_text,
+                about_image,
+                company_values,
+                company_competencies,
+                contact_title,
+                contact_subtitle,
+                contact_form_title,
+                contact_email,
+                contact_phone,
+                contact_hours,
+                contact_image,
+                instagram_url,
+                facebook_url,
+                tiktok_url,
+                whatsapp_url,
+                feedback_title,
+                feedback_subtitle,
+                feedback_image
+            ) VALUES (
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                ?, ?, ?
+            )
             ON DUPLICATE KEY UPDATE
                 primary_color = VALUES(primary_color),
                 secondary_color = VALUES(secondary_color),
@@ -267,7 +369,21 @@ elseif ($operacao === 'salvar') {
                 about_text = VALUES(about_text),
                 about_image = VALUES(about_image),
                 company_values = VALUES(company_values),
-                company_competencies = VALUES(company_competencies)
+                company_competencies = VALUES(company_competencies),
+                contact_title = VALUES(contact_title),
+                contact_subtitle = VALUES(contact_subtitle),
+                contact_form_title = VALUES(contact_form_title),
+                contact_email = VALUES(contact_email),
+                contact_phone = VALUES(contact_phone),
+                contact_hours = VALUES(contact_hours),
+                contact_image = VALUES(contact_image),
+                instagram_url = VALUES(instagram_url),
+                facebook_url = VALUES(facebook_url),
+                tiktok_url = VALUES(tiktok_url),
+                whatsapp_url = VALUES(whatsapp_url),
+                feedback_title = VALUES(feedback_title),
+                feedback_subtitle = VALUES(feedback_subtitle),
+                feedback_image = VALUES(feedback_image)
         ");
 
         $stmt->execute([
@@ -281,7 +397,21 @@ elseif ($operacao === 'salvar') {
             $sobreNos,
             $urlImagemSobre,
             $nossosValores,
-            $nossasCompetencias
+            $nossasCompetencias,
+            $tituloContato,
+            $subtituloContato,
+            $tituloFormularioContato,
+            $emailContato,
+            $telefoneContato,
+            $horarioContato,
+            $urlImagemContato,
+            $instagramUrl,
+            $facebookUrl,
+            $tiktokUrl,
+            $whatsappUrl,
+            $tituloFeedback,
+            $subtituloFeedback,
+            $urlImagemFeedback
         ]);
 
         // 3.2 Remover Planos
