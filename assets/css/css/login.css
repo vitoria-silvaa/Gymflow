@@ -1,0 +1,415 @@
+/* ========================================
+   GYMFLOW - TELA DE LOGIN
+   ======================================== */
+
+
+/* =========================
+   PÁGINA
+========================= */
+
+.login-page {
+    width: 100%;
+    min-height: 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background-color: #0f0f0f;
+}
+
+
+/* =========================
+   CONTAINER PRINCIPAL
+========================= */
+
+.login-container {
+    width: 100%;
+    min-height: 100vh;
+
+    display: flex;
+
+    background-color: var(--cor-branca);
+
+    overflow: hidden;
+}
+
+
+/* =========================
+   LADO ESQUERDO
+========================= */
+
+.login-first-column {
+    width: 50%;
+    padding: 60px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    background-color: #ffb000;
+}
+
+
+/* =========================
+   LINK VOLTAR
+========================= */
+
+.login-back-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    align-self: flex-start;
+
+    margin-bottom: 40px;
+    padding: 10px 18px;
+
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 8px;
+
+    background-color: transparent;
+    color: var(--cor-branca);
+
+    font-size: 15px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.login-back-link:hover {
+    background-color: var(--cor-branca);
+    border-color: var(--cor-branca);
+
+    color: #000000;
+}
+
+
+/* =========================
+   APRESENTAÇÃO
+========================= */
+
+.login-introduction {
+    width: 100%;
+    max-width: 650px;
+}
+
+.login-title {
+    margin-bottom: 20px;
+
+    font-family: 'Arial Black', Arial, sans-serif;
+    font-size: clamp(42px, 4vw, 64px);
+    line-height: 1.15;
+
+    color: #000000;
+}
+
+.login-description {
+    max-width: 550px;
+
+    margin: 0;
+
+    color: var(--cor-branca);
+    font-size: 20px;
+    line-height: 1.5;
+}
+
+
+/* =========================
+   LADO DIREITO
+========================= */
+
+.login-second-column {
+    width: 50%;
+    min-height: 100vh;
+
+    padding: 60px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background-color: var(--cor-branca);
+}
+
+
+/* =========================
+   FORMULÁRIO
+========================= */
+
+.login-form-container {
+    width: 100%;
+    max-width: 500px;
+}
+
+
+/* =========================
+   CABEÇALHO
+========================= */
+
+.login-header {
+    margin-bottom: 35px;
+}
+
+.login-form-title {
+    margin-bottom: 10px;
+
+    font-size: 32px;
+    color: #000000;
+}
+
+.login-form-description {
+    margin: 0;
+
+    font-size: 16px;
+    color: var(--cor-texto-secundario);
+}
+
+
+/* =========================
+   FORM
+========================= */
+
+.login-form {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 24px;
+}
+
+
+/* =========================
+   GRUPO DO CAMPO
+========================= */
+
+.form-group {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+
+/* =========================
+   LABEL
+========================= */
+
+.form-label {
+    margin-bottom: 0;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    color: #000000;
+}
+
+
+/* =========================
+   INPUT
+========================= */
+
+.form-input {
+    width: 100%;
+    min-height: 52px;
+
+    padding: 14px 16px;
+
+    font-family: inherit;
+    font-size: 16px;
+
+    color: #000000;
+    background-color: #ffffff;
+
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
+}
+
+
+/* PLACEHOLDER */
+
+.form-input::placeholder {
+    color: #9ca3af;
+}
+
+
+/* FOCO */
+
+.form-input:focus {
+    border-color: #ffb000;
+
+    background-color: #ffffff;
+
+    box-shadow: 0 0 0 3px rgba(255, 176, 0, 0.15);
+}
+
+
+/* =========================
+   BOTÃO
+========================= */
+
+.login-submit-button {
+    width: 100%;
+    min-height: 52px;
+
+    margin-top: 8px;
+    padding: 14px 18px;
+
+    border: none;
+    border-radius: 8px;
+
+    background-color: #000000;
+    color: var(--cor-branca);
+
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.login-submit-button:hover {
+    background-color: #ffb000;
+    color: #000000;
+}
+
+.login-submit-button:active {
+    transform: scale(0.98);
+}
+
+
+/* =========================
+   ALERTA DE ERRO
+========================= */
+
+.login-alert-error {
+    width: 100%;
+
+    margin-bottom: 20px;
+    padding: 14px 16px;
+
+    border: 1px solid #fca5a5;
+    border-radius: 8px;
+
+    background-color: #fee2e2;
+    color: #991b1b;
+
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+
+/* =========================
+   RESPONSIVIDADE
+========================= */
+
+@media (max-width: 900px) {
+
+    .login-first-column,
+    .login-second-column {
+        padding: 40px;
+    }
+
+    .login-title {
+        font-size: 42px;
+    }
+
+    .login-form-container {
+        max-width: 450px;
+    }
+
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 768px) {
+
+    .login-container {
+        flex-direction: column;
+    }
+
+    .login-first-column,
+    .login-second-column {
+        width: 100%;
+    }
+
+    .login-first-column {
+        min-height: 40vh;
+        padding: 30px;
+    }
+
+    .login-second-column {
+        min-height: 60vh;
+        padding: 40px 30px;
+    }
+
+    .login-title {
+        font-size: 36px;
+    }
+
+    .login-description {
+        font-size: 17px;
+    }
+
+    .login-back-link {
+        align-self: flex-start;
+    }
+
+    .login-form-container {
+        max-width: 100%;
+    }
+
+}
+
+
+/* =========================
+   CELULARES PEQUENOS
+========================= */
+
+@media (max-width: 480px) {
+
+    .login-first-column {
+        min-height: auto;
+        padding: 25px;
+    }
+
+    .login-second-column {
+        min-height: auto;
+        padding: 35px 25px;
+    }
+
+    .login-title {
+        font-size: 30px;
+    }
+
+    .login-form-title {
+        font-size: 28px;
+    }
+
+    .form-input,
+    .login-submit-button {
+        min-height: 50px;
+    }
+
+}
