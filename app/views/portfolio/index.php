@@ -326,6 +326,97 @@ include __DIR__ . '/../shared/header.php';
     <?php endif; ?>
 </div>
 
+<h3 style="margin-top: 30px;">Benefícios aceitos</h3>
+<p style="margin-top: -5px; color: #666;">
+    Marque os benefícios aceitos pela academia e, se quiser, envie a logo que será exibida no site público.
+</p>
+
+<fieldset style="margin-bottom: 18px; border: 1px solid #ddd; padding: 15px; border-radius: 6px;">
+    <legend style="padding: 0 8px; font-weight: bold;">Wellhub (Gympass)</legend>
+
+    <div style="margin-bottom: 12px;">
+        <label style="display: flex; align-items: center; gap: 8px; width: fit-content; cursor: pointer;">
+            <input
+                type="checkbox"
+                name="aceitaWellhub"
+                value="1"
+                <?= !empty($config['accepts_wellhub']) ? 'checked' : '' ?>
+                style="width: auto; margin: 0;"
+            >
+            <span>A academia aceita Wellhub (Gympass)</span>
+        </label>
+    </div>
+
+    <div>
+        <label>Logo / ícone do Wellhub:</label>
+
+        <input
+            type="file"
+            name="wellhub_arquivo"
+            accept="image/png, image/jpeg, image/webp"
+        >
+
+        <input
+            type="hidden"
+            name="urlIconeWellhub"
+            value="<?= htmlspecialchars($config['wellhub_icon'] ?? '') ?>"
+        >
+
+        <?php if (!empty($config['wellhub_icon'])): ?>
+            <div style="margin-top: 10px;">
+                <img
+                    src="<?= htmlspecialchars($config['wellhub_icon']) ?>"
+                    alt="Logo atual do Wellhub"
+                    style="width: 180px; max-height: 90px; object-fit: contain; border-radius: 6px;"
+                >
+            </div>
+        <?php endif; ?>
+    </div>
+</fieldset>
+
+<fieldset style="margin-bottom: 18px; border: 1px solid #ddd; padding: 15px; border-radius: 6px;">
+    <legend style="padding: 0 8px; font-weight: bold;">TotalPass</legend>
+
+    <div style="margin-bottom: 12px;">
+        <label style="display: flex; align-items: center; gap: 8px; width: fit-content; cursor: pointer;">
+            <input
+                type="checkbox"
+                name="aceitaTotalpass"
+                value="1"
+                <?= !empty($config['accepts_totalpass']) ? 'checked' : '' ?>
+                style="width: auto; margin: 0;"
+            >
+            <span>A academia aceita TotalPass</span>
+        </label>
+    </div>
+
+    <div>
+        <label>Logo / ícone do TotalPass:</label>
+
+        <input
+            type="file"
+            name="totalpass_arquivo"
+            accept="image/png, image/jpeg, image/webp"
+        >
+
+        <input
+            type="hidden"
+            name="urlIconeTotalpass"
+            value="<?= htmlspecialchars($config['totalpass_icon'] ?? '') ?>"
+        >
+
+        <?php if (!empty($config['totalpass_icon'])): ?>
+            <div style="margin-top: 10px;">
+                <img
+                    src="<?= htmlspecialchars($config['totalpass_icon']) ?>"
+                    alt="Logo atual do TotalPass"
+                    style="width: 180px; max-height: 90px; object-fit: contain; border-radius: 6px;"
+                >
+            </div>
+        <?php endif; ?>
+    </div>
+</fieldset>
+
                     <hr>
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <h3>Modalidades Oferecidas</h3>

@@ -252,6 +252,10 @@ CREATE TABLE portfolio_config (
     feedback_title VARCHAR(150),
     feedback_subtitle TEXT,
     feedback_image TEXT,
+    accepts_wellhub BOOLEAN NOT NULL DEFAULT TRUE,
+    wellhub_icon TEXT,
+    accepts_totalpass BOOLEAN NOT NULL DEFAULT TRUE,
+    totalpass_icon TEXT,
     FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
 );
 

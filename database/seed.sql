@@ -155,7 +155,11 @@ INSERT INTO portfolio_config (
     whatsapp_url,
     feedback_title,
     feedback_subtitle,
-    feedback_image
+    feedback_image,
+    accepts_wellhub,
+    wellhub_icon,
+    accepts_totalpass,
+    totalpass_icon
 ) VALUES (
     1,
     'GymFlow Ecosystem',
@@ -183,6 +187,10 @@ INSERT INTO portfolio_config (
     '',
     'Como foi sua experiência?',
     'Envie seu feedback e nos ajude a melhorar sua experiência.',
+    NULL,
+    TRUE,
+    NULL,
+    TRUE,
     NULL
 );
 

@@ -12,7 +12,7 @@
     >
 
     <link rel="stylesheet" href="/Gymflow/assets/css/css/global.css">
-    <link rel="stylesheet" href="/Gymflow/assets/css/css/portifolio.css?v=7">
+    <link rel="stylesheet" href="/Gymflow/assets/css/css/portifolio.css?v=11">
 
     <script
         src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"

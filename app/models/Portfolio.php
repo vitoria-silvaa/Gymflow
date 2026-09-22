@@ -35,7 +35,11 @@ $configPadrao = [
     'whatsapp_url'         => '',
     'feedback_title'       => 'Como foi sua experiência?',
     'feedback_subtitle'    => 'Envie seu feedback e nos ajude a melhorar sua experiência.',
-    'feedback_image'       => ''
+    'feedback_image'       => '',
+    'accepts_wellhub'      => 1,
+    'wellhub_icon'         => '',
+    'accepts_totalpass'    => 1,
+    'totalpass_icon'       => ''
 ];
 
 // ======================================================
@@ -327,6 +331,29 @@ elseif ($operacao === 'salvar') {
             }
         }
 
+        // Benefícios aceitos no portfólio
+        $aceitaWellhub = isset($dadosPost['aceitaWellhub']) ? 1 : 0;
+        $urlIconeWellhub = trim($dadosPost['urlIconeWellhub'] ?? '');
+
+        if (!empty($dadosFiles['wellhub_arquivo']) && is_array($dadosFiles['wellhub_arquivo'])) {
+            $novoIconeWellhub = $salvarImagem($dadosFiles['wellhub_arquivo'], 'wellhub');
+
+            if ($novoIconeWellhub !== null) {
+                $urlIconeWellhub = $novoIconeWellhub;
+            }
+        }
+
+        $aceitaTotalpass = isset($dadosPost['aceitaTotalpass']) ? 1 : 0;
+        $urlIconeTotalpass = trim($dadosPost['urlIconeTotalpass'] ?? '');
+
+        if (!empty($dadosFiles['totalpass_arquivo']) && is_array($dadosFiles['totalpass_arquivo'])) {
+            $novoIconeTotalpass = $salvarImagem($dadosFiles['totalpass_arquivo'], 'totalpass');
+
+            if ($novoIconeTotalpass !== null) {
+                $urlIconeTotalpass = $novoIconeTotalpass;
+            }
+        }
+
         $stmt = $pdo->prepare("
             INSERT INTO portfolio_config (
                 company_id,
@@ -353,11 +380,15 @@ elseif ($operacao === 'salvar') {
                 whatsapp_url,
                 feedback_title,
                 feedback_subtitle,
-                feedback_image
+                feedback_image,
+                accepts_wellhub,
+                wellhub_icon,
+                accepts_totalpass,
+                totalpass_icon
             ) VALUES (
                 ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                 ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                ?, ?, ?
+                ?, ?, ?, ?, ?, ?, ?
             )
             ON DUPLICATE KEY UPDATE
                 primary_color = VALUES(primary_color),
@@ -383,7 +414,11 @@ elseif ($operacao === 'salvar') {
                 whatsapp_url = VALUES(whatsapp_url),
                 feedback_title = VALUES(feedback_title),
                 feedback_subtitle = VALUES(feedback_subtitle),
-                feedback_image = VALUES(feedback_image)
+                feedback_image = VALUES(feedback_image),
+                accepts_wellhub = VALUES(accepts_wellhub),
+                wellhub_icon = VALUES(wellhub_icon),
+                accepts_totalpass = VALUES(accepts_totalpass),
+                totalpass_icon = VALUES(totalpass_icon)
         ");
 
         $stmt->execute([
@@ -411,7 +446,11 @@ elseif ($operacao === 'salvar') {
             $whatsappUrl,
             $tituloFeedback,
             $subtituloFeedback,
-            $urlImagemFeedback
+            $urlImagemFeedback,
+            $aceitaWellhub,
+            $urlIconeWellhub,
+            $aceitaTotalpass,
+            $urlIconeTotalpass
         ]);
 
         // 3.2 Remover Planos

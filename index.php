@@ -1,9 +1,20 @@
 <?php
 // index.php - Portfólio Público (View)
 
+require_once __DIR__ . '/config/sessao.php';
+
 $company_id = 1;
 $operacao = 'buscar_publico';
 require_once __DIR__ . '/app/models/Portfolio.php';
+
+// Controle de acesso ao formulário de feedback
+$alunoLogado =
+    isset($_SESSION['usuario_id']) &&
+    ($_SESSION['usuario_role'] ?? '') === 'Aluno';
+
+$nomeAlunoLogado = $alunoLogado
+    ? trim($_SESSION['usuario_nome'] ?? '')
+    : '';
 
 $tituloPagina = $config['app_name'] ?? "GymCore";
 include __DIR__ . '/app/views/shared/portfolio_header.php';
@@ -217,34 +228,69 @@ include __DIR__ . '/app/views/shared/portfolio_header.php';
     <?php endif; ?>
 
     <!-- parceiros dos planos -->
-    <div class="portfolio-parceiros" aria-labelledby="parceiros-titulo">
-        <div class="parceiros-conteudo">
-            <div class="parceiros-texto">
-                <span class="secao-destaque">Benefícios</span>
-                <h2 id="parceiros-titulo">Nossas unidades aceitam</h2>
-                <p>Use seu benefício fitness e treine com a gente.</p>
-            </div>
+    <?php
+        $aceitaWellhub = !empty($config['accepts_wellhub']);
+        $aceitaTotalpass = !empty($config['accepts_totalpass']);
+    ?>
 
-            <div class="parceiros-marcas">
-                <div class="parceiro-marca">
-                    <span class="parceiro-icone parceiro-icone-wellhub" aria-hidden="true">✦</span>
-                    <div>
-                        <strong>Wellhub</strong>
-                        <small>(Gympass)</small>
-                    </div>
+    <?php if ($aceitaWellhub || $aceitaTotalpass): ?>
+        <div class="portfolio-parceiros" aria-labelledby="parceiros-titulo">
+            <div class="parceiros-conteudo">
+                <div class="parceiros-texto">
+                    <span class="secao-destaque">Benefícios</span>
+                    <h2 id="parceiros-titulo">Nossas unidades aceitam</h2>
+                    <p>Use seu benefício fitness e treine com a gente.</p>
                 </div>
 
-                <span class="parceiro-divisor" aria-hidden="true"></span>
+                <div class="parceiros-marcas">
+                    <?php if ($aceitaWellhub): ?>
+                        <div class="parceiro-marca">
+                            <?php if (!empty($config['wellhub_icon'])): ?>
+                                <span class="parceiro-icone parceiro-icone-imagem">
+                                    <img
+                                        src="<?= htmlspecialchars($config['wellhub_icon']) ?>"
+                                        alt="Wellhub"
+                                        style="width: 100%; height: 100%; object-fit: contain;"
+                                    >
+                                </span>
+                            <?php else: ?>
+                                <span class="parceiro-icone parceiro-icone-wellhub" aria-hidden="true">✦</span>
+                            <?php endif; ?>
 
-                <div class="parceiro-marca">
-                    <span class="parceiro-icone parceiro-icone-totalpass" aria-hidden="true">TP</span>
-                    <div>
-                        <strong>TotalPass</strong>
-                    </div>
+                            <div>
+                                <strong>Wellhub</strong>
+                                <small>(Gympass)</small>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if ($aceitaWellhub && $aceitaTotalpass): ?>
+                        <span class="parceiro-divisor" aria-hidden="true"></span>
+                    <?php endif; ?>
+
+                    <?php if ($aceitaTotalpass): ?>
+                        <div class="parceiro-marca">
+                            <?php if (!empty($config['totalpass_icon'])): ?>
+                                <span class="parceiro-icone parceiro-icone-imagem">
+                                    <img
+                                        src="<?= htmlspecialchars($config['totalpass_icon']) ?>"
+                                        alt="TotalPass"
+                                        style="width: 100%; height: 100%; object-fit: contain;"
+                                    >
+                                </span>
+                            <?php else: ?>
+                                <span class="parceiro-icone parceiro-icone-totalpass" aria-hidden="true">TP</span>
+                            <?php endif; ?>
+
+                            <div>
+                                <strong>TotalPass</strong>
+                            </div>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
-    </div>
+    <?php endif; ?>
 
 </section>
 
@@ -638,6 +684,7 @@ body.mapa-modal-aberto {
                             id="contato-nome"
                             name="nome"
                             placeholder="Digite seu nome"
+                            required
                         >
                     </div>
 
@@ -648,6 +695,7 @@ body.mapa-modal-aberto {
                             id="contato-email"
                             name="email"
                             placeholder="Digite seu e-mail"
+                            required
                         >
                     </div>
 
@@ -658,12 +706,13 @@ body.mapa-modal-aberto {
                             id="contato-telefone"
                             name="telefone"
                             placeholder="(11) 99999-9999"
+                            required
                         >
                     </div>
 
                     <div class="contato-campo">
                         <label for="contato-unidade">Unidade desejada</label>
-                        <select id="contato-unidade" name="filial_id">
+                        <select id="contato-unidade" name="filial_id" required>
                             <option value="">Selecione uma unidade</option>
 
                             <?php foreach (($filiais ?? []) as $filial): ?>
@@ -681,10 +730,11 @@ body.mapa-modal-aberto {
                             name="mensagem"
                             rows="5"
                             placeholder="Como podemos ajudar?"
+                            required
                         ></textarea>
                     </div>
 
-                    <button type="button" class="contato-btn">
+                    <button type="submit" class="contato-btn">
                         Enviar mensagem
                     </button>
                 </form>
@@ -717,42 +767,64 @@ body.mapa-modal-aberto {
                     </div>
                 <?php endif; ?>
 
-                <form
-                    class="feedback-formulario"
-                    method="POST"
-                    action="/Gymflow/app/controllers/FeedbackController.php"
-                >
-                    <div class="feedback-avaliacao">
-                        <span class="feedback-avaliacao-label">Sua avaliação</span>
+                <?php if ($alunoLogado): ?>
+                    <form
+                        class="feedback-formulario"
+                        method="POST"
+                        action="/Gymflow/app/controllers/FeedbackController.php"
+                    >
+                        <?php if ($nomeAlunoLogado !== ''): ?>
+                            <div class="feedback-usuario-logado">
+                                Avaliando como
+                                <strong><?= htmlspecialchars($nomeAlunoLogado) ?></strong>
+                            </div>
+                        <?php endif; ?>
 
-                        <div class="feedback-estrelas" role="radiogroup" aria-label="Escolha uma nota de 1 a 5 estrelas">
-                            <?php for ($estrela = 1; $estrela <= 5; $estrela++): ?>
-                                <button
-                                    type="button"
-                                    class="feedback-estrela"
-                                    data-nota="<?= $estrela ?>"
-                                    aria-label="<?= $estrela ?> estrela<?= $estrela > 1 ? 's' : '' ?>"
-                                >☆</button>
-                            <?php endfor; ?>
+                        <div class="feedback-avaliacao">
+                            <span class="feedback-avaliacao-label">Sua avaliação</span>
+
+                            <div class="feedback-estrelas" role="radiogroup" aria-label="Escolha uma nota de 1 a 5 estrelas">
+                                <?php for ($estrela = 1; $estrela <= 5; $estrela++): ?>
+                                    <button
+                                        type="button"
+                                        class="feedback-estrela"
+                                        data-nota="<?= $estrela ?>"
+                                        aria-label="<?= $estrela ?> estrela<?= $estrela > 1 ? 's' : '' ?>"
+                                    >☆</button>
+                                <?php endfor; ?>
+                            </div>
+
+                            <input type="hidden" name="nota" id="feedback-nota" value="">
                         </div>
 
-                        <input type="hidden" name="nota" id="feedback-nota" value="">
-                    </div>
+                        <div class="feedback-campo">
+                            <label for="feedback-mensagem">Mensagem</label>
+                            <textarea
+                                id="feedback-mensagem"
+                                name="mensagem"
+                                rows="5"
+                                placeholder="Conte pra gente como foi sua experiência..."
+                            ></textarea>
+                        </div>
 
-                    <div class="feedback-campo">
-                        <label for="feedback-mensagem">Mensagem</label>
-                        <textarea
-                            id="feedback-mensagem"
-                            name="mensagem"
-                            rows="5"
-                            placeholder="Conte pra gente como foi sua experiência..."
-                        ></textarea>
-                    </div>
+                        <button type="submit" class="feedback-btn">
+                            Enviar feedback
+                        </button>
+                    </form>
+                <?php else: ?>
+                    <div class="feedback-login-aviso">
+                        <strong>Quer deixar sua avaliação?</strong>
+                        <p>Entre como aluno para enviar seu feedback.</p>
 
-                    <button type="submit" class="feedback-btn">
-                        Enviar feedback
-                    </button>
-                </form>
+                        <a
+                            href="/Gymflow/app/controllers/LoginController.php?acao=login"
+                            class="feedback-btn"
+                            style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none;"
+                        >
+                            Entrar para avaliar
+                        </a>
+                    </div>
+                <?php endif; ?>
             </div>
 
             <div class="feedback-imagem-wrap">
