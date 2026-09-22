@@ -1,10 +1,24 @@
 <?php
-// app/views/treinos/biblioteca.php
+if (!isset($tituloPagina)) {
+    header("Location: /Gymflow/app/controllers/ExercicioController.php");
+    exit;
+}
+
+$tituloPagina = "Biblioteca de Exercícios";
+
+include __DIR__ . '/../shared/header.php';
+include __DIR__ . '/../shared/sidebar.php';
 ?>
-
-<?php require __DIR__ . '/../shared/header.php'; ?>
-
 <main>
+
+
+    <?php if (isset($_GET['sucesso']) && $_GET['sucesso'] === 'excluido'): ?>
+
+        <div class="mensagem-sucesso">
+            Exercício desativado com sucesso!
+        </div>
+
+    <?php endif; ?>
 
     <div class="pagina-cabecalho">
 
@@ -18,8 +32,7 @@
 
         <a
             href="/Gymflow/app/views/exercicios/exercicios.php"
-            class="btn"
-        >
+            class="btn">
             + Novo exercício
         </a>
 
@@ -45,8 +58,7 @@
                         id="pesquisa"
                         name="pesquisa"
                         placeholder="Digite o nome do exercício..."
-                        value="<?= htmlspecialchars($pesquisa ?? '') ?>"
-                    >
+                        value="<?= htmlspecialchars($pesquisa ?? '') ?>">
 
                 </div>
 
@@ -150,13 +162,11 @@
                                         height: 200px;
                                         object-fit: cover;
                                         border-radius: 8px;
-                                    "
-                                >
+                                    ">
 
                                     <source
                                         src="<?= htmlspecialchars($exercicio['midia']) ?>"
-                                        type="video/mp4"
-                                    >
+                                        type="video/mp4">
 
                                     Seu navegador não suporta vídeo.
 
@@ -173,8 +183,7 @@
                                         height: 200px;
                                         object-fit: cover;
                                         border-radius: 8px;
-                                    "
-                                >
+                                    ">
 
                             <?php endif; ?>
 
@@ -210,16 +219,14 @@
                     <div class="exercicio-acoes">
 
                         <a
-                            href="/Gymflow/app/controllers/ExercicioController.php?acao=editar&id=<?= (int) $exercicio['id'] ?>"
-                        >
+                            href="/Gymflow/app/controllers/ExercicioController.php?acao=editar&id=<?= (int) $exercicio['id'] ?>">
                             Editar
                         </a>
 
                         <a
                             href="/Gymflow/app/controllers/ExercicioController.php?acao=excluir&id=<?= (int) $exercicio['id'] ?>"
                             class="excluir"
-                            onclick="return confirm('Tem certeza que deseja excluir este exercício?');"
-                        >
+                            onclick="return confirm('Tem certeza que deseja excluir este exercício?');">
                             Excluir
                         </a>
 
@@ -251,6 +258,5 @@
     </div>
 
 </main>
-
 
 <?php require __DIR__ . '/../shared/footer.php'; ?>

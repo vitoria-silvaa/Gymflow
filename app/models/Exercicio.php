@@ -10,6 +10,7 @@ function listarExercicios($pdo)
 {
     $sql = "SELECT id, nome, grupo, midia, tipo_midia
             FROM exercicios
+            WHERE ativo = 1
             ORDER BY nome ASC";
 
     $stmt = $pdo->prepare($sql);
@@ -26,6 +27,7 @@ function pesquisarExercicios($pdo, $pesquisa)
     $sql = "SELECT id, nome, grupo, midia, tipo_midia
             FROM exercicios
             WHERE nome LIKE ?
+            AND ativo = 1
             ORDER BY nome ASC";
 
     $stmt = $pdo->prepare($sql);
@@ -42,6 +44,7 @@ function filtrarExerciciosPorGrupo($pdo, $grupo)
     $sql = "SELECT id, nome, grupo, midia, tipo_midia
             FROM exercicios
             WHERE grupo = ?
+            AND ativo = 1
             ORDER BY nome ASC";
 
     $stmt = $pdo->prepare($sql);
@@ -69,12 +72,13 @@ function cadastrarExercicio($pdo, $nome, $grupo, $midia, $tipo_midia)
 }
 
 /**
- * Exclui um exercício.
+ * Desativa um exercício.
  */
 function excluirExercicio($pdo, $id)
-
 {
-    $sql = "DELETE FROM exercicios WHERE id = ?";
+    $sql = "UPDATE exercicios
+            SET ativo = 0
+            WHERE id = ?";
 
     $stmt = $pdo->prepare($sql);
 

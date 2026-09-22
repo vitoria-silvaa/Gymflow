@@ -1,0 +1,13 @@
+/* BOTÃO SALVAR FICHA (nao esta funcionando ainda. é pro 
+botao ficar cinza quando estiver inativo e com cor padrao quando 
+estiver ativo)*/
+
+#btnSalvarFicha:disabled {
+    background-color: #d1d5db;
+    color: #6b7280;
+    cursor: not-allowed;
+}
+
+#btnSalvarFicha:not(:disabled) {
+    cursor: pointer;
+}

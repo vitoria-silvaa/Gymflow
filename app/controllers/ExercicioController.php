@@ -29,11 +29,12 @@ if (
     excluirExercicio($pdo, $id);
 
     header(
-        'Location: /Gymflow/app/controllers/ExercicioController.php'
+        'Location: /Gymflow/app/controllers/ExercicioController.php?sucesso=excluido'
     );
 
     exit;
 }
+
 
 
 // =====================================================
@@ -150,14 +151,12 @@ if (
                 'png',
                 'webp'
             ];
-
         } elseif ($tipo_midia === 'video') {
 
             $extensoesPermitidas = [
                 'mp4',
                 'webm'
             ];
-
         } else {
 
             die('Tipo de mídia inválido.');
@@ -228,9 +227,7 @@ if (
             )
         ) {
 
-            die(
-                'Não foi possível salvar o novo arquivo.'
-            );
+            die('Não foi possível salvar o novo arquivo.');
         }
 
 
@@ -299,9 +296,7 @@ if (
         $tipo_midia === ''
     ) {
 
-        die(
-            'Preencha todos os campos obrigatórios.'
-        );
+        die('Preencha todos os campos obrigatórios.');
     }
 
 
@@ -314,9 +309,7 @@ if (
         $_FILES['arquivo']['error'] !== UPLOAD_ERR_OK
     ) {
 
-        die(
-            'Selecione uma imagem ou vídeo.'
-        );
+        die('Selecione uma imagem ou vídeo.');
     }
 
 
@@ -347,19 +340,15 @@ if (
             'png',
             'webp'
         ];
-
     } elseif ($tipo_midia === 'video') {
 
         $extensoesPermitidas = [
             'mp4',
             'webm'
         ];
-
     } else {
 
-        die(
-            'Tipo de mídia inválido.'
-        );
+        die('Tipo de mídia inválido.');
     }
 
 
@@ -375,9 +364,7 @@ if (
         )
     ) {
 
-        die(
-            'Formato de arquivo não permitido.'
-        );
+        die('Formato de arquivo não permitido.');
     }
 
 
@@ -429,9 +416,7 @@ if (
         )
     ) {
 
-        die(
-            'Não foi possível salvar o arquivo.'
-        );
+        die('Não foi possível salvar o arquivo.');
     }
 
 
@@ -488,14 +473,12 @@ if (!empty($pesquisa)) {
         $pdo,
         $pesquisa
     );
-
 } elseif (!empty($grupo)) {
 
     $exercicios = filtrarExerciciosPorGrupo(
         $pdo,
         $grupo
     );
-
 } else {
 
     $exercicios = listarExercicios(
