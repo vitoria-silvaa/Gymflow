@@ -21,6 +21,9 @@ $role = $_SESSION['usuario_role'] ?? 'Admin';
 
     <link rel="stylesheet" href="/Gymflow/assets/css/css/global.css">
     <link rel="stylesheet" href="/Gymflow/assets/css/css/layout.css">
+    <?php if (!empty($cssEspecifico)): ?>
+        <link rel="stylesheet" href="<?= htmlspecialchars($cssEspecifico) ?>">
+    <?php endif; ?>
 </head>
 
 <body>

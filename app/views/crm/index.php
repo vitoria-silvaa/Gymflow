@@ -1,5 +1,10 @@
 <?php
-if (!isset($tituloPagina)) { header("Location: /Gymflow/app/controllers/CrmController.php"); exit; }
+if (!isset($tituloPagina)) {
+    header("Location: /Gymflow/app/controllers/CrmController.php");
+    exit;
+}
+
+$cssEspecifico = '/Gymflow/assets/css/css/jorge-financeiro.css';
 
 include __DIR__ . '/../shared/header.php';
 include __DIR__ . '/../shared/sidebar.php';
@@ -11,43 +16,117 @@ foreach ($leads ?? [] as $lead) {
     $st = $lead['status'] ?? 'Novo';
     $leadsPorStatus[$st][] = $lead;
 }
+
+$columnClassMap = [
+    'Novo' => 'crm-col-novo',
+    'Contato Agendado' => 'crm-col-contato',
+    'Experimental' => 'crm-col-experimental',
+    'Convertido' => 'crm-col-convertido',
+    'Perdido' => 'crm-col-perdido',
+];
+
+$totalLeads = count($leads ?? []);
 ?>
 
-<h1>CRM / Quadro de Leads</h1>
+<link rel="stylesheet" href="/Gymflow/assets/css/css/jorge-financeiro.css">
 
-<p><a href="<?= $baseUrl ?>?acao=cadastrar">+ Novo Lead</a></p>
+<main class="conteudo crm-page">
 
-<div style="display: flex; gap: 15px; overflow-x: auto;">
-    <?php foreach ($colunasStatus as $coluna): ?>
-        <div style="flex: 1; min-width: 200px; border: 1px solid #ccc; padding: 10px; background: #f9f9f9; border-radius: 4px;">
-            <h3 style="margin: 0 0 10px 0; border-bottom: 1px solid #ddd; padding-bottom: 5px;">
-                <?= $coluna ?> (<?= count($leadsPorStatus[$coluna]) ?>)
-            </h3>
-
-            <?php foreach ($leadsPorStatus[$coluna] as $lead): ?>
-                <div style="border: 1px solid #ddd; padding: 8px; margin-bottom: 8px; background: #fff; border-radius: 4px;">
-                    <p style="margin: 0 0 4px 0;"><strong>Nome:</strong> <?= htmlspecialchars($lead['nome']) ?></p>
-                    <p style="margin: 0 0 4px 0;"><strong>Tel:</strong> <?= htmlspecialchars($lead['telefone'] ?? '-') ?></p>
-                    <?php if (!empty($lead['objetivo'])): ?><p style="margin: 0 0 4px 0;"><strong>Objetivo:</strong> <?= htmlspecialchars($lead['objetivo']) ?></p><?php endif; ?>
-                    <?php if (!empty($lead['campanha'])): ?><p style="margin: 0 0 4px 0;"><strong>Campanha:</strong> <?= htmlspecialchars($lead['campanha']) ?></p><?php endif; ?>
-
-                    <p style="margin: 6px 0;">
-                        <a href="<?= $baseUrl ?>?acao=editar&id=<?= $lead['id'] ?>">Editar</a> |
-                        <a href="<?= $baseUrl ?>?acao=excluir&id=<?= $lead['id'] ?>" onclick="return confirm('Excluir este lead?');">Excluir</a>
-                    </p>
-
-                    <form method="POST" action="<?= $baseUrl ?>?acao=atualizar_status" style="margin: 0;">
-                        <input type="hidden" name="id" value="<?= $lead['id'] ?>">
-                        <select name="status" onchange="this.form.submit()">
-                            <?php foreach ($colunasStatus as $st): ?>
-                                <option value="<?= $st ?>" <?= $lead['status'] === $st ? 'selected' : '' ?>><?= $st ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </form>
-                </div>
-            <?php endforeach; ?>
+    <div class="fin-page-header">
+        <div class="fin-header-info">
+            <h1>CRM / Quadro de Leads</h1>
+            <p>Gerencie o funil de prospecção e conversão de potenciais alunos (<?= $totalLeads ?> lead(s) ativos).</p>
         </div>
-    <?php endforeach; ?>
-</div>
+
+        <div class="fin-header-actions">
+            <a href="<?= $baseUrl ?>?acao=cadastrar" class="fin-btn fin-btn-primary">
+                + Novo Lead
+            </a>
+        </div>
+    </div>
+
+    <!-- Quadro Kanban de Leads -->
+    <div class="crm-kanban-board">
+        <?php foreach ($colunasStatus as $coluna): ?>
+            <?php 
+                $colClass = $columnClassMap[$coluna] ?? 'crm-col-novo'; 
+                $quantidade = count($leadsPorStatus[$coluna]);
+            ?>
+            <div class="crm-kanban-column <?= $colClass ?>">
+                <div class="crm-column-header">
+                    <h3 class="crm-column-title">
+                        <?= htmlspecialchars($coluna) ?>
+                    </h3>
+                    <span class="crm-column-count"><?= $quantidade ?></span>
+                </div>
+
+                <div class="crm-column-cards">
+                    <?php if ($quantidade === 0): ?>
+                        <div class="crm-empty-state">
+                            Nenhum lead nesta etapa
+                        </div>
+                    <?php else: ?>
+                        <?php foreach ($leadsPorStatus[$coluna] as $lead): ?>
+                            <div class="crm-lead-card">
+                                <h4 class="crm-lead-name">
+                                    <?= htmlspecialchars($lead['nome']) ?>
+                                </h4>
+
+                                <div class="crm-lead-details">
+                                    <div class="crm-lead-detail-item">
+                                        <span>📞</span>
+                                        <strong><?= htmlspecialchars($lead['telefone'] ?? '-') ?></strong>
+                                    </div>
+
+                                    <?php if (!empty($lead['objetivo'])): ?>
+                                        <div class="crm-lead-detail-item">
+                                            <span class="crm-lead-tag">
+                                                🎯 <?= htmlspecialchars($lead['objetivo']) ?>
+                                            </span>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <?php if (!empty($lead['campanha'])): ?>
+                                        <div class="crm-lead-detail-item">
+                                            <span class="crm-lead-tag">
+                                                📢 <?= htmlspecialchars($lead['campanha']) ?>
+                                            </span>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+
+                                <div class="crm-lead-actions">
+                                    <div class="crm-lead-links">
+                                        <a href="<?= $baseUrl ?>?acao=editar&id=<?= $lead['id'] ?>">Editar</a>
+                                        <span>•</span>
+                                        <a
+                                            href="<?= $baseUrl ?>?acao=excluir&id=<?= $lead['id'] ?>"
+                                            class="crm-delete-link"
+                                            onclick="return confirm('Deseja realmente excluir este lead?');"
+                                        >
+                                            Excluir
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <form method="POST" action="<?= $baseUrl ?>?acao=atualizar_status" class="crm-status-form">
+                                    <input type="hidden" name="id" value="<?= (int) $lead['id'] ?>">
+                                    <select name="status" class="crm-status-select" onchange="this.form.submit()">
+                                        <?php foreach ($colunasStatus as $st): ?>
+                                            <option value="<?= $st ?>" <?= $lead['status'] === $st ? 'selected' : '' ?>>
+                                                Mover: <?= $st ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </form>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+
+</main>
 
 <?php include __DIR__ . '/../shared/footer.php'; ?>
