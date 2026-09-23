@@ -1,5 +1,6 @@
 /* ========================================
    GYMFLOW - TELA DE LOGIN
+   PADRÃO VISUAL DO PORTFÓLIO
    ======================================== */
 
 
@@ -15,12 +16,12 @@
     align-items: center;
     justify-content: center;
 
-    background-color: #0f0f0f;
+    background-color: var(--portfolio-secondary, #0b0b0b);
 }
 
 
 /* =========================
-   CONTAINER PRINCIPAL
+   CONTAINER
 ========================= */
 
 .login-container {
@@ -29,9 +30,9 @@
 
     display: flex;
 
-    background-color: var(--cor-branca);
-
     overflow: hidden;
+
+    background-color: var(--portfolio-secondary, #0b0b0b);
 }
 
 
@@ -41,13 +42,65 @@
 
 .login-first-column {
     width: 50%;
+    min-height: 100vh;
+
     padding: 60px;
 
     display: flex;
     flex-direction: column;
     justify-content: center;
 
-    background-color: #ffb000;
+    position: relative;
+    overflow: hidden;
+
+    background-color: #050505;
+
+    background-image:
+        linear-gradient(90deg,
+            rgba(0, 0, 0, 0.90),
+            rgba(0, 0, 0, 0.68)),
+        url("/Gymflow/assets/imgLogin/academia.jpg");
+
+    background-size: cover;
+    background-position: center;
+}
+
+
+/* =========================
+   MARCA
+========================= */
+
+.login-brand {
+    position: absolute;
+
+    top: 38px;
+    left: 60px;
+
+    color: #ffffff;
+
+    font-size: 19px;
+    font-weight: 700;
+
+    letter-spacing: 2px;
+
+    z-index: 2;
+}
+
+.login-brand span {
+    color: var(--portfolio-primary, #ffb000);
+}
+
+
+/* =========================
+   CONTEÚDO
+========================= */
+
+.login-left-content {
+    width: 100%;
+    max-width: 620px;
+
+    position: relative;
+    z-index: 2;
 }
 
 
@@ -60,63 +113,154 @@
     align-items: center;
     justify-content: center;
 
-    align-self: flex-start;
+    gap: 8px;
 
-    margin-bottom: 40px;
-    padding: 10px 18px;
+    margin-bottom: 35px;
 
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 8px;
+    min-height: 38px;
 
-    background-color: transparent;
-    color: var(--cor-branca);
+    padding: 0 15px;
 
-    font-size: 15px;
+    color: #ffffff;
+
+    background-color: rgba(0, 0, 0, 0.25);
+
+    border: 1px solid rgba(255, 255, 255, 0.30);
+
+    border-radius: 6px;
+
+    font-size: 13px;
     font-weight: 600;
 
     text-decoration: none;
 
-    transition:
-        background-color 0.2s ease,
-        color 0.2s ease,
-        border-color 0.2s ease;
+    transition: 0.2s ease;
 }
 
 .login-back-link:hover {
-    background-color: var(--cor-branca);
-    border-color: var(--cor-branca);
-
     color: #000000;
+
+    background-color: var(--portfolio-primary, #ffb000);
+
+    border-color: var(--portfolio-primary, #ffb000);
+}
+
+.back-arrow {
+    font-size: 16px;
 }
 
 
 /* =========================
-   APRESENTAÇÃO
+   LINHA DE DESTAQUE
 ========================= */
 
-.login-introduction {
-    width: 100%;
-    max-width: 650px;
-}
+.login-title-line {
+    width: 45px;
+    height: 2px;
 
-.login-title {
     margin-bottom: 20px;
 
-    font-family: 'Arial Black', Arial, sans-serif;
-    font-size: clamp(42px, 4vw, 64px);
-    line-height: 1.15;
-
-    color: #000000;
+    background-color: var(--portfolio-primary, #ffb000);
 }
 
+
+/* =========================
+   TÍTULO
+========================= */
+
+.login-title {
+    max-width: 600px;
+
+    margin: 0 0 20px;
+
+    color: #ffffff;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    font-size: clamp(40px, 4vw, 60px);
+
+    line-height: 1.02;
+
+    font-weight: 800;
+
+    letter-spacing: -1px;
+}
+
+.login-title span {
+    color: var(--portfolio-primary, #ffb000);
+}
+
+
+/* =========================
+   DESCRIÇÃO
+========================= */
+
 .login-description {
-    max-width: 550px;
+    max-width: 520px;
 
     margin: 0;
 
-    color: var(--cor-branca);
-    font-size: 20px;
-    line-height: 1.5;
+    color: #c0c0c0;
+
+    font-size: 16px;
+
+    line-height: 1.7;
+}
+
+
+/* =========================
+   BENEFÍCIOS
+========================= */
+
+.login-features {
+    display: flex;
+    align-items: center;
+
+    margin-top: 40px;
+}
+
+.login-feature {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 0 20px;
+
+    border-right: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.login-feature:first-child {
+    padding-left: 0;
+}
+
+.login-feature:last-child {
+    border-right: none;
+}
+
+.feature-icon {
+    color: var(--portfolio-primary, #ffb000);
+
+    font-size: 17px;
+}
+
+.login-feature strong {
+    display: block;
+
+    margin-bottom: 3px;
+
+    color: #ffffff;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.login-feature span {
+    display: block;
+
+    color: #8f8f8f;
+
+    font-size: 11px;
 }
 
 
@@ -134,7 +278,35 @@
     align-items: center;
     justify-content: center;
 
-    background-color: var(--cor-branca);
+    position: relative;
+    overflow: hidden;
+
+    background-color: #101010;
+}
+
+
+/* =========================
+   DETALHE DE FUNDO
+========================= */
+
+.login-background-glow {
+    position: absolute;
+
+    width: 450px;
+    height: 450px;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    border-radius: 50%;
+
+    background-color: rgba(255, 176, 0, 0.035);
+
+    filter: blur(80px);
+
+    pointer-events: none;
 }
 
 
@@ -144,7 +316,58 @@
 
 .login-form-container {
     width: 100%;
-    max-width: 500px;
+    max-width: 470px;
+
+    padding: 45px;
+
+    position: relative;
+    z-index: 2;
+
+    background-color: #111111;
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 18px 45px rgba(0, 0, 0, 0.35);
+}
+
+
+/* =========================
+   LINHA SUPERIOR DO CARD
+========================= */
+
+.login-card-glow {
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 2px;
+
+    background-color: var(--portfolio-primary, #ffb000);
+}
+
+
+/* =========================
+   MARCA DO FORM
+========================= */
+
+.form-brand {
+    margin-bottom: 30px;
+
+    color: #ffffff;
+
+    font-size: 17px;
+    font-weight: 700;
+
+    letter-spacing: 2px;
+}
+
+.form-brand span {
+    color: var(--portfolio-primary, #ffb000);
 }
 
 
@@ -153,21 +376,29 @@
 ========================= */
 
 .login-header {
-    margin-bottom: 35px;
+    margin-bottom: 30px;
 }
 
 .login-form-title {
-    margin-bottom: 10px;
+    margin: 0 0 10px;
 
-    font-size: 32px;
-    color: #000000;
+    color: #ffffff;
+
+    font-size: 30px;
+
+    line-height: 1.1;
+
+    font-weight: 800;
 }
 
 .login-form-description {
     margin: 0;
 
-    font-size: 16px;
-    color: var(--cor-texto-secundario);
+    color: #999999;
+
+    font-size: 14px;
+
+    line-height: 1.6;
 }
 
 
@@ -181,12 +412,12 @@
     display: flex;
     flex-direction: column;
 
-    gap: 24px;
+    gap: 20px;
 }
 
 
 /* =========================
-   GRUPO DO CAMPO
+   GRUPO
 ========================= */
 
 .form-group {
@@ -194,6 +425,7 @@
 
     display: flex;
     flex-direction: column;
+
     gap: 8px;
 }
 
@@ -203,12 +435,43 @@
 ========================= */
 
 .form-label {
-    margin-bottom: 0;
+    margin: 0;
 
-    font-size: 15px;
-    font-weight: 600;
+    color: #eeeeee;
 
-    color: #000000;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+
+/* =========================
+   WRAPPER INPUT
+========================= */
+
+.input-wrapper {
+    width: 100%;
+
+    position: relative;
+
+    display: flex;
+    align-items: center;
+}
+
+
+/* =========================
+   ÍCONE INPUT
+========================= */
+
+.input-icon {
+    position: absolute;
+
+    left: 15px;
+
+    color: #777777;
+
+    font-size: 14px;
+
+    z-index: 2;
 }
 
 
@@ -218,81 +481,257 @@
 
 .form-input {
     width: 100%;
-    min-height: 52px;
+    min-height: 48px;
 
-    padding: 14px 16px;
+    padding: 12px 14px 12px 40px;
 
-    font-family: inherit;
-    font-size: 16px;
+    color: #ffffff;
 
-    color: #000000;
-    background-color: #ffffff;
+    background-color: #080808;
 
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+
+    border-radius: 7px;
 
     outline: none;
 
+    font-family: inherit;
+    font-size: 14px;
+
     transition:
         border-color 0.2s ease,
-        box-shadow 0.2s ease,
-        background-color 0.2s ease;
-}
-
-
-/* PLACEHOLDER */
-
-.form-input::placeholder {
-    color: #9ca3af;
-}
-
-
-/* FOCO */
-
-.form-input:focus {
-    border-color: #ffb000;
-
-    background-color: #ffffff;
-
-    box-shadow: 0 0 0 3px rgba(255, 176, 0, 0.15);
+        background-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 
 /* =========================
-   BOTÃO
+   PLACEHOLDER
+========================= */
+
+.form-input::placeholder {
+    color: #666666;
+}
+
+
+/* =========================
+   HOVER
+========================= */
+
+.form-input:hover {
+    border-color: rgba(255, 255, 255, 0.30);
+}
+
+
+/* =========================
+   FOCO
+========================= */
+
+.form-input:focus {
+    background-color: #0c0c0c;
+
+    border-color: var(--portfolio-primary, #ffb000);
+
+    box-shadow:
+        0 0 0 3px rgba(255, 176, 0, 0.08);
+}
+
+
+/* =========================
+   SENHA
+========================= */
+
+.password-input {
+    padding-right: 48px;
+}
+
+
+/* =========================
+   BOTÃO MOSTRAR SENHA
+========================= */
+
+.password-toggle {
+    position: absolute;
+
+    right: 10px;
+
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    color: #777777;
+
+    background-color: transparent;
+
+    border: none;
+
+    border-radius: 5px;
+
+    font-size: 13px;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.password-toggle:hover {
+    color: var(--portfolio-primary, #ffb000);
+
+    background-color: rgba(255, 176, 0, 0.08);
+}
+
+
+/* =========================
+   OPÇÕES
+========================= */
+
+.login-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-top: -2px;
+}
+
+
+/* =========================
+   LEMBRAR
+========================= */
+
+.remember-me {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    margin: 0;
+
+    color: #999999;
+
+    font-size: 12px;
+
+    font-weight: 500;
+
+    cursor: pointer;
+}
+
+.remember-me input {
+    width: 14px;
+    height: 14px;
+
+    margin: 0;
+
+    accent-color: var(--portfolio-primary, #ffb000);
+
+    cursor: pointer;
+}
+
+
+/* =========================
+   ESQUECEU SENHA
+========================= */
+
+.forgot-password {
+    color: var(--portfolio-primary, #ffb000);
+
+    font-size: 12px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition: 0.2s ease;
+}
+
+.forgot-password:hover {
+    color: #ffffff;
+}
+
+
+/* =========================
+   BOTÃO ENTRAR
 ========================= */
 
 .login-submit-button {
     width: 100%;
-    min-height: 52px;
+    min-height: 48px;
 
-    margin-top: 8px;
-    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    border: none;
-    border-radius: 8px;
+    gap: 10px;
 
-    background-color: #000000;
-    color: var(--cor-branca);
+    margin-top: 5px;
+
+    padding: 0 20px;
+
+    color: #000000;
+
+    background-color: var(--portfolio-primary, #ffb000);
+
+    border: 1px solid var(--portfolio-primary, #ffb000);
+
+    border-radius: 6px;
 
     font-family: inherit;
-    font-size: 16px;
-    font-weight: 700;
+
+    font-size: 14px;
+    font-weight: 800;
 
     cursor: pointer;
 
-    transition:
-        background-color 0.2s ease,
-        transform 0.2s ease;
+    transition: 0.25s ease;
 }
+
+
+/* =========================
+   HOVER BOTÃO
+========================= */
 
 .login-submit-button:hover {
-    background-color: #ffb000;
     color: #000000;
+
+    background-color: var(--portfolio-primary, #ffb000);
+
+    border-color: var(--portfolio-primary, #ffb000);
+
+    filter: brightness(0.9);
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 20px rgba(255, 176, 0, 0.12);
 }
 
+
+/* =========================
+   CLIQUE
+========================= */
+
 .login-submit-button:active {
-    transform: scale(0.98);
+    transform: translateY(0);
+}
+
+
+/* =========================
+   SETA DO BOTÃO
+========================= */
+
+.button-arrow {
+    font-size: 16px;
+
+    transition: 0.2s ease;
+}
+
+.login-submit-button:hover .button-arrow {
+    transform: translateX(3px);
 }
 
 
@@ -304,46 +743,113 @@
     width: 100%;
 
     margin-bottom: 20px;
-    padding: 14px 16px;
 
-    border: 1px solid #fca5a5;
-    border-radius: 8px;
+    padding: 12px 14px;
 
-    background-color: #fee2e2;
-    color: #991b1b;
+    color: #fca5a5;
 
-    font-size: 14px;
-    line-height: 1.4;
+    background-color: rgba(239, 68, 68, 0.08);
+
+    border: 1px solid rgba(239, 68, 68, 0.30);
+
+    border-radius: 7px;
+
+    font-size: 13px;
+
+    line-height: 1.5;
 }
 
 
 /* =========================
-   RESPONSIVIDADE
+   RODAPÉ DO FORM
 ========================= */
 
-@media (max-width: 900px) {
+.login-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 5px;
+
+    margin-top: 25px;
+    padding-top: 22px;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+    color: #777777;
+
+    font-size: 12px;
+}
+
+.login-footer a {
+    color: var(--portfolio-primary, #ffb000);
+
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition: 0.2s ease;
+}
+
+.login-footer a:hover {
+    color: #ffffff;
+}
+
+
+/* =========================
+   ANIMAÇÃO DISCRETA
+========================= */
+
+.login-form-container {
+    animation: loginEntrada 0.4s ease-out;
+}
+
+@keyframes loginEntrada {
+
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+
+/* =========================
+   TABLET
+========================= */
+
+@media (max-width: 1000px) {
 
     .login-first-column,
     .login-second-column {
-        padding: 40px;
+        padding: 45px;
+    }
+
+    .login-brand {
+        left: 45px;
     }
 
     .login-title {
-        font-size: 42px;
+        font-size: clamp(36px, 5vw, 50px);
     }
 
     .login-form-container {
-        max-width: 450px;
+        padding: 38px;
     }
 
 }
 
 
 /* =========================
-   MOBILE
+   TABLET MENOR
 ========================= */
 
-@media (max-width: 768px) {
+@media (max-width: 800px) {
 
     .login-container {
         flex-direction: column;
@@ -355,29 +861,82 @@
     }
 
     .login-first-column {
-        min-height: 40vh;
-        padding: 30px;
+        min-height: 480px;
+
+        padding: 45px;
     }
 
     .login-second-column {
-        min-height: 60vh;
-        padding: 40px 30px;
+        min-height: auto;
+
+        padding: 60px 45px;
     }
 
-    .login-title {
-        font-size: 36px;
+    .login-brand {
+        top: 30px;
+        left: 45px;
     }
 
-    .login-description {
+    .login-left-content {
+        margin-top: 35px;
+    }
+
+}
+
+
+/* =========================
+   CELULAR
+========================= */
+
+@media (max-width: 600px) {
+
+    .login-first-column {
+        min-height: 430px;
+
+        padding: 35px 25px;
+    }
+
+    .login-second-column {
+        padding: 45px 25px;
+    }
+
+    .login-brand {
+        top: 25px;
+        left: 25px;
+
         font-size: 17px;
     }
 
+    .login-title {
+        font-size: 38px;
+
+        letter-spacing: -0.8px;
+    }
+
+    .login-description {
+        font-size: 14px;
+    }
+
+    .login-features {
+        display: none;
+    }
+
     .login-back-link {
-        align-self: flex-start;
+        margin-bottom: 25px;
     }
 
     .login-form-container {
-        max-width: 100%;
+        padding: 30px 25px;
+
+        border-radius: 10px;
+    }
+
+    .login-form-title {
+        font-size: 27px;
+    }
+
+    .login-form-description {
+        font-size: 13px;
     }
 
 }
@@ -387,29 +946,33 @@
    CELULARES PEQUENOS
 ========================= */
 
-@media (max-width: 480px) {
+@media (max-width: 400px) {
 
     .login-first-column {
-        min-height: auto;
-        padding: 25px;
+        min-height: 400px;
+
+        padding: 30px 20px;
     }
 
     .login-second-column {
-        min-height: auto;
-        padding: 35px 25px;
+        padding: 35px 20px;
+    }
+
+    .login-brand {
+        left: 20px;
     }
 
     .login-title {
-        font-size: 30px;
+        font-size: 34px;
     }
 
-    .login-form-title {
-        font-size: 28px;
+    .login-form-container {
+        padding: 25px 20px;
     }
 
-    .form-input,
-    .login-submit-button {
-        min-height: 50px;
+    .login-options {
+        flex-direction: column;
+        align-items: flex-start;
     }
 
 }
