@@ -1,0 +1,196 @@
+/* ========================================
+   BIBLIOTECA DE EXERCÍCIOS
+   ======================================== */
+
+.pagina-cabecalho {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.pagina-cabecalho h1 {
+    margin: 0 0 5px 0;
+    font-size: 24px;
+    color: #111827;
+}
+
+.pagina-cabecalho p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.pagina-cabecalho .btn {
+    background-color: #10b981;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.pagina-cabecalho .btn:hover {
+    background-color: #059669;
+}
+
+/* FILTROS */
+.filtros-exercicios {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+
+.campo-pesquisa {
+    display: flex;
+    gap: 20px;
+    align-items: flex-end;
+}
+
+.campo-pesquisa div {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.campo-pesquisa label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.campo-pesquisa input,
+.campo-pesquisa select {
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.campo-pesquisa input:focus,
+.campo-pesquisa select:focus {
+    border-color: #10b981;
+}
+
+.botao-pesquisa {
+    flex: 0 0 auto !important;
+}
+
+.botao-pesquisa button {
+    background-color: #10b981;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.botao-pesquisa button:hover {
+    background-color: #059669;
+}
+
+/* GRID DE EXERCÍCIOS */
+.exercicios-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.exercicio-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.exercicio-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+}
+
+.exercicio-midia {
+    width: 100%;
+    height: 200px;
+    background-color: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+}
+
+.exercicio-info {
+    padding: 16px;
+    flex: 1;
+}
+
+.exercicio-info h3 {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    color: #111827;
+}
+
+.exercicio-grupo {
+    display: inline-block;
+    background-color: #e0f2fe;
+    color: #0369a1;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.exercicio-acoes {
+    display: flex;
+    border-top: 1px solid #f3f4f6;
+}
+
+.exercicio-acoes a {
+    flex: 1;
+    text-align: center;
+    padding: 12px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    color: #4b5563;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.exercicio-acoes a:hover {
+    background-color: #f9fafb;
+    color: #10b981;
+}
+
+.exercicio-acoes a.excluir:hover {
+    color: #ef4444;
+}
+
+.exercicio-acoes a + a {
+    border-left: 1px solid #f3f4f6;
+}
+
+.nenhum-exercicio {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px;
+    background: #ffffff;
+    border-radius: 12px;
+    color: #6b7280;
+}
+
+.nenhum-exercicio h3 {
+    color: #111827;
+    margin-bottom: 10px;
+}

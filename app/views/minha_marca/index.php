@@ -1,7 +1,7 @@
 <?php
 
 if (!isset($tituloPagina)) {
-    header("Location: /Gymflow/app/controllers/MinhaMarcaController.php");
+    header("Location: " . BASE_URL . "/app/controllers/MinhaMarcaController.php");
     exit;
 }
 
@@ -38,7 +38,7 @@ include __DIR__ . '/../shared/sidebar.php';
 
 
     <form
-        action="/Gymflow/app/controllers/MinhaMarcaController.php?acao=salvar"
+        action="<?= BASE_URL ?>/app/controllers/MinhaMarcaController.php?acao=salvar"
         method="POST">
 
 

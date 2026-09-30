@@ -1,6 +1,6 @@
    <?php
 if (!isset($tituloPagina)) {
-    header("Location: /Gymflow/app/controllers/PortfolioController.php");
+    header("Location: " . BASE_URL . "/app/controllers/PortfolioController.php");
     exit;
 }
 
@@ -19,7 +19,7 @@ include __DIR__ . '/../shared/header.php';
 <main>
     <form
         method="POST"
-        action="/Gymflow/app/controllers/PortfolioController.php?acao=salvar"
+        action="<?= BASE_URL ?>/app/controllers/PortfolioController.php?acao=salvar"
         id="portfolioForm"
         enctype="multipart/form-data"
     >

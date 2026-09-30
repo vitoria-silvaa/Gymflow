@@ -1,6 +1,6 @@
 <?php
 if (!isset($filiais)) {
-    header("Location: /Gymflow/app/controllers/FuncionarioController.php?acao=cadastrar");
+    header("Location: " . BASE_URL . "/app/controllers/FuncionarioController.php?acao=cadastrar");
     exit;
 }
 /** @var array $filiais */
@@ -21,7 +21,7 @@ include __DIR__ . '/../shared/sidebar.php';
     </div>
 <?php endif; ?>
 
-<form action="/Gymflow/app/controllers/FuncionarioController.php?acao=cadastrar" method="POST">
+<form action="<?= BASE_URL ?>/app/controllers/FuncionarioController.php?acao=cadastrar" method="POST">
 
     <!-- Dados do Colaborador -->
     <h3>Dados do Colaborador</h3>
@@ -64,7 +64,7 @@ include __DIR__ . '/../shared/sidebar.php';
     <br><br>
 
     <button type="submit">Salvar Cadastro</button>
-    <a href="/Gymflow/app/controllers/FuncionarioController.php?acao=listar">Cancelar</a>
+    <a href="<?= BASE_URL ?>/app/controllers/FuncionarioController.php?acao=listar">Cancelar</a>
 
 </form>
 

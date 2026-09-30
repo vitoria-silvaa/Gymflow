@@ -28,7 +28,7 @@ if ($acao === 'baixar') {
     $conta_id = (int) ($_GET['id'] ?? 0);
   
     if ($conta_id <= 0) {
-        header("Location: /Gymflow/app/controllers/FinanceiroController.php");
+        header("Location: " . BASE_URL . "/app/controllers/FinanceiroController.php");
         exit;
     }
 
@@ -36,7 +36,7 @@ if ($acao === 'baixar') {
     require __DIR__ . '/../models/Financeiro.php';
 
     if (!$conta) {
-        header("Location: /Gymflow/app/controllers/FinanceiroController.php");
+        header("Location: " . BASE_URL . "/app/controllers/FinanceiroController.php");
         exit;
     }
 
@@ -51,13 +51,13 @@ if ($acao === 'confirmar_pagamento') {
     $forma_pagamento = trim($_POST['forma_pagamento'] ?? '');
 
     if ($conta_id <= 0 || $forma_pagamento === '') {
-        header("Location: /Gymflow/app/controllers/FinanceiroController.php");
+        header("Location: " . BASE_URL . "/app/controllers/FinanceiroController.php");
         exit;
     }
 
     $operacao = 'baixar_pagamento';
     require __DIR__ . '/../models/Financeiro.php';
 
-    header("Location: /Gymflow/app/controllers/FinanceiroController.php");
+    header("Location: " . BASE_URL . "/app/controllers/FinanceiroController.php");
     exit;
 }

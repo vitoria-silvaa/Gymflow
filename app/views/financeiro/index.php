@@ -1,11 +1,11 @@
 <?php
 if (!isset($tituloPagina)) {
-    header("Location: /Gymflow/app/controllers/FinanceiroController.php");
+    header("Location: " . BASE_URL . "/app/controllers/FinanceiroController.php");
     exit;
 }
 
 $tituloPagina = "Financeiro";
-$cssEspecifico = '/Gymflow/assets/css/css/jorge-financeiro.css';
+$cssEspecifico = BASE_URL . '/assets/css/jorge-financeiro.css';
 
 include __DIR__ . '/../shared/header.php';
 include __DIR__ . '/../shared/sidebar.php';
@@ -13,7 +13,7 @@ include __DIR__ . '/../shared/sidebar.php';
 $totalGeral = ($totalAberto ?? 0) + ($totalRecebido ?? 0);
 ?>
 
-<link rel="stylesheet" href="/Gymflow/assets/css/css/jorge-financeiro.css">
+<link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/jorge-financeiro.css">
 
 <main class="conteudo financeiro-page">
 
@@ -124,7 +124,7 @@ $totalGeral = ($totalAberto ?? 0) + ($totalRecebido ?? 0);
                                 <td style="text-align: right;">
                                     <?php if ($conta['status'] !== 'Pago'): ?>
                                         <a
-                                            href="/Gymflow/app/controllers/FinanceiroController.php?acao=baixar&id=<?= $conta['id'] ?>"
+                                            href="<?= BASE_URL ?>/app/controllers/FinanceiroController.php?acao=baixar&id=<?= $conta['id'] ?>"
                                             class="fin-btn fin-btn-primary fin-btn-sm"
                                         >
                                             Baixar

@@ -35,7 +35,7 @@ include __DIR__ . '/../shared/portfolio_header.php';
                     <p>Processamento protegido e seguro via <strong>Mercado Pago</strong>.</p>
                     <br>
 
-                    <form action="/Gymflow/app/controllers/MatriculaController.php?acao=pagamento" method="POST" id="form-pagamento">
+                    <form action="<?= BASE_URL ?>/app/controllers/MatriculaController.php?acao=pagamento" method="POST" id="form-pagamento">
                         <label>Método de Pagamento *:</label>
                         <select name="metodo" id="metodo_pagamento" required>
                             <option value="pix" selected>PIX (Aprovação Instantânea)</option>
@@ -71,7 +71,7 @@ include __DIR__ . '/../shared/portfolio_header.php';
                         <br><br>
 
                         <div class="hero-acoes">
-                            <a href="/Gymflow/app/controllers/MatriculaController.php?acao=filial" class="hero-btn hero-btn-secundario">← Voltar para Filial</a>
+                            <a href="<?= BASE_URL ?>/app/controllers/MatriculaController.php?acao=filial" class="hero-btn hero-btn-secundario">← Voltar para Filial</a>
                             <button type="submit" class="hero-btn hero-btn-principal">Confirmar e Pagar R$ <?= number_format((float) $plano['valor'], 2, ',', '.') ?></button>
                         </div>
                     </form>

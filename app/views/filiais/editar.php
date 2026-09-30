@@ -1,7 +1,7 @@
 <?php
 if (!isset($filial)) {
     $id = $_GET['id'] ?? null;
-    header("Location: /Gymflow/app/controllers/FilialController.php?acao=editar" . ($id ? "&id=" . $id : ""));
+    header("Location: " . BASE_URL . "/app/controllers/FilialController.php?acao=editar" . ($id ? "&id=" . $id : ""));
     exit;
 }
 
@@ -21,7 +21,7 @@ include __DIR__ . '/../shared/sidebar.php';
             <h2>Editar Filial</h2>
 
             <a
-                href="/Gymflow/app/controllers/FilialController.php?acao=listar"
+                href="<?= BASE_URL ?>/app/controllers/FilialController.php?acao=listar"
                 class="modal-fechar"
                 aria-label="Fechar">
                 ×
@@ -36,7 +36,7 @@ include __DIR__ . '/../shared/sidebar.php';
 
         <form
             class="form-editar-filial"
-            action="/Gymflow/app/controllers/FilialController.php?acao=editar&id=<?= $filial['id'] ?>"
+            action="<?= BASE_URL ?>/app/controllers/FilialController.php?acao=editar&id=<?= $filial['id'] ?>"
             method="POST">
 
             <input
@@ -90,7 +90,7 @@ include __DIR__ . '/../shared/sidebar.php';
             <div class="modal-editar-acoes">
 
                 <a
-                    href="/Gymflow/app/controllers/FilialController.php?acao=listar"
+                    href="<?= BASE_URL ?>/app/controllers/FilialController.php?acao=listar"
                     class="btn-cancelar-editar">
                     Cancelar
                 </a>

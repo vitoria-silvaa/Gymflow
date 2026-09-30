@@ -59,7 +59,7 @@
         linear-gradient(90deg,
             rgba(0, 0, 0, 0.90),
             rgba(0, 0, 0, 0.68)),
-        url("/Gymflow/assets/imgLogin/academia.jpg");
+        url("../img/academia.jpg");
 
     background-size: cover;
     background-position: center;

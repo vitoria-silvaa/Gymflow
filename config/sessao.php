@@ -2,6 +2,10 @@
 // config/sessao.php
 
 // Inicializa a sessão de forma segura se ainda não estiver ativa
+if (!defined('BASE_URL')) {
+    define('BASE_URL', '/Gymflow');
+}
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -25,7 +29,7 @@ function iniciarSessao($usuario) {
  */
 function verificarLogado() {
     if (!isset($_SESSION['usuario_id'])) {
-        header("Location: /Gymflow/app/controllers/LoginController.php?acao=login");
+        header("Location: " . BASE_URL . "/app/controllers/LoginController.php?acao=login");
         exit;
     }
 }
@@ -42,9 +46,9 @@ function verificarRole(array $rolesPermitidas) {
     if (!in_array($_SESSION['usuario_role'], $rolesPermitidas)) {
         // Redirecionamento de segurança caso tente acessar módulo indevido
         if ($_SESSION['usuario_role'] === 'Aluno') {
-            header("Location: /Gymflow/app/controllers/PortalAlunoController.php?acao=aluno");
+            header("Location: " . BASE_URL . "/app/controllers/PortalAlunoController.php?acao=aluno");
         } else {
-            header("Location: /Gymflow/app/controllers/DashboardController.php");
+            header("Location: " . BASE_URL . "/app/controllers/DashboardController.php");
         }
         exit;
     }
@@ -63,6 +67,6 @@ function efetuarLogout() {
         );
     }
     session_destroy();
-    header("Location: /Gymflow/app/controllers/LoginController.php?acao=login");
+    header("Location: " . BASE_URL . "/app/controllers/LoginController.php?acao=login");
     exit;
 }

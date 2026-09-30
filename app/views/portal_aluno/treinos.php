@@ -2,9 +2,7 @@
 
 if (!isset($fichas)) {
 
-    header(
-        "Location: /Gymflow/app/controllers/PortalAlunoController.php?acao=treinos"
-    );
+    header("Location: " . BASE_URL . "/app/controllers/PortalAlunoController.php?acao=treinos");
 
     exit;
 }
@@ -18,13 +16,16 @@ $tituloPagina = "Treinos";
 
 ?>
 
-<?php include __DIR__ . '/../shared/navbar.php'; ?>
+<?php 
+include __DIR__ . '/../shared/header.php'; 
+include __DIR__ . '/../shared/sidebar.php'; 
+?>
 
 
 <!-- CSS EXCLUSIVO DA PÁGINA DE TREINOS -->
 <link
     rel="stylesheet"
-    href="/Gymflow/assets/css/css/treinos.css?v=<?= time() ?>">
+    href="<?= BASE_URL ?>/assets/css/treinos.css?v=<?= time() ?>">
 
 
 <main class="treinos-page">
@@ -112,7 +113,7 @@ $tituloPagina = "Treinos";
                         class="ficha-tab <?= (
                                                 $ficha_id_selecionada == $ficha['id']
                                             ) ? 'ativo' : ''; ?>"
-                        href="/Gymflow/app/controllers/PortalAlunoController.php?acao=treinos&ficha=<?= (int)$ficha['id']; ?>">
+                        href="<?= BASE_URL ?>/app/controllers/PortalAlunoController.php?acao=treinos&ficha=<?= (int)$ficha['id']; ?>">
 
                         <span class="ficha-tab-titulo">
 

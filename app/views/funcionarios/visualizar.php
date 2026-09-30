@@ -1,7 +1,7 @@
 <?php
 if (!isset($funcionario)) {
     $id = $_GET['id'] ?? null;
-    header("Location: /Gymflow/app/controllers/FuncionarioController.php?acao=visualizar" . ($id ? "&id=" . $id : ""));
+    header("Location: " . BASE_URL . "/app/controllers/FuncionarioController.php?acao=visualizar" . ($id ? "&id=" . $id : ""));
     exit;
 }
 /** @var array $funcionario */
@@ -13,7 +13,7 @@ include __DIR__ . '/../shared/sidebar.php';
 ?>
 
 <h1>Detalhes do Funcionário</h1>
-<a href="/Gymflow/app/controllers/FuncionarioController.php?acao=listar">Voltar para a Lista</a>
+<a href="<?= BASE_URL ?>/app/controllers/FuncionarioController.php?acao=listar">Voltar para a Lista</a>
 
 <br><br>
 
@@ -32,6 +32,6 @@ include __DIR__ . '/../shared/sidebar.php';
 </section>
 
 <br>
-<a href="/Gymflow/app/controllers/FuncionarioController.php?acao=editar&id=<?php echo $funcionario['id']; ?>">Editar Cadastro</a>
+<a href="<?= BASE_URL ?>/app/controllers/FuncionarioController.php?acao=editar&id=<?php echo $funcionario['id']; ?>">Editar Cadastro</a>
 
 <?php include __DIR__ . '/../shared/footer.php'; ?>

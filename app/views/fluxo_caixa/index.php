@@ -1,11 +1,11 @@
 <?php
 if (!isset($tituloPagina)) {
-    header("Location: /Gymflow/app/controllers/FluxoCaixaController.php");
+    header("Location: " . BASE_URL . "/app/controllers/FluxoCaixaController.php");
     exit;
 }
 
 $tituloPagina = "Fluxo de Caixa";
-$cssEspecifico = '/Gymflow/assets/css/css/jorge-financeiro.css';
+$cssEspecifico = BASE_URL . '/assets/css/jorge-financeiro.css';
 
 include __DIR__ . '/../shared/header.php';
 include __DIR__ . '/../shared/sidebar.php';
@@ -14,7 +14,7 @@ $periodoAtual = $_GET['periodo'] ?? 'mensal';
 $isResultadoPositivo = ($resultado ?? 0) >= 0;
 ?>
 
-<link rel="stylesheet" href="/Gymflow/assets/css/css/jorge-financeiro.css">
+<link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/jorge-financeiro.css">
 
 <main class="conteudo fluxo-page">
 
@@ -28,14 +28,14 @@ $isResultadoPositivo = ($resultado ?? 0) >= 0;
             <!-- Seletor de Período Diário/Mensal -->
             <div class="fin-tabs-container">
                 <a
-                    href="/Gymflow/app/controllers/FluxoCaixaController.php?periodo=diario"
+                    href="<?= BASE_URL ?>/app/controllers/FluxoCaixaController.php?periodo=diario"
                     class="fin-tab-item <?= $periodoAtual === 'diario' ? 'active' : '' ?>"
                 >
                     Diário
                 </a>
 
                 <a
-                    href="/Gymflow/app/controllers/FluxoCaixaController.php?periodo=mensal"
+                    href="<?= BASE_URL ?>/app/controllers/FluxoCaixaController.php?periodo=mensal"
                     class="fin-tab-item <?= $periodoAtual !== 'diario' ? 'active' : '' ?>"
                 >
                     Mensal
@@ -44,7 +44,7 @@ $isResultadoPositivo = ($resultado ?? 0) >= 0;
 
             <!-- Botão de Lançar Custo -->
             <a
-                href="/Gymflow/app/controllers/FluxoCaixaController.php?acao=lancar"
+                href="<?= BASE_URL ?>/app/controllers/FluxoCaixaController.php?acao=lancar"
                 class="fin-btn fin-btn-primary"
             >
                 + Lançar Custo

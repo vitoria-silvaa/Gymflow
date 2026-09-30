@@ -1,7 +1,7 @@
 <?php
 if (!isset($plano)) {
     $id = $_GET['id'] ?? null;
-    header("Location: /Gymflow/app/controllers/PlanoController.php?acao=editar" . ($id ? "&id=" . $id : ""));
+    header("Location: " . BASE_URL . "/app/controllers/PlanoController.php?acao=editar" . ($id ? "&id=" . $id : ""));
     exit;
 }
 /** @var array $plano */
@@ -13,7 +13,7 @@ include __DIR__ . '/../shared/sidebar.php';
 ?>
 
 <h1>Editar Plano</h1>
-<a href="/Gymflow/app/controllers/PlanoController.php?acao=listar">Voltar</a>
+<a href="<?= BASE_URL ?>/app/controllers/PlanoController.php?acao=listar">Voltar</a>
 <br><br>
 
 <!-- Mensagem de Erro -->
@@ -23,7 +23,7 @@ include __DIR__ . '/../shared/sidebar.php';
     </div>
 <?php endif; ?>
 
-<form action="/Gymflow/app/controllers/PlanoController.php?acao=editar&id=<?= $plano['id'] ?>" method="POST">
+<form action="<?= BASE_URL ?>/app/controllers/PlanoController.php?acao=editar&id=<?= $plano['id'] ?>" method="POST">
     
     <label>Nome do Plano *:</label><br>
     <input type="text" name="nome" value="<?php echo htmlspecialchars($plano['nome']); ?>" required>
@@ -48,7 +48,7 @@ include __DIR__ . '/../shared/sidebar.php';
     <br><br>
 
     <button type="submit">Salvar Alterações</button>
-    <a href="/Gymflow/app/controllers/PlanoController.php?acao=listar">Cancelar</a>
+    <a href="<?= BASE_URL ?>/app/controllers/PlanoController.php?acao=listar">Cancelar</a>
 
 </form>
 

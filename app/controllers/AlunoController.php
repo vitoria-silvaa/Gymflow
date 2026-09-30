@@ -8,7 +8,7 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/../../config/sessao.php';
 verificarRole(['Admin', 'Professor', 'Recepcao']);
 
-$baseUrl = '/Gymflow/app/controllers/AlunoController.php';
+$baseUrl = BASE_URL . '/app/controllers/AlunoController.php';
 $acao = $_GET['acao'] ?? 'listar';
 
 /* 1. LISTAR ALUNOS */

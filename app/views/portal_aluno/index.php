@@ -2,9 +2,7 @@
 
 if (!isset($aluno)) {
 
-    header(
-        "Location: /Gymflow/app/controllers/PortalAlunoController.php?acao=aluno"
-    );
+    header("Location: " . BASE_URL . "/app/controllers/PortalAlunoController.php?acao=aluno");
 
     exit;
 }
@@ -15,7 +13,8 @@ $faturas_abertas = $faturas_abertas ?? 0;
 
 $tituloPagina = "Portal do Aluno";
 
-include __DIR__ . '/../shared/navbar.php';
+include __DIR__ . '/../shared/header.php';
+include __DIR__ . '/../shared/sidebar.php';
 
 ?>
 
@@ -121,7 +120,7 @@ include __DIR__ . '/../shared/navbar.php';
 
             <a
                 class="portal-link"
-                href="/Gymflow/app/controllers/PortalAlunoController.php?acao=faturas">
+                href="<?= BASE_URL ?>/app/controllers/PortalAlunoController.php?acao=faturas">
                 Ver minhas faturas
             </a>
 
@@ -139,7 +138,7 @@ include __DIR__ . '/../shared/navbar.php';
 
             <a
                 class="portal-link"
-                href="/Gymflow/app/controllers/PortalAlunoController.php?acao=treinos">
+                href="<?= BASE_URL ?>/app/controllers/PortalAlunoController.php?acao=treinos">
                 Ver meus treinos
             </a>
 

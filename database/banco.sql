@@ -173,7 +173,8 @@ CREATE TABLE exercicios (
     nome VARCHAR(100) NOT NULL,
     grupo VARCHAR(30) NOT NULL,
     midia TEXT,
-    tipo_midia VARCHAR(10) NOT NULL DEFAULT 'imagem'
+    tipo_midia VARCHAR(10) NOT NULL DEFAULT 'imagem',
+    ativo BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 CREATE TABLE fichas_treino (
@@ -249,6 +250,11 @@ CREATE TABLE preferencias_usuario (
     notificacoes_email BOOLEAN NOT NULL DEFAULT TRUE,
     notificacoes_push BOOLEAN NOT NULL DEFAULT TRUE,
     tema VARCHAR(20) NOT NULL DEFAULT 'light',
+    nome_painel VARCHAR(100) DEFAULT 'Gymflow',
+    cor_primaria VARCHAR(20) DEFAULT '#ffb000',
+    cor_secundaria VARCHAR(20) DEFAULT '#000000',
+    tema_predefinido VARCHAR(30) DEFAULT 'padrao',
+    logo_url TEXT,
     atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT uq_preferencias_user UNIQUE (user_id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -559,4 +565,4 @@ INSERT INTO portfolio_modalities (id, filial_id, name, description, image_url) V
 INSERT INTO portfolio_feedbacks (company_id, nome, nota, mensagem, criado_em, ativo) VALUES
 (1, 'Ana Paula Silva', 5, 'Excelente estrutura! Aparelhos novinhos e professores muito atenciosos.', '2026-09-10 10:00:00', TRUE),
 (2, 'Ricardo Silveira', 4, 'Ambiente limpo, organizado e climatizado. Muito satisfeito!', '2026-09-12 14:30:00', TRUE),
-(3, 'Mariana Costa', 5, 'As aulas coletivas são incríveis e a ficha de treino no app facilita tudo.', '2026-09-15 09:15:00', TRUE);
+(1, 'Mariana Costa', 5, 'As aulas coletivas são incríveis e a ficha de treino no app facilita tudo.', '2026-09-15 09:15:00', TRUE);

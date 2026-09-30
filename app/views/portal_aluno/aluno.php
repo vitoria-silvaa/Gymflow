@@ -1,6 +1,6 @@
 <?php
 if (!isset($aluno)) {
-    header("Location: /Gymflow/app/controllers/PortalAlunoController.php?acao=aluno");
+    header("Location: " . BASE_URL . "/app/controllers/PortalAlunoController.php?acao=aluno");
     exit;
 }
 
@@ -16,7 +16,10 @@ $faturas_abertas = $faturas_abertas ?? 0;
 $tituloPagina = "Portal do Aluno";
 ?>
 
-<?php include __DIR__ . '/../shared/navbar.php'; ?>
+<?php 
+include __DIR__ . '/../shared/header.php'; 
+include __DIR__ . '/../shared/sidebar.php'; 
+?>
 
 <main class="portal-aluno">
 
@@ -82,7 +85,7 @@ $tituloPagina = "Portal do Aluno";
                 </div>
 
                 <a
-                    href="/Gymflow/app/controllers/PortalAlunoController.php?acao=treinos"
+                    href="<?= BASE_URL ?>/app/controllers/PortalAlunoController.php?acao=treinos"
                     class="portal-btn">
                     Treinar agora
                     <span>→</span>
@@ -172,7 +175,7 @@ $tituloPagina = "Portal do Aluno";
             </div>
 
             <a
-                href="/Gymflow/app/controllers/PortalAlunoController.php?acao=faturas"
+                href="<?= BASE_URL ?>/app/controllers/PortalAlunoController.php?acao=faturas"
                 class="card-link">
                 Ver faturas →
             </a>
@@ -195,14 +198,14 @@ $tituloPagina = "Portal do Aluno";
         <div class="quick-actions">
 
             <a
-                href="/Gymflow/app/controllers/PortalAlunoController.php?acao=treinos"
+                href="<?= BASE_URL ?>/app/controllers/PortalAlunoController.php?acao=treinos"
                 class="quick-action">
                 <strong>Meus treinos</strong>
                 <span>Visualizar seus treinos →</span>
             </a>
 
             <a
-                href="/Gymflow/app/controllers/PortalAlunoController.php?acao=faturas"
+                href="<?= BASE_URL ?>/app/controllers/PortalAlunoController.php?acao=faturas"
                 class="quick-action">
                 <strong>Financeiro</strong>
                 <span>Consultar pagamentos →</span>

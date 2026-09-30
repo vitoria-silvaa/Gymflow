@@ -1,6 +1,6 @@
 <?php
 if (!isset($tituloPagina)) {
-    header("Location: /Gymflow/app/controllers/DashboardController.php");
+    header("Location: " . BASE_URL . "/app/controllers/DashboardController.php");
     exit;
 }
 /** @var array $cards */

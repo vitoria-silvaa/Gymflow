@@ -9,6 +9,7 @@ require_once __DIR__ . '/../../config/sessao.php';
 require_once __DIR__ . '/../models/Exercicio.php';
 
 $tituloPagina = "Biblioteca de Exercícios";
+$cssEspecifico = BASE_URL . '/assets/css/biblioteca.css?v=' . time();
 
 
 // =====================================================
@@ -28,9 +29,7 @@ if (
 
     excluirExercicio($pdo, $id);
 
-    header(
-        'Location: /Gymflow/app/controllers/ExercicioController.php?sucesso=excluido'
-    );
+    header("Location: " . BASE_URL . "/app/controllers/ExercicioController.php?sucesso=excluido");
 
     exit;
 }
@@ -234,7 +233,7 @@ if (
         // Caminho salvo no banco
 
         $midia =
-            '/Gymflow/assets/uploads/exercicios/' .
+            BASE_URL . '/assets/uploads/exercicios/' .
             $nomeArquivo;
     }
 
@@ -257,9 +256,7 @@ if (
     // VOLTA PARA A BIBLIOTECA
     // =====================================================
 
-    header(
-        'Location: /Gymflow/app/controllers/ExercicioController.php'
-    );
+    header("Location: " . BASE_URL . "/app/controllers/ExercicioController.php");
 
     exit;
 }
@@ -425,7 +422,7 @@ if (
     // =====================================================
 
     $midia =
-        '/Gymflow/assets/uploads/exercicios/' .
+        BASE_URL . '/assets/uploads/exercicios/' .
         $nomeArquivo;
 
 
@@ -446,9 +443,7 @@ if (
     // VOLTA PARA A BIBLIOTECA
     // =====================================================
 
-    header(
-        'Location: /Gymflow/app/controllers/ExercicioController.php'
-    );
+    header("Location: " . BASE_URL . "/app/controllers/ExercicioController.php");
 
     exit;
 }

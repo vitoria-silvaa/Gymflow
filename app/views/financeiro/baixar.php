@@ -1,17 +1,17 @@
 <?php
 if (!isset($conta)) {
-    header("Location: /Gymflow/app/controllers/FinanceiroController.php");
+    header("Location: " . BASE_URL . "/app/controllers/FinanceiroController.php");
     exit;
 }
 
 $tituloPagina = "Baixar pagamento";
-$cssEspecifico = '/Gymflow/assets/css/css/jorge-financeiro.css';
+$cssEspecifico = BASE_URL . '/assets/css/jorge-financeiro.css';
 
 include __DIR__ . '/../shared/header.php';
 include __DIR__ . '/../shared/sidebar.php';
 ?>
 
-<link rel="stylesheet" href="/Gymflow/assets/css/css/jorge-financeiro.css">
+<link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/jorge-financeiro.css">
 
 <main class="conteudo financeiro-page">
 
@@ -21,7 +21,7 @@ include __DIR__ . '/../shared/sidebar.php';
             <p>Confirme o recebimento e selecione o método de liquidação da fatura.</p>
         </div>
         <div class="fin-header-actions">
-            <a href="/Gymflow/app/controllers/FinanceiroController.php" class="fin-btn fin-btn-secondary fin-btn-sm">
+            <a href="<?= BASE_URL ?>/app/controllers/FinanceiroController.php" class="fin-btn fin-btn-secondary fin-btn-sm">
                 ← Voltar às contas
             </a>
         </div>
@@ -63,7 +63,7 @@ include __DIR__ . '/../shared/sidebar.php';
 
         <form
             method="POST"
-            action="/Gymflow/app/controllers/FinanceiroController.php?acao=confirmar_pagamento"
+            action="<?= BASE_URL ?>/app/controllers/FinanceiroController.php?acao=confirmar_pagamento"
         >
             <input
                 type="hidden"
@@ -95,7 +95,7 @@ include __DIR__ . '/../shared/sidebar.php';
                     ✓ Confirmar Pagamento
                 </button>
 
-                <a href="/Gymflow/app/controllers/FinanceiroController.php" class="fin-btn fin-btn-secondary">
+                <a href="<?= BASE_URL ?>/app/controllers/FinanceiroController.php" class="fin-btn fin-btn-secondary">
                     Cancelar
                 </a>
             </div>

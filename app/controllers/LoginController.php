@@ -7,7 +7,7 @@ error_reporting(E_ALL);
 
 require_once __DIR__ . '/../../config/sessao.php';
 
-$baseUrl = '/Gymflow/app/controllers/LoginController.php';
+$baseUrl = BASE_URL . '/app/controllers/LoginController.php';
 $acao = $_GET['acao'] ?? 'login';
 
 /* 1. LOGIN */
@@ -15,9 +15,9 @@ if ($acao === 'login') {
     // Redireciona estrategicamente se já estiver logado
     if (isset($_SESSION['usuario_id'])) {
         if (($_SESSION['usuario_role'] ?? '') === 'Aluno') {
-            header("Location: /Gymflow/app/controllers/PortalAlunoController.php?acao=aluno");
+            header("Location: " . BASE_URL . "/app/controllers/PortalAlunoController.php?acao=aluno");
         } else {
-            header("Location: /Gymflow/app/controllers/DashboardController.php");
+            header("Location: " . BASE_URL . "/app/controllers/DashboardController.php");
         }
         exit;
     }
@@ -60,9 +60,9 @@ if ($acao === 'login') {
                 }
 
                 if ($usuario['role'] === 'Aluno') {
-                    header("Location: /Gymflow/app/controllers/PortalAlunoController.php?acao=aluno");
+                    header("Location: " . BASE_URL . "/app/controllers/PortalAlunoController.php?acao=aluno");
                 } else {
-                    header("Location: /Gymflow/app/controllers/DashboardController.php");
+                    header("Location: " . BASE_URL . "/app/controllers/DashboardController.php");
                 }
                 exit;
             } else {

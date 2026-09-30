@@ -25,11 +25,11 @@ if ($acao === 'salvar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     require __DIR__ . '/../models/Portfolio.php';
 
     if (!empty($erroModel)) {
-        header("Location: /Gymflow/app/controllers/PortfolioController.php?status=erro");
+        header("Location: " . BASE_URL . "/app/controllers/PortfolioController.php?status=erro");
         exit;
     }
 
-    header("Location: /Gymflow/app/controllers/PortfolioController.php?status=sucesso");
+    header("Location: " . BASE_URL . "/app/controllers/PortfolioController.php?status=sucesso");
     exit;
 }
 

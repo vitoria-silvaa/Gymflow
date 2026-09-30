@@ -198,7 +198,7 @@ elseif ($operacao === 'salvar') {
         // ======================================================
         $raizProjeto = dirname(__DIR__, 2);
         $pastaUploads = $raizProjeto . '/assets/uploads/portfolio/';
-        $urlBaseUploads = '/Gymflow/assets/uploads/portfolio/';
+        $urlBaseUploads = BASE_URL . '/assets/uploads/portfolio/';
 
         if (!is_dir($pastaUploads)) {
             if (!mkdir($pastaUploads, 0775, true) && !is_dir($pastaUploads)) {

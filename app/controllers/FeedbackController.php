@@ -6,7 +6,7 @@ require_once __DIR__ . '/../models/Database.php';
 
 // Só aceita envio pelo formulário
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /Gymflow/#feedback');
+    header("Location: " . BASE_URL . "/#feedback");
     exit;
 }
 
@@ -16,7 +16,7 @@ if (
     ($_SESSION['usuario_role'] ?? '') !== 'Aluno' ||
     empty($_SESSION['usuario_nome'])
 ) {
-    header('Location: /Gymflow/app/controllers/LoginController.php?acao=login');
+    header("Location: " . BASE_URL . "/app/controllers/LoginController.php?acao=login");
     exit;
 }
 
@@ -45,7 +45,7 @@ if (
     $mensagem === '' ||
     $tamanhoMensagem > 1000
 ) {
-    header('Location: /Gymflow/?feedback=erro#feedback');
+    header("Location: " . BASE_URL . "/?feedback=erro#feedback");
     exit;
 }
 
@@ -67,10 +67,10 @@ try {
         $mensagem
     ]);
 
-    header('Location: /Gymflow/?feedback=sucesso#feedback');
+    header("Location: " . BASE_URL . "/?feedback=sucesso#feedback");
     exit;
 
 } catch (Throwable $e) {
-    header('Location: /Gymflow/?feedback=erro#feedback');
+    header("Location: " . BASE_URL . "/?feedback=erro#feedback");
     exit;
 }

@@ -1,6 +1,6 @@
 <?php
 if (!isset($tituloPagina)) {
-    header("Location: /Gymflow/app/controllers/ExercicioController.php");
+    header("Location: " . BASE_URL . "/app/controllers/ExercicioController.php");
     exit;
 }
 
@@ -31,7 +31,7 @@ include __DIR__ . '/../shared/sidebar.php';
         </div>
 
         <a
-            href="/Gymflow/app/views/exercicios/exercicios.php"
+            href="<?= BASE_URL ?>/app/views/exercicios/exercicios.php"
             class="btn">
             + Novo exercício
         </a>
@@ -219,12 +219,12 @@ include __DIR__ . '/../shared/sidebar.php';
                     <div class="exercicio-acoes">
 
                         <a
-                            href="/Gymflow/app/controllers/ExercicioController.php?acao=editar&id=<?= (int) $exercicio['id'] ?>">
+                            href="<?= BASE_URL ?>/app/controllers/ExercicioController.php?acao=editar&id=<?= (int) $exercicio['id'] ?>">
                             Editar
                         </a>
 
                         <a
-                            href="/Gymflow/app/controllers/ExercicioController.php?acao=excluir&id=<?= (int) $exercicio['id'] ?>"
+                            href="<?= BASE_URL ?>/app/controllers/ExercicioController.php?acao=excluir&id=<?= (int) $exercicio['id'] ?>"
                             class="excluir"
                             onclick="return confirm('Tem certeza que deseja excluir este exercício?');">
                             Excluir

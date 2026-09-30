@@ -1,10 +1,10 @@
 <?php
 if (!isset($tituloPagina)) {
-    header("Location: /Gymflow/app/controllers/CrmController.php");
+    header("Location: " . BASE_URL . "/app/controllers/CrmController.php");
     exit;
 }
 
-$cssEspecifico = '/Gymflow/assets/css/css/jorge-financeiro.css';
+$cssEspecifico = BASE_URL . '/assets/css/jorge-financeiro.css';
 
 include __DIR__ . '/../shared/header.php';
 include __DIR__ . '/../shared/sidebar.php';
@@ -13,7 +13,7 @@ $isEdicao = !empty($dados['id']);
 $colunasStatus = ['Novo', 'Contato Agendado', 'Experimental', 'Convertido', 'Perdido'];
 ?>
 
-<link rel="stylesheet" href="/Gymflow/assets/css/css/jorge-financeiro.css">
+<link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/jorge-financeiro.css">
 
 <main class="conteudo crm-page">
 

@@ -50,7 +50,7 @@ if ($acao === 'confirmar_lancamento') {
         $valor === '' ||
         $data === ''
     ) {
-        header("Location: /Gymflow/app/controllers/FluxoCaixaController.php");
+        header("Location: " . BASE_URL . "/app/controllers/FluxoCaixaController.php");
         exit;
     }
 
@@ -58,6 +58,6 @@ if ($acao === 'confirmar_lancamento') {
 
     require __DIR__ . '/../models/FluxoCaixa.php';
 
-    header("Location: /Gymflow/app/controllers/FluxoCaixaController.php");
+    header("Location: " . BASE_URL . "/app/controllers/FluxoCaixaController.php");
     exit;
 }

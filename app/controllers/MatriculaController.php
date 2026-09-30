@@ -8,7 +8,7 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/../../config/sessao.php';
 require_once __DIR__ . '/../services/MercadoPagoService.php';
 
-$baseUrl = '/Gymflow/app/controllers/MatriculaController.php';
+$baseUrl = BASE_URL . '/app/controllers/MatriculaController.php';
 $acao    = $_GET['acao'] ?? 'identificacao';
 
 // =====================================================================
@@ -256,7 +256,7 @@ elseif ($acao === 'sucesso') {
     $resultado = $_SESSION['matricula_sucesso'] ?? null;
 
     if (empty($resultado)) {
-        header("Location: /Gymflow/index.php");
+        header("Location: " . BASE_URL . "/index.php");
         exit;
     }
 

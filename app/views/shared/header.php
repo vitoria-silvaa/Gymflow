@@ -19,13 +19,18 @@ $role = $_SESSION['usuario_role'] ?? 'Admin';
         <?= htmlspecialchars($titulo) ?>
     </title>
 
-    <link rel="stylesheet" href="/Gymflow/assets/css/css/global.css">
-    <link rel="stylesheet" href="/Gymflow/assets/css/css/layout.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/global.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/layout.css?v=<?= time() ?>">
+    <?php if ($role === 'Aluno'): ?>
+        <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/portal.css?v=<?= time() ?>">
+        <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/treinos.css?v=<?= time() ?>">
+    <?php endif; ?>
+
     <?php if (!empty($cssEspecifico)): ?>
         <link rel="stylesheet" href="<?= htmlspecialchars($cssEspecifico) ?>">
     <?php endif; ?>
 
-    <link rel="stylesheet" href="/Gymflow/assets/css/css/cadastros.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/cadastros.css">
 </head>
 
 <body>
@@ -39,11 +44,7 @@ $role = $_SESSION['usuario_role'] ?? 'Admin';
 
         <div class="header-direita">
 
-            <?php if ($role === 'Aluno'): ?>
-                <a href="/Gymflow/app/controllers/PortalAlunoController.php?acao=aluno">
-                    Portal do Aluno
-                </a>
-            <?php endif; ?>
+
 
             <span>
                 <?= htmlspecialchars($usuario) ?>

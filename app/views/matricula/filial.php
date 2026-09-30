@@ -25,7 +25,7 @@ include __DIR__ . '/../shared/portfolio_header.php';
             <br>
         <?php endif; ?>
 
-        <form action="/Gymflow/app/controllers/MatriculaController.php?acao=filial" method="POST">
+        <form action="<?= BASE_URL ?>/app/controllers/MatriculaController.php?acao=filial" method="POST">
             <div class="modalidades-grid">
                 <?php if (empty($filiais)): ?>
                     <article class="modalidade-card">
@@ -72,7 +72,7 @@ include __DIR__ . '/../shared/portfolio_header.php';
 
             <br><br>
             <div class="hero-acoes">
-                <a href="/Gymflow/app/controllers/MatriculaController.php?acao=identificacao" class="hero-btn hero-btn-secundario">← Voltar para Identificação</a>
+                <a href="<?= BASE_URL ?>/app/controllers/MatriculaController.php?acao=identificacao" class="hero-btn hero-btn-secundario">← Voltar para Identificação</a>
                 <button type="submit" class="hero-btn hero-btn-principal">Continuar para Pagamento →</button>
             </div>
         </form>

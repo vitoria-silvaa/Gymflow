@@ -4,7 +4,7 @@
 /** @var array $exercicios */
 /** @var array $professores */
 if (!isset($tituloPagina)) {
-    header("Location: /Gymflow/app/controllers/TreinoController.php");
+    header("Location: " . BASE_URL . "/app/controllers/TreinoController.php");
     exit;
 }
 
@@ -267,7 +267,7 @@ include __DIR__ . '/../shared/sidebar.php';
         lista.innerHTML = '<p>Carregando histórico...</p>';
         historico.style.display = 'block';
 
-        fetch('/Gymflow/app/controllers/TreinoController.php?acao=historico&aluno_id=' + alunoId)
+        fetch('<?= BASE_URL ?>/app/controllers/TreinoController.php?acao=historico&aluno_id=' + alunoId)
             .then(response => response.json())
             .then(fichas => {
 

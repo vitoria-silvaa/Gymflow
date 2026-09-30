@@ -33,7 +33,7 @@ include __DIR__ . '/../shared/portfolio_header.php';
                     <p>Informe seus dados pessoais e crie sua senha de acesso ao Portal do Aluno.</p>
                     <br>
 
-                    <form action="/Gymflow/app/controllers/MatriculaController.php?acao=identificacao" method="POST">
+                    <form action="<?= BASE_URL ?>/app/controllers/MatriculaController.php?acao=identificacao" method="POST">
                         <label for="plano_id">Plano Selecionado *:</label>
                         <select id="plano_id" name="plano_id" required>
                             <option value="">Selecione um plano</option>
@@ -88,7 +88,7 @@ include __DIR__ . '/../shared/portfolio_header.php';
                         <br><br>
 
                         <div class="hero-acoes">
-                            <a href="/Gymflow/index.php" class="hero-btn hero-btn-secundario">← Voltar ao Portfólio</a>
+                            <a href="<?= BASE_URL ?>/index.php" class="hero-btn hero-btn-secundario">← Voltar ao Portfólio</a>
                             <button type="submit" class="hero-btn hero-btn-principal">Continuar para Filial →</button>
                         </div>
                     </form>

@@ -1,8 +1,6 @@
 <?php
 if (!isset($alunos)) {
-    header(
-        'Location: /Gymflow/app/controllers/AlunoController.php?acao=listar'
-    );
+    header("Location: " . BASE_URL . "/app/controllers/AlunoController.php?acao=listar");
     exit;
 }
 /** @var string $status */

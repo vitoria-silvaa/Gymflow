@@ -1,6 +1,6 @@
 <?php
 if (!isset($filiais)) {
-    header("Location: /Gymflow/app/controllers/FilialController.php?acao=listar");
+    header("Location: " . BASE_URL . "/app/controllers/FilialController.php?acao=listar");
     exit;
 }
 
@@ -47,7 +47,7 @@ include __DIR__ . '/../shared/sidebar.php';
         <div class="filiais-acoes">
             <form
                 method="GET"
-                action="/Gymflow/app/controllers/FilialController.php">
+                action="<?= BASE_URL ?>/app/controllers/FilialController.php">
                 <input type="hidden" name="acao" value="listar">
 
                 <select name="status" onchange="this.form.submit()">
@@ -67,7 +67,7 @@ include __DIR__ . '/../shared/sidebar.php';
 
             <a
                 class="btn-criar-filial"
-                href="/Gymflow/app/controllers/FilialController.php?acao=cadastrar">
+                href="<?= BASE_URL ?>/app/controllers/FilialController.php?acao=cadastrar">
                 + &nbsp; Criar Filial
             </a>
         </div>
@@ -125,12 +125,12 @@ include __DIR__ . '/../shared/sidebar.php';
 
                         <a
                             class="btn-editar"
-                            href="/Gymflow/app/controllers/FilialController.php?acao=editar&id=<?= $filial['id'] ?>">
+                            href="<?= BASE_URL ?>/app/controllers/FilialController.php?acao=editar&id=<?= $filial['id'] ?>">
                             ✎ &nbsp; Editar
                         </a>
 
                         <a
-                            href="/Gymflow/app/controllers/FilialController.php?acao=alternar_status&id=<?= $filial['id'] ?>"
+                            href="<?= BASE_URL ?>/app/controllers/FilialController.php?acao=alternar_status&id=<?= $filial['id'] ?>"
                             class="<?= $filial['ativo'] ? 'btn-inativar' : 'btn-ativar' ?>">
                             ⏻ &nbsp;
                             <?= $filial['ativo'] ? 'Inativar' : 'Ativar' ?>

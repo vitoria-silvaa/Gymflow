@@ -10,6 +10,7 @@ require_once __DIR__ . '/../../config/sessao.php';
 verificarRole(['Admin', 'Professor', 'Recepcao']);
 
 $tituloPagina = "Treinos";
+$cssEspecifico = BASE_URL . '/assets/css/fichatreino.css?v=' . time();
 
 $operacao = 'listar';
 require __DIR__ . '/../models/Aluno.php';

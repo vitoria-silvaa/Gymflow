@@ -15,7 +15,7 @@ require __DIR__ . '/../shared/header.php';
     <form
         method="POST"
         enctype="multipart/form-data"
-        action="/Gymflow/app/controllers/ExercicioController.php"
+        action="<?= BASE_URL ?>/app/controllers/ExercicioController.php"
     >
 
         <!-- INFORMAÇÕES DA EDIÇÃO -->
@@ -255,7 +255,7 @@ require __DIR__ . '/../shared/header.php';
             </button>
 
             <a
-                href="/Gymflow/app/controllers/ExercicioController.php"
+                href="<?= BASE_URL ?>/app/controllers/ExercicioController.php"
             >
                 Cancelar
             </a>

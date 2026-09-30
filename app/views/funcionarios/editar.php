@@ -1,7 +1,7 @@
 <?php
 if (!isset($funcionario)) {
     $id = $_GET['id'] ?? null;
-    header("Location: /Gymflow/app/controllers/FuncionarioController.php?acao=editar" . ($id ? "&id=" . $id : ""));
+    header("Location: " . BASE_URL . "/app/controllers/FuncionarioController.php?acao=editar" . ($id ? "&id=" . $id : ""));
     exit;
 }
 /** @var array $funcionario */
@@ -15,7 +15,7 @@ include __DIR__ . '/../shared/sidebar.php';
 ?>
 
 <h1>Editar Funcionário</h1>
-<a href="/Gymflow/app/controllers/FuncionarioController.php?acao=listar">Voltar</a>
+<a href="<?= BASE_URL ?>/app/controllers/FuncionarioController.php?acao=listar">Voltar</a>
 
 <!-- Exibição de mensagens de erro -->
 <?php if (!empty($erro)): ?>
@@ -24,7 +24,7 @@ include __DIR__ . '/../shared/sidebar.php';
     </div>
 <?php endif; ?>
 
-<form action="/Gymflow/app/controllers/FuncionarioController.php?acao=editar&id=<?= $funcionario['id'] ?>" method="POST">
+<form action="<?= BASE_URL ?>/app/controllers/FuncionarioController.php?acao=editar&id=<?= $funcionario['id'] ?>" method="POST">
     <input type="hidden" name="id" value="<?= $funcionario['id'] ?>">
 
     <h3>Dados do Colaborador</h3>
@@ -69,7 +69,7 @@ include __DIR__ . '/../shared/sidebar.php';
     <br><br>
 
     <button type="submit">Salvar Alterações</button>
-    <a href="/Gymflow/app/controllers/FuncionarioController.php?acao=listar">Cancelar</a>
+    <a href="<?= BASE_URL ?>/app/controllers/FuncionarioController.php?acao=listar">Cancelar</a>
 </form>
 
 <?php include __DIR__ . '/../shared/footer.php'; ?>

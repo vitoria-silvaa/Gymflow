@@ -1,6 +1,6 @@
 <?php
 if (!isset($funcionarios)) {
-    header("Location: /Gymflow/app/controllers/FuncionarioController.php?acao=listar");
+    header("Location: " . BASE_URL . "/app/controllers/FuncionarioController.php?acao=listar");
     exit;
 }
 /** @var array $funcionarios */
@@ -16,7 +16,7 @@ include __DIR__ . '/../shared/sidebar.php';
 <h1>Gestão de Funcionários / Colaboradores</h1>
 
 <!-- Formulário de Busca Simples -->
-<form action="/Gymflow/app/controllers/FuncionarioController.php" method="GET">
+<form action="<?= BASE_URL ?>/app/controllers/FuncionarioController.php" method="GET">
     <input type="hidden" name="acao" value="listar">
     <label>Nome:</label>
     <input type="text" name="nome_busca" value="<?php echo htmlspecialchars($nome_busca); ?>">
@@ -33,7 +33,7 @@ include __DIR__ . '/../shared/sidebar.php';
 </form>
 
 <br>
-<a href="/Gymflow/app/controllers/FuncionarioController.php?acao=cadastrar"> + Novo Funcionário</a>
+<a href="<?= BASE_URL ?>/app/controllers/FuncionarioController.php?acao=cadastrar"> + Novo Funcionário</a>
 <br><br>
 
 <!-- Tabela de Listagem -->
@@ -64,8 +64,8 @@ include __DIR__ . '/../shared/sidebar.php';
                 <td><?php echo htmlspecialchars($func['role']); ?></td>
                 <td>Ativo</td>
                 <td>
-                    <a href="/Gymflow/app/controllers/FuncionarioController.php?acao=visualizar&id=<?php echo $func['id']; ?>">Ver</a> |
-                    <a href="/Gymflow/app/controllers/FuncionarioController.php?acao=editar&id=<?php echo $func['id']; ?>">Editar</a>
+                    <a href="<?= BASE_URL ?>/app/controllers/FuncionarioController.php?acao=visualizar&id=<?php echo $func['id']; ?>">Ver</a> |
+                    <a href="<?= BASE_URL ?>/app/controllers/FuncionarioController.php?acao=editar&id=<?php echo $func['id']; ?>">Editar</a>
                 </td>
             </tr>
         <?php

@@ -1,6 +1,6 @@
 <?php
 if (!isset($planos)) {
-    header("Location: /Gymflow/app/controllers/PlanoController.php?acao=listar");
+    header("Location: " . BASE_URL . "/app/controllers/PlanoController.php?acao=listar");
     exit;
 }
 /** @var array $planos */
@@ -15,7 +15,7 @@ include __DIR__ . '/../shared/sidebar.php';
 <p>Cadastre e gerencie os pacotes e mensalidades oferecidos na rede.</p>
 
 <br>
-<a href="/Gymflow/app/controllers/PlanoController.php?acao=cadastrar"> + Novo Plano</a>
+<a href="<?= BASE_URL ?>/app/controllers/PlanoController.php?acao=cadastrar"> + Novo Plano</a>
 <br><br>
 
 <!-- Tabela de Listagem -->
@@ -44,7 +44,7 @@ include __DIR__ . '/../shared/sidebar.php';
                     <td>R$ <?php echo number_format($plano['valor'], 2, ',', '.'); ?></td>
                     <td><?php echo htmlspecialchars($plano['duracao']); ?></td>
                     <td align="center">
-                        <a href="/Gymflow/app/controllers/PlanoController.php?acao=editar&id=<?php echo $plano['id']; ?>">Editar</a>
+                        <a href="<?= BASE_URL ?>/app/controllers/PlanoController.php?acao=editar&id=<?php echo $plano['id']; ?>">Editar</a>
                     </td>
                 </tr>
             <?php endforeach; ?>

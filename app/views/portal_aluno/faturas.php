@@ -2,9 +2,7 @@
 
 if (!isset($todas_contas)) {
 
-    header(
-        "Location: /Gymflow/app/controllers/PortalAlunoController.php?acao=faturas"
-    );
+    header("Location: " . BASE_URL . "/app/controllers/PortalAlunoController.php?acao=faturas");
 
     exit;
 }
@@ -21,14 +19,17 @@ $tituloPagina = "Faturas";
 
 ?>
 
-<?php include __DIR__ . '/../shared/navbar.php'; ?>
+<?php 
+include __DIR__ . '/../shared/header.php'; 
+include __DIR__ . '/../shared/sidebar.php'; 
+?>
 
 
 <!-- CSS EXCLUSIVO DA PÁGINA DE FATURAS -->
 
 <link
     rel="stylesheet"
-    href="/Gymflow/assets/css/css/faturas.css?v=<?= time() ?>">
+    href="<?= BASE_URL ?>/assets/css/faturas.css?v=<?= time() ?>">
 
 
 <?php
@@ -157,7 +158,7 @@ $lista = match ($aba) {
 
 
             <a
-                href="/Gymflow/app/controllers/PortalAlunoController.php?acao=faturas&aba=vencer"
+                href="<?= BASE_URL ?>/app/controllers/PortalAlunoController.php?acao=faturas&aba=vencer"
                 class="<?= $aba === 'vencer' ? 'ativo' : '' ?>">
 
                 <span>
@@ -173,7 +174,7 @@ $lista = match ($aba) {
 
 
             <a
-                href="/Gymflow/app/controllers/PortalAlunoController.php?acao=faturas&aba=atraso"
+                href="<?= BASE_URL ?>/app/controllers/PortalAlunoController.php?acao=faturas&aba=atraso"
                 class="<?= $aba === 'atraso' ? 'ativo' : '' ?>">
 
                 <span>
@@ -189,7 +190,7 @@ $lista = match ($aba) {
 
 
             <a
-                href="/Gymflow/app/controllers/PortalAlunoController.php?acao=faturas&aba=pagas"
+                href="<?= BASE_URL ?>/app/controllers/PortalAlunoController.php?acao=faturas&aba=pagas"
                 class="<?= $aba === 'pagas' ? 'ativo' : '' ?>">
 
                 <span>

@@ -10,7 +10,7 @@ require_once __DIR__ . '/../../config/sessao.php';
 // Garante que apenas alunos autenticados acessem o portal
 verificarRole(['Aluno']);
 
-$baseUrl = '/Gymflow/app/controllers/PortalAlunoController.php';
+$baseUrl = BASE_URL . '/app/controllers/PortalAlunoController.php';
 $acao = $_GET['acao'] ?? 'aluno';
 
 $aluno_id = $_SESSION['aluno_id'];
@@ -18,7 +18,7 @@ $aluno_id = $_SESSION['aluno_id'];
 if (empty($aluno_id)) {
     $_SESSION = [];
     session_destroy();
-    header("Location: /Gymflow/app/controllers/LoginController.php?acao=login");
+    header("Location: " . BASE_URL . "/app/controllers/LoginController.php?acao=login");
     exit;
 }
 

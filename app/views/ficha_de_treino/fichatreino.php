@@ -1,6 +1,6 @@
 <?php
 if (!isset($filiais)) {
-    header("Location: /Gymflow/app/controllers/FilialController.php?acao=listar");
+    header("Location: " . BASE_URL . "/app/controllers/FilialController.php?acao=listar");
     exit;
 }
 /** @var array $filiais */
@@ -22,7 +22,7 @@ include __DIR__ . '/../shared/sidebar.php';
 
             <div>
 
-                <a href="/Gymflow/index.php">
+                <a href="<?= BASE_URL ?>/index.php">
                     ← Voltar para o site
                 </a>
 

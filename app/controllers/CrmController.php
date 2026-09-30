@@ -9,7 +9,7 @@ require_once __DIR__ . '/../../config/sessao.php';
 verificarRole(['Admin', 'Recepcao']);
 
 $tituloPagina = "CRM";
-$baseUrl = '/Gymflow/app/controllers/CrmController.php';
+$baseUrl = BASE_URL . '/app/controllers/CrmController.php';
 $acao = $_GET['acao'] ?? 'listar';
 
 /* 1. LISTAR LEADS */

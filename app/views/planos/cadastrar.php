@@ -1,6 +1,6 @@
 <?php
 if (!isset($erro)) {
-    header("Location: /Gymflow/app/controllers/PlanoController.php?acao=cadastrar");
+    header("Location: " . BASE_URL . "/app/controllers/PlanoController.php?acao=cadastrar");
     exit;
 }
 /** @var string $erro */
@@ -11,7 +11,7 @@ include __DIR__ . '/../shared/sidebar.php';
 ?>
 
 <h1>Cadastrar Novo Plano</h1>
-<a href="/Gymflow/app/controllers/PlanoController.php?acao=listar">Voltar</a>
+<a href="<?= BASE_URL ?>/app/controllers/PlanoController.php?acao=listar">Voltar</a>
 <br><br>
 
 <!-- Mensagem de Erro -->
@@ -21,7 +21,7 @@ include __DIR__ . '/../shared/sidebar.php';
     </div>
 <?php endif; ?>
 
-<form action="/Gymflow/app/controllers/PlanoController.php?acao=cadastrar" method="POST">
+<form action="<?= BASE_URL ?>/app/controllers/PlanoController.php?acao=cadastrar" method="POST">
     
     <label>Nome do Plano *:</label><br>
     <input type="text" name="nome" placeholder="Ex: Plano Trimestral Black" value="<?php echo htmlspecialchars($_POST['nome'] ?? ''); ?>" required>
@@ -46,7 +46,7 @@ include __DIR__ . '/../shared/sidebar.php';
     <br><br>
 
     <button type="submit">Salvar Plano</button>
-    <a href="/Gymflow/app/controllers/PlanoController.php?acao=listar">Cancelar</a>
+    <a href="<?= BASE_URL ?>/app/controllers/PlanoController.php?acao=listar">Cancelar</a>
 
 </form>
 

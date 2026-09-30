@@ -1,6 +1,6 @@
 <?php
 if (!isset($erro)) {
-    header("Location: /Gymflow/app/controllers/LoginController.php?acao=login");
+    header("Location: " . BASE_URL . "/app/controllers/LoginController.php?acao=login");
     exit;
 }
 ?>
@@ -14,9 +14,8 @@ if (!isset($erro)) {
 
     <title>Login - GymCore</title>
 
-    <link rel="stylesheet" href="/Gymflow/assets/css/css/global.css">
-    <link rel="stylesheet"
-        href="/Gymflow/assets/css/css/login.css?v=<?php echo filemtime($_SERVER['DOCUMENT_ROOT'] . '/Gymflow/assets/css/css/login.css'); ?>">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/global.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/login.css?v=<?php echo filemtime(__DIR__ . '/../../../assets/css/login.css'); ?>">
 </head>
 
 <body>
@@ -42,7 +41,7 @@ if (!isset($erro)) {
 
                     <!-- Voltar -->
                     <a
-                        href="/Gymflow/index.php"
+                        href="<?= BASE_URL ?>/index.php"
                         class="login-back-link">
 
                         <span class="back-arrow">←</span>
@@ -330,7 +329,7 @@ if (!isset($erro)) {
                             Novo por aqui?
                         </span>
 
-                        <a href="/Gymflow/index.php#contato">
+                        <a href="<?= BASE_URL ?>/index.php#contato">
                             Entre em contato
                         </a>
 

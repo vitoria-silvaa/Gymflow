@@ -19,7 +19,7 @@ include __DIR__ . '/../shared/sidebar.php';
             <h2>Nova Filial</h2>
 
             <a
-                href="/Gymflow/app/controllers/FilialController.php?acao=listar"
+                href="<?= BASE_URL ?>/app/controllers/FilialController.php?acao=listar"
                 class="modal-fechar"
                 aria-label="Fechar">
                 ×
@@ -34,7 +34,7 @@ include __DIR__ . '/../shared/sidebar.php';
 
         <form
             class="form-editar-filial"
-            action="/Gymflow/app/controllers/FilialController.php?acao=cadastrar"
+            action="<?= BASE_URL ?>/app/controllers/FilialController.php?acao=cadastrar"
             method="POST">
 
             <div class="campo-editar-filial">
@@ -83,7 +83,7 @@ include __DIR__ . '/../shared/sidebar.php';
             <div class="modal-editar-acoes">
 
                 <a
-                    href="/Gymflow/app/controllers/FilialController.php?acao=listar"
+                    href="<?= BASE_URL ?>/app/controllers/FilialController.php?acao=listar"
                     class="btn-cancelar-editar">
                     Cancelar
                 </a>

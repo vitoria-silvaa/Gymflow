@@ -45,8 +45,8 @@ include __DIR__ . '/../shared/portfolio_header.php';
                     <br><br>
 
                     <div class="hero-acoes">
-                        <a href="/Gymflow/app/controllers/LoginController.php?acao=login" class="hero-btn hero-btn-principal">Entrar no Portal do Aluno →</a>
-                        <a href="/Gymflow/index.php" class="hero-btn hero-btn-secundario">Voltar para a Página Inicial</a>
+                        <a href="<?= BASE_URL ?>/app/controllers/LoginController.php?acao=login" class="hero-btn hero-btn-principal">Entrar no Portal do Aluno →</a>
+                        <a href="<?= BASE_URL ?>/index.php" class="hero-btn hero-btn-secundario">Voltar para a Página Inicial</a>
                     </div>
                 </div>
             </article>
