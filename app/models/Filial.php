@@ -23,16 +23,14 @@ if ($operacao === 'listar') {
     $filiais = $stmt->fetchAll();
 }
 
-/* 2. BUSCAR FILIAL POR ID */
-elseif ($operacao === 'buscar') {
+/* 2. BUSCAR FILIAL POR ID */ elseif ($operacao === 'buscar') {
     $id = (int) ($id ?? 0);
     $stmt = $pdo->prepare("SELECT * FROM filiais WHERE id = :id");
     $stmt->execute([':id' => $id]);
     $filial = $stmt->fetch() ?: null;
 }
 
-/* 3. CADASTRAR FILIAL */
-elseif ($operacao === 'cadastrar') {
+/* 3. CADASTRAR FILIAL */ elseif ($operacao === 'cadastrar') {
     $companyId = (int) ($dados['company_id'] ?? 1);
     $cnpj = trim($dados['cnpj'] ?? '');
 
@@ -61,8 +59,7 @@ elseif ($operacao === 'cadastrar') {
     }
 }
 
-/* 4. ATUALIZAR FILIAL */
-elseif ($operacao === 'atualizar') {
+/* 4. ATUALIZAR FILIAL */ elseif ($operacao === 'atualizar') {
     $id = (int) ($id ?? 0);
     $companyId = (int) ($dados['company_id'] ?? 1);
     $cnpj = trim($dados['cnpj'] ?? '');
@@ -86,6 +83,27 @@ elseif ($operacao === 'atualizar') {
             ':telefone'    => trim($dados['telefone'] ?? ''),
             ':responsavel' => trim($dados['responsavel'] ?? ''),
             ':id'          => $id
+        ]);
+    } catch (Throwable $e) {
+        $erroModel = $e->getMessage();
+    }
+}
+
+/* 5. ATIVAR / INATIVAR FILIAL */ elseif ($operacao === 'alternar_status') {
+    $id = (int) ($id ?? 0);
+
+    try {
+        $stmt = $pdo->prepare("
+            UPDATE filiais
+            SET ativo = CASE
+                WHEN ativo = 1 THEN 0
+                ELSE 1
+            END
+            WHERE id = :id
+        ");
+
+        $stmt->execute([
+            ':id' => $id
         ]);
     } catch (Throwable $e) {
         $erroModel = $e->getMessage();
