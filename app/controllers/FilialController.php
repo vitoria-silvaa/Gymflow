@@ -14,6 +14,7 @@ $acao = $_GET['acao'] ?? 'listar';
 /* 1. LISTAR FILIAIS */
 if ($acao === 'listar') {
     $statusFiltro = $_GET['status'] ?? '';
+    $mensagem = $_GET['mensagem'] ?? '';
 
     $operacao = 'listar';
     require __DIR__ . '/../models/Filial.php';
@@ -21,8 +22,7 @@ if ($acao === 'listar') {
     require __DIR__ . '/../views/filiais/index.php';
 }
 
-/* 2. CADASTRAR FILIAL */
-elseif ($acao === 'cadastrar') {
+/* 2. CADASTRAR FILIAL */ elseif ($acao === 'cadastrar') {
     $erro = '';
     $dados = [];
 
@@ -50,8 +50,7 @@ elseif ($acao === 'cadastrar') {
     require __DIR__ . '/../views/filiais/cadastrar.php';
 }
 
-/* 3. EDITAR FILIAL */
-elseif ($acao === 'editar') {
+/* 3. EDITAR FILIAL */ elseif ($acao === 'editar') {
     $id = (int) ($_GET['id'] ?? $_POST['id'] ?? 0);
 
     if ($id <= 0) {
@@ -99,7 +98,41 @@ elseif ($acao === 'editar') {
     require __DIR__ . '/../views/filiais/editar.php';
 }
 
-else {
+/* 4. ATIVAR / INATIVAR FILIAL */ elseif ($acao === 'alternar_status') {
+    $id = (int) ($_GET['id'] ?? 0);
+
+    if ($id <= 0) {
+        header("Location: $baseUrl?acao=listar");
+        exit;
+    }
+
+    // Busca o status atual antes de alterar
+    $operacao = 'buscar';
+    require __DIR__ . '/../models/Filial.php';
+
+    if (!$filial) {
+        header("Location: $baseUrl?acao=listar");
+        exit;
+    }
+
+    $filialAtiva = (int) $filial['ativo'] === 1;
+
+    // Altera o status
+    $operacao = 'alternar_status';
+    require __DIR__ . '/../models/Filial.php';
+
+    if (empty($erroModel)) {
+
+        $mensagem = $filialAtiva
+            ? 'Filial inativada'
+            : 'Filial reativada';
+
+        header(
+            "Location: $baseUrl?acao=listar&mensagem=" . urlencode($mensagem)
+        );
+        exit;
+    }
+
     header("Location: $baseUrl?acao=listar");
     exit;
 }
