@@ -158,15 +158,15 @@
 
             <div>
 
+                <button type="submit">
+                    Adicionar exercício
+                </button>
+
                 <a
                     href="/Gymflow/app/controllers/ExercicioController.php"
                     class="btn">
                     Cancelar
                 </a>
-
-                <button type="submit">
-                    Adicionar exercício
-                </button>
 
             </div>
 
