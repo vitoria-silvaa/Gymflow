@@ -24,6 +24,8 @@ $role = $_SESSION['usuario_role'] ?? 'Admin';
     <?php if (!empty($cssEspecifico)): ?>
         <link rel="stylesheet" href="<?= htmlspecialchars($cssEspecifico) ?>">
     <?php endif; ?>
+
+    <link rel="stylesheet" href="/Gymflow/assets/css/css/cadastros.css">
 </head>
 
 <body>
