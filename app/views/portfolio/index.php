@@ -52,7 +52,7 @@ include __DIR__ . '/../shared/header.php';
 <?php endif; ?>
             </div>
             <div>
-                <button type="submit" style="background-color: #10b981; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 5px; font-weight: bold;">Salvar Alterações</button>
+                <button type="submit" style="background-color: var(--cor-primaria); color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 5px; font-weight: bold;">Salvar Alterações</button>
             </div>
         </header>
 

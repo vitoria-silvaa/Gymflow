@@ -6,7 +6,7 @@ ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
 require_once __DIR__ . '/../../config/sessao.php';
-verificarRole(['Admin', 'Professor', 'Recepcao']);
+verificarRole(['Admin']);
 
 $baseUrl = BASE_URL . '/app/controllers/FilialController.php';
 $acao = $_GET['acao'] ?? 'listar';
@@ -31,7 +31,7 @@ if ($acao === 'listar') {
         $dados['cnpj']        = trim($_POST['cnpj'] ?? '');
         $dados['telefone']    = trim($_POST['telefone'] ?? '');
         $dados['responsavel'] = trim($_POST['responsavel'] ?? '');
-        $dados['company_id']  = 1;
+        $dados['company_id']  = $_SESSION['company_id'] ?? 1;
 
         if ($dados['nome'] === '' || $dados['cnpj'] === '' || $dados['responsavel'] === '') {
             $erro = "Por favor, preencha todos os campos obrigatórios (*).";
@@ -74,7 +74,7 @@ if ($acao === 'listar') {
             'cnpj'        => trim($_POST['cnpj'] ?? ''),
             'telefone'    => trim($_POST['telefone'] ?? ''),
             'responsavel' => trim($_POST['responsavel'] ?? ''),
-            'company_id'  => $filial['company_id'] ?? 1
+            'company_id'  => $filial['company_id'] ?? $_SESSION['company_id'] ?? 1
         ];
 
         if ($dados['nome'] === '' || $dados['cnpj'] === '' || $dados['responsavel'] === '') {

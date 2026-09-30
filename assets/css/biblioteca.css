@@ -1,5 +1,5 @@
-/* ========================================
-   BIBLIOTECA DE EXERCÍCIOS
+﻿/* ========================================
+   BIBLIOTECA DE EXERCÃCIOS
    ======================================== */
 
 .pagina-cabecalho {
@@ -24,7 +24,7 @@
 }
 
 .pagina-cabecalho .btn {
-    background-color: #10b981;
+    background-color: var(--cor-primaria);
     color: white;
     padding: 10px 20px;
     border-radius: 8px;
@@ -34,7 +34,7 @@
 }
 
 .pagina-cabecalho .btn:hover {
-    background-color: #059669;
+    background-color: var(--cor-primaria-hover);
 }
 
 /* FILTROS */
@@ -77,7 +77,7 @@
 
 .campo-pesquisa input:focus,
 .campo-pesquisa select:focus {
-    border-color: #10b981;
+    border-color: var(--cor-primaria);
 }
 
 .botao-pesquisa {
@@ -85,7 +85,7 @@
 }
 
 .botao-pesquisa button {
-    background-color: #10b981;
+    background-color: var(--cor-primaria);
     color: white;
     border: none;
     padding: 12px 24px;
@@ -96,10 +96,10 @@
 }
 
 .botao-pesquisa button:hover {
-    background-color: #059669;
+    background-color: var(--cor-primaria-hover);
 }
 
-/* GRID DE EXERCÍCIOS */
+/* GRID DE EXERCÃCIOS */
 .exercicios-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -170,7 +170,7 @@
 
 .exercicio-acoes a:hover {
     background-color: #f9fafb;
-    color: #10b981;
+    color: var(--cor-primaria);
 }
 
 .exercicio-acoes a.excluir:hover {

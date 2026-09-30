@@ -8,7 +8,7 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/../../config/sessao.php';
 
 // Apenas funcionários autorizados gerenciam planos
-verificarRole(['Admin', 'Professor', 'Recepcao']);
+verificarRole(['Admin', 'Recepcao']);
 
 $baseUrl = BASE_URL . '/app/controllers/PlanoController.php';
 $acao = $_GET['acao'] ?? 'listar';
@@ -32,7 +32,7 @@ elseif ($acao === 'cadastrar') {
         $dados['categoria'] = trim($_POST['categoria'] ?? '');
         $dados['valor'] = trim($_POST['valor'] ?? '');
         $dados['duracao'] = $_POST['duracao'] ?? '';
-        $dados['company_id'] = 1; // MVP default
+        $dados['company_id'] = $_SESSION['company_id'] ?? 1;
 
         $dados['valor'] = str_replace(',', '.', $dados['valor']);
 

@@ -48,7 +48,8 @@ CREATE TABLE users (
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role VARCHAR(30) NOT NULL,
-    aluno_id INT DEFAULT NULL
+    aluno_id INT DEFAULT NULL,
+    remember_token VARCHAR(100) DEFAULT NULL
 );
 
 CREATE TABLE user_filiais (
@@ -76,6 +77,7 @@ CREATE TABLE planos (
 CREATE TABLE alunos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     filial_id INT NOT NULL,
+    professor_id INT DEFAULT NULL,
     nome VARCHAR(100) NOT NULL,
     cpf VARCHAR(14) NOT NULL UNIQUE,
     rg VARCHAR(20),
@@ -86,7 +88,8 @@ CREATE TABLE alunos (
     endereco TEXT,
     status VARCHAR(20) NOT NULL DEFAULT 'Ativo',
     criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (filial_id) REFERENCES filiais(id) ON DELETE RESTRICT
+    FOREIGN KEY (filial_id) REFERENCES filiais(id) ON DELETE RESTRICT,
+    FOREIGN KEY (professor_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
 -- Vinculando a chave estrangeira de usuários/alunos de forma segura para o MySQL

@@ -89,6 +89,26 @@ elseif ($acao === 'treinos') {
     require __DIR__ . '/../views/portal_aluno/treinos.php';
 }
 
+/* LISTAR CONTRATOS DO ALUNO */
+elseif ($acao === 'contratos') {
+    $operacao = 'listar_contratos';
+    require __DIR__ . '/../models/Aluno.php';
+    require __DIR__ . '/../views/portal_aluno/contratos.php';
+}
+
+/* IMPRIMIR CONTRATO */
+elseif ($acao === 'imprimir_contrato') {
+    $contrato_id = (int)($_GET['id'] ?? 0);
+    $operacao = 'buscar_contrato_impressao';
+    require __DIR__ . '/../models/Aluno.php';
+    
+    if (!$contrato) {
+        die("Contrato não encontrado ou sem permissão de acesso.");
+    }
+    
+    require __DIR__ . '/../views/portal_aluno/imprimir_contrato.php';
+}
+
 else {
     header("Location: $baseUrl?acao=aluno");
     exit;

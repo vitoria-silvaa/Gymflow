@@ -286,12 +286,8 @@ if (!isset($erro)) {
                             </label>
 
 
-                            <!--
-                                ALTERE O HREF QUANDO CRIAR
-                                A PÁGINA DE RECUPERAÇÃO.
-                            -->
                             <a
-                                href="#"
+                                href="<?= BASE_URL ?>/app/controllers/LoginController.php?acao=esqueci_senha"
                                 class="forgot-password">
 
                                 Esqueceu sua senha?

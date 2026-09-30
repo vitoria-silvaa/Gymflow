@@ -1,11 +1,11 @@
-/* ========================================
+﻿/* ========================================
    GYMFLOW
    PORTAL DO ALUNO - FATURAS
    ======================================== */
 
 
 /* ========================================
-   PÁGINA
+   PÃGINA
    ======================================== */
 
 .faturas-page {
@@ -20,7 +20,7 @@
 
 
 /* ========================================
-   CABEÇALHO
+   CABEÃ‡ALHO
    ======================================== */
 
 .faturas-header {
@@ -139,7 +139,7 @@
 
     background: #ecfdf5;
 
-    color: #059669;
+    color: var(--cor-primaria-hover);
 
 }
 
@@ -188,7 +188,7 @@
 
 
 /* ========================================
-   ÁREA DAS FATURAS
+   ÃREA DAS FATURAS
    ======================================== */
 
 .faturas-lista {
@@ -263,7 +263,7 @@
 
 .faturas-tabs a.ativo {
 
-    background: #10b981;
+    background: var(--cor-primaria);
 
     color: #ffffff;
 
@@ -347,7 +347,7 @@
 
 .fatura-aberta {
 
-    border-left: 4px solid #10b981;
+    border-left: 4px solid var(--cor-primaria);
 
 }
 
@@ -361,7 +361,7 @@
 
 
 /* ========================================
-   CABEÇALHO CARD
+   CABEÃ‡ALHO CARD
    ======================================== */
 
 .fatura-card-header {
@@ -444,7 +444,7 @@
 
     background: #ecfdf5;
 
-    color: #059669;
+    color: var(--cor-primaria-hover);
 
 }
 
@@ -498,7 +498,7 @@
 
 
 /* ========================================
-   INFORMAÇÕES
+   INFORMAÃ‡Ã•ES
    ======================================== */
 
 .fatura-info {
@@ -554,7 +554,7 @@
 
 
 /* ========================================
-   AÇÕES
+   AÃ‡Ã•ES
    ======================================== */
 
 .fatura-acoes {

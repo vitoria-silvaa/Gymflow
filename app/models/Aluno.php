@@ -15,6 +15,18 @@ if ($operacao === 'listar') {
     $sql = "SELECT a.*, f.nome AS nome_filial FROM alunos a INNER JOIN filiais f ON f.id = a.filial_id WHERE 1 = 1";
     $parametros = [];
 
+    // LÓGICA DE MULTI-TENANT (RESTRIÇÃO DE FILIAL)
+    $role_logado = $_SESSION['usuario_role'] ?? '';
+    $id_logado = $_SESSION['usuario_id'] ?? 0;
+    
+    if ($role_logado === 'Professor') {
+        $sql .= " AND a.professor_id = :user_id";
+        $parametros[':user_id'] = $id_logado;
+    } elseif ($role_logado === 'Recepcao') {
+        $sql .= " AND a.filial_id IN (SELECT filial_id FROM user_filiais WHERE user_id = :user_id)";
+        $parametros[':user_id'] = $id_logado;
+    }
+
     if ($cpf !== '') {
         $sql .= " AND a.cpf LIKE :cpf";
         $parametros[':cpf'] = "%$cpf%";
@@ -64,19 +76,20 @@ elseif ($operacao === 'cadastrar') {
 
         // Insere aluno
         $stmt = $pdo->prepare("
-            INSERT INTO alunos (filial_id, nome, cpf, rg, sexo, nascimento, email, telefone, endereco, status)
-            VALUES (:filial_id, :nome, :cpf, :rg, :sexo, :nascimento, :email, :telefone, :endereco, 'Ativo')
+            INSERT INTO alunos (filial_id, professor_id, nome, cpf, rg, sexo, nascimento, email, telefone, endereco, status)
+            VALUES (:filial_id, :professor_id, :nome, :cpf, :rg, :sexo, :nascimento, :email, :telefone, :endereco, 'Ativo')
         ");
         $stmt->execute([
-            ':filial_id'  => $dados['filial_id'],
-            ':nome'       => $dados['nome'],
-            ':cpf'        => $dados['cpf'],
-            ':rg'         => !empty($dados['rg']) ? $dados['rg'] : null,
-            ':sexo'       => $dados['sexo'],
-            ':nascimento' => $dados['nascimento'],
-            ':email'      => $dados['email'],
-            ':telefone'   => $dados['telefone'],
-            ':endereco'   => !empty($dados['endereco']) ? $dados['endereco'] : null
+            ':filial_id'    => $dados['filial_id'],
+            ':professor_id' => !empty($dados['professor_id']) ? $dados['professor_id'] : null,
+            ':nome'         => $dados['nome'],
+            ':cpf'          => $dados['cpf'],
+            ':rg'           => !empty($dados['rg']) ? $dados['rg'] : null,
+            ':sexo'         => $dados['sexo'],
+            ':nascimento'   => $dados['nascimento'],
+            ':email'        => $dados['email'],
+            ':telefone'     => $dados['telefone'],
+            ':endereco'     => !empty($dados['endereco']) ? $dados['endereco'] : null
         ]);
 
         $novoAlunoId = (int) $pdo->lastInsertId();
@@ -126,23 +139,24 @@ elseif ($operacao === 'atualizar') {
         // Atualiza aluno
         $stmt = $pdo->prepare("
             UPDATE alunos
-            SET filial_id = :filial_id, nome = :nome, cpf = :cpf, rg = :rg, sexo = :sexo,
+            SET filial_id = :filial_id, professor_id = :professor_id, nome = :nome, cpf = :cpf, rg = :rg, sexo = :sexo,
                 nascimento = :nascimento, email = :email, telefone = :telefone,
                 endereco = :endereco, status = :status
             WHERE id = :id
         ");
         $stmt->execute([
-            ':filial_id'  => $dados['filial_id'],
-            ':nome'       => $dados['nome'],
-            ':cpf'        => $dados['cpf'],
-            ':rg'         => !empty($dados['rg']) ? $dados['rg'] : null,
-            ':sexo'       => $dados['sexo'],
-            ':nascimento' => $dados['nascimento'],
-            ':email'      => $dados['email'],
-            ':telefone'   => $dados['telefone'],
-            ':endereco'   => !empty($dados['endereco']) ? $dados['endereco'] : null,
-            ':status'     => $dados['status'],
-            ':id'         => $id
+            ':filial_id'    => $dados['filial_id'],
+            ':professor_id' => !empty($dados['professor_id']) ? $dados['professor_id'] : null,
+            ':nome'         => $dados['nome'],
+            ':cpf'          => $dados['cpf'],
+            ':rg'           => !empty($dados['rg']) ? $dados['rg'] : null,
+            ':sexo'         => $dados['sexo'],
+            ':nascimento'   => $dados['nascimento'],
+            ':email'        => $dados['email'],
+            ':telefone'     => $dados['telefone'],
+            ':endereco'     => !empty($dados['endereco']) ? $dados['endereco'] : null,
+            ':status'       => $dados['status'],
+            ':id'           => $id
         ]);
 
         // Atualiza usuário
@@ -347,4 +361,38 @@ elseif ($operacao === 'dados_portal_aluno') {
     $stmt = $pdo->prepare("SELECT COUNT(*) AS total FROM contas WHERE aluno_id = :aluno_id AND status = 'Aberto'");
     $stmt->execute([':aluno_id' => $alunoId]);
     $faturas_abertas = (int) $stmt->fetchColumn();
+}
+
+/* 10. LISTAR CONTRATOS/MATRÍCULAS DO ALUNO */
+elseif ($operacao === 'listar_contratos') {
+    $alunoId = (int) ($aluno_id ?? 0);
+
+    $stmt = $pdo->prepare("
+        SELECT m.id, m.inicio, m.fim, m.valor, m.desconto, m.ativa, p.nome AS nome_plano, p.categoria, p.duracao 
+        FROM matriculas m
+        JOIN planos p ON m.plano_id = p.id
+        WHERE m.aluno_id = :aluno_id
+        ORDER BY m.inicio DESC
+    ");
+    $stmt->execute([':aluno_id' => $alunoId]);
+    $contratos = $stmt->fetchAll();
+}
+
+/* 11. BUSCAR DETALHES DO CONTRATO PARA IMPRESSÃO */
+elseif ($operacao === 'buscar_contrato_impressao') {
+    $alunoId = (int) ($aluno_id ?? 0);
+    $contratoId = (int) ($contrato_id ?? 0);
+
+    $stmt = $pdo->prepare("
+        SELECT m.*, p.nome AS nome_plano, p.categoria, p.duracao,
+               a.nome AS nome_aluno, a.cpf AS cpf_aluno, a.telefone AS tel_aluno,
+               f.nome AS nome_filial
+        FROM matriculas m
+        JOIN planos p ON m.plano_id = p.id
+        JOIN alunos a ON m.aluno_id = a.id
+        JOIN filiais f ON a.filial_id = f.id
+        WHERE m.aluno_id = :aluno_id AND m.id = :contrato_id
+    ");
+    $stmt->execute([':aluno_id' => $alunoId, ':contrato_id' => $contratoId]);
+    $contrato = $stmt->fetch();
 }

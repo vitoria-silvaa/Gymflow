@@ -40,11 +40,11 @@ INSERT INTO filiais (id, company_id, nome, cnpj, telefone, responsavel, ativo, l
 (3, 1, 'GymFlow Zona Leste', '12.345.678/0003-50', '(11) 98765-4323', 'Maria Fernanda', TRUE, -23.54000000, -46.47000000);
 
 -- 3. ALUNOS
-INSERT INTO alunos (id, filial_id, nome, cpf, rg, sexo, nascimento, email, telefone, endereco, status) VALUES
-(1, 1, 'Ana Oliveira', '111.222.333-44', '12.345.678-9', 'Feminino', '1995-03-15', 'ana.oliveira@email.com', '(11) 91111-1111', 'Rua A, 123 - São Paulo', 'Ativo'),
-(2, 1, 'Bruno Souza', '222.333.444-55', '98.765.432-1', 'Masculino', '1988-07-20', 'bruno.souza@email.com', '(11) 92222-2222', 'Av. B, 456 - São Paulo', 'Ativo'),
-(3, 1, 'Camila Lima', '333.444.555-66', '45.678.901-2', 'Feminino', '2000-11-05', 'camila.lima@email.com', '(11) 93333-3333', 'Rua C, 789 - São Paulo', 'Inativo'),
-(4, 3, 'Diego Rocha', '444.555.666-77', '34.567.890-3', 'Masculino', '1992-05-10', 'diego.rocha@email.com', '(21) 94444-4444', 'Rua D, 101 - Rio de Janeiro', 'Ativo');
+INSERT INTO alunos (id, filial_id, professor_id, nome, cpf, rg, sexo, nascimento, email, telefone, endereco, status) VALUES
+(1, 1, 2, 'Ana Oliveira', '111.222.333-44', '12.345.678-9', 'Feminino', '1995-03-15', 'ana.oliveira@email.com', '(11) 91111-1111', 'Rua A, 123 - São Paulo', 'Ativo'),
+(2, 1, 2, 'Bruno Souza', '222.333.444-55', '98.765.432-1', 'Masculino', '1988-07-20', 'bruno.souza@email.com', '(11) 92222-2222', 'Av. B, 456 - São Paulo', 'Ativo'),
+(3, 1, NULL, 'Camila Lima', '333.444.555-66', '45.678.901-2', 'Feminino', '2000-11-05', 'camila.lima@email.com', '(11) 93333-3333', 'Rua C, 789 - São Paulo', 'Inativo'),
+(4, 3, 3, 'Diego Rocha', '444.555.666-77', '34.567.890-3', 'Masculino', '1992-05-10', 'diego.rocha@email.com', '(21) 94444-4444', 'Rua D, 101 - Rio de Janeiro', 'Ativo');
 
 -- 4. USERS
 -- Senha padrão para todos: 'admin' | Hash bcrypt válido gerado com password_hash('admin', PASSWORD_BCRYPT)

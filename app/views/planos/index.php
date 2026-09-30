@@ -10,46 +10,60 @@ include __DIR__ . '/../shared/header.php';
 include __DIR__ . '/../shared/sidebar.php';
 ?>
 
-<!-- Título principal -->
-<h1>Gestão de Planos de Acesso</h1>
-<p>Cadastre e gerencie os pacotes e mensalidades oferecidos na rede.</p>
+<link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/jorge-financeiro.css">
 
-<br>
-<a href="<?= BASE_URL ?>/app/controllers/PlanoController.php?acao=cadastrar"> + Novo Plano</a>
-<br><br>
+<main class="conteudo financeiro-page">
 
-<!-- Tabela de Listagem -->
-<table border="1" width="100%" cellpadding="8" style="border-collapse: collapse;">
-    <thead>
-        <tr style="background-color: #f2f2f2;">
-            <th>ID</th>
-            <th>Nome do Plano</th>
-            <th>Categoria</th>
-            <th>Valor</th>
-            <th>Duração</th>
-            <th>Ações</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php if (count($planos) == 0): ?>
-            <tr>
-                <td colspan="6" align="center">Nenhum plano cadastrado no sistema.</td>
-            </tr>
-        <?php else: ?>
-            <?php foreach ($planos as $plano): ?>
-                <tr>
-                    <td align="center"><?php echo htmlspecialchars($plano['id']); ?></td>
-                    <td><strong><?php echo htmlspecialchars($plano['nome']); ?></strong></td>
-                    <td><?php echo htmlspecialchars($plano['categoria']); ?></td>
-                    <td>R$ <?php echo number_format($plano['valor'], 2, ',', '.'); ?></td>
-                    <td><?php echo htmlspecialchars($plano['duracao']); ?></td>
-                    <td align="center">
-                        <a href="<?= BASE_URL ?>/app/controllers/PlanoController.php?acao=editar&id=<?php echo $plano['id']; ?>">Editar</a>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        <?php endif; ?>
-    </tbody>
-</table>
+    <div class="fin-page-header">
+        <div class="fin-header-info">
+            <h1>Gestão de Planos de Acesso</h1>
+            <p>Cadastre e gerencie os pacotes e mensalidades oferecidos na rede.</p>
+        </div>
+        <div class="fin-header-actions">
+            <a href="<?= BASE_URL ?>/app/controllers/PlanoController.php?acao=cadastrar" class="fin-btn fin-btn-primary">
+                + Novo Plano
+            </a>
+        </div>
+    </div>
+
+    <!-- Tabela de Listagem -->
+    <section class="fin-table-card">
+        <div class="fin-table-responsive">
+            <table class="fin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome do Plano</th>
+                        <th>Categoria</th>
+                        <th>Valor</th>
+                        <th>Duração</th>
+                        <th style="text-align: right;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (count($planos) == 0): ?>
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 32px; color: var(--fin-text-muted);">Nenhum plano cadastrado no sistema.</td>
+                        </tr>
+                    <?php else: ?>
+                        <?php foreach ($planos as $plano): ?>
+                            <tr>
+                                <td><span class="fin-badge-categoria">#<?= htmlspecialchars($plano['id']); ?></span></td>
+                                <td><strong><?= htmlspecialchars($plano['nome']); ?></strong></td>
+                                <td><span class="fin-badge fin-badge-aberto"><?= htmlspecialchars($plano['categoria']); ?></span></td>
+                                <td><strong>R$ <?= number_format($plano['valor'], 2, ',', '.'); ?></strong></td>
+                                <td><?= htmlspecialchars($plano['duracao']); ?></td>
+                                <td style="text-align: right;">
+                                    <a href="<?= BASE_URL ?>/app/controllers/PlanoController.php?acao=editar&id=<?= $plano['id']; ?>" class="fin-btn fin-btn-primary fin-btn-sm">Editar</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</main>
 
 <?php include __DIR__ . '/../shared/footer.php'; ?>

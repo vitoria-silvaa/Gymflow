@@ -6,10 +6,24 @@ require_once __DIR__ . '/Database.php';
 $operacao = $operacao ?? '';
 
 if ($operacao === 'metricas_executivas') {
-    // 1. Alunos Ativos
-    $totalAlunosAtivos = (int) $pdo->query("
-        SELECT COUNT(*) FROM alunos WHERE status = 'Ativo'
-    ")->fetchColumn();
+    // 1. Alunos Ativos e Inativos
+    if ($role_logado === 'Professor') {
+        $totalAlunosAtivos = (int) $pdo->query("
+            SELECT COUNT(*) FROM alunos WHERE status = 'Ativo' AND professor_id = $id_logado
+        ")->fetchColumn();
+        
+        $totalAlunosInativos = (int) $pdo->query("
+            SELECT COUNT(*) FROM alunos WHERE status = 'Inativo' AND professor_id = $id_logado
+        ")->fetchColumn();
+    } else {
+        $totalAlunosAtivos = (int) $pdo->query("
+            SELECT COUNT(*) FROM alunos WHERE status = 'Ativo'
+        ")->fetchColumn();
+        
+        $totalAlunosInativos = (int) $pdo->query("
+            SELECT COUNT(*) FROM alunos WHERE status = 'Inativo'
+        ")->fetchColumn();
+    }
 
     // 2. Matrículas Ativas
     $totalMatriculasAtivas = (int) $pdo->query("
@@ -34,12 +48,22 @@ if ($operacao === 'metricas_executivas') {
     ")->fetchColumn();
 
     // 5. Novos Alunos agrupados por mês no ano atual
-    $stmtNovosAlunos = $pdo->query("
-        SELECT MONTH(criado_em) AS mes, COUNT(*) AS total
-        FROM alunos
-        WHERE YEAR(criado_em) = YEAR(CURDATE())
-        GROUP BY MONTH(criado_em)
-        ORDER BY MONTH(criado_em)
-    ");
+    if ($role_logado === 'Professor') {
+        $stmtNovosAlunos = $pdo->query("
+            SELECT MONTH(criado_em) AS mes, COUNT(*) AS total
+            FROM alunos
+            WHERE YEAR(criado_em) = YEAR(CURDATE()) AND professor_id = $id_logado
+            GROUP BY MONTH(criado_em)
+            ORDER BY MONTH(criado_em)
+        ");
+    } else {
+        $stmtNovosAlunos = $pdo->query("
+            SELECT MONTH(criado_em) AS mes, COUNT(*) AS total
+            FROM alunos
+            WHERE YEAR(criado_em) = YEAR(CURDATE())
+            GROUP BY MONTH(criado_em)
+            ORDER BY MONTH(criado_em)
+        ");
+    }
     $novosAlunosPorMes = $stmtNovosAlunos->fetchAll(PDO::FETCH_ASSOC);
 }

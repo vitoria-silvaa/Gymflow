@@ -1,17 +1,18 @@
-/* ========================================
+﻿/* ========================================
    GYMFLOW - LAYOUT & ESTRUTURA
    ======================================== */
 
 body {
     margin: 0;
-    margin-left: 240px;
+    margin-left: 240px; /* Volta para 240px */
     background-color: #f8fafc;
     color: #111827;
     font-family: Arial, Helvetica, sans-serif;
     min-height: 100vh;
+    transition: margin-left 0.3s ease;
 }
 
-/* ÁREA DE CONTEÚDO */
+/* ÃREA DE CONTEÃšDO */
 main,
 .conteudo,
 .main-content {
@@ -19,12 +20,12 @@ main,
     box-sizing: border-box;
 }
 
-/* SIDEBAR */
+/* SIDEBAR - FIXA NO DESKTOP */
 .sidebar {
     position: fixed;
     top: 0;
     left: 0;
-    width: 240px;
+    width: 240px; /* Expandida por padrÃ£o */
     height: 100%;
     padding: 20px;
     box-sizing: border-box;
@@ -32,22 +33,29 @@ main,
     border-right: 1px solid #e2e8f0;
     display: flex;
     flex-direction: column;
-    z-index: 100;
+    z-index: 1000;
+    transition: transform 0.3s ease; /* TransiÃ§Ã£o apenas para o mobile */
+    overflow-x: hidden;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.02);
 }
 
-/* TÍTULO / LOGO SIDEBAR */
+/* TÃTULO / LOGO SIDEBAR */
 .sidebar h1,
 .sidebar h2 {
     margin: 0 0 25px 0;
     font-size: 20px;
     font-weight: bold;
     color: #111827;
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
-/* NAVEGAÇÃO SIDEBAR */
+/* NAVEGAÃ‡ÃƒO SIDEBAR */
 .sidebar nav {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .sidebar ul {
@@ -56,14 +64,16 @@ main,
     padding: 0;
 }
 
-/* ESPAÇO ENTRE ITENS */
+/* ESPAÃ‡O ENTRE ITENS */
 .sidebar li {
     margin-bottom: 4px;
 }
 
 /* GAVETAS / LINKS */
 .sidebar nav a {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 15px;
     padding: 10px 12px;
     border-radius: 8px;
     color: #374151;
@@ -76,14 +86,16 @@ main,
 /* HOVER MENU */
 .sidebar nav a:hover {
     background-color: #f1f5f9;
-    color: #10b981;
+    color: var(--cor-primaria);
 }
 
-/* BOTÃO SAIR */
+/* BOTÃƒO SAIR */
 .sidebar .sair {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 15px;
     margin-top: auto;
-    padding: 12px;
+    padding: 12px 10px;
     border-top: 1px solid #e2e8f0;
     color: #ef4444;
     text-decoration: none;
@@ -96,6 +108,52 @@ main,
     background-color: #fef2f2;
     color: #dc2626;
     border-radius: 6px;
+}
+
+/* HAMBURGER BTN PARA MOBILE (OCULTO NO DESKTOP) */
+.mobile-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #111827;
+}
+
+/* ========================================
+   RESPONSIVO (MOBILE)
+   ======================================== */
+@media (max-width: 768px) {
+    body {
+        margin-left: 0; /* Remove margem do body */
+    }
+
+    .mobile-toggle {
+        display: block; /* Mostra o hamburger */
+    }
+
+    .sidebar {
+        transform: translateX(-100%); /* Esconde fora da tela */
+        width: 240px; /* Quando abrir, abre total */
+        padding: 20px;
+    }
+
+    /* Classe ativada por JS */
+    .sidebar.open {
+        transform: translateX(0);
+    }
+}
+
+/* OVERLAY MOBILE */
+.mobile-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+}
+.mobile-overlay.active {
+    display: block;
 }
 
 /* HEADER */
@@ -207,7 +265,7 @@ main,
     font-size: 12px;
 }
 
-/* SEÇÃO DO GRÁFICO */
+/* SEÃ‡ÃƒO DO GRÃFICO */
 .painel-grafico {
     margin-top: 35px;
 }

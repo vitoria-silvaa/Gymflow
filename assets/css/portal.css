@@ -1,10 +1,10 @@
-/* ========================================
+﻿/* ========================================
    GYMFLOW - PORTAL DO ALUNO
    ======================================== */
 
 
 /* ========================================
-   ÁREA PRINCIPAL
+   ÃREA PRINCIPAL
    ======================================== */
 
 .portal-aluno {
@@ -18,7 +18,7 @@
 
 
 /* ========================================
-   CABEÇALHO DO PORTAL
+   CABEÃ‡ALHO DO PORTAL
    ======================================== */
 
 .portal-header {
@@ -151,7 +151,7 @@
 
 
 /* ========================================
-   INFORMAÇÕES DO PLANO
+   INFORMAÃ‡Ã•ES DO PLANO
    ======================================== */
 
 .plano-info {
@@ -190,7 +190,7 @@
 
 
 /* ========================================
-   BOTÃO PRINCIPAL
+   BOTÃƒO PRINCIPAL
    ======================================== */
 
 .portal-btn {
@@ -203,7 +203,7 @@
 
     padding: 11px 14px;
 
-    background-color: #10b981;
+    background-color: var(--cor-primaria);
     color: #ffffff;
 
     border-radius: 6px;
@@ -221,7 +221,7 @@
 }
 
 .portal-btn:hover {
-    background-color: #059669;
+    background-color: var(--cor-primaria-hover);
 
     color: #ffffff;
 
@@ -234,7 +234,7 @@
 
 
 /* ========================================
-   CARDS DE FREQUÊNCIA / FATURAS
+   CARDS DE FREQUÃŠNCIA / FATURAS
    ======================================== */
 
 .frequencia-card,
@@ -259,7 +259,7 @@
 
     border-radius: 7px;
 
-    color: #10b981;
+    color: var(--cor-primaria);
 
     font-size: 17px;
     font-weight: 700;
@@ -299,7 +299,7 @@
 }
 
 .texto-sucesso {
-    color: #10b981 !important;
+    color: var(--cor-primaria) !important;
 }
 
 .texto-alerta {
@@ -316,7 +316,7 @@
 
     margin-top: 18px;
 
-    color: #10b981;
+    color: var(--cor-primaria);
 
     font-size: 13px;
     font-weight: 600;
@@ -325,12 +325,12 @@
 }
 
 .card-link:hover {
-    color: #059669;
+    color: var(--cor-primaria-hover);
 }
 
 
 /* ========================================
-   ACESSO RÁPIDO
+   ACESSO RÃPIDO
    ======================================== */
 
 .portal-bottom {
@@ -352,7 +352,7 @@
 
 
 /* ========================================
-   AÇÕES RÁPIDAS
+   AÃ‡Ã•ES RÃPIDAS
    ======================================== */
 
 .quick-actions {

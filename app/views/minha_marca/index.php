@@ -19,218 +19,93 @@ include __DIR__ . '/../shared/sidebar.php';
 
 ?>
 
-<main>
+<link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/minha-marca.css">
 
-    <h2>Minha Marca</h2>
+<main class="conteudo minha-marca-page">
 
-    <p>
-        Personalize a aparência do seu painel.
-    </p>
-
+    <div class="minha-marca-topo">
+        <div class="minha-marca-titulo">
+            <h2>Minha Marca</h2>
+            <p>Personalize a aparência do seu painel.</p>
+        </div>
+    </div>
 
     <?php if (($_GET['msg'] ?? '') === 'salvo'): ?>
-
-        <p>
+        <div class="alert-success">
             Preferências salvas com sucesso.
-        </p>
-
+        </div>
     <?php endif; ?>
 
-
-    <form
-        action="<?= BASE_URL ?>/app/controllers/MinhaMarcaController.php?acao=salvar"
-        method="POST">
-
+    <form action="<?= BASE_URL ?>/app/controllers/MinhaMarcaController.php?acao=salvar" method="POST">
 
         <!-- NOME DO PAINEL -->
-
-        <section>
-
+        <div class="marca-card">
             <h3>Nome do painel</h3>
-
-            <label for="nome_painel">
-                Nome exibido no sistema
-            </label>
-
-            <input
-                type="text"
-                name="nome_painel"
-                id="nome_painel"
-                maxlength="100"
-                value="<?= htmlspecialchars($preferencias['nome_painel'] ?? 'Gymflow'); ?>">
-
-        </section>
-
-
-        <hr>
-
+            <div class="form-group">
+                <label for="nome_painel">Nome exibido no sistema</label>
+                <input type="text" name="nome_painel" id="nome_painel" maxlength="100" value="<?= htmlspecialchars($preferencias['nome_painel'] ?? 'Gymflow'); ?>">
+            </div>
+        </div>
 
         <!-- TEMA CLARO / ESCURO -->
-
-        <section>
-
+        <div class="marca-card">
             <h3>Aparência</h3>
-
-            <label>
-                <input
-                    type="radio"
-                    name="tema"
-                    value="dark"
-                    id="tema_dark"
-                    <?= ($preferencias['tema'] ?? 'dark') === 'dark' ? 'checked' : ''; ?>>
-
-                Tema escuro
-            </label>
-
-
-            <label>
-                <input
-                    type="radio"
-                    name="tema"
-                    value="light"
-                    id="tema_light"
-                    <?= ($preferencias['tema'] ?? 'dark') === 'light' ? 'checked' : ''; ?>>
-
-                Tema claro
-            </label>
-
-        </section>
-
-
-        <hr>
-
+            <div class="radio-group">
+                <label class="radio-item">
+                    <input type="radio" name="tema" value="dark" id="tema_dark" <?= ($preferencias['tema'] ?? 'dark') === 'dark' ? 'checked' : ''; ?>>
+                    Tema escuro
+                </label>
+                <label class="radio-item">
+                    <input type="radio" name="tema" value="light" id="tema_light" <?= ($preferencias['tema'] ?? 'dark') === 'light' ? 'checked' : ''; ?>>
+                    Tema claro
+                </label>
+            </div>
+        </div>
 
         <!-- TEMAS PREDEFINIDOS -->
-
-        <section>
-
+        <div class="marca-card">
             <h3>Temas predefinidos</h3>
-
-            <label for="tema_predefinido">
-                Escolha um tema
-            </label>
-
-            <select
-                name="tema_predefinido"
-                id="tema_predefinido">
-
-                <option
-                    value="padrao"
-                    <?= ($preferencias['tema_predefinido'] ?? '') === 'padrao' ? 'selected' : ''; ?>>
-                    Gymflow Padrão
-                </option>
-
-                <option
-                    value="dark"
-                    <?= ($preferencias['tema_predefinido'] ?? '') === 'dark' ? 'selected' : ''; ?>>
-                    Dark
-                </option>
-
-                <option
-                    value="forest"
-                    <?= ($preferencias['tema_predefinido'] ?? '') === 'forest' ? 'selected' : ''; ?>>
-                    Forest
-                </option>
-
-                <option
-                    value="sunset"
-                    <?= ($preferencias['tema_predefinido'] ?? '') === 'sunset' ? 'selected' : ''; ?>>
-                    Sunset
-                </option>
-
-                <option
-                    value="ocean"
-                    <?= ($preferencias['tema_predefinido'] ?? '') === 'ocean' ? 'selected' : ''; ?>>
-                    Ocean
-                </option>
-
-            </select>
-
-        </section>
-
-
-        <hr>
-
+            <div class="form-group">
+                <label for="tema_predefinido">Escolha um tema</label>
+                <select name="tema_predefinido" id="tema_predefinido">
+                    <option value="padrao" <?= ($preferencias['tema_predefinido'] ?? '') === 'padrao' ? 'selected' : ''; ?>>Gymflow Padrão</option>
+                    <option value="dark" <?= ($preferencias['tema_predefinido'] ?? '') === 'dark' ? 'selected' : ''; ?>>Dark</option>
+                    <option value="forest" <?= ($preferencias['tema_predefinido'] ?? '') === 'forest' ? 'selected' : ''; ?>>Forest</option>
+                    <option value="sunset" <?= ($preferencias['tema_predefinido'] ?? '') === 'sunset' ? 'selected' : ''; ?>>Sunset</option>
+                    <option value="ocean" <?= ($preferencias['tema_predefinido'] ?? '') === 'ocean' ? 'selected' : ''; ?>>Ocean</option>
+                </select>
+            </div>
+        </div>
 
         <!-- CORES PERSONALIZADAS -->
-
-        <section>
-
+        <div class="marca-card">
             <h3>Paleta personalizada</h3>
-
-
-            <div>
-
-                <label for="cor_primaria">
-                    Cor primária
-                </label>
-
-                <input
-                    type="color"
-                    name="cor_primaria"
-                    id="cor_primaria"
-                    value="<?= htmlspecialchars($preferencias['cor_primaria'] ?? '#ffb000'); ?>">
-
-                <span id="valor_cor_primaria">
-                    <?= htmlspecialchars($preferencias['cor_primaria'] ?? '#ffb000'); ?>
-                </span>
-
+            
+            <div class="form-group">
+                <label for="cor_primaria">Cor primária</label>
+                <div class="color-picker-group">
+                    <input type="color" name="cor_primaria" id="cor_primaria" value="<?= htmlspecialchars($preferencias['cor_primaria'] ?? '#ffb000'); ?>">
+                    <span id="valor_cor_primaria"><?= htmlspecialchars($preferencias['cor_primaria'] ?? '#ffb000'); ?></span>
+                </div>
             </div>
 
-
-            <br>
-
-
-            <div>
-
-                <label for="cor_secundaria">
-                    Cor secundária
-                </label>
-
-                <input
-                    type="color"
-                    name="cor_secundaria"
-                    id="cor_secundaria"
-                    value="<?= htmlspecialchars($preferencias['cor_secundaria'] ?? '#000000'); ?>">
-
-                <span id="valor_cor_secundaria">
-                    <?= htmlspecialchars($preferencias['cor_secundaria'] ?? '#000000'); ?>
-                </span>
-
+            <div class="form-group">
+                <label for="cor_secundaria">Cor secundária</label>
+                <div class="color-picker-group">
+                    <input type="color" name="cor_secundaria" id="cor_secundaria" value="<?= htmlspecialchars($preferencias['cor_secundaria'] ?? '#000000'); ?>">
+                    <span id="valor_cor_secundaria"><?= htmlspecialchars($preferencias['cor_secundaria'] ?? '#000000'); ?></span>
+                </div>
             </div>
-
-        </section>
-
-
-        <hr>
-
+        </div>
 
         <!-- LOGOTIPO -->
-
-        <section>
-
+        <div class="marca-card">
             <h3>Logotipo</h3>
+            <p style="color: #55708d; font-size: 15px; margin: 0;">O upload e as opções de logotipo serão adicionados na próxima etapa.</p>
+            <input type="hidden" name="logo_url" value="<?= htmlspecialchars($preferencias['logo_url'] ?? ''); ?>">
+        </div>
 
-            <p>
-                O upload e as opções de logotipo serão adicionados na próxima etapa.
-            </p>
-
-            <input
-                type="hidden"
-                name="logo_url"
-                value="<?= htmlspecialchars($preferencias['logo_url'] ?? ''); ?>">
-
-        </section>
-
-
-        <hr>
-
-
-        <!-- BOTÃO SALVAR -->
-
-        <button type="submit">
-            Salvar alterações
-        </button>
+        <button type="submit" class="btn-salvar-marca">Salvar alterações</button>
 
     </form>
 
@@ -371,10 +246,10 @@ include __DIR__ . '/../shared/sidebar.php';
         else {
 
             document.body.style.backgroundColor =
-                secundaria;
+                '#f8fafc';
 
             document.body.style.color =
-                '#ffffff';
+                '#111827';
 
             if (header) {
 
@@ -382,6 +257,11 @@ include __DIR__ . '/../shared/sidebar.php';
                     secundaria;
 
                 header.style.color =
+                    '#ffffff';
+            }
+            
+            if (tituloPainel) {
+                tituloPainel.style.color =
                     '#ffffff';
             }
         }

@@ -11,80 +11,95 @@ include __DIR__ . '/../shared/header.php';
 include __DIR__ . '/../shared/sidebar.php';
 ?>
 
-<h1>Alunos</h1>
+<link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/jorge-financeiro.css">
 
-<a href="<?= $baseUrl ?>?acao=cadastrar">
-    Cadastrar Aluno
-</a>
+<main class="conteudo financeiro-page">
 
-<br><br>
+    <div class="fin-page-header">
+        <div class="fin-header-info">
+            <h1>Alunos</h1>
+            <p>Gerencie todos os alunos cadastrados no sistema.</p>
+        </div>
+        <div class="fin-header-actions">
+            <a href="<?= $baseUrl ?>?acao=cadastrar" class="fin-btn fin-btn-primary">
+                + Novo Aluno
+            </a>
+        </div>
+    </div>
 
-<form action="<?= $baseUrl ?>" method="GET">
-    <input type="hidden" name="acao" value="listar">
+    <!-- Filtros -->
+    <section class="fin-table-card" style="margin-bottom: 24px;">
+        <form action="<?= $baseUrl ?>" method="GET" class="fin-form-grid" style="display: flex; gap: 16px; align-items: flex-end; padding: 20px;">
+            <input type="hidden" name="acao" value="listar">
 
-    <label>CPF:</label>
-    <input
-        type="text"
-        name="cpf"
-        value="<?= htmlspecialchars($cpf) ?>">
+            <div class="fin-form-group" style="flex: 1;">
+                <label>CPF</label>
+                <input type="text" name="cpf" class="fin-input" placeholder="Buscar por CPF" value="<?= htmlspecialchars($cpf) ?>">
+            </div>
 
-    <label>Status:</label>
-    <select name="status">
-        <option value="">Todos</option>
-        <option
-            value="Ativo"
-            <?= $status === 'Ativo' ? 'selected' : '' ?>>
-            Ativo
-        </option>
-        <option
-            value="Inativo"
-            <?= $status === 'Inativo' ? 'selected' : '' ?>>
-            Inativo
-        </option>
-    </select>
+            <div class="fin-form-group" style="flex: 1;">
+                <label>Status</label>
+                <select name="status" class="fin-select">
+                    <option value="">Todos os status</option>
+                    <option value="Ativo" <?= $status === 'Ativo' ? 'selected' : '' ?>>Ativo</option>
+                    <option value="Inativo" <?= $status === 'Inativo' ? 'selected' : '' ?>>Inativo</option>
+                </select>
+            </div>
 
-    <button type="submit">Buscar</button>
-</form>
+            <div class="fin-form-group">
+                <button type="submit" class="fin-btn fin-btn-secondary">Filtrar</button>
+            </div>
+        </form>
+    </section>
 
-<br>
+    <!-- Tabela -->
+    <section class="fin-table-card">
+        <div class="fin-table-responsive">
+            <table class="fin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>CPF</th>
+                        <th>Filial</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Ações</th>
+                    </tr>
+                </thead>
 
-<table border="1" width="100%" cellpadding="6">
-    <tr>
-        <th>ID</th>
-        <th>Nome</th>
-        <th>CPF</th>
-        <th>Filial</th>
-        <th>Status</th>
-        <th>Ações</th>
-    </tr>
+                <tbody>
+                    <?php if (count($alunos) === 0): ?>
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 32px; color: var(--fin-text-muted);">Nenhum aluno encontrado.</td>
+                        </tr>
+                    <?php else: ?>
+                        <?php foreach ($alunos as $aluno): ?>
+                            <tr>
+                                <td><span class="fin-badge-categoria">#<?= htmlspecialchars($aluno['id']) ?></span></td>
+                                <td><strong><?= htmlspecialchars($aluno['nome']) ?></strong></td>
+                                <td><?= htmlspecialchars($aluno['cpf']) ?></td>
+                                <td><?= htmlspecialchars($aluno['nome_filial']) ?></td>
+                                <td>
+                                    <?php if ($aluno['status'] === 'Ativo'): ?>
+                                        <span class="fin-badge fin-badge-pago">Ativo</span>
+                                    <?php else: ?>
+                                        <span class="fin-badge fin-badge-aberto">Inativo</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td style="text-align: right;">
+                                    <div class="fin-actions-dropdown" style="display: inline-flex; gap: 8px;">
+                                        <a href="<?= $baseUrl ?>?acao=visualizar&id=<?= $aluno['id'] ?>" class="fin-btn fin-btn-sm" style="background: #f1f5f9; color: #475569;">Ver</a>
+                                        <a href="<?= $baseUrl ?>?acao=editar&id=<?= $aluno['id'] ?>" class="fin-btn fin-btn-primary fin-btn-sm">Editar</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </section>
 
-    <?php if (count($alunos) === 0): ?>
-        <tr>
-            <td colspan="6">Nenhum aluno encontrado.</td>
-        </tr>
-    <?php else: ?>
-        <?php foreach ($alunos as $aluno): ?>
-            <tr>
-                <td><?= htmlspecialchars($aluno['id']) ?></td>
-                <td><?= htmlspecialchars($aluno['nome']) ?></td>
-                <td><?= htmlspecialchars($aluno['cpf']) ?></td>
-                <td><?= htmlspecialchars($aluno['nome_filial']) ?></td>
-                <td><?= htmlspecialchars($aluno['status']) ?></td>
-                <td>
-                    <a
-                        href="<?= $baseUrl ?>?acao=visualizar&id=<?= $aluno['id'] ?>">
-                        Ver
-                    </a>
-
-                    |
-
-                    <a href="<?= $baseUrl ?>?acao=editar&id=<?= $aluno['id'] ?>">
-                        Editar
-                    </a>
-                </td>
-            </tr>
-        <?php endforeach; ?>
-    <?php endif; ?>
-</table>
+</main>
 
 <?php include __DIR__ . '/../shared/footer.php'; ?>

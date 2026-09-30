@@ -1,11 +1,11 @@
-/* ========================================
+﻿/* ========================================
    GYMFLOW
    PORTAL DO ALUNO - TREINOS
    ======================================== */
 
 
 /* ========================================
-   PÁGINA
+   PÃGINA
    ======================================== */
 
 .treinos-page {
@@ -22,7 +22,7 @@
 
 
 /* ========================================
-   CABEÇALHO
+   CABEÃ‡ALHO
    ======================================== */
 
 .treinos-header {
@@ -62,7 +62,7 @@
 
     margin-bottom: 7px;
 
-    color: #10b981;
+    color: var(--cor-primaria);
 
     font-size: 11px;
 
@@ -74,7 +74,7 @@
 
 
 /* ========================================
-   TÍTULOS
+   TÃTULOS
    ======================================== */
 
 .section-title {
@@ -90,7 +90,7 @@
 
     margin-bottom: 6px;
 
-    color: #10b981;
+    color: var(--cor-primaria);
 
     font-size: 11px;
 
@@ -208,7 +208,7 @@
 
 .ficha-tab.ativo .ficha-tab-versao {
 
-    color: #10b981;
+    color: var(--cor-primaria);
 
 }
 
@@ -235,7 +235,7 @@
 
 
 /* ========================================
-   CABEÇALHO DA FICHA
+   CABEÃ‡ALHO DA FICHA
    ======================================== */
 
 .ficha-header {
@@ -284,7 +284,7 @@
 
 .ficha-meta span:not(:last-child)::after {
 
-    content: "•";
+    content: "â€¢";
 
     position: absolute;
 
@@ -296,7 +296,7 @@
 
 
 /* ========================================
-   LISTA DE EXERCÍCIOS
+   LISTA DE EXERCÃCIOS
    ======================================== */
 
 .exercicios-list {
@@ -309,7 +309,7 @@
 
 
 /* ========================================
-   EXERCÍCIO
+   EXERCÃCIO
    ======================================== */
 
 .exercicio-card {
@@ -338,7 +338,7 @@
 
 
 /* ========================================
-   TOPO DO EXERCÍCIO
+   TOPO DO EXERCÃCIO
    ======================================== */
 
 .exercicio-top {
@@ -409,16 +409,16 @@
 
 .exercicio-check input:checked+.checkmark {
 
-    background: #10b981;
+    background: var(--cor-primaria);
 
-    border-color: #10b981;
+    border-color: var(--cor-primaria);
 
 }
 
 
 .exercicio-check input:checked+.checkmark::after {
 
-    content: "✓";
+    content: "âœ“";
 
     display: flex;
 
@@ -438,7 +438,7 @@
 
 
 /* ========================================
-   NUMERAÇÃO
+   NUMERAÃ‡ÃƒO
    ======================================== */
 
 .exercicio-numero {
@@ -455,7 +455,7 @@
 
 
 /* ========================================
-   INFORMAÇÕES
+   INFORMAÃ‡Ã•ES
    ======================================== */
 
 .exercicio-info {
@@ -542,7 +542,7 @@
 
 
 /* ========================================
-   AÇÕES
+   AÃ‡Ã•ES
    ======================================== */
 
 .exercicio-acoes {
@@ -605,7 +605,7 @@
 
     outline: none;
 
-    border-color: #10b981;
+    border-color: var(--cor-primaria);
 
     box-shadow:
         0 0 0 3px rgba(16, 185, 129, 0.08);
@@ -614,7 +614,7 @@
 
 
 /* ========================================
-   BOTÃO DE PAUSA
+   BOTÃƒO DE PAUSA
    ======================================== */
 
 .btn-pausa {
@@ -649,9 +649,9 @@
 
     background: #f8fafc;
 
-    border-color: #10b981;
+    border-color: var(--cor-primaria);
 
-    color: #059669;
+    color: var(--cor-primaria-hover);
 
 }
 
@@ -706,7 +706,7 @@
 
     border-radius: 10px;
 
-    color: #10b981;
+    color: var(--cor-primaria);
 
     font-size: 25px;
 
@@ -745,7 +745,7 @@
 
 
 /* ========================================
-   FICHA SEM EXERCÍCIOS
+   FICHA SEM EXERCÃCIOS
    ======================================== */
 
 .exercicios-empty {

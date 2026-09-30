@@ -6,7 +6,7 @@ ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
 require_once __DIR__ . '/../../config/sessao.php';
-verificarRole(['Admin', 'Professor', 'Recepcao']);
+verificarRole(['Admin', 'Recepcao']);
 
 $baseUrl = BASE_URL . '/app/controllers/AlunoController.php';
 $acao = $_GET['acao'] ?? 'listar';
@@ -37,6 +37,7 @@ elseif ($acao === 'cadastrar') {
         $dados['telefone']    = trim($_POST['telefone'] ?? '');
         $dados['endereco']    = trim($_POST['endereco'] ?? '');
         $dados['filial_id']   = (int) ($_POST['filial_id'] ?? 0);
+        $dados['professor_id'] = !empty($_POST['professor_id']) ? (int) $_POST['professor_id'] : null;
         $dados['senha']       = $_POST['senha'] ?? '';
 
         if (
@@ -63,6 +64,10 @@ elseif ($acao === 'cadastrar') {
 
     $operacao = 'listar_filiais';
     require __DIR__ . '/../models/Aluno.php';
+
+    // LISTAR PROFESSORES PARA ATRIBUIR
+    $stmt_professores = $pdo->query("SELECT id, name FROM users WHERE role = 'Professor' ORDER BY name");
+    $professores = $stmt_professores->fetchAll();
 
     require __DIR__ . '/../views/alunos/cadastrar.php';
 }
@@ -92,6 +97,7 @@ elseif ($acao === 'editar') {
         $dados['telefone']    = trim($_POST['telefone'] ?? '');
         $dados['endereco']    = trim($_POST['endereco'] ?? '');
         $dados['filial_id']   = (int) ($_POST['filial_id'] ?? 0);
+        $dados['professor_id'] = !empty($_POST['professor_id']) ? (int) $_POST['professor_id'] : null;
         $dados['status']      = trim($_POST['status'] ?? '');
         $dados['senha']       = $_POST['senha'] ?? '';
 
@@ -119,6 +125,10 @@ elseif ($acao === 'editar') {
 
     $operacao = 'listar_filiais';
     require __DIR__ . '/../models/Aluno.php';
+
+    // LISTAR PROFESSORES PARA ATRIBUIR
+    $stmt_professores = $pdo->query("SELECT id, name FROM users WHERE role = 'Professor' ORDER BY name");
+    $professores = $stmt_professores->fetchAll();
 
     require __DIR__ . '/../views/alunos/editar.php';
 }

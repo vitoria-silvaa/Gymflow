@@ -7,7 +7,7 @@ error_reporting(E_ALL);
 
 require_once __DIR__ . '/../../config/sessao.php';
 
-verificarRole(['Admin', 'Professor', 'Recepcao']);
+verificarRole(['Admin', 'Professor']);
 
 $tituloPagina = "Treinos";
 $cssEspecifico = BASE_URL . '/assets/css/fichatreino.css?v=' . time();
@@ -125,15 +125,13 @@ require __DIR__ . '/../models/Exercicio.php';
 $exercicios = listarExercicios($pdo);
 
 /* LISTAR PROFESSORES */
-$stmt_professores = $pdo->prepare("
-    SELECT id, name
-    FROM users
-    WHERE role = 'Professor'
-    ORDER BY name ASC
-");
-
-$stmt_professores->execute();
-
+if ($_SESSION['usuario_role'] === 'Professor') {
+    $stmt_professores = $pdo->prepare("SELECT id, name FROM users WHERE id = :id");
+    $stmt_professores->execute([':id' => $_SESSION['usuario_id']]);
+} else {
+    $stmt_professores = $pdo->prepare("SELECT id, name FROM users WHERE role = 'Professor' ORDER BY name ASC");
+    $stmt_professores->execute();
+}
 $professores = $stmt_professores->fetchAll();
 
 require __DIR__ . '/../views/treinos/index.php';

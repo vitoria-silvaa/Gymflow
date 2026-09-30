@@ -110,6 +110,22 @@ include __DIR__ . '/../shared/sidebar.php';
     </select>
     <br><br>
 
+    <label>Professor Responsável:</label>
+    <select name="professor_id">
+        <option value="">Nenhum</option>
+
+        <?php foreach ($professores as $professor): ?>
+            <option
+                value="<?= $professor['id'] ?>"
+                <?= ($dados['professor_id'] ?? '') == $professor['id']
+                    ? 'selected'
+                    : '' ?>>
+                <?= htmlspecialchars($professor['name']) ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+    <br><br>
+
     <label>Status *:</label>
     <select name="status" required>
         <option

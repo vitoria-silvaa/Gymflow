@@ -1,4 +1,4 @@
-body {
+﻿body {
     /* =========================================================
    FILIAIS
    ========================================================= */
@@ -73,7 +73,7 @@ body {
         justify-content: center;
 
         border-radius: 11px;
-        background: #10b981;
+        background: var(--cor-primaria);
         color: #ffffff;
 
         font-size: 16px;
@@ -129,7 +129,7 @@ body {
 
 
     /* =========================================================
-   CABEÇALHO DO CARD
+   CABEÃ‡ALHO DO CARD
    ========================================================= */
 
     .card-header {
@@ -164,7 +164,7 @@ body {
     }
 
     .badge.ativa {
-        background: #10b981;
+        background: var(--cor-primaria);
         color: #ffffff;
     }
 
@@ -175,7 +175,7 @@ body {
 
 
     /* =========================================================
-   INFORMAÇÕES
+   INFORMAÃ‡Ã•ES
    ========================================================= */
 
     .card-body {
@@ -200,7 +200,7 @@ body {
 
 
     /* =========================================================
-   BOTÕES DO CARD
+   BOTÃ•ES DO CARD
    ========================================================= */
 
     .card-footer {
@@ -262,7 +262,7 @@ body {
 
     .btn-ativar {
         border: none;
-        background: #10b981;
+        background: var(--cor-primaria);
         color: #ffffff;
     }
 
@@ -271,7 +271,7 @@ body {
     }
 
 
-    /* HISTÓRICO */
+    /* HISTÃ“RICO */
 
     .btn-historico {
         grid-column: 1 / -1;
@@ -432,7 +432,7 @@ body {
         box-sizing: border-box;
     }
 
-    /* Cabeçalho */
+    /* CabeÃ§alho */
 
     .modal-editar-header {
         display: flex;
@@ -477,7 +477,7 @@ body {
         color: #102437;
     }
 
-    /* Formulário */
+    /* FormulÃ¡rio */
 
     .form-editar-filial {
         width: 100%;
@@ -524,9 +524,9 @@ body {
     }
 
     .campo-editar-filial input:focus {
-        border-color: #10b981;
+        border-color: var(--cor-primaria);
 
-        box-shadow: 0 0 0 1px #10b981;
+        box-shadow: 0 0 0 1px var(--cor-primaria);
     }
 
     /* Mensagem de erro */
@@ -547,7 +547,7 @@ body {
         font-weight: 600;
     }
 
-    /* Botões */
+    /* BotÃµes */
 
     .modal-editar-acoes {
         display: flex;
@@ -600,7 +600,7 @@ body {
     }
 
     .btn-salvar-editar {
-        background: #10b981;
+        background: var(--cor-primaria);
 
         border: none;
 
@@ -639,5 +639,36 @@ body {
         }
     }
 
+    /* RESPONSIVO MOBILE - GERAL DOS CADASTROS */
+    @media (max-width: 768px) {
+        .filiais-topo,
+        .topo-acoes {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 15px;
+        }
+
+        .filiais-acoes {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .filiais-acoes select,
+        .btn-criar-filial,
+        .btn-salvar {
+            width: 100%;
+        }
+
+        .cards-container, 
+        .grid-cards {
+            grid-template-columns: 1fr !important;
+        }
+
+        .formulario-bloco, 
+        .grid-2-colunas, 
+        .form-grid {
+            grid-template-columns: 1fr !important;
+        }
+    }
 
 }

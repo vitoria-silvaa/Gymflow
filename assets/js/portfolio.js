@@ -283,6 +283,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 maxZoom: 13
             });
         }
+        
+        window._limitesMapaCompleto = limitesModal;
     }
 
     function abrirModalMapa() {
@@ -295,8 +297,19 @@ document.addEventListener('DOMContentLoaded', function () {
         window.setTimeout(function () {
             if (mapaCompleto) {
                 mapaCompleto.invalidateSize();
+                
+                if (window._limitesMapaCompleto) {
+                    if (window._limitesMapaCompleto.length === 1) {
+                        mapaCompleto.setView(window._limitesMapaCompleto[0], 14);
+                    } else if (window._limitesMapaCompleto.length > 1) {
+                        mapaCompleto.fitBounds(window._limitesMapaCompleto, {
+                            padding: [55, 55],
+                            maxZoom: 13
+                        });
+                    }
+                }
             }
-        }, 80);
+        }, 150);
     }
 
     function fecharModalMapa() {

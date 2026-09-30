@@ -59,6 +59,14 @@ if ($acao === 'login') {
                     $_SESSION['logo_url'] = null;
                 }
 
+                // Lógica de "Lembrar-me"
+                if (!empty($_POST['lembrar'])) {
+                    $token = bin2hex(random_bytes(32));
+                    $stmtToken = $pdo->prepare("UPDATE users SET remember_token = ? WHERE id = ?");
+                    $stmtToken->execute([$token, $usuario['id']]);
+                    setcookie('gymflow_remember', $token, time() + (86400 * 30), "/"); // 30 dias
+                }
+
                 if ($usuario['role'] === 'Aluno') {
                     header("Location: " . BASE_URL . "/app/controllers/PortalAlunoController.php?acao=aluno");
                 } else {
@@ -74,9 +82,75 @@ if ($acao === 'login') {
     require __DIR__ . '/../views/login/index.php';
 }
 
+
 /* 2. LOGOUT */ elseif ($acao === 'logout') {
     efetuarLogout();
-} else {
+}
+
+/* 3. ESQUECI A SENHA */
+elseif ($acao === 'esqueci_senha') {
+    $erro = '';
+    $sucesso = '';
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $email = trim($_POST['email'] ?? '');
+        if ($email) {
+            require_once __DIR__ . '/../../config/conexao.php';
+            $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+            $stmt->execute([$email]);
+            $user = $stmt->fetch();
+
+            if ($user) {
+                // Gera token temporário
+                $token = bin2hex(random_bytes(16));
+                $stmtToken = $pdo->prepare("UPDATE users SET remember_token = ? WHERE id = ?");
+                $stmtToken->execute([$token, $user['id']]);
+
+                // Simulação de envio de e-mail (Exibe na tela para testes locais)
+                $link = BASE_URL . "/app/controllers/LoginController.php?acao=redefinir_senha&token=" . $token;
+                $sucesso = "Se este fosse um servidor real, um e-mail seria enviado. <br>Para fins de teste, clique aqui para redefinir: <a href='$link'>$link</a>";
+            } else {
+                // Por segurança, não dizemos se o e-mail existe ou não
+                $sucesso = "Se o e-mail existir, você receberá um link de recuperação.";
+            }
+        }
+    }
+    require __DIR__ . '/../views/login/esqueci_senha.php';
+}
+
+/* 4. REDEFINIR SENHA */
+elseif ($acao === 'redefinir_senha') {
+    $token = $_GET['token'] ?? '';
+    if (!$token) {
+        die("Token inválido.");
+    }
+    require_once __DIR__ . '/../../config/conexao.php';
+    $stmt = $pdo->prepare("SELECT id FROM users WHERE remember_token = ?");
+    $stmt->execute([$token]);
+    $user = $stmt->fetch();
+
+    if (!$user) {
+        die("Token expirado ou inválido.");
+    }
+
+    $erro = '';
+    $sucesso = '';
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $nova_senha = $_POST['nova_senha'] ?? '';
+        if (strlen($nova_senha) >= 6) {
+            $hash = password_hash($nova_senha, PASSWORD_DEFAULT);
+            $stmtUpdate = $pdo->prepare("UPDATE users SET password = ?, remember_token = NULL WHERE id = ?");
+            $stmtUpdate->execute([$hash, $user['id']]);
+            $sucesso = "Senha redefinida com sucesso! <a href='" . BASE_URL . "/app/controllers/LoginController.php?acao=login'>Fazer Login</a>";
+        } else {
+            $erro = "A senha deve ter pelo menos 6 caracteres.";
+        }
+    }
+    require __DIR__ . '/../views/login/redefinir_senha.php';
+}
+
+else {
     header("Location: $baseUrl?acao=login");
     exit;
 }

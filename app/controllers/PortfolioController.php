@@ -12,7 +12,7 @@ verificarRole(['Admin']);
 
 $tituloPagina = "Portfólio";
 $acao = $_GET['acao'] ?? 'index';
-$company_id = 1;
+$company_id = $_SESSION['company_id'] ?? (int)($_GET['id'] ?? 1);
 
 // ======================================================
 // 1. SALVAR ALTERAÇÕES

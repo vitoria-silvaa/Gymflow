@@ -48,8 +48,23 @@
     </nav>
 
     <div class="portfolio-acoes">
-        <a href="<?= BASE_URL ?>/app/controllers/LoginController.php?acao=login">Entrar</a>
-        <a href="<?= BASE_URL ?>/app/controllers/MatriculaController.php">Matricule-se</a>
+        <?php if ($usuarioLogado): ?>
+            <?php if ($roleUsuario === 'Aluno'): ?>
+                <a href="<?= BASE_URL ?>/app/controllers/PortalAlunoController.php?acao=aluno" style="background-color: var(--portfolio-primary); color: #fff; border-radius: 4px; padding: 8px 16px;">
+                    Área do Aluno
+                </a>
+            <?php else: ?>
+                <a href="<?= BASE_URL ?>/app/controllers/DashboardController.php" style="background-color: var(--portfolio-primary); color: #fff; border-radius: 4px; padding: 8px 16px;">
+                    Painel GymFlow
+                </a>
+            <?php endif; ?>
+            <a href="<?= BASE_URL ?>/app/controllers/LoginController.php?acao=logout" style="margin-left: 10px;">Sair</a>
+        <?php else: ?>
+            <a href="<?= BASE_URL ?>/app/controllers/LoginController.php?acao=login">Entrar</a>
+            <a href="<?= BASE_URL ?>/app/controllers/MatriculaController.php" style="background-color: var(--portfolio-primary); color: #fff; border-radius: 4px; padding: 8px 16px;">
+                Matricule-se
+            </a>
+        <?php endif; ?>
     </div>
 
 </header>

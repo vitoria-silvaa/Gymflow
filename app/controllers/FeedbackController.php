@@ -20,7 +20,7 @@ if (
     exit;
 }
 
-$company_id = 1;
+$company_id = $_SESSION['company_id'] ?? (int)($_GET['id'] ?? 1);
 
 // Nome vem da sessão do usuário autenticado
 $nome = trim($_SESSION['usuario_nome']);

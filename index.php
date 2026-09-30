@@ -3,18 +3,13 @@
 
 require_once __DIR__ . '/config/sessao.php';
 
-$company_id = 1;
+$company_id = (int) ($_GET['id'] ?? 1);
 $operacao = 'buscar_publico';
 require_once __DIR__ . '/app/models/Portfolio.php';
 
-// Controle de acesso ao formulário de feedback
-$alunoLogado =
-    isset($_SESSION['usuario_id']) &&
-    ($_SESSION['usuario_role'] ?? '') === 'Aluno';
-
-$nomeAlunoLogado = $alunoLogado
-    ? trim($_SESSION['usuario_nome'] ?? '')
-    : '';
+$usuarioLogado = isset($_SESSION['usuario_id']);
+$roleUsuario = $_SESSION['usuario_role'] ?? '';
+$nomeUsuarioLogado = $usuarioLogado ? trim($_SESSION['usuario_nome'] ?? '') : '';
 
 $tituloPagina = $config['app_name'] ?? "GymCore";
 include __DIR__ . '/app/views/shared/portfolio_header.php';
@@ -509,7 +504,7 @@ include __DIR__ . '/app/views/shared/portfolio_header.php';
     background: #050505;
 }
 #mapa-unidades-completo .leaflet-tile-pane {
-    filter: grayscale(1) invert(1) sepia(.18) saturate(.75) brightness(.38) contrast(1.42);
+    filter: grayscale(100%) invert(100%) brightness(0.95) contrast(1.2) hue-rotate(180deg);
 }
 #mapa-unidades-completo .leaflet-popup-content-wrapper,
 #mapa-unidades-completo .leaflet-popup-tip {

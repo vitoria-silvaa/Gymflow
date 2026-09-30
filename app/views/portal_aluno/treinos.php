@@ -209,7 +209,57 @@ include __DIR__ . '/../shared/sidebar.php';
 
                     </div>
 
+                    <div class="ficha-header-acoes">
+                        <style>
+                            .btn-pdf {
+                                background-color: #ef4444;
+                                color: white;
+                                padding: 8px 16px;
+                                border: none;
+                                border-radius: 8px;
+                                font-weight: 600;
+                                cursor: pointer;
+                                transition: background-color 0.2s;
+                                display: flex;
+                                align-items: center;
+                                gap: 8px;
+                            }
+                            .btn-pdf:hover {
+                                background-color: #dc2626;
+                            }
+                            .ficha-header {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: flex-start;
+                            }
+                        </style>
+                        <button class="btn-pdf" onclick="baixarPdfTreinos()">
+                            📄 Baixar em PDF
+                        </button>
+                    </div>
+
                 </header>
+
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                <script>
+                    function baixarPdfTreinos() {
+                        const elemento = document.querySelector('.ficha-container');
+                        const btn = document.querySelector('.btn-pdf');
+                        btn.style.display = 'none'; // Oculta o botão no PDF
+
+                        const opt = {
+                            margin:       [10, 10, 10, 10], // top, left, bottom, right em mm
+                            filename:     'Meu_Treino_Gymflow.pdf',
+                            image:        { type: 'jpeg', quality: 0.98 },
+                            html2canvas:  { scale: 2, useCORS: true },
+                            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                        };
+
+                        html2pdf().set(opt).from(elemento).save().then(() => {
+                            btn.style.display = 'inline-block'; // Mostra novamente
+                        });
+                    }
+                </script>
 
 
 
