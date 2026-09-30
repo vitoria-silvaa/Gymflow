@@ -1,3 +1,643 @@
-body{
-    
+body {
+    /* =========================================================
+   FILIAIS
+   ========================================================= */
+
+    .filiais-page {
+        padding: 40px 38px 60px;
+        background: #f5f9fc;
+        min-height: calc(100vh - 52px);
+        box-sizing: border-box;
+    }
+
+
+    /* =========================================================
+   TOPO
+   ========================================================= */
+
+    .filiais-topo {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 30px;
+        margin-bottom: 32px;
+    }
+
+    .filiais-titulo h1 {
+        margin: 0 0 4px;
+        font-size: 38px;
+        font-weight: 700;
+        color: #071c30;
+    }
+
+    .filiais-titulo p {
+        margin: 0;
+        font-size: 18px;
+        color: #55708d;
+    }
+
+
+    /* =========================================================
+   FILTRO + CRIAR
+   ========================================================= */
+
+    .filiais-acoes {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .filiais-acoes form {
+        margin: 0;
+    }
+
+    .filiais-acoes select {
+        width: 200px;
+        height: 46px;
+        padding: 0 16px;
+        border: 1px solid #d4e0e8;
+        border-radius: 11px;
+        background: #ffffff;
+        color: #102437;
+        font-size: 16px;
+        outline: none;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    }
+
+    .btn-criar-filial {
+        height: 46px;
+        padding: 0 20px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 11px;
+        background: #10b981;
+        color: #ffffff;
+
+        font-size: 16px;
+        font-weight: 600;
+        text-decoration: none;
+
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+
+        transition: 0.2s ease;
+    }
+
+    .btn-criar-filial:hover {
+        background: #0da874;
+        color: #ffffff;
+        transform: translateY(-1px);
+    }
+
+
+    /* =========================================================
+   CARDS
+   ========================================================= */
+
+    .cards-container {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 20px;
+        width: 100%;
+    }
+
+
+    /* =========================================================
+   CARD DA FILIAL
+   ========================================================= */
+
+    .card-filial {
+        background: #ffffff;
+        border: 1px solid #d7e1e8;
+        border-radius: 17px;
+
+        padding: 25px;
+
+        box-sizing: border-box;
+
+        box-shadow: 0 2px 7px rgba(0, 0, 0, 0.07);
+
+        transition: 0.2s ease;
+    }
+
+    .card-filial:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.09);
+    }
+
+
+    /* =========================================================
+   CABEÇALHO DO CARD
+   ========================================================= */
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+
+        margin-bottom: 14px;
+    }
+
+    .card-header h2 {
+        margin: 0;
+        color: #071c30;
+        font-size: 23px;
+        font-weight: 600;
+    }
+
+
+    /* =========================================================
+   STATUS
+   ========================================================= */
+
+    .badge {
+        flex-shrink: 0;
+
+        padding: 6px 13px;
+        border-radius: 10px;
+
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .badge.ativa {
+        background: #10b981;
+        color: #ffffff;
+    }
+
+    .badge.inativa {
+        background: #635bdf;
+        color: #ffffff;
+    }
+
+
+    /* =========================================================
+   INFORMAÇÕES
+   ========================================================= */
+
+    .card-body {
+        margin-bottom: 20px;
+    }
+
+    .card-body p {
+        margin: 0 0 14px;
+
+        color: #0c2a45;
+        font-size: 16px;
+        line-height: 1.4;
+    }
+
+    .card-body p:last-child {
+        margin-bottom: 0;
+    }
+
+    .card-body span {
+        color: #55708d;
+    }
+
+
+    /* =========================================================
+   BOTÕES DO CARD
+   ========================================================= */
+
+    .card-footer {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+    }
+
+    .card-footer a,
+    .card-footer button {
+        min-height: 41px;
+
+        border-radius: 10px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-family: inherit;
+        font-size: 15px;
+        font-weight: 600;
+
+        text-decoration: none;
+
+        cursor: pointer;
+
+        box-sizing: border-box;
+    }
+
+
+    /* EDITAR */
+
+    .btn-editar {
+        background: #f7fbfd;
+        border: 1px solid #d4e0e8;
+        color: #102437;
+    }
+
+    .btn-editar:hover {
+        background: #edf4f8;
+        color: #102437;
+    }
+
+
+    /* INATIVAR */
+
+    .btn-inativar {
+        border: none;
+        background: #ef0000;
+        color: #ffffff;
+    }
+
+    .btn-inativar:hover {
+        background: #d90000;
+    }
+
+
+    /* ATIVAR */
+
+    .btn-ativar {
+        border: none;
+        background: #10b981;
+        color: #ffffff;
+    }
+
+    .btn-ativar:hover {
+        background: #0da874;
+    }
+
+
+    /* HISTÓRICO */
+
+    .btn-historico {
+        grid-column: 1 / -1;
+
+        background: #f7fbfd;
+        border: 1px solid #d4e0e8;
+        color: #102437;
+    }
+
+    .btn-historico:hover {
+        background: #edf4f8;
+        color: #102437;
+    }
+
+
+    /* =========================================================
+   SEM RESULTADOS
+   ========================================================= */
+
+    .filiais-vazio {
+        grid-column: 1 / -1;
+
+        padding: 30px;
+
+        background: #ffffff;
+        border: 1px solid #d7e1e8;
+        border-radius: 15px;
+
+        text-align: center;
+
+        color: #55708d;
+        font-size: 16px;
+    }
+
+
+    /* =========================================================
+   RESPONSIVO
+   ========================================================= */
+
+    @media (max-width: 1100px) {
+
+        .cards-container {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+    }
+
+    @media (max-width: 750px) {
+
+        .filiais-page {
+            padding: 25px 20px 40px;
+        }
+
+        .filiais-topo {
+            flex-direction: column;
+        }
+
+        .filiais-acoes {
+            width: 100%;
+        }
+
+        .filiais-acoes select {
+            width: 100%;
+        }
+
+        .btn-criar-filial {
+            white-space: nowrap;
+        }
+
+        .cards-container {
+            grid-template-columns: 1fr;
+        }
+
+    }
+
+    .mensagem-sucesso {
+        position: fixed;
+        top: 38px;
+        right: 30px;
+
+        width: 445px;
+        min-height: 66px;
+
+        box-sizing: border-box;
+        padding: 0 18px;
+
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        background: #ecfdf5;
+        border: 1px solid #a7f3d0;
+        border-radius: 10px;
+
+        color: #087443;
+        font-size: 16px;
+        font-weight: 600;
+
+        box-shadow: 0 5px 14px rgba(0, 0, 0, 0.08);
+
+        z-index: 9999;
+
+        opacity: 1;
+        transition: opacity 0.3s ease;
+    }
+
+    .mensagem-sucesso-icone {
+        width: 20px;
+        height: 20px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 50%;
+
+        background: #079447;
+        color: #ffffff;
+
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1;
+        flex-shrink: 0;
+    }
+
+    /* =========================================================
+   MODAL - EDITAR FILIAL
+   ========================================================= */
+
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        background: rgba(0, 0, 0, 0.78);
+
+        z-index: 9998;
+
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .modal-editar-filial {
+        width: 640px;
+        max-width: 100%;
+
+        background: #f8fcff;
+
+        border-radius: 12px;
+
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+
+        padding: 26px 30px 30px;
+
+        box-sizing: border-box;
+    }
+
+    /* Cabeçalho */
+
+    .modal-editar-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        margin-bottom: 24px;
+    }
+
+    .modal-editar-header h2 {
+        margin: 0;
+
+        color: #102437;
+
+        font-size: 23px;
+        font-weight: 600;
+    }
+
+    .modal-fechar {
+        width: 28px;
+        height: 28px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        color: #52616f;
+
+        font-size: 28px;
+        font-weight: 300;
+        line-height: 1;
+
+        text-decoration: none;
+
+        border-radius: 6px;
+
+        transition: 0.2s ease;
+    }
+
+    .modal-fechar:hover {
+        background: #edf2f5;
+        color: #102437;
+    }
+
+    /* Formulário */
+
+    .form-editar-filial {
+        width: 100%;
+    }
+
+    .campo-editar-filial {
+        margin-bottom: 22px;
+    }
+
+    .campo-editar-filial label {
+        display: block;
+
+        margin-bottom: 6px;
+
+        color: #102437;
+
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .campo-editar-filial input {
+        width: 100%;
+        height: 47px;
+
+        box-sizing: border-box;
+
+        padding: 0 15px;
+
+        background: #ffffff;
+
+        border: 1px solid #d4e0e8;
+        border-radius: 10px;
+
+        color: #102437;
+
+        font-family: inherit;
+        font-size: 16px;
+
+        outline: none;
+
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+
+        transition: 0.2s ease;
+    }
+
+    .campo-editar-filial input:focus {
+        border-color: #10b981;
+
+        box-shadow: 0 0 0 1px #10b981;
+    }
+
+    /* Mensagem de erro */
+
+    .mensagem-erro-filial {
+        margin-bottom: 20px;
+
+        padding: 12px 14px;
+
+        background: #fef2f2;
+
+        border: 1px solid #fecaca;
+        border-radius: 9px;
+
+        color: #b91c1c;
+
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    /* Botões */
+
+    .modal-editar-acoes {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+
+        gap: 10px;
+
+        margin-top: 2px;
+    }
+
+    .btn-cancelar-editar,
+    .btn-salvar-editar {
+        height: 45px;
+
+        padding: 0 20px;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        box-sizing: border-box;
+
+        border-radius: 10px;
+
+        font-family: inherit;
+        font-size: 16px;
+        font-weight: 600;
+
+        text-decoration: none;
+
+        cursor: pointer;
+
+        transition: 0.2s ease;
+    }
+
+    .btn-cancelar-editar {
+        background: #ffffff;
+
+        border: 1px solid #d4e0e8;
+
+        color: #102437;
+
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+    }
+
+    .btn-cancelar-editar:hover {
+        background: #f1f5f8;
+        color: #102437;
+    }
+
+    .btn-salvar-editar {
+        background: #10b981;
+
+        border: none;
+
+        color: #ffffff;
+
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .btn-salvar-editar:hover {
+        background: #0da874;
+
+        transform: translateY(-1px);
+    }
+
+
+    /* Responsivo */
+
+    @media (max-width: 700px) {
+
+        .modal-overlay {
+            padding: 15px;
+        }
+
+        .modal-editar-filial {
+            padding: 22px 20px 24px;
+        }
+
+        .modal-editar-acoes {
+            flex-direction: column-reverse;
+            align-items: stretch;
+        }
+
+        .btn-cancelar-editar,
+        .btn-salvar-editar {
+            width: 100%;
+        }
+    }
+
+
 }
