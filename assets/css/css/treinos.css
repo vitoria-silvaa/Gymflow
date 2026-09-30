@@ -1,0 +1,844 @@
+/* ========================================
+   GYMFLOW
+   PORTAL DO ALUNO - TREINOS
+   ======================================== */
+
+
+/* ========================================
+   PÁGINA
+   ======================================== */
+
+.treinos-page {
+
+    width: 100%;
+
+    max-width: 1500px;
+
+    margin: 0 auto;
+
+    padding: 34px 36px 55px;
+
+}
+
+
+/* ========================================
+   CABEÇALHO
+   ======================================== */
+
+.treinos-header {
+
+    margin-bottom: 32px;
+
+}
+
+
+.treinos-header h1 {
+
+    margin: 0 0 7px;
+
+    color: #111827;
+
+    font-size: 30px;
+
+    font-weight: 700;
+
+}
+
+
+.treinos-header p {
+
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 15px;
+
+}
+
+
+.portal-eyebrow {
+
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #10b981;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.8px;
+
+}
+
+
+/* ========================================
+   TÍTULOS
+   ======================================== */
+
+.section-title {
+
+    margin-bottom: 18px;
+
+}
+
+
+.section-label {
+
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #10b981;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.7px;
+
+}
+
+
+.section-title h2 {
+
+    margin: 0;
+
+    color: #111827;
+
+    font-size: 20px;
+
+    font-weight: 700;
+
+}
+
+
+/* ========================================
+   FICHAS
+   ======================================== */
+
+.fichas-section {
+
+    margin-bottom: 24px;
+
+}
+
+
+.fichas-nav {
+
+    display: flex;
+
+    gap: 10px;
+
+    overflow-x: auto;
+
+    padding-bottom: 4px;
+
+}
+
+
+.ficha-tab {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    padding: 11px 15px;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 7px;
+
+    color: #475569;
+
+    text-decoration: none;
+
+    white-space: nowrap;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+
+}
+
+
+.ficha-tab:hover {
+
+    border-color: #cbd5e1;
+
+    color: #111827;
+
+}
+
+
+.ficha-tab.ativo {
+
+    background: #ecfdf5;
+
+    border-color: #a7f3d0;
+
+    color: #047857;
+
+}
+
+
+.ficha-tab-titulo {
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+}
+
+
+.ficha-tab-versao {
+
+    color: #94a3b8;
+
+    font-size: 11px;
+
+}
+
+
+.ficha-tab.ativo .ficha-tab-versao {
+
+    color: #10b981;
+
+}
+
+
+/* ========================================
+   CONTAINER DA FICHA
+   ======================================== */
+
+.ficha-container {
+
+    overflow: hidden;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.03),
+        0 4px 12px rgba(15, 23, 42, 0.025);
+
+}
+
+
+/* ========================================
+   CABEÇALHO DA FICHA
+   ======================================== */
+
+.ficha-header {
+
+    padding: 25px 26px;
+
+    border-bottom: 1px solid #e2e8f0;
+
+}
+
+
+.ficha-header h2 {
+
+    margin: 0 0 12px;
+
+    color: #111827;
+
+    font-size: 23px;
+
+    font-weight: 700;
+
+}
+
+
+.ficha-meta {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 18px;
+
+    color: #64748b;
+
+    font-size: 13px;
+
+}
+
+
+.ficha-meta span {
+
+    position: relative;
+
+}
+
+
+.ficha-meta span:not(:last-child)::after {
+
+    content: "•";
+
+    position: absolute;
+
+    right: -11px;
+
+    color: #cbd5e1;
+
+}
+
+
+/* ========================================
+   LISTA DE EXERCÍCIOS
+   ======================================== */
+
+.exercicios-list {
+
+    display: flex;
+
+    flex-direction: column;
+
+}
+
+
+/* ========================================
+   EXERCÍCIO
+   ======================================== */
+
+.exercicio-card {
+
+    padding: 22px 26px;
+
+    border-bottom: 1px solid #eef2f7;
+
+    transition: background-color 0.2s ease;
+
+}
+
+
+.exercicio-card:last-child {
+
+    border-bottom: none;
+
+}
+
+
+.exercicio-card:hover {
+
+    background: #fcfdfd;
+
+}
+
+
+/* ========================================
+   TOPO DO EXERCÍCIO
+   ======================================== */
+
+.exercicio-top {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    margin-bottom: 20px;
+
+}
+
+
+/* ========================================
+   CHECKBOX
+   ======================================== */
+
+.exercicio-check {
+
+    position: relative;
+
+    display: flex;
+
+    width: 22px;
+
+    height: 22px;
+
+    flex-shrink: 0;
+
+    cursor: pointer;
+
+}
+
+
+.exercicio-check input {
+
+    position: absolute;
+
+    opacity: 0;
+
+    width: 0;
+
+    height: 0;
+
+}
+
+
+.checkmark {
+
+    width: 22px;
+
+    height: 22px;
+
+    background: #ffffff;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 6px;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease;
+
+}
+
+
+.exercicio-check input:checked+.checkmark {
+
+    background: #10b981;
+
+    border-color: #10b981;
+
+}
+
+
+.exercicio-check input:checked+.checkmark::after {
+
+    content: "✓";
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    height: 100%;
+
+    color: white;
+
+    font-size: 13px;
+
+    font-weight: bold;
+
+}
+
+
+/* ========================================
+   NUMERAÇÃO
+   ======================================== */
+
+.exercicio-numero {
+
+    width: 34px;
+
+    color: #94a3b8;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+}
+
+
+/* ========================================
+   INFORMAÇÕES
+   ======================================== */
+
+.exercicio-info {
+
+    flex: 1;
+
+}
+
+
+.exercicio-info h3 {
+
+    margin: 0 0 4px;
+
+    color: #111827;
+
+    font-size: 16px;
+
+    font-weight: 600;
+
+}
+
+
+.grupo-muscular {
+
+    color: #64748b;
+
+    font-size: 12px;
+
+}
+
+
+/* ========================================
+   DADOS
+   ======================================== */
+
+.exercicio-dados {
+
+    display: flex;
+
+    gap: 12px;
+
+    margin-left: 70px;
+
+    margin-bottom: 18px;
+
+}
+
+
+.dado {
+
+    min-width: 110px;
+
+    padding: 11px 13px;
+
+    background: #f8fafc;
+
+    border: 1px solid #eef2f7;
+
+    border-radius: 7px;
+
+}
+
+
+.dado span {
+
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: #94a3b8;
+
+    font-size: 11px;
+
+}
+
+
+.dado strong {
+
+    color: #334155;
+
+    font-size: 14px;
+
+}
+
+
+/* ========================================
+   AÇÕES
+   ======================================== */
+
+.exercicio-acoes {
+
+    display: flex;
+
+    align-items: flex-end;
+
+    gap: 12px;
+
+    margin-left: 70px;
+
+}
+
+
+.carga-container {
+
+    width: 220px;
+
+}
+
+
+.carga-container label {
+
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #64748b;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+}
+
+
+.carga-container input {
+
+    width: 100%;
+
+    height: 38px;
+
+    padding: 8px 11px;
+
+    background: #ffffff;
+
+    border: 1px solid #dbe2ea;
+
+    border-radius: 6px;
+
+    box-sizing: border-box;
+
+    font-size: 13px;
+
+}
+
+
+.carga-container input:focus {
+
+    outline: none;
+
+    border-color: #10b981;
+
+    box-shadow:
+        0 0 0 3px rgba(16, 185, 129, 0.08);
+
+}
+
+
+/* ========================================
+   BOTÃO DE PAUSA
+   ======================================== */
+
+.btn-pausa {
+
+    height: 38px;
+
+    padding: 0 15px;
+
+    background: #ffffff;
+
+    border: 1px solid #dbe2ea;
+
+    border-radius: 6px;
+
+    color: #475569;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+
+}
+
+
+.btn-pausa:hover {
+
+    background: #f8fafc;
+
+    border-color: #10b981;
+
+    color: #059669;
+
+}
+
+
+/* ========================================
+   ESTADO VAZIO
+   ======================================== */
+
+.treinos-empty {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height: 300px;
+
+    padding: 40px;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 12px;
+
+    text-align: center;
+
+    box-shadow:
+        0 1px 3px rgba(15, 23, 42, 0.04);
+
+}
+
+
+.empty-icon {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 48px;
+
+    height: 48px;
+
+    margin-bottom: 16px;
+
+    background: #ecfdf5;
+
+    border-radius: 10px;
+
+    color: #10b981;
+
+    font-size: 25px;
+
+}
+
+
+.treinos-empty h2 {
+
+    margin: 0 0 7px;
+
+    color: #111827;
+
+    font-size: 19px;
+
+}
+
+
+.treinos-empty p {
+
+    margin: 0 0 5px;
+
+    color: #64748b;
+
+    font-size: 14px;
+
+}
+
+
+.treinos-empty>span {
+
+    color: #94a3b8;
+
+    font-size: 13px;
+
+}
+
+
+/* ========================================
+   FICHA SEM EXERCÍCIOS
+   ======================================== */
+
+.exercicios-empty {
+
+    padding: 45px 25px;
+
+    text-align: center;
+
+}
+
+
+.exercicios-empty h3 {
+
+    margin: 0 0 6px;
+
+    color: #334155;
+
+    font-size: 16px;
+
+}
+
+
+.exercicios-empty p {
+
+    margin: 0;
+
+    color: #94a3b8;
+
+    font-size: 13px;
+
+}
+
+
+/* ========================================
+   RESPONSIVIDADE
+   ======================================== */
+
+@media (max-width: 800px) {
+
+    .treinos-page {
+
+        padding: 25px 20px 40px;
+
+    }
+
+
+    .ficha-meta {
+
+        flex-direction: column;
+
+        gap: 6px;
+
+    }
+
+
+    .ficha-meta span::after {
+
+        display: none;
+
+    }
+
+
+    .exercicio-dados {
+
+        margin-left: 0;
+
+        flex-wrap: wrap;
+
+    }
+
+
+    .exercicio-acoes {
+
+        margin-left: 0;
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+    }
+
+
+    .carga-container {
+
+        width: 100%;
+
+    }
+
+
+    .btn-pausa {
+
+        width: 100%;
+
+    }
+
+}

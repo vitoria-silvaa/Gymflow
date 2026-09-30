@@ -22,22 +22,41 @@ $usuario = $_SESSION['usuario_nome'] ?? 'Aluno';
         <?= htmlspecialchars($titulo) ?>
     </title>
 
-    <link
-        rel="stylesheet"
-        href="/Gymflow/assets/css/css/global.css">
+
+    <!-- CSS GERAL -->
 
     <link
         rel="stylesheet"
-        href="/Gymflow/assets/css/css/layout.css">
+        href="/Gymflow/assets/css/css/global.css?v=2">
+
+
+    <!-- CSS DO LAYOUT -->
 
     <link
         rel="stylesheet"
-        href="/Gymflow/assets/css/css/portal.css">
+        href="/Gymflow/assets/css/css/layout.css?v=2">
+
+
+    <!-- CSS DO PORTAL -->
+
+    <link
+        rel="stylesheet"
+        href="/Gymflow/assets/css/css/portal.css?v=2">
+
+
+    <!-- CSS DOS TREINOS -->
+
+    <link
+        rel="stylesheet"
+        href="/Gymflow/assets/css/css/treinos.css?v=2">
 
 </head>
 
+
 <body>
 
+
+    <!-- SIDEBAR -->
 
     <aside class="sidebar">
 
@@ -51,30 +70,38 @@ $usuario = $_SESSION['usuario_nome'] ?? 'Aluno';
             <ul>
 
                 <li>
+
                     <a href="/Gymflow/app/controllers/PortalAlunoController.php?acao=aluno">
                         Início
                     </a>
+
                 </li>
 
 
                 <li>
+
                     <a href="/Gymflow/app/controllers/PortalAlunoController.php?acao=treinos">
                         Treinos
                     </a>
+
                 </li>
 
 
                 <li>
+
                     <a href="/Gymflow/app/controllers/PortalAlunoController.php?acao=faturas">
                         Faturas
                     </a>
+
                 </li>
 
 
                 <li>
+
                     <a href="#">
                         Contratos
                     </a>
+
                 </li>
 
             </ul>
@@ -85,11 +112,15 @@ $usuario = $_SESSION['usuario_nome'] ?? 'Aluno';
         <a
             class="sair"
             href="/Gymflow/app/controllers/LoginController.php?acao=logout">
+
             Sair
+
         </a>
 
     </aside>
 
+
+    <!-- HEADER -->
 
     <header class="header">
 
@@ -105,8 +136,11 @@ $usuario = $_SESSION['usuario_nome'] ?? 'Aluno';
         <div class="header-direita">
 
             <span>
+
                 <?= htmlspecialchars($usuario) ?>
+
                 (Aluno)
+
             </span>
 
         </div>

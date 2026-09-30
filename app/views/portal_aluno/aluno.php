@@ -3,6 +3,7 @@ if (!isset($aluno)) {
     header("Location: /Gymflow/app/controllers/PortalAlunoController.php?acao=aluno");
     exit;
 }
+
 /** @var array $aluno */
 /** @var array|false $matricula */
 /** @var int $frequencia */
@@ -17,43 +18,198 @@ $tituloPagina = "Portal do Aluno";
 
 <?php include __DIR__ . '/../shared/navbar.php'; ?>
 
-<main>
+<main class="portal-aluno">
 
-    <header>
-        <h1>Olá, <?php echo htmlspecialchars($aluno['nome'] ?? 'Aluno'); ?>!</h1>
-        <p>Pronto para o treino de hoje?</p>
+    <!-- CABEÇALHO -->
+    <header class="portal-header">
+        <div>
+            <span class="portal-eyebrow">PORTAL DO ALUNO</span>
+
+            <h1>
+                Olá, <?php echo htmlspecialchars($aluno['nome'] ?? 'Aluno'); ?>!
+            </h1>
+
+            <p>Pronto para o treino de hoje?</p>
+        </div>
     </header>
 
-    <section>
-        <h2>Meu Plano</h2>
 
-        <?php if (!empty($matricula)): ?>
-            <h3><?php echo htmlspecialchars($matricula['nome_plano']); ?></h3>
-            <p>Plano ativo</p>
-            <p>Expira em: <?php echo date('d/m/Y', strtotime($matricula['fim'])); ?></p>
-        <?php else: ?>
-            <p>Nenhum plano ativo no momento.</p>
-            <p>Procure a recepção para realizar sua matrícula.</p>
-        <?php endif; ?>
+    <!-- RESUMO -->
+    <section class="portal-grid">
 
-        <a href="/Gymflow/app/controllers/PortalAlunoController.php?acao=treinos">Treinar agora</a>
+        <!-- PLANO -->
+        <article class="portal-card plano-card">
+
+            <div class="card-top">
+                <div>
+                    <span class="card-label">MEU PLANO</span>
+
+                    <?php if (!empty($matricula)): ?>
+
+                        <h2>
+                            <?php echo htmlspecialchars($matricula['nome_plano']); ?>
+                        </h2>
+
+                        <span class="status status-ativo">
+                            Plano ativo
+                        </span>
+
+                    <?php else: ?>
+
+                        <h2>Nenhum plano</h2>
+
+                        <span class="status status-pendente">
+                            Sem matrícula ativa
+                        </span>
+
+                    <?php endif; ?>
+                </div>
+            </div>
+
+
+            <?php if (!empty($matricula)): ?>
+
+                <div class="plano-info">
+
+                    <div>
+                        <span>Validade</span>
+
+                        <strong>
+                            <?php echo date('d/m/Y', strtotime($matricula['fim'])); ?>
+                        </strong>
+                    </div>
+
+                </div>
+
+                <a
+                    href="/Gymflow/app/controllers/PortalAlunoController.php?acao=treinos"
+                    class="portal-btn">
+                    Treinar agora
+                    <span>→</span>
+                </a>
+
+            <?php else: ?>
+
+                <p class="card-description">
+                    Procure a recepção para realizar sua matrícula.
+                </p>
+
+            <?php endif; ?>
+
+        </article>
+
+
+        <!-- FREQUÊNCIA -->
+        <article class="portal-card frequencia-card">
+
+            <div class="card-icon">
+                ✓
+            </div>
+
+            <div class="card-content">
+
+                <span class="card-label">
+                    FREQUÊNCIA DO MÊS
+                </span>
+
+                <strong class="metric">
+                    <?php echo (int)$frequencia; ?>
+                    <small>
+                        dia<?php echo $frequencia != 1 ? 's' : ''; ?>
+                    </small>
+                </strong>
+
+                <p>
+                    Treinados em <?php echo date('F'); ?>
+                </p>
+
+            </div>
+
+        </article>
+
+
+        <!-- FATURAS -->
+        <article class="portal-card fatura-card">
+
+            <div class="card-icon">
+                $
+            </div>
+
+            <div class="card-content">
+
+                <span class="card-label">
+                    MINHAS FATURAS
+                </span>
+
+                <?php if ($faturas_abertas > 0): ?>
+
+                    <strong class="metric">
+                        <?php echo (int)$faturas_abertas; ?>
+                        <small>
+                            em aberto
+                        </small>
+                    </strong>
+
+                    <p class="texto-alerta">
+                        Existem pagamentos pendentes.
+                    </p>
+
+                <?php else: ?>
+
+                    <strong class="metric">
+                        0
+                        <small>
+                            pendentes
+                        </small>
+                    </strong>
+
+                    <p class="texto-sucesso">
+                        Tudo em dia!
+                    </p>
+
+                <?php endif; ?>
+
+            </div>
+
+            <a
+                href="/Gymflow/app/controllers/PortalAlunoController.php?acao=faturas"
+                class="card-link">
+                Ver faturas →
+            </a>
+
+        </article>
+
     </section>
 
-    <section>
-        <h2>Frequência do mês</h2>
-        <p><?php echo (int)$frequencia; ?> dia<?php echo $frequencia != 1 ? 's' : ''; ?> treinado<?php echo $frequencia != 1 ? 's' : ''; ?> em <?php echo date('F'); ?></p>
-    </section>
 
-    <section>
-        <h2>Minhas Faturas</h2>
+    <!-- ÁREA INFERIOR -->
+    <section class="portal-bottom">
 
-        <?php if ($faturas_abertas > 0): ?>
-            <p>Você tem <strong><?php echo (int)$faturas_abertas; ?></strong> fatura<?php echo $faturas_abertas > 1 ? 's' : ''; ?> em aberto.</p>
-        <?php else: ?>
-            <p>Nenhuma fatura pendente. Tudo em dia!</p>
-        <?php endif; ?>
+        <div class="section-heading">
+            <div>
+                <span class="portal-eyebrow">ACESSO RÁPIDO</span>
+                <h2>O que você deseja fazer?</h2>
+            </div>
+        </div>
 
-        <a href="/Gymflow/app/controllers/PortalAlunoController.php?acao=faturas">Ver faturas</a>
+        <div class="quick-actions">
+
+            <a
+                href="/Gymflow/app/controllers/PortalAlunoController.php?acao=treinos"
+                class="quick-action">
+                <strong>Meus treinos</strong>
+                <span>Visualizar seus treinos →</span>
+            </a>
+
+            <a
+                href="/Gymflow/app/controllers/PortalAlunoController.php?acao=faturas"
+                class="quick-action">
+                <strong>Financeiro</strong>
+                <span>Consultar pagamentos →</span>
+            </a>
+
+        </div>
+
     </section>
 
 </main>
