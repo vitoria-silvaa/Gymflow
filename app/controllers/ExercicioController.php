@@ -1,16 +1,85 @@
 <?php
 // app/controllers/ExercicioController.php
 
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
-error_reporting(E_ALL);
-
 require_once __DIR__ . '/../../config/sessao.php';
 require_once __DIR__ . '/../models/Exercicio.php';
 
 $tituloPagina = "Biblioteca de Exercícios";
 $cssEspecifico = BASE_URL . '/assets/css/biblioteca.css?v=' . time();
 
+
+// =====================================================
+// FUNÇÃO AUXILIAR — PROCESSAR UPLOAD DE MÍDIA
+// Valida extensão, MIME type real e tamanho do arquivo.
+// Retorna o caminho público salvo ou lança Exception.
+// =====================================================
+
+function processarUploadMidia(array $arquivo, string $tipo_midia): string
+{
+    $extensoesPermitidas = [
+        'imagem' => ['jpg', 'jpeg', 'png', 'webp'],
+        'video'  => ['mp4', 'webm'],
+    ];
+
+    $mimesPermitidos = [
+        'imagem' => ['image/jpeg', 'image/png', 'image/webp'],
+        'video'  => ['video/mp4', 'video/webm'],
+    ];
+
+    if (!isset($extensoesPermitidas[$tipo_midia])) {
+        throw new InvalidArgumentException('Tipo de mídia inválido.');
+    }
+
+    $extensao = strtolower(pathinfo($arquivo['name'], PATHINFO_EXTENSION));
+
+    if (!in_array($extensao, $extensoesPermitidas[$tipo_midia], true)) {
+        throw new InvalidArgumentException('Formato de arquivo não permitido.');
+    }
+
+    // Valida MIME type real (lê os bytes do arquivo, não confia no nome)
+    $finfo    = new finfo(FILEINFO_MIME_TYPE);
+    $mimeReal = $finfo->file($arquivo['tmp_name']);
+
+    if (!in_array($mimeReal, $mimesPermitidos[$tipo_midia], true)) {
+        throw new InvalidArgumentException('Tipo de arquivo real não corresponde ao formato esperado.');
+    }
+
+    // Limite de tamanho: 5 MB para imagem, 50 MB para vídeo
+    $limiteBytes = $tipo_midia === 'video' ? 50 * 1024 * 1024 : 5 * 1024 * 1024;
+    if ($arquivo['size'] > $limiteBytes) {
+        $limite = $tipo_midia === 'video' ? '50 MB' : '5 MB';
+        throw new InvalidArgumentException("O arquivo excede o tamanho máximo permitido ($limite).");
+    }
+
+    $pastaUpload = __DIR__ . '/../../assets/uploads/exercicios/';
+
+    if (!is_dir($pastaUpload)) {
+        mkdir($pastaUpload, 0755, true);
+    }
+
+    $nomeArquivo  = uniqid('exercicio_', true) . '.' . $extensao;
+    $caminhoCompleto = $pastaUpload . $nomeArquivo;
+
+    if (!move_uploaded_file($arquivo['tmp_name'], $caminhoCompleto)) {
+        throw new RuntimeException('Não foi possível salvar o arquivo.');
+    }
+
+    return BASE_URL . '/assets/uploads/exercicios/' . $nomeArquivo;
+}
+
+
+// =====================================================
+// NOVO EXERCÍCIO - ABRIR FORMULÁRIO
+// =====================================================
+
+if (
+    isset($_GET['acao']) &&
+    $_GET['acao'] === 'novo' &&
+    $_SERVER['REQUEST_METHOD'] === 'GET'
+) {
+    require __DIR__ . '/../views/exercicios/exercicios.php';
+    exit;
+}
 
 // =====================================================
 // EXCLUSÃO DE EXERCÍCIO
@@ -24,7 +93,8 @@ if (
     $id = (int) ($_GET['id'] ?? 0);
 
     if ($id <= 0) {
-        die('Exercício inválido.');
+        header("Location: " . BASE_URL . "/app/controllers/ExercicioController.php?erro=invalido");
+        exit;
     }
 
     excluirExercicio($pdo, $id);
@@ -49,13 +119,15 @@ if (
     $id = (int) ($_GET['id'] ?? 0);
 
     if ($id <= 0) {
-        die('Exercício inválido.');
+        header("Location: " . BASE_URL . "/app/controllers/ExercicioController.php?erro=invalido");
+        exit;
     }
 
     $exercicio = buscarExercicioPorId($pdo, $id);
 
     if (!$exercicio) {
-        die('Exercício não encontrado.');
+        header("Location: " . BASE_URL . "/app/controllers/ExercicioController.php?erro=nao_encontrado");
+        exit;
     }
 
     require __DIR__ . '/../views/exercicios/editar.php';
@@ -76,187 +148,45 @@ if (
     $id = (int) ($_POST['id'] ?? 0);
 
     if ($id <= 0) {
-        die('Exercício inválido.');
+        header("Location: " . BASE_URL . "/app/controllers/ExercicioController.php?erro=invalido");
+        exit;
     }
 
     $exercicio = buscarExercicioPorId($pdo, $id);
 
     if (!$exercicio) {
-        die('Exercício não encontrado.');
+        header("Location: " . BASE_URL . "/app/controllers/ExercicioController.php?erro=nao_encontrado");
+        exit;
     }
 
-
-    // =====================================================
-    // DADOS DO FORMULÁRIO
-    // =====================================================
-
-    $nome = trim($_POST['nome'] ?? '');
-    $grupo = trim($_POST['grupo_muscular'] ?? '');
+    $nome       = trim($_POST['nome'] ?? '');
+    $grupo      = trim($_POST['grupo_muscular'] ?? '');
     $tipo_midia = trim($_POST['tipo_midia'] ?? '');
 
-
-    // =====================================================
-    // VALIDAÇÃO
-    // =====================================================
-
-    if (
-        $nome === '' ||
-        $grupo === '' ||
-        $tipo_midia === ''
-    ) {
-
-        die('Preencha todos os campos obrigatórios.');
+    if ($nome === '' || $grupo === '' || $tipo_midia === '') {
+        header("Location: " . BASE_URL . "/app/controllers/ExercicioController.php?acao=editar&id=$id&erro=campos");
+        exit;
     }
 
-
-    // =====================================================
-    // MANTÉM A MÍDIA ATUAL
-    // =====================================================
-
+    // Mantém a mídia atual
     $midia = $exercicio['midia'];
 
-
-    // =====================================================
-    // NOVA MÍDIA
-    // =====================================================
-
+    // Nova mídia (se enviada)
     if (
         isset($_FILES['arquivo']) &&
         $_FILES['arquivo']['error'] === UPLOAD_ERR_OK
     ) {
-
-        $arquivo = $_FILES['arquivo'];
-
-
-        // Descobre a extensão
-
-        $extensao = strtolower(
-            pathinfo(
-                $arquivo['name'],
-                PATHINFO_EXTENSION
-            )
-        );
-
-
-        // =====================================================
-        // EXTENSÕES PERMITIDAS
-        // =====================================================
-
-        if ($tipo_midia === 'imagem') {
-
-            $extensoesPermitidas = [
-                'jpg',
-                'jpeg',
-                'png',
-                'webp'
-            ];
-        } elseif ($tipo_midia === 'video') {
-
-            $extensoesPermitidas = [
-                'mp4',
-                'webm'
-            ];
-        } else {
-
-            die('Tipo de mídia inválido.');
+        try {
+            $midia = processarUploadMidia($_FILES['arquivo'], $tipo_midia);
+        } catch (Throwable $e) {
+            header("Location: " . BASE_URL . "/app/controllers/ExercicioController.php?acao=editar&id=$id&erro=" . urlencode($e->getMessage()));
+            exit;
         }
-
-
-        // =====================================================
-        // VERIFICA EXTENSÃO
-        // =====================================================
-
-        if (
-            !in_array(
-                $extensao,
-                $extensoesPermitidas,
-                true
-            )
-        ) {
-
-            die('Formato de arquivo não permitido.');
-        }
-
-
-        // =====================================================
-        // PASTA DE UPLOAD
-        // =====================================================
-
-        $pastaUpload =
-            __DIR__ .
-            '/../../assets/uploads/exercicios/';
-
-
-        if (!is_dir($pastaUpload)) {
-
-            mkdir(
-                $pastaUpload,
-                0777,
-                true
-            );
-        }
-
-
-        // =====================================================
-        // NOVO NOME DO ARQUIVO
-        // =====================================================
-
-        $nomeArquivo =
-            uniqid(
-                'exercicio_',
-                true
-            ) .
-            '.' .
-            $extensao;
-
-
-        $caminhoCompleto =
-            $pastaUpload .
-            $nomeArquivo;
-
-
-        // =====================================================
-        // SALVA NOVO ARQUIVO
-        // =====================================================
-
-        if (
-            !move_uploaded_file(
-                $arquivo['tmp_name'],
-                $caminhoCompleto
-            )
-        ) {
-
-            die('Não foi possível salvar o novo arquivo.');
-        }
-
-
-        // Caminho salvo no banco
-
-        $midia =
-            BASE_URL . '/assets/uploads/exercicios/' .
-            $nomeArquivo;
     }
 
+    atualizarExercicio($pdo, $id, $nome, $grupo, $midia, $tipo_midia);
 
-    // =====================================================
-    // ATUALIZA NO BANCO
-    // =====================================================
-
-    atualizarExercicio(
-        $pdo,
-        $id,
-        $nome,
-        $grupo,
-        $midia,
-        $tipo_midia
-    );
-
-
-    // =====================================================
-    // VOLTA PARA A BIBLIOTECA
-    // =====================================================
-
-    header("Location: " . BASE_URL . "/app/controllers/ExercicioController.php");
+    header("Location: " . BASE_URL . "/app/controllers/ExercicioController.php?sucesso=atualizado");
 
     exit;
 }
@@ -266,184 +196,35 @@ if (
 // CADASTRO DE EXERCÍCIO
 // =====================================================
 
-if (
-    $_SERVER['REQUEST_METHOD'] === 'POST'
-) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $nome = trim(
-        $_POST['nome'] ?? ''
-    );
+    $nome       = trim($_POST['nome'] ?? '');
+    $grupo      = trim($_POST['grupo_muscular'] ?? '');
+    $tipo_midia = trim($_POST['tipo_midia'] ?? '');
 
-    $grupo = trim(
-        $_POST['grupo_muscular'] ?? ''
-    );
-
-    $tipo_midia = trim(
-        $_POST['tipo_midia'] ?? ''
-    );
-
-
-    // =====================================================
-    // VERIFICA CAMPOS OBRIGATÓRIOS
-    // =====================================================
-
-    if (
-        $nome === '' ||
-        $grupo === '' ||
-        $tipo_midia === ''
-    ) {
-
-        die('Preencha todos os campos obrigatórios.');
+    if ($nome === '' || $grupo === '' || $tipo_midia === '') {
+        header("Location: " . BASE_URL . "/app/controllers/ExercicioController.php?acao=novo&erro=campos");
+        exit;
     }
-
-
-    // =====================================================
-    // VERIFICA ARQUIVO
-    // =====================================================
 
     if (
         !isset($_FILES['arquivo']) ||
         $_FILES['arquivo']['error'] !== UPLOAD_ERR_OK
     ) {
-
-        die('Selecione uma imagem ou vídeo.');
+        header("Location: " . BASE_URL . "/app/controllers/ExercicioController.php?acao=novo&erro=arquivo");
+        exit;
     }
 
-
-    $arquivo = $_FILES['arquivo'];
-
-
-    // =====================================================
-    // EXTENSÃO
-    // =====================================================
-
-    $extensao = strtolower(
-        pathinfo(
-            $arquivo['name'],
-            PATHINFO_EXTENSION
-        )
-    );
-
-
-    // =====================================================
-    // EXTENSÕES PERMITIDAS
-    // =====================================================
-
-    if ($tipo_midia === 'imagem') {
-
-        $extensoesPermitidas = [
-            'jpg',
-            'jpeg',
-            'png',
-            'webp'
-        ];
-    } elseif ($tipo_midia === 'video') {
-
-        $extensoesPermitidas = [
-            'mp4',
-            'webm'
-        ];
-    } else {
-
-        die('Tipo de mídia inválido.');
+    try {
+        $midia = processarUploadMidia($_FILES['arquivo'], $tipo_midia);
+    } catch (Throwable $e) {
+        header("Location: " . BASE_URL . "/app/controllers/ExercicioController.php?acao=novo&erro=" . urlencode($e->getMessage()));
+        exit;
     }
 
+    cadastrarExercicio($pdo, $nome, $grupo, $midia, $tipo_midia);
 
-    // =====================================================
-    // VERIFICA EXTENSÃO
-    // =====================================================
-
-    if (
-        !in_array(
-            $extensao,
-            $extensoesPermitidas,
-            true
-        )
-    ) {
-
-        die('Formato de arquivo não permitido.');
-    }
-
-
-    // =====================================================
-    // PASTA DE UPLOAD
-    // =====================================================
-
-    $pastaUpload =
-        __DIR__ .
-        '/../../assets/uploads/exercicios/';
-
-
-    if (!is_dir($pastaUpload)) {
-
-        mkdir(
-            $pastaUpload,
-            0777,
-            true
-        );
-    }
-
-
-    // =====================================================
-    // NOME DO ARQUIVO
-    // =====================================================
-
-    $nomeArquivo =
-        uniqid(
-            'exercicio_',
-            true
-        ) .
-        '.' .
-        $extensao;
-
-
-    $caminhoCompleto =
-        $pastaUpload .
-        $nomeArquivo;
-
-
-    // =====================================================
-    // SALVA ARQUIVO
-    // =====================================================
-
-    if (
-        !move_uploaded_file(
-            $arquivo['tmp_name'],
-            $caminhoCompleto
-        )
-    ) {
-
-        die('Não foi possível salvar o arquivo.');
-    }
-
-
-    // =====================================================
-    // CAMINHO SALVO NO BANCO
-    // =====================================================
-
-    $midia =
-        BASE_URL . '/assets/uploads/exercicios/' .
-        $nomeArquivo;
-
-
-    // =====================================================
-    // SALVA NO BANCO
-    // =====================================================
-
-    cadastrarExercicio(
-        $pdo,
-        $nome,
-        $grupo,
-        $midia,
-        $tipo_midia
-    );
-
-
-    // =====================================================
-    // VOLTA PARA A BIBLIOTECA
-    // =====================================================
-
-    header("Location: " . BASE_URL . "/app/controllers/ExercicioController.php");
+    header("Location: " . BASE_URL . "/app/controllers/ExercicioController.php?sucesso=cadastrado");
 
     exit;
 }
@@ -464,21 +245,15 @@ $grupo = $_GET['grupo'] ?? '';
 
 if (!empty($pesquisa)) {
 
-    $exercicios = pesquisarExercicios(
-        $pdo,
-        $pesquisa
-    );
+    $exercicios = pesquisarExercicios($pdo, $pesquisa);
+
 } elseif (!empty($grupo)) {
 
-    $exercicios = filtrarExerciciosPorGrupo(
-        $pdo,
-        $grupo
-    );
+    $exercicios = filtrarExerciciosPorGrupo($pdo, $grupo);
+
 } else {
 
-    $exercicios = listarExercicios(
-        $pdo
-    );
+    $exercicios = listarExercicios($pdo);
 }
 
 

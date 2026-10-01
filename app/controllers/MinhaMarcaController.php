@@ -9,7 +9,8 @@ $acao = $_GET['acao'] ?? 'index';
 $user_id = $_SESSION['usuario_id'] ?? null;
 
 if (!$user_id) {
-    die('Usuário não identificado.');
+    header("Location: " . BASE_URL . "/app/controllers/LoginController.php?acao=login");
+    exit;
 }
 
 

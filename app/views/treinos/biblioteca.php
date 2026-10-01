@@ -31,8 +31,8 @@ include __DIR__ . '/../shared/sidebar.php';
         </div>
 
         <a
-            href="<?= BASE_URL ?>/app/views/exercicios/exercicios.php"
-            class="btn">
+            href="<?= BASE_URL ?>/app/controllers/ExercicioController.php?acao=novo"
+            class="fin-btn fin-btn-primary">
             + Novo exercício
         </a>
 

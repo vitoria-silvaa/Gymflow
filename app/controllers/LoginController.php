@@ -1,9 +1,6 @@
 <?php
 // app/controllers/LoginController.php
 
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
-error_reporting(E_ALL);
 
 require_once __DIR__ . '/../../config/sessao.php';
 
@@ -101,17 +98,24 @@ elseif ($acao === 'esqueci_senha') {
             $user = $stmt->fetch();
 
             if ($user) {
-                // Gera token temporário
-                $token = bin2hex(random_bytes(16));
-                $stmtToken = $pdo->prepare("UPDATE users SET remember_token = ? WHERE id = ?");
-                $stmtToken->execute([$token, $user['id']]);
+                // Token dedicado para reset (não contamina o remember_token)
+                $token   = bin2hex(random_bytes(32));
+                $expires = date('Y-m-d H:i:s', strtotime('+1 hour'));
+                $stmtToken = $pdo->prepare("UPDATE users SET reset_token = ?, reset_token_expires_at = ? WHERE id = ?");
+                $stmtToken->execute([$token, $expires, $user['id']]);
 
-                // Simulação de envio de e-mail (Exibe na tela para testes locais)
                 $link = BASE_URL . "/app/controllers/LoginController.php?acao=redefinir_senha&token=" . $token;
-                $sucesso = "Se este fosse um servidor real, um e-mail seria enviado. <br>Para fins de teste, clique aqui para redefinir: <a href='$link'>$link</a>";
+
+                // Em desenvolvimento: exibir link. Em produção: integrar PHPMailer/SendGrid.
+                if (defined('BASE_URL') && str_contains(BASE_URL, 'localhost')) {
+                    $sucesso = "Link de recuperação (ambiente local):<br><a href='$link'>$link</a>";
+                } else {
+                    // TODO: enviar e-mail real com o $link
+                    $sucesso = "Se o e-mail existir, você receberá um link de recuperação em breve.";
+                }
             } else {
-                // Por segurança, não dizemos se o e-mail existe ou não
-                $sucesso = "Se o e-mail existir, você receberá um link de recuperação.";
+                // Por segurança, não revelamos se o e-mail existe
+                $sucesso = "Se o e-mail existir, você receberá um link de recuperação em breve.";
             }
         }
     }
@@ -122,15 +126,19 @@ elseif ($acao === 'esqueci_senha') {
 elseif ($acao === 'redefinir_senha') {
     $token = $_GET['token'] ?? '';
     if (!$token) {
-        die("Token inválido.");
+        header("Location: $baseUrl?acao=login");
+        exit;
     }
     require_once __DIR__ . '/../../config/conexao.php';
-    $stmt = $pdo->prepare("SELECT id FROM users WHERE remember_token = ?");
+    // Valida token dedicado de reset com expiração
+    $stmt = $pdo->prepare("SELECT id FROM users WHERE reset_token = ? AND reset_token_expires_at > NOW()");
     $stmt->execute([$token]);
     $user = $stmt->fetch();
 
     if (!$user) {
-        die("Token expirado ou inválido.");
+        $erro = "Link de recuperação inválido ou expirado.";
+        require __DIR__ . '/../views/login/esqueci_senha.php';
+        exit;
     }
 
     $erro = '';
@@ -140,7 +148,8 @@ elseif ($acao === 'redefinir_senha') {
         $nova_senha = $_POST['nova_senha'] ?? '';
         if (strlen($nova_senha) >= 6) {
             $hash = password_hash($nova_senha, PASSWORD_DEFAULT);
-            $stmtUpdate = $pdo->prepare("UPDATE users SET password = ?, remember_token = NULL WHERE id = ?");
+            // Limpa o token de reset após uso
+            $stmtUpdate = $pdo->prepare("UPDATE users SET password = ?, reset_token = NULL, reset_token_expires_at = NULL WHERE id = ?");
             $stmtUpdate->execute([$hash, $user['id']]);
             $sucesso = "Senha redefinida com sucesso! <a href='" . BASE_URL . "/app/controllers/LoginController.php?acao=login'>Fazer Login</a>";
         } else {

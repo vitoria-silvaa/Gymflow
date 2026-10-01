@@ -8,13 +8,14 @@ require_once __DIR__ . '/Database.php';
  */
 function listarExercicios($pdo)
 {
+    $company_id = $_SESSION['company_id'] ?? 0;
     $sql = "SELECT id, nome, grupo, midia, tipo_midia
             FROM exercicios
-            WHERE ativo = 1
+            WHERE ativo = 1 AND company_id = ?
             ORDER BY nome ASC";
 
     $stmt = $pdo->prepare($sql);
-    $stmt->execute();
+    $stmt->execute([$company_id]);
 
     return $stmt->fetchAll();
 }
@@ -24,14 +25,15 @@ function listarExercicios($pdo)
  */
 function pesquisarExercicios($pdo, $pesquisa)
 {
+    $company_id = $_SESSION['company_id'] ?? 0;
     $sql = "SELECT id, nome, grupo, midia, tipo_midia
             FROM exercicios
             WHERE nome LIKE ?
-            AND ativo = 1
+            AND ativo = 1 AND company_id = ?
             ORDER BY nome ASC";
 
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(["%" . $pesquisa . "%"]);
+    $stmt->execute(["%" . $pesquisa . "%", $company_id]);
 
     return $stmt->fetchAll();
 }
@@ -41,14 +43,15 @@ function pesquisarExercicios($pdo, $pesquisa)
  */
 function filtrarExerciciosPorGrupo($pdo, $grupo)
 {
+    $company_id = $_SESSION['company_id'] ?? 0;
     $sql = "SELECT id, nome, grupo, midia, tipo_midia
             FROM exercicios
             WHERE grupo = ?
-            AND ativo = 1
+            AND ativo = 1 AND company_id = ?
             ORDER BY nome ASC";
 
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([$grupo]);
+    $stmt->execute([$grupo, $company_id]);
 
     return $stmt->fetchAll();
 }
@@ -58,12 +61,14 @@ function filtrarExerciciosPorGrupo($pdo, $grupo)
  */
 function cadastrarExercicio($pdo, $nome, $grupo, $midia, $tipo_midia)
 {
-    $sql = "INSERT INTO exercicios (nome, grupo, midia, tipo_midia)
-            VALUES (?, ?, ?, ?)";
+    $company_id = $_SESSION['company_id'] ?? 0;
+    $sql = "INSERT INTO exercicios (company_id, nome, grupo, midia, tipo_midia)
+            VALUES (?, ?, ?, ?, ?)";
 
     $stmt = $pdo->prepare($sql);
 
     return $stmt->execute([
+        $company_id,
         $nome,
         $grupo,
         $midia,
@@ -76,13 +81,14 @@ function cadastrarExercicio($pdo, $nome, $grupo, $midia, $tipo_midia)
  */
 function excluirExercicio($pdo, $id)
 {
+    $company_id = $_SESSION['company_id'] ?? 0;
     $sql = "UPDATE exercicios
             SET ativo = 0
-            WHERE id = ?";
+            WHERE id = ? AND company_id = ?";
 
     $stmt = $pdo->prepare($sql);
 
-    return $stmt->execute([$id]);
+    return $stmt->execute([$id, $company_id]);
 }
 
 /**
@@ -90,12 +96,13 @@ function excluirExercicio($pdo, $id)
  */
 function buscarExercicioPorId($pdo, $id)
 {
+    $company_id = $_SESSION['company_id'] ?? 0;
     $sql = "SELECT id, nome, grupo, midia, tipo_midia
             FROM exercicios
-            WHERE id = ?";
+            WHERE id = ? AND company_id = ?";
 
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([$id]);
+    $stmt->execute([$id, $company_id]);
 
     return $stmt->fetch();
 }
@@ -106,9 +113,10 @@ function buscarExercicioPorId($pdo, $id)
  */
 function atualizarExercicio($pdo, $id, $nome, $grupo, $midia, $tipo_midia)
 {
+    $company_id = $_SESSION['company_id'] ?? 0;
     $sql = "UPDATE exercicios
             SET nome = ?, grupo = ?, midia = ?, tipo_midia = ?
-            WHERE id = ?";
+            WHERE id = ? AND company_id = ?";
 
     $stmt = $pdo->prepare($sql);
 
@@ -117,6 +125,7 @@ function atualizarExercicio($pdo, $id, $nome, $grupo, $midia, $tipo_midia)
         $grupo,
         $midia,
         $tipo_midia,
-        $id
+        $id,
+        $company_id
     ]);
 }

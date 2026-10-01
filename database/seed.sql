@@ -48,12 +48,12 @@ INSERT INTO alunos (id, filial_id, professor_id, nome, cpf, rg, sexo, nascimento
 
 -- 4. USERS
 -- Senha padrão para todos: 'admin' | Hash bcrypt válido gerado com password_hash('admin', PASSWORD_BCRYPT)
-INSERT INTO users (id, name, email, password, role, aluno_id) VALUES
-(1, 'Administrador Principal', 'admin@gymflow.com', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Admin', NULL),
-(2, 'Professor Marcelo', 'marcelo.treino@gymflow.com', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Professor', NULL),
-(3, 'Professora Juliana', 'juliana.fit@gymflow.com', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Professor', NULL),
-(4, 'Ana Oliveira', 'ana.oliveira@email.com', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Aluno', 1),
-(5, 'Bruno Souza', 'bruno.souza@email.com', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Aluno', 2);
+INSERT INTO users (id, company_id, name, email, password, role, aluno_id) VALUES
+(1, 1, 'Administrador Principal', 'admin@gymflow.com', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Admin', NULL),
+(2, 1, 'Professor Marcelo', 'marcelo.treino@gymflow.com', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Professor', NULL),
+(3, 1, 'Professora Juliana', 'juliana.fit@gymflow.com', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Professor', NULL),
+(4, 1, 'Ana Oliveira', 'ana.oliveira@email.com', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Aluno', 1),
+(5, 1, 'Bruno Souza', 'bruno.souza@email.com', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Aluno', 2);
 
 -- 5. USER_FILIAIS
 INSERT INTO user_filiais (user_id, filial_id) VALUES
@@ -94,12 +94,12 @@ INSERT INTO custos (id, filial_id, descricao, categoria, valor, data) VALUES
 (3, 3, 'Energia Elétrica', 'Contas de Consumo', 850.00, '2026-07-08');
 
 -- 11. EXERCICIOS
-INSERT INTO exercicios (id, nome, grupo, midia, tipo_midia) VALUES
-(1, 'Supino Reto', 'Peito', 'https://example.com/supino.gif', 'imagem'),
-(2, 'Agachamento Livre', 'Quadríceps', 'https://example.com/agachamento.gif', 'imagem'),
-(3, 'Puxada no Pulley', 'Costas', 'https://example.com/puxada.gif', 'imagem'),
-(4, 'Rosca Direta', 'Bíceps', 'https://example.com/rosca.gif', 'imagem'),
-(5, 'Tríceps Corda', 'Tríceps', 'https://example.com/triceps.gif', 'imagem');
+INSERT INTO exercicios (id, company_id, nome, grupo, midia, tipo_midia) VALUES
+(1, 1, 'Supino Reto', 'Peito', 'https://example.com/supino.gif', 'imagem'),
+(2, 1, 'Agachamento Livre', 'Quadríceps', 'https://example.com/agachamento.gif', 'imagem'),
+(3, 1, 'Puxada no Pulley', 'Costas', 'https://example.com/puxada.gif', 'imagem'),
+(4, 1, 'Rosca Direta', 'Bíceps', 'https://example.com/rosca.gif', 'imagem'),
+(5, 1, 'Tríceps Corda', 'Tríceps', 'https://example.com/triceps.gif', 'imagem');
 
 -- 12. FICHAS_TREINO
 INSERT INTO fichas_treino (id, aluno_id, professor_id, objetivo, criada_em, versao) VALUES

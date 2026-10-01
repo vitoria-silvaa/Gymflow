@@ -12,8 +12,8 @@ if ($operacao === 'listar') {
     $cpf = trim($cpf ?? '');
     $status = trim($status ?? '');
 
-    $sql = "SELECT a.*, f.nome AS nome_filial FROM alunos a INNER JOIN filiais f ON f.id = a.filial_id WHERE 1 = 1";
-    $parametros = [];
+    $sql = "SELECT a.*, f.nome AS nome_filial FROM alunos a INNER JOIN filiais f ON f.id = a.filial_id WHERE f.company_id = :company_id";
+    $parametros = [':company_id' => $_SESSION['company_id'] ?? 0];
 
     // LÓGICA DE MULTI-TENANT (RESTRIÇÃO DE FILIAL)
     $role_logado = $_SESSION['usuario_role'] ?? '';
@@ -44,14 +44,18 @@ if ($operacao === 'listar') {
 
 /* 2. LISTAR FILIAIS ATIVAS */
 elseif ($operacao === 'listar_filiais') {
-    $filiais = $pdo->query("SELECT id, nome FROM filiais WHERE ativo = TRUE ORDER BY nome")->fetchAll();
+    $company_id = $_SESSION['company_id'] ?? 0;
+    $stmt = $pdo->prepare("SELECT id, nome FROM filiais WHERE ativo = TRUE AND company_id = ? ORDER BY nome");
+    $stmt->execute([$company_id]);
+    $filiais = $stmt->fetchAll();
 }
 
 /* 3. BUSCAR ALUNO POR ID */
 elseif ($operacao === 'buscar') {
+    $company_id = $_SESSION['company_id'] ?? 0;
     $id = (int) ($id ?? 0);
-    $stmt = $pdo->prepare("SELECT a.*, f.nome AS nome_filial FROM alunos a INNER JOIN filiais f ON f.id = a.filial_id WHERE a.id = :id");
-    $stmt->execute([':id' => $id]);
+    $stmt = $pdo->prepare("SELECT a.*, f.nome AS nome_filial FROM alunos a INNER JOIN filiais f ON f.id = a.filial_id WHERE a.id = :id AND f.company_id = :company_id");
+    $stmt->execute([':id' => $id, ':company_id' => $company_id]);
     $aluno = $stmt->fetch() ?: null;
 }
 
@@ -96,10 +100,11 @@ elseif ($operacao === 'cadastrar') {
 
         // Cria usuário de acesso para o aluno
         $stmt = $pdo->prepare("
-            INSERT INTO users (name, email, password, role, aluno_id)
-            VALUES (:nome, :email, :senha, 'Aluno', :aluno_id)
+            INSERT INTO users (company_id, name, email, password, role, aluno_id)
+            VALUES (:company_id, :nome, :email, :senha, 'Aluno', :aluno_id)
         ");
         $stmt->execute([
+            ':company_id'=> $_SESSION['company_id'],
             ':nome'     => $dados['nome'],
             ':email'    => $dados['email'],
             ':senha'    => password_hash($dados['senha'], PASSWORD_DEFAULT),

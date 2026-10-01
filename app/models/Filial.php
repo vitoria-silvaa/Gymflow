@@ -5,33 +5,36 @@ require_once __DIR__ . '/Database.php';
 
 $operacao = $operacao ?? '';
 $erroModel = '';
+$company_id = $_SESSION['company_id'] ?? 0;
 
 /* 1. LISTAR FILIAIS */
 if ($operacao === 'listar') {
     $statusFiltro = $statusFiltro ?? '';
 
+    $sql = "SELECT * FROM filiais WHERE company_id = ?";
+    $params = [$company_id];
+
     if ($statusFiltro === 'Ativa') {
-        $stmt = $pdo->prepare("SELECT * FROM filiais WHERE ativo = 1 ORDER BY id DESC");
-        $stmt->execute();
+        $sql .= " AND ativo = 1";
     } elseif ($statusFiltro === 'Inativa') {
-        $stmt = $pdo->prepare("SELECT * FROM filiais WHERE ativo = 0 ORDER BY id DESC");
-        $stmt->execute();
-    } else {
-        $stmt = $pdo->query("SELECT * FROM filiais ORDER BY id DESC");
+        $sql .= " AND ativo = 0";
     }
 
+    $sql .= " ORDER BY id DESC";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
     $filiais = $stmt->fetchAll();
 }
 
 /* 2. BUSCAR FILIAL POR ID */ elseif ($operacao === 'buscar') {
     $id = (int) ($id ?? 0);
-    $stmt = $pdo->prepare("SELECT * FROM filiais WHERE id = :id");
-    $stmt->execute([':id' => $id]);
+    $stmt = $pdo->prepare("SELECT * FROM filiais WHERE id = :id AND company_id = :company_id");
+    $stmt->execute([':id' => $id, ':company_id' => $company_id]);
     $filial = $stmt->fetch() ?: null;
 }
 
 /* 3. CADASTRAR FILIAL */ elseif ($operacao === 'cadastrar') {
-    $companyId = (int) ($dados['company_id'] ?? 1);
+    $companyId = (int) ($dados['company_id'] ?? $company_id);
     $cnpj = trim($dados['cnpj'] ?? '');
 
     try {
@@ -61,7 +64,7 @@ if ($operacao === 'listar') {
 
 /* 4. ATUALIZAR FILIAL */ elseif ($operacao === 'atualizar') {
     $id = (int) ($id ?? 0);
-    $companyId = (int) ($dados['company_id'] ?? 1);
+    $companyId = (int) ($dados['company_id'] ?? $company_id);
     $cnpj = trim($dados['cnpj'] ?? '');
 
     try {
@@ -75,14 +78,15 @@ if ($operacao === 'listar') {
         $stmt = $pdo->prepare("
             UPDATE filiais 
             SET nome = :nome, cnpj = :cnpj, telefone = :telefone, responsavel = :responsavel 
-            WHERE id = :id
+            WHERE id = :id AND company_id = :company_id
         ");
         $stmt->execute([
             ':nome'        => trim($dados['nome'] ?? ''),
             ':cnpj'        => $cnpj,
             ':telefone'    => trim($dados['telefone'] ?? ''),
             ':responsavel' => trim($dados['responsavel'] ?? ''),
-            ':id'          => $id
+            ':id'          => $id,
+            ':company_id'  => $companyId
         ]);
     } catch (Throwable $e) {
         $erroModel = $e->getMessage();
@@ -99,11 +103,12 @@ if ($operacao === 'listar') {
                 WHEN ativo = 1 THEN 0
                 ELSE 1
             END
-            WHERE id = :id
+            WHERE id = :id AND company_id = :company_id
         ");
 
         $stmt->execute([
-            ':id' => $id
+            ':id'         => $id,
+            ':company_id' => $company_id
         ]);
     } catch (Throwable $e) {
         $erroModel = $e->getMessage();

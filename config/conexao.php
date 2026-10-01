@@ -1,11 +1,13 @@
 <?php
 // config/conexao.php
 
-// Configurações de conexão com o banco de dados
-$host = 'localhost';
-$dbname = 'gymcore_db';
-$username = 'root';
-$password = ''; // Senha padrão vazia no XAMPP/WampServer
+// Configurações de conexão — lidas de variáveis de ambiente.
+// Em ambiente local (XAMPP), os valores padrão são aplicados automaticamente.
+// Em produção, defina as variáveis de ambiente no servidor (nunca comite credenciais no Git).
+$host     = getenv('DB_HOST')     ?: 'localhost';
+$dbname   = getenv('DB_NAME')     ?: 'gymcore_db';
+$username = getenv('DB_USER')     ?: 'root';
+$password = getenv('DB_PASSWORD') ?: '';
 
 try {
     // Inicialização da conexão PDO com charset UTF-8 e tratamento de erro configurado para exceções
@@ -15,6 +17,8 @@ try {
         PDO::ATTR_EMULATE_PREPARES   => false,                  // Desabilita emulação de prepared statements para segurança
     ]);
 } catch (PDOException $e) {
-    // Em caso de erro na conexão, interrompe a execução e exibe uma mensagem amigável
-    die("Erro na conexão com o banco de dados: " . $e->getMessage());
+    // Em caso de erro na conexão, registra no log e exibe mensagem genérica
+    error_log('DB Connection Error: ' . $e->getMessage());
+    http_response_code(503);
+    die("Serviço temporariamente indisponível. Tente novamente em instantes.");
 }

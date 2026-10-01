@@ -55,6 +55,7 @@ if (!isset($_SESSION['usuario_id']) && isset($_COOKIE['gymflow_remember'])) {
  */
 function iniciarSessao($usuario) {
     $_SESSION['usuario_id']    = $usuario['id'];
+    $_SESSION['company_id']    = $usuario['company_id'];
     $_SESSION['usuario_nome']  = $usuario['name'];
     $_SESSION['usuario_email'] = $usuario['email'];
     $_SESSION['usuario_role']  = $usuario['role'];

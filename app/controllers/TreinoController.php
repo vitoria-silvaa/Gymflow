@@ -1,9 +1,6 @@
 <?php
 // app/controllers/TreinoController.php
 
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
-error_reporting(E_ALL);
 
 require_once __DIR__ . '/../../config/sessao.php';
 
@@ -107,17 +104,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
 
         $operacao = 'salvar_ficha';
-
         $ficha_id = require __DIR__ . '/../models/Treino.php';
-
         $mensagemSucesso = 'Ficha de treino salva com sucesso!';
     }
-
-    $operacao = 'salvar_ficha';
-
-    $ficha_id = require __DIR__ . '/../models/Treino.php';
-
-    $mensagemSucesso = 'Ficha de treino salva com sucesso!';
 }
 
 require __DIR__ . '/../models/Exercicio.php';
@@ -129,8 +118,8 @@ if ($_SESSION['usuario_role'] === 'Professor') {
     $stmt_professores = $pdo->prepare("SELECT id, name FROM users WHERE id = :id");
     $stmt_professores->execute([':id' => $_SESSION['usuario_id']]);
 } else {
-    $stmt_professores = $pdo->prepare("SELECT id, name FROM users WHERE role = 'Professor' ORDER BY name ASC");
-    $stmt_professores->execute();
+    $stmt_professores = $pdo->prepare("SELECT id, name FROM users WHERE role = 'Professor' AND company_id = ? ORDER BY name ASC");
+    $stmt_professores->execute([$_SESSION['company_id'] ?? 0]);
 }
 $professores = $stmt_professores->fetchAll();
 

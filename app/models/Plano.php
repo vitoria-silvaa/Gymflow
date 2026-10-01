@@ -12,14 +12,15 @@ $operacao = $operacao ?? '';
 
 /* LISTAR PLANOS */
 if ($operacao === 'listar') {
-    $stmt = $pdo->query("SELECT * FROM planos ORDER BY id DESC");
+    $stmt = $pdo->prepare("SELECT * FROM planos WHERE company_id = ? ORDER BY id DESC");
+    $stmt->execute([$_SESSION['company_id'] ?? 0]);
     $planos = $stmt->fetchAll();
 }
 
 /* BUSCAR PLANO POR ID */
 elseif ($operacao === 'buscar') {
-    $stmt = $pdo->prepare("SELECT * FROM planos WHERE id = :id");
-    $stmt->execute([':id' => $id]);
+    $stmt = $pdo->prepare("SELECT * FROM planos WHERE id = :id AND company_id = :company_id");
+    $stmt->execute([':id' => $id, ':company_id' => $_SESSION['company_id'] ?? 0]);
     $plano = $stmt->fetch();
 }
 
@@ -32,7 +33,7 @@ elseif ($operacao === 'cadastrar') {
         
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
-            ':company_id' => $dados['company_id'],
+            ':company_id' => $_SESSION['company_id'] ?? 0,
             ':nome'       => $dados['nome'],
             ':categoria'  => $dados['categoria'],
             ':valor'      => $dados['valor'],
@@ -47,14 +48,15 @@ elseif ($operacao === 'cadastrar') {
 elseif ($operacao === 'atualizar') {
     $erroModel = '';
     try {
-        $sql = "UPDATE planos SET nome = :nome, categoria = :categoria, valor = :valor, duracao = :duracao WHERE id = :id";
+        $sql = "UPDATE planos SET nome = :nome, categoria = :categoria, valor = :valor, duracao = :duracao WHERE id = :id AND company_id = :company_id";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             ':nome'      => $dados['nome'],
             ':categoria' => $dados['categoria'],
             ':valor'     => $dados['valor'],
             ':duracao'   => $dados['duracao'],
-            ':id'        => $id
+            ':id'        => $id,
+            ':company_id'=> $_SESSION['company_id'] ?? 0
         ]);
     } catch (Throwable $e) {
         $erroModel = 'Erro ao atualizar plano: ' . $e->getMessage();

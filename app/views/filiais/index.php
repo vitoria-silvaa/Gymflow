@@ -66,9 +66,9 @@ include __DIR__ . '/../shared/sidebar.php';
             </form>
 
             <a
-                class="btn-criar-filial"
+                class="fin-btn fin-btn-primary"
                 href="<?= BASE_URL ?>/app/controllers/FilialController.php?acao=cadastrar">
-                + &nbsp; Criar Filial
+                + &nbsp; Nova Filial
             </a>
         </div>
     </div>

@@ -4,12 +4,13 @@
 require_once __DIR__ . '/Database.php';
 
 $operacao = $operacao ?? '';
+$company_id = $_SESSION['company_id'] ?? 0;
 
 // listar contas
 
 if ($operacao === 'listar_contas') {
 
-    $stmt = $pdo->query("
+    $stmt = $pdo->prepare("
         SELECT 
             c.id,
             c.aluno_id,
@@ -21,31 +22,36 @@ if ($operacao === 'listar_contas') {
             c.pago_em,
             a.nome AS aluno_nome
         FROM contas c
-        INNER JOIN alunos a
-            ON a.id = c.aluno_id
+        INNER JOIN alunos a ON a.id = c.aluno_id
+        INNER JOIN filiais f ON f.id = a.filial_id
+        WHERE f.company_id = :company_id
         ORDER BY c.vencimento ASC
     ");
-
+    $stmt->execute([':company_id' => $company_id]);
     $contas = $stmt->fetchAll();
 
 
     // total em aberto
-    $stmt = $pdo->query("
-        SELECT COALESCE(SUM(valor), 0) AS total
-        FROM contas
-        WHERE status != 'Pago'
+    $stmt = $pdo->prepare("
+        SELECT COALESCE(SUM(c.valor), 0) AS total
+        FROM contas c
+        INNER JOIN alunos a ON a.id = c.aluno_id
+        INNER JOIN filiais f ON f.id = a.filial_id
+        WHERE c.status != 'Pago' AND f.company_id = ?
     ");
-
+    $stmt->execute([$company_id]);
     $totalAberto = $stmt->fetch()['total'];
 
 
     // total recebido
-    $stmt = $pdo->query("
-        SELECT COALESCE(SUM(valor), 0) AS total
-        FROM contas
-        WHERE status = 'Pago'
+    $stmt = $pdo->prepare("
+        SELECT COALESCE(SUM(c.valor), 0) AS total
+        FROM contas c
+        INNER JOIN alunos a ON a.id = c.aluno_id
+        INNER JOIN filiais f ON f.id = a.filial_id
+        WHERE c.status = 'Pago' AND f.company_id = ?
     ");
-
+    $stmt->execute([$company_id]);
     $totalRecebido = $stmt->fetch()['total'];
 }
 
@@ -68,14 +74,15 @@ elseif ($operacao === 'buscar_conta') {
             c.pago_em,
             a.nome AS aluno_nome
         FROM contas c
-        INNER JOIN alunos a
-            ON a.id = c.aluno_id
-        WHERE c.id = :id
+        INNER JOIN alunos a ON a.id = c.aluno_id
+        INNER JOIN filiais f ON f.id = a.filial_id
+        WHERE c.id = :id AND f.company_id = :company_id
         LIMIT 1
     ");
 
     $stmt->execute([
-        ':id' => $conta_id
+        ':id'         => $conta_id,
+        ':company_id' => $company_id
     ]);
 
     $conta = $stmt->fetch() ?: null;
@@ -91,19 +98,24 @@ elseif ($operacao === 'baixar_pagamento') {
 
     if ($conta_id > 0 && $forma_pagamento !== '') {
 
+        // Verifica se a conta pertence a um aluno desta empresa antes de atualizar
         $stmt = $pdo->prepare("
-            UPDATE contas
+            UPDATE contas c
+            INNER JOIN alunos a ON a.id = c.aluno_id
+            INNER JOIN filiais f ON f.id = a.filial_id
             SET
-                status = 'Pago',
-                forma_pagamento = :forma_pagamento,
-                pago_em = CURRENT_TIMESTAMP
-            WHERE id = :id
-              AND status != 'Pago'
+                c.status = 'Pago',
+                c.forma_pagamento = :forma_pagamento,
+                c.pago_em = CURRENT_TIMESTAMP
+            WHERE c.id = :id
+              AND c.status != 'Pago'
+              AND f.company_id = :company_id
         ");
 
         $stmt->execute([
             ':forma_pagamento' => $forma_pagamento,
-            ':id' => $conta_id
+            ':id'              => $conta_id,
+            ':company_id'      => $company_id
         ]);
     }
 }

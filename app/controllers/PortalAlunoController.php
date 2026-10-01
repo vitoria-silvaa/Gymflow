@@ -1,9 +1,6 @@
 <?php
 // app/controllers/PortalAlunoController.php
 
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
-error_reporting(E_ALL);
 
 require_once __DIR__ . '/../../config/sessao.php';
 
@@ -91,6 +88,8 @@ elseif ($acao === 'treinos') {
 
 /* LISTAR CONTRATOS DO ALUNO */
 elseif ($acao === 'contratos') {
+    // aluno_id sempre da sessão — previne IDOR por manipulação de URL
+    $aluno_id = (int) $_SESSION['aluno_id'];
     $operacao = 'listar_contratos';
     require __DIR__ . '/../models/Aluno.php';
     require __DIR__ . '/../views/portal_aluno/contratos.php';
@@ -98,14 +97,17 @@ elseif ($acao === 'contratos') {
 
 /* IMPRIMIR CONTRATO */
 elseif ($acao === 'imprimir_contrato') {
-    $contrato_id = (int)($_GET['id'] ?? 0);
-    $operacao = 'buscar_contrato_impressao';
+    $contrato_id = (int) ($_GET['id'] ?? 0);
+    // aluno_id sempre da sessão — garante que o aluno só vê seus próprios contratos
+    $aluno_id    = (int) $_SESSION['aluno_id'];
+    $operacao    = 'buscar_contrato_impressao';
     require __DIR__ . '/../models/Aluno.php';
-    
+
     if (!$contrato) {
-        die("Contrato não encontrado ou sem permissão de acesso.");
+        header("Location: $baseUrl?acao=contratos");
+        exit;
     }
-    
+
     require __DIR__ . '/../views/portal_aluno/imprimir_contrato.php';
 }
 
