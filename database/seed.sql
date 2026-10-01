@@ -1,11 +1,14 @@
--- =====================================================================
+﻿-- =====================================================================
 -- GymCore - Massa de Dados de Teste (Mock / Seed)
 -- =====================================================================
 
 -- Garante que estamos usando o banco correto
 USE gymcore_db;
 
--- Limpa os dados em ordem reversa de dependência das FKs para evitar conflitos ao re-executar
+-- Desabilita checagem de FK temporariamente para limpar na ordem certa
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- Limpa todos os dados
 DELETE FROM portfolio_slides;
 DELETE FROM portfolio_filial_images;
 DELETE FROM portfolio_feedbacks;
@@ -28,138 +31,157 @@ DELETE FROM alunos;
 DELETE FROM filiais;
 DELETE FROM companies;
 
+-- Reativa checagem de FK
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- =====================================================================
 -- 1. COMPANIES
-INSERT INTO companies (id, nome) VALUES 
-(1, 'GymFlow Corporation'), 
+-- =====================================================================
+INSERT INTO companies (id, nome) VALUES
+(1, 'GymFlow Corporation'),
 (2, 'FitLife Group');
 
+-- =====================================================================
 -- 2. FILIAIS
+-- =====================================================================
 INSERT INTO filiais (id, company_id, nome, cnpj, telefone, responsavel, ativo, latitude, longitude) VALUES
-(1, 1, 'GymFlow Central', '12.345.678/0001-90', '(11) 98765-4321', 'Jorge Silva', TRUE, -23.55052000, -46.63330800),
-(2, 1, 'GymFlow Zona Sul', '12.345.678/0002-70', '(11) 98765-4322', 'Mariana Costa', TRUE, -23.65000000, -46.65000000),
-(3, 1, 'GymFlow Zona Leste', '12.345.678/0003-50', '(11) 98765-4323', 'Maria Fernanda', TRUE, -23.54000000, -46.47000000);
+(1, 1, 'GymFlow Central',    '12.345.678/0001-90', '(11) 98765-4321', 'Jorge Silva',     TRUE, -23.55052000, -46.63330800),
+(2, 1, 'GymFlow Zona Sul',   '12.345.678/0002-70', '(11) 98765-4322', 'Mariana Costa',   TRUE, -23.65000000, -46.65000000),
+(3, 1, 'GymFlow Zona Leste', '12.345.678/0003-50', '(11) 98765-4323', 'Maria Fernanda',  TRUE, -23.54000000, -46.47000000);
 
--- 3. ALUNOS
-INSERT INTO alunos (id, filial_id, professor_id, nome, cpf, rg, sexo, nascimento, email, telefone, endereco, status) VALUES
-(1, 1, 2, 'Ana Oliveira', '111.222.333-44', '12.345.678-9', 'Feminino', '1995-03-15', 'ana.oliveira@email.com', '(11) 91111-1111', 'Rua A, 123 - São Paulo', 'Ativo'),
-(2, 1, 2, 'Bruno Souza', '222.333.444-55', '98.765.432-1', 'Masculino', '1988-07-20', 'bruno.souza@email.com', '(11) 92222-2222', 'Av. B, 456 - São Paulo', 'Ativo'),
-(3, 1, NULL, 'Camila Lima', '333.444.555-66', '45.678.901-2', 'Feminino', '2000-11-05', 'camila.lima@email.com', '(11) 93333-3333', 'Rua C, 789 - São Paulo', 'Inativo'),
-(4, 3, 3, 'Diego Rocha', '444.555.666-77', '34.567.890-3', 'Masculino', '1992-05-10', 'diego.rocha@email.com', '(21) 94444-4444', 'Rua D, 101 - Rio de Janeiro', 'Ativo');
-
--- 4. USERS
--- Senha padrão para todos: 'admin' | Hash bcrypt válido gerado com password_hash('admin', PASSWORD_BCRYPT)
+-- =====================================================================
+-- 3. USERS (sem aluno_id ainda - sera atualizado apos inserir alunos)
+-- Senha padrao para todos: 'admin'
+-- Hash bcrypt: password_hash('admin', PASSWORD_BCRYPT)
+-- =====================================================================
 INSERT INTO users (id, company_id, name, email, password, role, aluno_id) VALUES
-(1, 1, 'Administrador Principal', 'admin@gymflow.com', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Admin', NULL),
-(2, 1, 'Professor Marcelo', 'marcelo.treino@gymflow.com', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Professor', NULL),
-(3, 1, 'Professora Juliana', 'juliana.fit@gymflow.com', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Professor', NULL),
-(4, 1, 'Ana Oliveira', 'ana.oliveira@email.com', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Aluno', 1),
-(5, 1, 'Bruno Souza', 'bruno.souza@email.com', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Aluno', 2);
+(1, 1, 'Administrador Principal', 'admin@gymflow.com',          '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Admin',     NULL),
+(2, 1, 'Professor Marcelo',       'marcelo.treino@gymflow.com', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Professor', NULL),
+(3, 1, 'Professora Juliana',      'juliana.fit@gymflow.com',    '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Professor', NULL),
+(4, 1, 'Ana Oliveira',            'ana.oliveira@email.com',     '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Aluno',     NULL),
+(5, 1, 'Bruno Souza',             'bruno.souza@email.com',      '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Aluno',     NULL);
 
+-- =====================================================================
+-- 4. ALUNOS (agora os users com role Professor ja existem)
+-- =====================================================================
+INSERT INTO alunos (id, filial_id, professor_id, nome, cpf, rg, sexo, nascimento, email, telefone, endereco, status) VALUES
+(1, 1, 2, 'Ana Oliveira',  '111.222.333-44', '12.345.678-9', 'Feminino',  '1995-03-15', 'ana.oliveira@email.com', '(11) 91111-1111', 'Rua A, 123 - Sao Paulo',         'Ativo'),
+(2, 1, 2, 'Bruno Souza',   '222.333.444-55', '98.765.432-1', 'Masculino', '1988-07-20', 'bruno.souza@email.com',  '(11) 92222-2222', 'Av. B, 456 - Sao Paulo',         'Ativo'),
+(3, 1, NULL, 'Camila Lima', '333.444.555-66', '45.678.901-2', 'Feminino', '2000-11-05', 'camila.lima@email.com',  '(11) 93333-3333', 'Rua C, 789 - Sao Paulo',         'Inativo'),
+(4, 3, 3, 'Diego Rocha',   '444.555.666-77', '34.567.890-3', 'Masculino', '1992-05-10', 'diego.rocha@email.com',  '(21) 94444-4444', 'Rua D, 101 - Rio de Janeiro',    'Ativo');
+
+-- Atualiza aluno_id nos users de role Aluno (agora que alunos existem)
+UPDATE users SET aluno_id = 1 WHERE id = 4;
+UPDATE users SET aluno_id = 2 WHERE id = 5;
+
+-- =====================================================================
 -- 5. USER_FILIAIS
+-- =====================================================================
 INSERT INTO user_filiais (user_id, filial_id) VALUES
 (1, 1),
 (1, 2),
 (2, 1),
 (3, 3);
 
+-- =====================================================================
 -- 6. PLANOS
+-- =====================================================================
 INSERT INTO planos (id, company_id, nome, categoria, valor, duracao) VALUES
-(1, 1, 'Plano Mensal Gold', 'Musculação', 99.90, '1 Mês'),
-(2, 1, 'Plano Semestral Platinum', 'Musculação + Aulas', 499.00, '6 Meses'),
-(3, 1, 'Plano Anual Black', 'Livre Acesso', 899.00, '1 Ano'),
-(4, 2, 'Plano Standard', 'Básico', 79.90, '1 Mês');
+(1, 1, 'Plano Mensal Gold',      'Musculacao',             99.90,  '1 Mes'),
+(2, 1, 'Plano Semestral Platinum', 'Musculacao + Aulas',  499.00, '6 Meses'),
+(3, 1, 'Plano Anual Black',      'Livre Acesso',          899.00, '1 Ano'),
+(4, 2, 'Plano Standard',         'Basico',                 79.90, '1 Mes');
 
--- 7. MATRÍCULAS
+-- =====================================================================
+-- 7. MATRICULAS
+-- =====================================================================
 INSERT INTO matriculas (id, aluno_id, plano_id, inicio, fim, valor, desconto, ativa) VALUES
-(1, 1, 1, '2026-07-01', '2026-08-01', 99.90, 0.00, TRUE),
+(1, 1, 1, '2026-07-01', '2026-08-01', 99.90,  0.00,  TRUE),
 (2, 2, 2, '2026-01-15', '2026-07-15', 499.00, 50.00, FALSE),
-(3, 4, 4, '2026-06-01', '2026-07-01', 79.90, 0.00, TRUE);
+(3, 4, 1, '2026-06-01', '2026-07-01', 79.90,  0.00,  TRUE);
 
--- 8. CONTAS
+-- =====================================================================
+-- 8. CONTAS (matricula_id referencias validas: 1, 2, 3 - corrigido)
+-- =====================================================================
 INSERT INTO contas (id, aluno_id, matricula_id, vencimento, valor, status, forma_pagamento, pago_em) VALUES
-(1, 1, 1, '2026-07-01', 99.90, 'Pago', 'Cartão de Crédito', '2026-07-01 10:00:00'),
-(2, 2, 2, '2026-01-15', 449.00, 'Pago', 'Dinheiro', '2026-01-15 14:30:00'),
-(3, 4, 3, '2026-06-01', 79.90, 'Aberto', NULL, NULL);
+(1, 1, 1, '2026-07-01', 99.90,  'Pago',  'Cartao de Credito', '2026-07-01 10:00:00'),
+(2, 2, 2, '2026-01-15', 449.00, 'Pago',  'Dinheiro',          '2026-01-15 14:30:00'),
+(3, 4, 3, '2026-06-01', 79.90,  'Aberto', NULL,               NULL);
 
+-- =====================================================================
 -- 9. LEADS
+-- =====================================================================
 INSERT INTO leads (id, filial_id, nome, telefone, objetivo, campanha, status, criado_em) VALUES
-(1, 1, 'Carlos Eduardo', '(11) 95555-5555', 'Hipertrofia', 'Instagram Ads', 'Novo', '2026-07-15 08:30:00'),
-(2, 1, 'Fernanda Mello', '(11) 96666-6666', 'Emagrecimento', 'Indicação', 'Em Atendimento', '2026-07-14 11:00:00'),
-(3, 2, 'Gabriela Santos', '(11) 97777-7777', 'Condicionamento Físico', 'Google Search', 'Convertido', '2026-07-12 15:45:00');
+(1, 1, 'Carlos Eduardo',  '(11) 95555-5555', 'Hipertrofia',           'Instagram Ads', 'Novo',           '2026-07-15 08:30:00'),
+(2, 1, 'Fernanda Mello',  '(11) 96666-6666', 'Emagrecimento',         'Indicacao',     'Em Atendimento', '2026-07-14 11:00:00'),
+(3, 2, 'Gabriela Santos', '(11) 97777-7777', 'Condicionamento Fisico', 'Google Search', 'Convertido',    '2026-07-12 15:45:00');
 
+-- =====================================================================
 -- 10. CUSTOS
+-- =====================================================================
 INSERT INTO custos (id, filial_id, descricao, categoria, valor, data) VALUES
-(1, 1, 'Aluguel do imóvel', 'Infraestrutura', 3500.00, '2026-07-05'),
-(2, 1, 'Manutenção de esteiras', 'Equipamentos', 450.00, '2026-07-10'),
-(3, 3, 'Energia Elétrica', 'Contas de Consumo', 850.00, '2026-07-08');
+(1, 1, 'Aluguel do imovel',        'Infraestrutura',    3500.00, '2026-07-05'),
+(2, 1, 'Manutencao de esteiras',   'Equipamentos',       450.00, '2026-07-10'),
+(3, 3, 'Energia Eletrica',         'Contas de Consumo',  850.00, '2026-07-08');
 
+-- =====================================================================
 -- 11. EXERCICIOS
+-- =====================================================================
 INSERT INTO exercicios (id, company_id, nome, grupo, midia, tipo_midia) VALUES
-(1, 1, 'Supino Reto', 'Peito', 'https://example.com/supino.gif', 'imagem'),
-(2, 1, 'Agachamento Livre', 'Quadríceps', 'https://example.com/agachamento.gif', 'imagem'),
-(3, 1, 'Puxada no Pulley', 'Costas', 'https://example.com/puxada.gif', 'imagem'),
-(4, 1, 'Rosca Direta', 'Bíceps', 'https://example.com/rosca.gif', 'imagem'),
-(5, 1, 'Tríceps Corda', 'Tríceps', 'https://example.com/triceps.gif', 'imagem');
+(1, 1, 'Supino Reto',       'Peito',       'https://example.com/supino.gif',      'imagem'),
+(2, 1, 'Agachamento Livre', 'Quadriceps',  'https://example.com/agachamento.gif', 'imagem'),
+(3, 1, 'Puxada no Pulley',  'Costas',      'https://example.com/puxada.gif',      'imagem'),
+(4, 1, 'Rosca Direta',      'Biceps',      'https://example.com/rosca.gif',       'imagem'),
+(5, 1, 'Triceps Corda',     'Triceps',     'https://example.com/triceps.gif',     'imagem');
 
+-- =====================================================================
 -- 12. FICHAS_TREINO
+-- =====================================================================
 INSERT INTO fichas_treino (id, aluno_id, professor_id, objetivo, criada_em, versao) VALUES
 (1, 1, 2, 'Hipertrofia Muscular', '2026-07-02 10:00:00', 1),
-(2, 2, 2, 'Resistência Muscular', '2026-01-20 09:00:00', 1);
+(2, 2, 2, 'Resistencia Muscular', '2026-01-20 09:00:00', 1);
 
+-- =====================================================================
 -- 13. FICHA_ITENS
+-- =====================================================================
 INSERT INTO ficha_itens (id, ficha_id, exercicio_id, ordem, series, repeticoes, carga, intervalo) VALUES
 (1, 1, 1, 1, 4, '10 a 12', '20kg cada lado', '60s'),
-(2, 1, 4, 2, 3, '12', '10kg', '45s'),
-(3, 2, 2, 1, 4, '15', 'Sem peso adicional', '30s');
+(2, 1, 4, 2, 3, '12',      '10kg',           '45s'),
+(3, 2, 2, 1, 4, '15',      'Sem peso',        '30s');
 
+-- =====================================================================
 -- 14. AVALIACOES
+-- =====================================================================
 INSERT INTO avaliacoes (id, aluno_id, data, peso, altura, gordura, massa_magra, braco, peitoral, abdomen, cintura, quadril, coxa, panturrilha) VALUES
-(1, 1, '2026-07-02', 65.50, 1.68, 22.40, 50.80, 28.5, 90.0, 78.0, 72.0, 95.0, 52.0, 34.0),
+(1, 1, '2026-07-02', 65.50, 1.68, 22.40, 50.80, 28.5, 90.0,  78.0, 72.0, 95.0,  52.0, 34.0),
 (2, 2, '2026-01-16', 82.00, 1.80, 18.50, 66.80, 35.0, 102.0, 88.0, 84.0, 100.0, 58.0, 38.0);
 
+-- =====================================================================
 -- 15. CHECKINS
+-- =====================================================================
 INSERT INTO checkins (id, aluno_id, data, ficha_id) VALUES
 (1, 1, '2026-07-15 07:15:00', 1),
 (2, 1, '2026-07-16 07:20:00', 1),
 (3, 2, '2026-07-10 18:30:00', 2);
 
+-- =====================================================================
 -- 16. TRANCAMENTOS
+-- =====================================================================
 INSERT INTO trancamentos (id, aluno_id, inicio, fim, justificativa, taxa) VALUES
 (1, 3, '2026-07-01', '2026-08-01', 'Viagem a trabalho', 30.00);
 
+-- =====================================================================
 -- 17. PORTFOLIO_CONFIG
+-- =====================================================================
 INSERT INTO portfolio_config (
-    company_id,
-    app_name,
-    theme_mode,
-    primary_color,
-    secondary_color,
-    logo_url,
-    hero_title,
-    hero_subtitle,
-    hero_cta,
-    about_text,
-    about_image,
-    company_values,
-    company_competencies,
-    contact_title,
-    contact_subtitle,
-    contact_form_title,
-    contact_email,
-    contact_phone,
-    contact_hours,
-    contact_image,
-    instagram_url,
-    facebook_url,
-    tiktok_url,
-    whatsapp_url,
-    feedback_title,
-    feedback_subtitle,
-    feedback_image,
-    accepts_wellhub,
-    wellhub_icon,
-    accepts_totalpass,
-    totalpass_icon
+    company_id, app_name, theme_mode, primary_color, secondary_color, logo_url,
+    hero_title, hero_subtitle, hero_cta, about_text, about_image,
+    company_values, company_competencies,
+    contact_title, contact_subtitle, contact_form_title,
+    contact_email, contact_phone, contact_hours, contact_image,
+    instagram_url, facebook_url, tiktok_url, whatsapp_url,
+    feedback_title, feedback_subtitle, feedback_image,
+    accepts_wellhub, wellhub_icon, accepts_totalpass, totalpass_icon
 ) VALUES (
     1,
     'GymFlow Ecosystem',
@@ -169,67 +191,37 @@ INSERT INTO portfolio_config (
     'https://example.com/logo.png',
     'Transforme seu corpo e sua mente',
     'O melhor ecossistema de academias para gerenciar seus treinos e metas.',
-    'Matricule-se Já',
+    'Matricule-se Ja',
     'Focados em entregar alta performance com conforto e tecnologia.',
     'https://example.com/about.jpg',
     'Foco, Disciplina, Resultado',
-    'Musculação Avançada, Acompanhamento Nutricional',
+    'Musculacao Avancada, Acompanhamento Nutricional',
     'Entre em contato conosco',
-    'Nossa equipe está pronta para ajudar você.',
+    'Nossa equipe esta pronta para ajudar voce.',
     'Ficaremos felizes em te atender!',
     'contato@gymflow.com',
     '(11) 98765-4321',
-    'Segunda a sexta: 06h às 22h | Sábado: 08h às 18h | Domingo: 08h às 14h',
+    'Segunda a sexta: 06h as 22h | Sabado: 08h as 18h | Domingo: 08h as 14h',
+    NULL, '', '', '', '',
+    'Como foi sua experiencia?',
+    'Envie seu feedback e nos ajude a melhorar sua experiencia.',
     NULL,
-    '',
-    '',
-    '',
-    '',
-    'Como foi sua experiência?',
-    'Envie seu feedback e nos ajude a melhorar sua experiência.',
-    NULL,
-    TRUE,
-    NULL,
-    TRUE,
-    NULL
+    TRUE, NULL,
+    TRUE, NULL
 );
 
+-- =====================================================================
 -- 18. PORTFOLIO_MODALITIES
+-- =====================================================================
 INSERT INTO portfolio_modalities (id, filial_id, name, description, image_url) VALUES
 (1, 1, 'CrossFit', 'Treinamento funcional de alta intensidade.', 'https://example.com/crossfit.jpg'),
-(2, 1, 'Pilates', 'Aulas focadas em postura, flexibilidade e core.', 'https://example.com/pilates.jpg'),
-(3, 2, 'Muay Thai', 'Arte marcial tailandesa de alta queima calórica.', 'https://example.com/muaythai.jpg');
+(2, 1, 'Pilates',  'Aulas focadas em postura, flexibilidade e core.', 'https://example.com/pilates.jpg'),
+(3, 2, 'Muay Thai','Arte marcial tailandesa de alta queima calorica.', 'https://example.com/muaythai.jpg');
 
+-- =====================================================================
 -- 19. PORTFOLIO_FEEDBACKS
-INSERT INTO portfolio_feedbacks (
-    company_id,
-    nome,
-    nota,
-    mensagem,
-    criado_em,
-    ativo
-) VALUES
-(
-    1,
-    'Ana Paula',
-    5,
-    'Excelente atendimento e ótimos equipamentos!',
-    '2026-05-22 10:00:00',
-    TRUE
-),
-(
-    1,
-    'Ricardo S.',
-    4,
-    'Ambiente limpo e organizado. Recomendo!',
-    '2026-04-19 14:30:00',
-    TRUE
-),
-(
-    1,
-    'Mariana C.',
-    5,
-    'Professores atenciosos e aulas incríveis!',
-    '2026-03-06 09:15:00',
-    TRUE
-);
+-- =====================================================================
+INSERT INTO portfolio_feedbacks (company_id, nome, nota, mensagem, criado_em, ativo) VALUES
+(1, 'Ana Paula',  5, 'Excelente atendimento e otimos equipamentos!',    '2026-05-22 10:00:00', TRUE),
+(1, 'Ricardo S.', 4, 'Ambiente limpo e organizado. Recomendo!',          '2026-04-19 14:30:00', TRUE),
+(1, 'Mariana C.', 5, 'Professores atenciosos e aulas incriveis!',        '2026-03-06 09:15:00', TRUE);

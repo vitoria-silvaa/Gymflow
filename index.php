@@ -762,16 +762,16 @@ body.mapa-modal-aberto {
                     </div>
                 <?php endif; ?>
 
-                <?php if ($alunoLogado): ?>
+                <?php if ($usuarioLogado): ?>
                     <form
                         class="feedback-formulario"
                         method="POST"
                         action="<?= BASE_URL ?>/app/controllers/FeedbackController.php"
                     >
-                        <?php if ($nomeAlunoLogado !== ''): ?>
+                        <?php if ($nomeUsuarioLogado !== ''): ?>
                             <div class="feedback-usuario-logado">
                                 Avaliando como
-                                <strong><?= htmlspecialchars($nomeAlunoLogado) ?></strong>
+                                <strong><?= htmlspecialchars($nomeUsuarioLogado) ?></strong>
                             </div>
                         <?php endif; ?>
 
@@ -809,7 +809,7 @@ body.mapa-modal-aberto {
                 <?php else: ?>
                     <div class="feedback-login-aviso">
                         <strong>Quer deixar sua avaliação?</strong>
-                        <p>Entre como aluno para enviar seu feedback.</p>
+                        <p>Entre na sua conta para enviar seu feedback.</p>
 
                         <a
                             href="<?= BASE_URL ?>/app/controllers/LoginController.php?acao=login"

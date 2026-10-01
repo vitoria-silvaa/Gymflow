@@ -48,7 +48,11 @@ $role = $_SESSION['usuario_role'] ?? 'Admin';
         </ul>
     </nav>
 
-    <a class="sair" href="<?= BASE_URL ?>/app/controllers/LoginController.php?acao=logout">
+    <a class="sair" href="<?= BASE_URL ?>/" style="margin-top: auto; border-top: 1px solid #e2e8f0; color: #374151;">
+        <span>Voltar ao Site</span>
+    </a>
+
+    <a class="sair" href="<?= BASE_URL ?>/app/controllers/LoginController.php?acao=logout" style="margin-top: 0;">
         <span>Sair</span>
     </a>
 

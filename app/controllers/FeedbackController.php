@@ -10,12 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Apenas alunos autenticados podem enviar feedback
-if (
-    !isset($_SESSION['usuario_id']) ||
-    ($_SESSION['usuario_role'] ?? '') !== 'Aluno' ||
-    empty($_SESSION['usuario_nome'])
-) {
+// Apenas usuários autenticados podem enviar feedback
+if (!isset($_SESSION['usuario_id']) || empty($_SESSION['usuario_nome'])) {
     header("Location: " . BASE_URL . "/app/controllers/LoginController.php?acao=login");
     exit;
 }

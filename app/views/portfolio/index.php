@@ -67,6 +67,7 @@ include __DIR__ . '/../shared/header.php';
                         <li><button type="button" class="tab-btn" data-target="tab-carrossel" style="padding: 10px;">Carrossel</button></li>
                         <li><button type="button" class="tab-btn" data-target="tab-planos" style="padding: 10px;">Planos</button></li>
                         <li><button type="button" class="tab-btn" data-target="tab-unidades" style="padding: 10px;">Unidades</button></li>
+                        <li><button type="button" class="tab-btn" data-target="tab-feedbacks" style="padding: 10px;">Avaliações</button></li>
                     </ul>
                 </nav>
 
@@ -626,6 +627,93 @@ include __DIR__ . '/../shared/header.php';
 </div>
                             </fieldset>
                         <?php endforeach; ?>
+                    </div>
+                </div>
+                <!-- ================= FEEDBACKS ================= -->
+                <div id="tab-feedbacks" class="tab-content" style="display: none;">
+                    <style>
+                        .toggle-switch {
+                            position: relative;
+                            display: inline-block;
+                            width: 40px;
+                            height: 22px;
+                            margin: 0;
+                        }
+                        .toggle-switch input {
+                            opacity: 0;
+                            width: 0;
+                            height: 0;
+                        }
+                        .toggle-slider {
+                            position: absolute;
+                            cursor: pointer;
+                            top: 0; left: 0; right: 0; bottom: 0;
+                            background-color: #ccc;
+                            transition: .4s;
+                            border-radius: 34px;
+                        }
+                        .toggle-slider:before {
+                            position: absolute;
+                            content: "";
+                            height: 16px;
+                            width: 16px;
+                            left: 3px;
+                            bottom: 3px;
+                            background-color: white;
+                            transition: .4s;
+                            border-radius: 50%;
+                        }
+                        .toggle-switch input:checked + .toggle-slider {
+                            background-color: #10b981;
+                        }
+                        .toggle-switch input:checked + .toggle-slider:before {
+                            transform: translateX(18px);
+                        }
+                    </style>
+                    <header style="display:flex; justify-content:space-between; align-items:center;">
+                        <h2>Avaliações dos Alunos</h2>
+                        <p style="font-size: 14px; color: #666;">Gerencie os feedbacks exibidos no site público.</p>
+                    </header>
+                    <div id="container-feedbacks">
+                        <?php if (empty($feedbacks)): ?>
+                            <p>Nenhuma avaliação recebida ainda.</p>
+                        <?php else: ?>
+                            <?php foreach ($feedbacks as $fb): ?>
+                                <fieldset style="margin-bottom: 15px; border: 1px solid #ddd; padding: 15px; border-radius: 8px;" id="feedback_<?= htmlspecialchars((string)($fb['id'] ?? '')) ?>">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                                        <div>
+                                            <strong><?= htmlspecialchars($fb['nome']) ?></strong>
+                                            <div style="color: #f59e0b; margin: 4px 0;">
+                                                <?= str_repeat('★', (int)$fb['nota']) ?><?= str_repeat('☆', 5 - (int)$fb['nota']) ?>
+                                            </div>
+                                            <small style="color: #666;"><?= date('d/m/Y H:i', strtotime($fb['criado_em'])) ?></small>
+                                        </div>
+                                        <button type="button" style="color:white; background: #ef4444; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;" onclick="removerItem('feedback_<?= htmlspecialchars((string)($fb['id'] ?? '')) ?>', 'feedbacks', <?= (int)($fb['id'] ?? 0) ?>)">
+                                            Excluir
+                                        </button>
+                                    </div>
+                                    
+                                    <p style="margin-bottom: 15px; padding: 10px; background: #f9f9f9; border-radius: 4px; font-style: italic;">
+                                        "<?= nl2br(htmlspecialchars($fb['mensagem'])) ?>"
+                                    </p>
+
+                                    <input type="hidden" name="feedbacks[<?= htmlspecialchars((string)($fb['id'] ?? '')) ?>][id]" value="<?= htmlspecialchars((string)($fb['id'] ?? '')) ?>">
+                                    
+                                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; width: fit-content; background: #fff; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; user-select: none;">
+                                        <div class="toggle-switch">
+                                            <input
+                                                type="checkbox"
+                                                name="feedbacks[<?= htmlspecialchars((string)($fb['id'] ?? '')) ?>][ativo]"
+                                                value="1"
+                                                <?= !empty($fb['ativo']) ? 'checked' : '' ?>
+                                            >
+                                            <span class="toggle-slider"></span>
+                                        </div>
+                                        <span style="font-weight: 500; color: #444; font-size: 14px;">Exibir no site público</span>
+                                    </label>
+                                </fieldset>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
                 </div>
             </section>

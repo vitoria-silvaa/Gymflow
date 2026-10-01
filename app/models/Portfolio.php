@@ -497,6 +497,31 @@ elseif ($operacao === 'salvar') {
             }
         }
 
+        // 3.5.1 Remover Feedbacks
+        if (!empty($dadosPost['feedbacks_remover']) && is_array($dadosPost['feedbacks_remover'])) {
+            $stmtDel = $pdo->prepare("DELETE FROM portfolio_feedbacks WHERE id = ? AND company_id = ?");
+            foreach ($dadosPost['feedbacks_remover'] as $id) {
+                try {
+                    $stmtDel->execute([(int)$id, $company_id]);
+                } catch (PDOException $e) {
+                }
+            }
+        }
+
+        // 3.5.2 Atualizar Feedbacks (visibilidade)
+        if (isset($dadosPost['feedbacks']) && is_array($dadosPost['feedbacks'])) {
+            $stmtUpdateFb = $pdo->prepare("
+                UPDATE portfolio_feedbacks
+                SET ativo = ?
+                WHERE id = ? AND company_id = ?
+            ");
+
+            foreach ($dadosPost['feedbacks'] as $id => $data) {
+                $ativo = isset($data['ativo']) ? 1 : 0;
+                $stmtUpdateFb->execute([$ativo, (int)$id, $company_id]);
+            }
+        }
+
         // 3.6 Atualizar / Inserir Planos
         if (isset($dadosPost['planos']) && is_array($dadosPost['planos'])) {
             $stmtUpdate = $pdo->prepare("
