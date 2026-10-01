@@ -41,13 +41,14 @@ try {
 
         case 'cadastrar':
             $stmt = $pdo->prepare("
-                INSERT INTO leads (filial_id, nome, telefone, objetivo, campanha, status) 
-                VALUES (:filial_id, :nome, :telefone, :objetivo, :campanha, :status)
+                INSERT INTO leads (filial_id, nome, telefone, email, objetivo, campanha, status) 
+                VALUES (:filial_id, :nome, :telefone, :email, :objetivo, :campanha, :status)
             ");
             $stmt->execute([
                 ':filial_id' => (int) ($dados['filial_id'] ?? 0),
                 ':nome'      => trim($dados['nome'] ?? ''),
                 ':telefone'  => trim($dados['telefone'] ?? ''),
+                ':email'     => !empty($dados['email']) ? trim($dados['email']) : null,
                 ':objetivo'  => !empty($dados['objetivo']) ? trim($dados['objetivo']) : null,
                 ':campanha'  => !empty($dados['campanha']) ? trim($dados['campanha']) : null,
                 ':status'    => $dados['status'] ?? 'Novo'
@@ -58,7 +59,7 @@ try {
             $id = (int) ($id ?? 0);
             $stmt = $pdo->prepare("
                 UPDATE leads 
-                SET filial_id = :filial_id, nome = :nome, telefone = :telefone, 
+                SET filial_id = :filial_id, nome = :nome, telefone = :telefone, email = :email,
                     objetivo = :objetivo, campanha = :campanha, status = :status 
                 WHERE id = :id AND filial_id IN (SELECT id FROM filiais WHERE company_id = :company_id)
             ");
@@ -66,6 +67,7 @@ try {
                 ':filial_id'  => (int) ($dados['filial_id'] ?? 0),
                 ':nome'       => trim($dados['nome'] ?? ''),
                 ':telefone'   => trim($dados['telefone'] ?? ''),
+                ':email'      => !empty($dados['email']) ? trim($dados['email']) : null,
                 ':objetivo'   => !empty($dados['objetivo']) ? trim($dados['objetivo']) : null,
                 ':campanha'   => !empty($dados['campanha']) ? trim($dados['campanha']) : null,
                 ':status'     => $dados['status'] ?? 'Novo',

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // app/controllers/AlunoController.php
 
 require_once __DIR__ . '/../../config/sessao.php';
@@ -11,8 +11,12 @@ $acao = $_GET['acao'] ?? 'listar';
 if ($acao === 'listar') {
     $cpf    = trim($_GET['cpf'] ?? '');
     $status = trim($_GET['status'] ?? '');
+    $filial_id_filter = (int)($_GET['filial_id'] ?? 0);
 
     $operacao = 'listar';
+    require __DIR__ . '/../models/Aluno.php';
+    
+    $operacao = 'listar_filiais';
     require __DIR__ . '/../models/Aluno.php';
 
     require __DIR__ . '/../views/alunos/index.php';

@@ -14,6 +14,7 @@ include __DIR__ . '/../shared/header.php';
 include __DIR__ . '/../shared/sidebar.php';
 
 ?>
+<link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/jorge-financeiro.css">
 
 <main class="filiais-page">
 
@@ -44,21 +45,19 @@ include __DIR__ . '/../shared/sidebar.php';
             <p>Gerencie as unidades da sua rede.</p>
         </div>
 
-        <div class="filiais-acoes">
+        <div class="filiais-acoes" style="display: flex; gap: 12px; align-items: center;">
             <form
                 method="GET"
                 action="<?= BASE_URL ?>/app/controllers/FilialController.php">
                 <input type="hidden" name="acao" value="listar">
 
-                <select name="status" onchange="this.form.submit()">
+                <select name="status" class="fin-select" onchange="this.form.submit()" style="padding: 8px 12px;">
                     <option value="" <?= $statusFiltro === '' ? 'selected' : '' ?>>
                         Todos
                     </option>
-
                     <option value="Ativa" <?= $statusFiltro === 'Ativa' ? 'selected' : '' ?>>
                         Ativo
                     </option>
-
                     <option value="Inativa" <?= $statusFiltro === 'Inativa' ? 'selected' : '' ?>>
                         Inativo
                     </option>
@@ -68,7 +67,7 @@ include __DIR__ . '/../shared/sidebar.php';
             <a
                 class="fin-btn fin-btn-primary"
                 href="<?= BASE_URL ?>/app/controllers/FilialController.php?acao=cadastrar">
-                + &nbsp; Nova Filial
+                + Nova Filial
             </a>
         </div>
     </div>
@@ -112,6 +111,26 @@ include __DIR__ . '/../shared/sidebar.php';
                             <span>Telefone:</span>
                             <?= htmlspecialchars($filial['telefone']) ?>
                         </p>
+                        
+                        <?php if (!empty($filial['email'])): ?>
+                            <p>
+                                <span>E-mail:</span>
+                                <?= htmlspecialchars($filial['email']) ?>
+                            </p>
+                        <?php endif; ?>
+                        
+                        <?php if (!empty($filial['endereco'])): ?>
+                            <p>
+                                <span>Endereço:</span>
+                                <?= htmlspecialchars($filial['endereco']) ?>
+                                <?php if (!empty($filial['numero'])): ?>
+                                    , <?= htmlspecialchars($filial['numero']) ?>
+                                <?php endif; ?>
+                                <?php if (!empty($filial['complemento'])): ?>
+                                    (<?= htmlspecialchars($filial['complemento']) ?>)
+                                <?php endif; ?>
+                            </p>
+                        <?php endif; ?>
 
                         <p>
                             <span>Responsável:</span>
@@ -121,25 +140,24 @@ include __DIR__ . '/../shared/sidebar.php';
                     </div>
 
 
-                    <div class="card-footer">
+                    <div class="card-footer" style="display: flex; gap: 8px;">
 
                         <a
-                            class="btn-editar"
+                            class="fin-btn fin-btn-secondary" style="flex: 1; text-align: center;"
                             href="<?= BASE_URL ?>/app/controllers/FilialController.php?acao=editar&id=<?= $filial['id'] ?>">
-                            ✎ &nbsp; Editar
+                            ✎ Editar
                         </a>
 
                         <a
                             href="<?= BASE_URL ?>/app/controllers/FilialController.php?acao=alternar_status&id=<?= $filial['id'] ?>"
-                            class="<?= $filial['ativo'] ? 'btn-inativar' : 'btn-ativar' ?>">
-                            ⏻ &nbsp;
-                            <?= $filial['ativo'] ? 'Inativar' : 'Ativar' ?>
+                            class="fin-btn <?= $filial['ativo'] ? 'fin-btn-danger' : 'fin-btn-primary' ?>" style="flex: 1; text-align: center; <?= $filial['ativo'] ? 'background: #EA4335; color: white;' : '' ?>">
+                            ⏻ <?= $filial['ativo'] ? 'Inativar' : 'Ativar' ?>
                         </a>
 
                         <a
                             href="#"
-                            class="btn-historico">
-                            ↶ &nbsp; Histórico
+                            class="fin-btn fin-btn-secondary" style="flex: 1; text-align: center;">
+                            ↶ Histórico
                         </a>
 
                     </div>

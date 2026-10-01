@@ -204,6 +204,7 @@ elseif ($acao === 'pagamento') {
         $dados = [
             'aluno' => [
                 'filial_id'  => $filial['id'],
+                'company_id' => $filial['company_id'],
                 'nome'       => $matriculaTemp['nome'],
                 'cpf'        => $matriculaTemp['cpf'],
                 'rg'         => $matriculaTemp['rg'] ?? null,

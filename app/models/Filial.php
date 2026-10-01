@@ -46,14 +46,18 @@ if ($operacao === 'listar') {
         }
 
         $stmt = $pdo->prepare("
-            INSERT INTO filiais (company_id, nome, cnpj, telefone, responsavel, ativo) 
-            VALUES (:company_id, :nome, :cnpj, :telefone, :responsavel, :ativo)
+            INSERT INTO filiais (company_id, nome, cnpj, telefone, endereco, numero, complemento, email, responsavel, ativo) 
+            VALUES (:company_id, :nome, :cnpj, :telefone, :endereco, :numero, :complemento, :email, :responsavel, :ativo)
         ");
         $stmt->execute([
             ':company_id'  => $companyId,
             ':nome'        => trim($dados['nome'] ?? ''),
             ':cnpj'        => $cnpj,
             ':telefone'    => trim($dados['telefone'] ?? ''),
+            ':endereco'    => trim($dados['endereco'] ?? ''),
+            ':numero'      => trim($dados['numero'] ?? ''),
+            ':complemento' => trim($dados['complemento'] ?? ''),
+            ':email'       => trim($dados['email'] ?? ''),
             ':responsavel' => trim($dados['responsavel'] ?? ''),
             ':ativo'       => 1
         ]);
@@ -77,13 +81,17 @@ if ($operacao === 'listar') {
 
         $stmt = $pdo->prepare("
             UPDATE filiais 
-            SET nome = :nome, cnpj = :cnpj, telefone = :telefone, responsavel = :responsavel 
+            SET nome = :nome, cnpj = :cnpj, telefone = :telefone, endereco = :endereco, numero = :numero, complemento = :complemento, email = :email, responsavel = :responsavel 
             WHERE id = :id AND company_id = :company_id
         ");
         $stmt->execute([
             ':nome'        => trim($dados['nome'] ?? ''),
             ':cnpj'        => $cnpj,
             ':telefone'    => trim($dados['telefone'] ?? ''),
+            ':endereco'    => trim($dados['endereco'] ?? ''),
+            ':numero'      => trim($dados['numero'] ?? ''),
+            ':complemento' => trim($dados['complemento'] ?? ''),
+            ':email'       => trim($dados['email'] ?? ''),
             ':responsavel' => trim($dados['responsavel'] ?? ''),
             ':id'          => $id,
             ':company_id'  => $companyId

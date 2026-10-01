@@ -21,7 +21,7 @@ elseif ($operacao === 'listar') {
     $nome_busca = trim($nome_busca ?? '');
     $role_busca = trim($role_busca ?? '');
 
-    $sql = "SELECT id, name, email, role FROM users WHERE role != 'Aluno' AND company_id = :company_id";
+    $sql = "SELECT id, name, email, telefone, role FROM users WHERE role != 'Aluno' AND company_id = :company_id";
     $parametros = [':company_id' => $_SESSION['company_id'] ?? 0];
 
     if ($nome_busca !== '') {
@@ -83,11 +83,13 @@ elseif ($operacao === 'cadastrar') {
         $pdo->beginTransaction();
 
         $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare("INSERT INTO users (company_id, name, email, password, role) VALUES (:company_id, :name, :email, :password, :role)");
+        $stmt = $pdo->prepare("INSERT INTO users (company_id, name, email, telefone, endereco, password, role) VALUES (:company_id, :name, :email, :telefone, :endereco, :password, :role)");
         $stmt->execute([
             ':company_id'=> $_SESSION['company_id'] ?? 0,
             ':name'     => trim($dados['nome'] ?? $nome ?? ''),
             ':email'    => $email,
+            ':telefone' => trim($dados['telefone'] ?? ''),
+            ':endereco' => trim($dados['endereco'] ?? ''),
             ':password' => $senhaHash,
             ':role'     => $dados['role'] ?? $role ?? 'Recepcao'
         ]);
@@ -126,24 +128,30 @@ elseif ($operacao === 'atualizar') {
         $pdo->beginTransaction();
 
         $nome = trim($dados['nome'] ?? $nome ?? '');
+        $telefone = trim($dados['telefone'] ?? '');
+        $endereco = trim($dados['endereco'] ?? '');
         $role = $dados['role'] ?? $role ?? 'Recepcao';
 
         if (!empty($novaSenha)) {
             $senhaHash = password_hash($novaSenha, PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare("UPDATE users SET name = :name, email = :email, password = :password, role = :role WHERE id = :id AND company_id = :company_id");
+            $stmt = $pdo->prepare("UPDATE users SET name = :name, email = :email, telefone = :telefone, endereco = :endereco, password = :password, role = :role WHERE id = :id AND company_id = :company_id");
             $stmt->execute([
                 ':name'     => $nome,
                 ':email'    => $email,
+                ':telefone' => $telefone,
+                ':endereco' => $endereco,
                 ':password' => $senhaHash,
                 ':role'     => $role,
                 ':id'       => $id,
                 ':company_id'=> $_SESSION['company_id'] ?? 0
             ]);
         } else {
-            $stmt = $pdo->prepare("UPDATE users SET name = :name, email = :email, role = :role WHERE id = :id AND company_id = :company_id");
+            $stmt = $pdo->prepare("UPDATE users SET name = :name, email = :email, telefone = :telefone, endereco = :endereco, role = :role WHERE id = :id AND company_id = :company_id");
             $stmt->execute([
                 ':name'  => $nome,
                 ':email' => $email,
+                ':telefone' => $telefone,
+                ':endereco' => $endereco,
                 ':role'  => $role,
                 ':id'    => $id,
                 ':company_id'=> $_SESSION['company_id'] ?? 0

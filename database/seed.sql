@@ -1,4 +1,4 @@
-﻿-- =====================================================================
+-- =====================================================================
 -- GymCore - Massa de Dados de Teste (Mock / Seed)
 -- =====================================================================
 
@@ -44,22 +44,22 @@ INSERT INTO companies (id, nome) VALUES
 -- =====================================================================
 -- 2. FILIAIS
 -- =====================================================================
-INSERT INTO filiais (id, company_id, nome, cnpj, telefone, responsavel, ativo, latitude, longitude) VALUES
-(1, 1, 'GymFlow Central',    '12.345.678/0001-90', '(11) 98765-4321', 'Jorge Silva',     TRUE, -23.55052000, -46.63330800),
-(2, 1, 'GymFlow Zona Sul',   '12.345.678/0002-70', '(11) 98765-4322', 'Mariana Costa',   TRUE, -23.65000000, -46.65000000),
-(3, 1, 'GymFlow Zona Leste', '12.345.678/0003-50', '(11) 98765-4323', 'Maria Fernanda',  TRUE, -23.54000000, -46.47000000);
+INSERT INTO filiais (id, company_id, nome, cnpj, telefone, endereco, numero, complemento, email, responsavel, ativo, latitude, longitude) VALUES
+(1, 1, 'GymFlow Central',    '12.345.678/0001-90', '(11) 98765-4321', 'Avenida Paulista', '1000', 'Conjunto 42', 'central@gymflow.com', 'Jorge Silva',     TRUE, -23.55052000, -46.63330800),
+(2, 1, 'GymFlow Zona Sul',   '12.345.678/0002-70', '(11) 98765-4322', 'Av. Ibirapuera', '500', '', 'zonasul@gymflow.com', 'Mariana Costa',   TRUE, -23.65000000, -46.65000000),
+(3, 1, 'GymFlow Zona Leste', '12.345.678/0003-50', '(11) 98765-4323', 'Rua Radial Leste', '200', 'Bloco B', 'zonaleste@gymflow.com', 'Maria Fernanda',  TRUE, -23.54000000, -46.47000000);
 
 -- =====================================================================
 -- 3. USERS (sem aluno_id ainda - sera atualizado apos inserir alunos)
 -- Senha padrao para todos: 'admin'
 -- Hash bcrypt: password_hash('admin', PASSWORD_BCRYPT)
 -- =====================================================================
-INSERT INTO users (id, company_id, name, email, password, role, aluno_id) VALUES
-(1, 1, 'Administrador Principal', 'admin@gymflow.com',          '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Admin',     NULL),
-(2, 1, 'Professor Marcelo',       'marcelo.treino@gymflow.com', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Professor', NULL),
-(3, 1, 'Professora Juliana',      'juliana.fit@gymflow.com',    '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Professor', NULL),
-(4, 1, 'Ana Oliveira',            'ana.oliveira@email.com',     '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Aluno',     NULL),
-(5, 1, 'Bruno Souza',             'bruno.souza@email.com',      '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Aluno',     NULL);
+INSERT INTO users (id, company_id, name, email, telefone, endereco, password, role, aluno_id) VALUES
+(1, 1, 'Administrador Principal', 'admin@gymflow.com', '(11) 99999-9999', 'Rua Admin, 1 - Centro', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Admin', NULL),
+(2, 1, 'Professor Marcelo',       'marcelo.treino@gymflow.com', '(11) 98888-8888', 'Av. Marcelo, 200 - SP', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Professor', NULL),
+(3, 1, 'Professora Juliana',      'juliana.fit@gymflow.com',    '(11) 97777-7777', 'Rua Juliana, 50 - SP', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Professor', NULL),
+(4, 1, 'Ana Oliveira',            'ana.oliveira@email.com',     '(11) 91111-1111', 'Rua A, 123 - Sao Paulo', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Aluno',     NULL),
+(5, 1, 'Bruno Souza',             'bruno.souza@email.com',      '(11) 92222-2222', 'Av. B, 456 - Sao Paulo', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Aluno',     NULL);
 
 -- =====================================================================
 -- 4. ALUNOS (agora os users com role Professor ja existem)

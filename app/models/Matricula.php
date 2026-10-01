@@ -103,10 +103,11 @@ elseif ($operacao === 'concretizar_matricula') {
 
         // 3. Cria o usuário com role 'Aluno' na tabela 'users' para acesso ao portal
         $stmtUser = $pdo->prepare("
-            INSERT INTO users (name, email, password, role, aluno_id)
-            VALUES (:name, :email, :password, 'Aluno', :aluno_id)
+            INSERT INTO users (company_id, name, email, password, role, aluno_id)
+            VALUES (:company_id, :name, :email, :password, 'Aluno', :aluno_id)
         ");
         $stmtUser->execute([
+            ':company_id'=> (int) $dadosAluno['company_id'],
             ':name'     => trim($dadosAluno['nome']),
             ':email'    => trim($dadosAluno['email']),
             ':password' => password_hash($dadosAluno['senha'], PASSWORD_DEFAULT),

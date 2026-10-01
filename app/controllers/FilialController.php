@@ -27,6 +27,10 @@ if ($acao === 'listar') {
         $dados['nome']        = trim($_POST['nome'] ?? '');
         $dados['cnpj']        = trim($_POST['cnpj'] ?? '');
         $dados['telefone']    = trim($_POST['telefone'] ?? '');
+        $dados['endereco']    = trim($_POST['endereco'] ?? '');
+        $dados['numero']      = trim($_POST['numero'] ?? '');
+        $dados['complemento'] = trim($_POST['complemento'] ?? '');
+        $dados['email']       = trim($_POST['email'] ?? '');
         $dados['responsavel'] = trim($_POST['responsavel'] ?? '');
         $dados['company_id']  = $_SESSION['company_id'] ?? 1;
 
@@ -70,6 +74,10 @@ if ($acao === 'listar') {
             'nome'        => trim($_POST['nome'] ?? ''),
             'cnpj'        => trim($_POST['cnpj'] ?? ''),
             'telefone'    => trim($_POST['telefone'] ?? ''),
+            'endereco'    => trim($_POST['endereco'] ?? ''),
+            'numero'      => trim($_POST['numero'] ?? ''),
+            'complemento' => trim($_POST['complemento'] ?? ''),
+            'email'       => trim($_POST['email'] ?? ''),
             'responsavel' => trim($_POST['responsavel'] ?? ''),
             'company_id'  => $filial['company_id'] ?? $_SESSION['company_id'] ?? 1
         ];

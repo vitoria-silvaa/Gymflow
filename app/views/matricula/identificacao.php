@@ -35,7 +35,7 @@ include __DIR__ . '/../shared/portfolio_header.php';
 
                     <form action="<?= BASE_URL ?>/app/controllers/MatriculaController.php?acao=identificacao" method="POST">
                         <label for="plano_id">Plano Selecionado *:</label>
-                        <select id="plano_id" name="plano_id" required>
+                        <select id="plano_id" name="plano_id" class="portfolio-input" required>
                             <option value="">Selecione um plano</option>
                             <?php foreach ($planos as $p): ?>
                                 <option value="<?= (int) $p['id'] ?>" <?= ((int) ($planoSelecionado['id'] ?? $dados['plano_id'] ?? 0) === (int) $p['id']) ? 'selected' : '' ?>>
@@ -46,19 +46,19 @@ include __DIR__ . '/../shared/portfolio_header.php';
                         <br><br>
 
                         <label for="nome">Nome Completo *:</label>
-                        <input type="text" id="nome" name="nome" value="<?= htmlspecialchars($dados['nome'] ?? '') ?>" placeholder="Seu nome completo" required>
+                        <input type="text" id="nome" name="nome" class="portfolio-input" value="<?= htmlspecialchars($dados['nome'] ?? '') ?>" placeholder="Seu nome completo" required>
                         <br><br>
 
                         <label for="cpf">CPF *:</label>
-                        <input type="text" id="cpf" name="cpf" value="<?= htmlspecialchars($dados['cpf'] ?? '') ?>" placeholder="000.000.000-00" required>
+                        <input type="text" id="cpf" name="cpf" class="portfolio-input" value="<?= htmlspecialchars($dados['cpf'] ?? '') ?>" placeholder="000.000.000-00" required>
                         <br><br>
 
                         <label for="nascimento">Data de Nascimento *:</label>
-                        <input type="date" id="nascimento" name="nascimento" value="<?= htmlspecialchars($dados['nascimento'] ?? '') ?>" required>
+                        <input type="date" id="nascimento" name="nascimento" class="portfolio-input" value="<?= htmlspecialchars($dados['nascimento'] ?? '') ?>" required>
                         <br><br>
 
                         <label for="sexo">Sexo *:</label>
-                        <select id="sexo" name="sexo" required>
+                        <select id="sexo" name="sexo" class="portfolio-input" required>
                             <option value="">Selecione</option>
                             <option value="Masculino" <?= (($dados['sexo'] ?? '') === 'Masculino') ? 'selected' : '' ?>>Masculino</option>
                             <option value="Feminino" <?= (($dados['sexo'] ?? '') === 'Feminino') ? 'selected' : '' ?>>Feminino</option>
@@ -67,24 +67,24 @@ include __DIR__ . '/../shared/portfolio_header.php';
                         <br><br>
 
                         <label for="email">E-mail *:</label>
-                        <input type="email" id="email" name="email" value="<?= htmlspecialchars($dados['email'] ?? '') ?>" placeholder="seu.email@exemplo.com" required>
+                        <input type="email" id="email" name="email" class="portfolio-input" value="<?= htmlspecialchars($dados['email'] ?? '') ?>" placeholder="seu.email@exemplo.com" required>
                         <br><br>
 
                         <label for="telefone">Celular / WhatsApp *:</label>
-                        <input type="text" id="telefone" name="telefone" value="<?= htmlspecialchars($dados['telefone'] ?? '') ?>" placeholder="(11) 99999-9999" required>
+                        <input type="text" id="telefone" name="telefone" class="portfolio-input" value="<?= htmlspecialchars($dados['telefone'] ?? '') ?>" placeholder="(11) 99999-9999" required>
                         <br><br>
 
                         <label for="senha">Senha para o Portal do Aluno *:</label>
-                        <input type="password" id="senha" name="senha" minlength="6" placeholder="Mínimo 6 caracteres" required>
+                        <input type="password" id="senha" name="senha" class="portfolio-input" minlength="6" placeholder="Mínimo 6 caracteres" required>
                         <small>Esta senha será usada para você acessar seus treinos e faturas no portal.</small>
                         <br><br>
 
                         <label for="rg">RG (Opcional):</label>
-                        <input type="text" id="rg" name="rg" value="<?= htmlspecialchars($dados['rg'] ?? '') ?>" placeholder="Número do RG">
+                        <input type="text" id="rg" name="rg" class="portfolio-input" value="<?= htmlspecialchars($dados['rg'] ?? '') ?>" placeholder="Número do RG">
                         <br><br>
 
                         <label for="endereco">Endereço (Opcional):</label>
-                        <input type="text" id="endereco" name="endereco" value="<?= htmlspecialchars($dados['endereco'] ?? '') ?>" placeholder="Rua, número, bairro, cidade">
+                        <input type="text" id="endereco" name="endereco" class="portfolio-input" value="<?= htmlspecialchars($dados['endereco'] ?? '') ?>" placeholder="Rua, número, bairro, cidade">
                         <br><br>
 
                         <div class="hero-acoes">

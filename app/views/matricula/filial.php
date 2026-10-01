@@ -42,7 +42,7 @@ include __DIR__ . '/../shared/portfolio_header.php';
                                 <p><strong>Responsável:</strong> <?= htmlspecialchars($f['responsavel'] ?? 'Coordenação') ?></p>
                                 <p><strong>CNPJ:</strong> <?= htmlspecialchars($f['cnpj'] ?? '') ?></p>
                                 <br>
-                                <label>
+                                <label class="filial-radio-label">
                                     <input 
                                         type="radio" 
                                         name="filial_id" 

@@ -12,7 +12,7 @@
     >
 
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/global.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/portifolio.css?v=11">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/portifolio.css?v=<?= time() ?>">
 
     <script
         src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
@@ -48,22 +48,20 @@
     </nav>
 
     <div class="portfolio-acoes">
-        <?php if ($usuarioLogado): ?>
-            <?php if ($roleUsuario === 'Aluno'): ?>
-                <a href="<?= BASE_URL ?>/app/controllers/PortalAlunoController.php?acao=aluno" style="background-color: var(--portfolio-primary); color: #fff; border-radius: 4px; padding: 8px 16px;">
+        <?php if ($usuarioLogado ?? false): ?>
+            <?php if (($roleUsuario ?? '') === 'Aluno'): ?>
+                <a href="<?= BASE_URL ?>/app/controllers/PortalAlunoController.php?acao=aluno">
                     Área do Aluno
                 </a>
             <?php else: ?>
-                <a href="<?= BASE_URL ?>/app/controllers/DashboardController.php" style="background-color: var(--portfolio-primary); color: #fff; border-radius: 4px; padding: 8px 16px;">
+                <a href="<?= BASE_URL ?>/app/controllers/DashboardController.php">
                     Painel GymFlow
                 </a>
             <?php endif; ?>
             <a href="<?= BASE_URL ?>/app/controllers/LoginController.php?acao=logout" style="margin-left: 10px;">Sair</a>
         <?php else: ?>
             <a href="<?= BASE_URL ?>/app/controllers/LoginController.php?acao=login">Entrar</a>
-            <a href="<?= BASE_URL ?>/app/controllers/MatriculaController.php" style="background-color: var(--portfolio-primary); color: #fff; border-radius: 4px; padding: 8px 16px;">
-                Matricule-se
-            </a>
+            <a href="<?= BASE_URL ?>/app/controllers/MatriculaController.php">Matricule-se</a>
         <?php endif; ?>
     </div>
 

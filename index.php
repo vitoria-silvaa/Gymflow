@@ -337,7 +337,11 @@ include __DIR__ . '/app/views/shared/portfolio_header.php';
                         <ul class="unidade-info">
                             <li>
                                 <span>📍</span>
-                                <span>São Paulo, SP</span>
+                                <span>
+                                    <?= !empty($filial['endereco']) ? htmlspecialchars($filial['endereco']) : 'Endereço não cadastrado' ?>
+                                    <?= !empty($filial['numero']) ? ', ' . htmlspecialchars($filial['numero']) : '' ?>
+                                    <?= !empty($filial['complemento']) ? ' (' . htmlspecialchars($filial['complemento']) . ')' : '' ?>
+                                </span>
                             </li>
 
                             <li>
@@ -351,8 +355,8 @@ include __DIR__ . '/app/views/shared/portfolio_header.php';
                             </li>
                         </ul>
 
-                        <a class="unidade-btn" href="#">
-                            Saiba mais
+                        <a class="unidade-btn" href="https://www.google.com/maps/search/?api=1&query=<?= urlencode(($filial['latitude'] ?? '') . ',' . ($filial['longitude'] ?? '')) ?>" target="_blank" style="display: inline-flex; align-items: center; gap: 6px;">
+                            <span aria-hidden="true">📍</span> Abrir no Google Maps
                         </a>
 
                     </div>
@@ -671,7 +675,8 @@ body.mapa-modal-aberto {
                     <?= htmlspecialchars($config['contact_form_title'] ?? '') ?>
                 </h3>
 
-                <form class="contato-formulario" onsubmit="return false;">
+                <?php $wpPort = preg_replace('/\D/', '', $config['contact_phone'] ?? ''); ?>
+                <form class="contato-formulario" onsubmit="enviarWhatsApp(event, '<?= $wpPort ?>')">
                     <div class="contato-campo">
                         <label for="contato-nome">Nome</label>
                         <input
@@ -733,6 +738,33 @@ body.mapa-modal-aberto {
                         Enviar mensagem
                     </button>
                 </form>
+
+                <script>
+                function enviarWhatsApp(event, telefoneZap) {
+                    event.preventDefault();
+                    if (!telefoneZap) {
+                        alert("O número de WhatsApp da academia ainda não foi configurado.");
+                        return;
+                    }
+
+                    const nome = document.getElementById('contato-nome').value;
+                    const email = document.getElementById('contato-email').value;
+                    const fone = document.getElementById('contato-telefone').value;
+                    
+                    const unidadeSelect = document.getElementById('contato-unidade');
+                    let unidadeNome = 'Nenhuma específica';
+                    if (unidadeSelect.selectedIndex > 0) {
+                        unidadeNome = unidadeSelect.options[unidadeSelect.selectedIndex].text.trim();
+                    }
+                    
+                    const mensagem = document.getElementById('contato-mensagem').value;
+
+                    const textoZap = `Olá! Meu nome é *${nome}*.\nE-mail: ${email}\nTelefone de Contato: ${fone}\nUnidade de interesse: *${unidadeNome}*\n\nMensagem: ${mensagem}`;
+                    
+                    const url = `https://wa.me/55${telefoneZap}?text=${encodeURIComponent(textoZap)}`;
+                    window.open(url, '_blank');
+                }
+                </script>
             </div>
         </div>
     </section>

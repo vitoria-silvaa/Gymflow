@@ -83,6 +83,17 @@ include __DIR__ . '/../shared/sidebar.php';
                                 <td><span class="fin-badge fin-badge-pago">Ativo</span></td>
                                 <td style="text-align: right;">
                                     <div class="fin-actions-dropdown" style="display: inline-flex; gap: 8px;">
+                                        <?php 
+                                            $whatsappNumber = preg_replace('/\D/', '', $func['telefone'] ?? '');
+                                            if (!empty($whatsappNumber)): 
+                                        ?>
+                                            <a href="https://wa.me/55<?= $whatsappNumber ?>" target="_blank" class="fin-btn fin-btn-sm" style="background: #25D366; color: white;">💬 WhatsApp</a>
+                                        <?php endif; ?>
+                                        
+                                        <?php if (!empty($func['email'])): ?>
+                                            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=<?= urlencode($func['email']) ?>" target="_blank" class="fin-btn fin-btn-sm" style="background: #EA4335; color: white;">✉️ E-mail</a>
+                                        <?php endif; ?>
+
                                         <a href="<?= BASE_URL ?>/app/controllers/FuncionarioController.php?acao=visualizar&id=<?php echo $func['id']; ?>" class="fin-btn fin-btn-sm" style="background: #f1f5f9; color: #475569;">Ver</a>
                                         <a href="<?= BASE_URL ?>/app/controllers/FuncionarioController.php?acao=editar&id=<?php echo $func['id']; ?>" class="fin-btn fin-btn-primary fin-btn-sm">Editar</a>
                                     </div>

@@ -138,6 +138,21 @@ document.addEventListener('DOMContentLoaded', function () {
             popup.appendChild(telefone);
         }
 
+        const btnMaps = document.createElement('a');
+        btnMaps.href = 'https://www.google.com/maps/search/?api=1&query=' + latitude + ',' + longitude;
+        btnMaps.target = '_blank';
+        btnMaps.textContent = '📍 Abrir no Google Maps';
+        btnMaps.style.display = 'inline-block';
+        btnMaps.style.marginTop = '10px';
+        btnMaps.style.padding = '4px 8px';
+        btnMaps.style.background = '#4285F4';
+        btnMaps.style.color = 'white';
+        btnMaps.style.textDecoration = 'none';
+        btnMaps.style.borderRadius = '4px';
+        btnMaps.style.fontSize = '12px';
+        btnMaps.style.fontWeight = 'bold';
+        popup.appendChild(btnMaps);
+
         marcador.bindPopup(popup);
 
         marcador.on('mouseover', function () {
@@ -251,6 +266,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 telefone.textContent = 'Telefone: ' + unidade.telefone;
                 popup.appendChild(telefone);
             }
+
+            const btnMaps = document.createElement('a');
+            btnMaps.href = 'https://www.google.com/maps/search/?api=1&query=' + latitude + ',' + longitude;
+            btnMaps.target = '_blank';
+            btnMaps.textContent = '📍 Abrir no Google Maps';
+            btnMaps.style.display = 'inline-block';
+            btnMaps.style.marginTop = '10px';
+            btnMaps.style.padding = '4px 8px';
+            btnMaps.style.background = '#4285F4';
+            btnMaps.style.color = 'white';
+            btnMaps.style.textDecoration = 'none';
+            btnMaps.style.borderRadius = '4px';
+            btnMaps.style.fontSize = '12px';
+            btnMaps.style.fontWeight = 'bold';
+            popup.appendChild(btnMaps);
 
             marcador.bindPopup(popup);
 

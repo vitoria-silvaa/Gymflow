@@ -35,6 +35,10 @@ if ($operacao === 'listar') {
         $sql .= " AND a.status = :status";
         $parametros[':status'] = $status;
     }
+    if (!empty($filial_id_filter)) {
+        $sql .= " AND a.filial_id = :filial_id_filter";
+        $parametros[':filial_id_filter'] = $filial_id_filter;
+    }
 
     $sql .= " ORDER BY a.nome";
     $stmt = $pdo->prepare($sql);

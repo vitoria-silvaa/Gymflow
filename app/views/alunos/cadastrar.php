@@ -91,12 +91,120 @@ include __DIR__ . '/../shared/sidebar.php';
         required>
     <br><br>
 
-    <label>Endereço:</label>
-    <input
-        type="text"
-        name="endereco"
-        value="<?= htmlspecialchars($dados['endereco'] ?? '') ?>">
-    <br><br>
+    <fieldset style="border: 1px solid #ccc; padding: 15px; margin-bottom: 20px;">
+        <legend>Endereço</legend>
+
+        <label>CEP:</label>
+        <input type="text" id="cep" placeholder="00000-000" maxlength="9" onblur="buscarCep(this.value)">
+        <br><br>
+
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <div style="flex: 2;">
+                <label>Logradouro/Rua:</label>
+                <input type="text" id="rua" style="width: 100%;" oninput="atualizarEndereco()">
+            </div>
+            <div style="flex: 1;">
+                <label>Número:</label>
+                <input type="text" id="numero" style="width: 100%;" oninput="atualizarEndereco()">
+            </div>
+        </div>
+
+        <div style="display: flex; align-items: center; margin-bottom: 15px;">
+            <input type="checkbox" id="is_condominio" onchange="toggleCondominio()" style="width: 18px; height: 18px; margin: 0 8px 0 0; cursor: pointer;">
+            <label for="is_condominio" style="margin: 0; cursor: pointer; font-weight: bold; display: inline;">É prédio / condomínio?</label>
+        </div>
+        
+        <div id="div_condominio" style="display: none; gap: 10px; margin-bottom: 15px;">
+            <div style="flex: 1;">
+                <label>Bloco/Torre:</label>
+                <input type="text" id="bloco" style="width: 100%;" oninput="atualizarEndereco()">
+            </div>
+            <div style="flex: 1;">
+                <label>Apto/Sala:</label>
+                <input type="text" id="apto" style="width: 100%;" oninput="atualizarEndereco()">
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <div style="flex: 1;">
+                <label>Bairro:</label>
+                <input type="text" id="bairro" style="width: 100%;" oninput="atualizarEndereco()">
+            </div>
+            <div style="flex: 1;">
+                <label>Cidade/UF:</label>
+                <input type="text" id="cidade_uf" style="width: 100%;" oninput="atualizarEndereco()">
+            </div>
+        </div>
+
+        <label>Endereço Completo (Salvo no sistema):</label>
+        <input
+            type="text"
+            id="endereco"
+            name="endereco"
+            value="<?= htmlspecialchars($dados['endereco'] ?? '') ?>"
+            placeholder="Ex: Rua, Bairro - Cidade/UF"
+            style="width: 100%; background: #f9f9f9;"
+        >
+    </fieldset>
+
+    <script>
+        function toggleCondominio() {
+            document.getElementById('div_condominio').style.display = document.getElementById('is_condominio').checked ? 'flex' : 'none';
+            atualizarEndereco();
+        }
+
+        function atualizarEndereco() {
+            let rua = document.getElementById('rua').value;
+            let numero = document.getElementById('numero').value;
+            let bairro = document.getElementById('bairro').value;
+            let cidade_uf = document.getElementById('cidade_uf').value;
+            let is_cond = document.getElementById('is_condominio').checked;
+            let bloco = document.getElementById('bloco').value;
+            let apto = document.getElementById('apto').value;
+
+            let partes = [];
+            if (rua) {
+                let logradouro = rua;
+                if (numero) logradouro += ", " + numero;
+                partes.push(logradouro);
+            }
+            if (is_cond) {
+                if (bloco) partes.push("Bloco " + bloco);
+                if (apto) partes.push("Apto " + apto);
+            }
+            if (bairro) partes.push(bairro);
+            if (cidade_uf) partes.push(cidade_uf);
+
+            if (partes.length > 0) {
+                document.getElementById('endereco').value = partes.join(' - ');
+            }
+        }
+
+        function buscarCep(cep) {
+            cep = cep.replace(/\D/g, '');
+            if (cep.length !== 8) return;
+
+            document.getElementById('endereco').value = 'Buscando...';
+
+            fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.erro) {
+                        alert('CEP não encontrado!');
+                        document.getElementById('endereco').value = '';
+                        return;
+                    }
+                    document.getElementById('rua').value = data.logradouro || '';
+                    document.getElementById('bairro').value = data.bairro || '';
+                    document.getElementById('cidade_uf').value = `${data.localidade || ''}/${data.uf || ''}`;
+                    atualizarEndereco();
+                })
+                .catch(() => {
+                    alert('Erro ao buscar o CEP.');
+                    document.getElementById('endereco').value = '';
+                });
+        }
+    </script>
 
     <label>Filial *:</label>
     <select name="filial_id" required>

@@ -46,6 +46,18 @@ include __DIR__ . '/../shared/sidebar.php';
                 </select>
             </div>
 
+            <div class="fin-form-group" style="flex: 1;">
+                <label>Filial</label>
+                <select name="filial_id" class="fin-select">
+                    <option value="">Todas as filiais</option>
+                    <?php foreach ($filiais ?? [] as $filial): ?>
+                        <option value="<?= $filial['id'] ?>" <?= ($filial_id_filter ?? 0) == $filial['id'] ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($filial['nome']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
             <div class="fin-form-group">
                 <button type="submit" class="fin-btn fin-btn-secondary">Filtrar</button>
             </div>
@@ -88,6 +100,16 @@ include __DIR__ . '/../shared/sidebar.php';
                                 </td>
                                 <td style="text-align: right;">
                                     <div class="fin-actions-dropdown" style="display: inline-flex; gap: 8px;">
+                                        <?php 
+                                            $whatsappNumber = preg_replace('/\D/', '', $aluno['telefone'] ?? '');
+                                            if (!empty($whatsappNumber)): 
+                                        ?>
+                                            <a href="https://wa.me/55<?= $whatsappNumber ?>" target="_blank" class="fin-btn fin-btn-sm" style="background: #25D366; color: white;">💬 WhatsApp</a>
+                                        <?php endif; ?>
+
+                                        <?php if (!empty($aluno['email'])): ?>
+                                            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=<?= urlencode($aluno['email']) ?>" target="_blank" class="fin-btn fin-btn-sm" style="background: #EA4335; color: white;">✉️ E-mail</a>
+                                        <?php endif; ?>
                                         <a href="<?= $baseUrl ?>?acao=visualizar&id=<?= $aluno['id'] ?>" class="fin-btn fin-btn-sm" style="background: #f1f5f9; color: #475569;">Ver</a>
                                         <a href="<?= $baseUrl ?>?acao=editar&id=<?= $aluno['id'] ?>" class="fin-btn fin-btn-primary fin-btn-sm">Editar</a>
                                     </div>

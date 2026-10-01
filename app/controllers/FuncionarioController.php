@@ -28,6 +28,8 @@ elseif ($acao === 'cadastrar') {
         $dados = [
             'nome'      => trim($_POST['nome'] ?? ''),
             'email'     => trim($_POST['email'] ?? ''),
+            'telefone'  => trim($_POST['telefone'] ?? ''),
+            'endereco'  => trim($_POST['endereco'] ?? ''),
             'senha'     => $_POST['senha'] ?? '',
             'role'      => $_POST['role'] ?? '',
             'id_filial' => (int) ($_POST['id_filial'] ?? 0)
@@ -78,6 +80,8 @@ elseif ($acao === 'editar') {
         $dados = [
             'nome'      => trim($_POST['nome'] ?? ''),
             'email'     => trim($_POST['email'] ?? ''),
+            'telefone'  => trim($_POST['telefone'] ?? ''),
+            'endereco'  => trim($_POST['endereco'] ?? ''),
             'senha'     => $_POST['senha'] ?? '',
             'role'      => $_POST['role'] ?? '',
             'id_filial' => (int) ($_POST['id_filial'] ?? 0)

@@ -88,6 +88,17 @@ $colunasStatus = ['Novo', 'Contato Agendado', 'Experimental', 'Convertido', 'Per
                 </div>
 
                 <div class="fin-form-group">
+                    <label class="fin-form-label">E-mail</label>
+                    <input
+                        type="email"
+                        name="email"
+                        class="fin-form-input"
+                        placeholder="Ex: joao@email.com"
+                        value="<?= htmlspecialchars($dados['email'] ?? '') ?>"
+                    >
+                </div>
+
+                <div class="fin-form-group">
                     <label class="fin-form-label">Objetivo Principal</label>
                     <input
                         type="text"
