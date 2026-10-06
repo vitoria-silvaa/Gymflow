@@ -10,44 +10,94 @@ include __DIR__ . '/../shared/header.php';
 include __DIR__ . '/../shared/sidebar.php';
 ?>
 
-<h1>Cadastrar Novo Plano</h1>
-<a href="<?= BASE_URL ?>/app/controllers/PlanoController.php?acao=listar">Voltar</a>
-<br><br>
+<link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/jorge-financeiro.css">
 
-<!-- Mensagem de Erro -->
-<?php if (!empty($erro)): ?>
-    <div style="color: red; font-weight: bold; margin-bottom: 15px;">
-        <?php echo htmlspecialchars($erro); ?>
+<main class="conteudo financeiro-page">
+
+    <div class="fin-page-header">
+        <div class="fin-header-info">
+            <h1>Cadastrar Novo Plano</h1>
+            <p>Configure um novo plano de mensalidade ou pacote para os alunos.</p>
+        </div>
+        <div class="fin-header-actions">
+            <a href="<?= BASE_URL ?>/app/controllers/PlanoController.php?acao=listar" class="fin-btn fin-btn-secondary">
+                ← Voltar para Lista
+            </a>
+        </div>
     </div>
-<?php endif; ?>
 
-<form action="<?= BASE_URL ?>/app/controllers/PlanoController.php?acao=cadastrar" method="POST">
-    
-    <label>Nome do Plano *:</label><br>
-    <input type="text" name="nome" placeholder="Ex: Plano Trimestral Black" value="<?php echo htmlspecialchars($_POST['nome'] ?? ''); ?>" required>
-    <br><br>
+    <?php if (!empty($erro)): ?>
+        <div style="background-color: #fee2e2; color: #b91c1c; padding: 14px 18px; border-radius: 8px; margin-bottom: 24px; font-weight: 600; border: 1px solid #fecaca;">
+            ⚠️ <?= htmlspecialchars($erro); ?>
+        </div>
+    <?php endif; ?>
 
-    <label>Categoria (Modalidade principal) *:</label><br>
-    <input type="text" name="categoria" placeholder="Ex: Musculação / Pilates" value="<?php echo htmlspecialchars($_POST['categoria'] ?? ''); ?>" required>
-    <br><br>
+    <!-- CARD DO FORMULÁRIO -->
+    <section class="fin-table-card" style="padding: 28px;">
 
-    <label>Valor Mensal/Total (R$) *:</label><br>
-    <input type="text" name="valor" placeholder="99.90" value="<?php echo htmlspecialchars($_POST['valor'] ?? ''); ?>" required>
-    <br><br>
+        <form action="<?= BASE_URL ?>/app/controllers/PlanoController.php?acao=cadastrar" method="POST">
 
-    <label>Duração *:</label><br>
-    <select name="duracao" required>
-        <option value="">Selecione...</option>
-        <option value="1 Mês" <?php if(($_POST['duracao'] ?? '') === '1 Mês') echo 'selected'; ?>>1 Mês</option>
-        <option value="3 Meses" <?php if(($_POST['duracao'] ?? '') === '3 Meses') echo 'selected'; ?>>3 Meses</option>
-        <option value="6 Meses" <?php if(($_POST['duracao'] ?? '') === '6 Meses') echo 'selected'; ?>>6 Meses</option>
-        <option value="1 Ano" <?php if(($_POST['duracao'] ?? '') === '1 Ano') echo 'selected'; ?>>1 Ano</option>
-    </select>
-    <br><br>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-bottom: 24px;">
 
-    <button type="submit">Salvar Plano</button>
-    <a href="<?= BASE_URL ?>/app/controllers/PlanoController.php?acao=listar">Cancelar</a>
+                <div class="fin-form-group">
+                    <label>Nome do Plano *</label>
+                    <input 
+                        type="text" 
+                        name="nome" 
+                        class="fin-input" 
+                        placeholder="Ex: Plano Trimestral Black" 
+                        value="<?= htmlspecialchars($_POST['nome'] ?? ''); ?>" 
+                        required>
+                </div>
 
-</form>
+                <div class="fin-form-group">
+                    <label>Categoria (Modalidade Principal) *</label>
+                    <input 
+                        type="text" 
+                        name="categoria" 
+                        class="fin-input" 
+                        placeholder="Ex: Musculação / Pilates" 
+                        value="<?= htmlspecialchars($_POST['categoria'] ?? ''); ?>" 
+                        required>
+                </div>
+
+                <div class="fin-form-group">
+                    <label>Valor Mensal/Total (R$) *</label>
+                    <input 
+                        type="text" 
+                        name="valor" 
+                        class="fin-input" 
+                        placeholder="99.90" 
+                        value="<?= htmlspecialchars($_POST['valor'] ?? ''); ?>" 
+                        required>
+                </div>
+
+                <div class="fin-form-group">
+                    <label>Duração *</label>
+                    <select name="duracao" class="fin-select" required>
+                        <option value="">Selecione...</option>
+                        <option value="1 Mês" <?= (($_POST['duracao'] ?? '') === '1 Mês') ? 'selected' : ''; ?>>1 Mês</option>
+                        <option value="3 Meses" <?= (($_POST['duracao'] ?? '') === '3 Meses') ? 'selected' : ''; ?>>3 Meses</option>
+                        <option value="6 Meses" <?= (($_POST['duracao'] ?? '') === '6 Meses') ? 'selected' : ''; ?>>6 Meses</option>
+                        <option value="1 Ano" <?= (($_POST['duracao'] ?? '') === '1 Ano') ? 'selected' : ''; ?>>1 Ano</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; padding-top: 16px; border-top: 1px solid #e2e8f0;">
+                <a href="<?= BASE_URL ?>/app/controllers/PlanoController.php?acao=listar" class="fin-btn fin-btn-secondary">
+                    Cancelar
+                </a>
+                <button type="submit" class="fin-btn fin-btn-primary">
+                    ✓ Salvar Plano
+                </button>
+            </div>
+
+        </form>
+
+    </section>
+
+</main>
 
 <?php include __DIR__ . '/../shared/footer.php'; ?>

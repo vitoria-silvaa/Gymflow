@@ -903,8 +903,23 @@
     color: var(--fin-danger);
 }
 
+.fin-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.fin-form-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    display: block;
+}
+
 .fin-form-input,
-.fin-form-select {
+.fin-form-select,
+.fin-input,
+.fin-select {
     width: 100%;
     padding: 10px 14px;
     font-size: 14px;
@@ -917,7 +932,9 @@
 }
 
 .fin-form-input:focus,
-.fin-form-select:focus {
+.fin-form-select:focus,
+.fin-input:focus,
+.fin-select:focus {
     border-color: var(--fin-primary);
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
     outline: none;
