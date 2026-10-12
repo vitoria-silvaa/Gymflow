@@ -58,14 +58,14 @@ INSERT INTO users (id, company_id, name, email, telefone, endereco, password, ro
 (1, 1, 'Administrador Principal', 'admin@gymflow.com', '(11) 99999-9999', 'Rua Admin, 1 - Centro', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Admin', NULL),
 (2, 1, 'Professor Marcelo',       'marcelo.treino@gymflow.com', '(11) 98888-8888', 'Av. Marcelo, 200 - SP', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Professor', NULL),
 (3, 1, 'Professora Juliana',      'juliana.fit@gymflow.com',    '(11) 97777-7777', 'Rua Juliana, 50 - SP', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Professor', NULL),
-(4, 1, 'Ana Oliveira',            'ana.oliveira@email.com',     '(11) 91111-1111', 'Rua A, 123 - Sao Paulo', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Aluno',     NULL),
+(4, 1, 'Ana Oliveira', 'nanda.bechara67@gmail.com', '(11) 91111-1111', 'Rua A, 123 - Sao Paulo', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Aluno', NULL),
 (5, 1, 'Bruno Souza',             'bruno.souza@email.com',      '(11) 92222-2222', 'Av. B, 456 - Sao Paulo', '$2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.', 'Aluno',     NULL);
 
 -- =====================================================================
 -- 4. ALUNOS (agora os users com role Professor ja existem)
 -- =====================================================================
 INSERT INTO alunos (id, filial_id, professor_id, nome, cpf, rg, sexo, nascimento, email, telefone, endereco, status) VALUES
-(1, 1, 2, 'Ana Oliveira',  '111.222.333-44', '12.345.678-9', 'Feminino',  '1995-03-15', 'ana.oliveira@email.com', '(11) 91111-1111', 'Rua A, 123 - Sao Paulo',         'Ativo'),
+(1, 1, 2, 'Ana Oliveira', '111.222.333-44', '12.345.678-9', 'Feminino', '1995-03-15', 'nanda.bechara67@gmail.com', '(11) 91111-1111', 'Rua A, 123 - Sao Paulo', 'Ativo'),
 (2, 1, 2, 'Bruno Souza',   '222.333.444-55', '98.765.432-1', 'Masculino', '1988-07-20', 'bruno.souza@email.com',  '(11) 92222-2222', 'Av. B, 456 - Sao Paulo',         'Ativo'),
 (3, 1, NULL, 'Camila Lima', '333.444.555-66', '45.678.901-2', 'Feminino', '2000-11-05', 'camila.lima@email.com',  '(11) 93333-3333', 'Rua C, 789 - Sao Paulo',         'Inativo'),
 (4, 3, 3, 'Diego Rocha',   '444.555.666-77', '34.567.890-3', 'Masculino', '1992-05-10', 'diego.rocha@email.com',  '(21) 94444-4444', 'Rua D, 101 - Rio de Janeiro',    'Ativo');

@@ -15,6 +15,7 @@
         .login-second-column { width: 100% !important; min-height: auto !important; padding: 40px; }
         .success-box { background: #d1fae5; color: #065f46; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; }
         .success-box a { color: #047857; font-weight: bold; text-decoration: underline; }
+        .error-box {background: #fee2e2; color: #991b1b; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 14px;}
     </style>
 </head>
 <body>
@@ -26,7 +27,11 @@
                         <h2 class="login-form-title">Recuperar Senha</h2>
                         <p class="login-form-description">Digite seu e-mail para receber o link de recuperação.</p>
                     </header>
-                    
+                    <?php if (!empty($erro)): ?>
+                 <div class="error-box" role="alert">
+                   <?= htmlspecialchars($erro, ENT_QUOTES, 'UTF-8') ?>
+                     </div>
+                        <?php endif; ?>
                     <?php if (!empty($sucesso)): ?>
                         <div class="success-box"><?= $sucesso ?></div>
                     <?php endif; ?>
