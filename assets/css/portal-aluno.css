@@ -1,10 +1,10 @@
 ﻿/* ========================================
    GYMFLOW - PORTAL DO ALUNO
+   PADRONIZAÇÃO VISUAL
    ======================================== */
 
-
 /* ========================================
-   ÃREA PRINCIPAL
+   ÁREA PRINCIPAL
    ======================================== */
 
 .portal-aluno {
@@ -16,14 +16,12 @@
     padding: 34px 36px 55px;
 }
 
-
 /* ========================================
-   CABEÃ‡ALHO
+   CABEÇALHO
    ======================================== */
 
 .portal-header {
     position: relative;
-
     margin-bottom: 30px;
 }
 
@@ -43,7 +41,7 @@
 .portal-header h1 {
     margin: 0 0 7px;
 
-    color: #111827;
+    color: var(--ui-texto, #111827);
 
     font-size: 32px;
     font-weight: 700;
@@ -53,11 +51,10 @@
 .portal-header p {
     margin: 0;
 
-    color: #64748b;
+    color: var(--ui-texto-suave, #64748b);
 
     font-size: 15px;
 }
-
 
 /* ========================================
    GRID PRINCIPAL
@@ -73,7 +70,6 @@
     margin-bottom: 42px;
 }
 
-
 /* ========================================
    CARDS
    ======================================== */
@@ -82,21 +78,19 @@
     position: relative;
 
     min-height: 230px;
-
     padding: 25px;
 
     overflow: hidden;
 
-    background: #ffffff;
+    background: var(--ui-fundo-card, #ffffff);
 
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
+    border: 1px solid var(--ui-borda, #e2e8f0);
+    border-radius: var(--ui-raio-lg, 12px);
 
     box-sizing: border-box;
 
-    box-shadow:
-        0 1px 2px rgba(15, 23, 42, 0.03),
-        0 4px 12px rgba(15, 23, 42, 0.025);
+    box-shadow: var(--ui-sombra-card,
+            0 1px 2px rgba(15, 23, 42, 0.03));
 
     transition:
         transform 0.2s ease,
@@ -109,13 +103,11 @@
 
     border-color: #d5dee8;
 
-    box-shadow:
-        0 3px 6px rgba(15, 23, 42, 0.04),
-        0 10px 20px rgba(15, 23, 42, 0.045);
+    box-shadow: var(--ui-sombra-hover,
+            0 5px 14px rgba(15, 23, 42, 0.06));
 }
 
-
-/* pequeno detalhe superior */
+/* Detalhe superior dos cards */
 
 .portal-card::before {
     content: "";
@@ -139,14 +131,12 @@
     opacity: 1;
 }
 
-
 /* ========================================
    CARD DO PLANO
    ======================================== */
 
 .plano-card {
     display: flex;
-
     flex-direction: column;
 }
 
@@ -159,7 +149,7 @@
 
     margin-bottom: 9px;
 
-    color: #64748b;
+    color: var(--ui-texto-suave, #64748b);
 
     font-size: 12px;
     font-weight: 700;
@@ -169,13 +159,12 @@
 .plano-card h2 {
     margin: 0 0 11px;
 
-    color: #111827;
+    color: var(--ui-texto, #111827);
 
     font-size: 23px;
     font-weight: 700;
     line-height: 1.25;
 }
-
 
 /* ========================================
    STATUS
@@ -183,7 +172,6 @@
 
 .status {
     display: inline-flex;
-
     align-items: center;
 
     padding: 5px 9px;
@@ -204,8 +192,7 @@
     color: #c2410c;
 }
 
-
-/* bolinha do status */
+/* Indicador do status ativo */
 
 .status-ativo::before {
     content: "";
@@ -220,9 +207,8 @@
     background: var(--cor-primaria);
 }
 
-
 /* ========================================
-   INFORMAÃ‡ÃƒO DO PLANO
+   INFORMAÇÕES DO PLANO
    ======================================== */
 
 .plano-info {
@@ -252,22 +238,20 @@
 
 .plano-info strong {
     color: #334155;
-
     font-size: 14px;
 }
 
 .card-description {
     margin: 20px 0;
 
-    color: #64748b;
+    color: var(--ui-texto-suave, #64748b);
 
     font-size: 14px;
     line-height: 1.6;
 }
 
-
 /* ========================================
-   BOTÃƒO PRINCIPAL
+   BOTÃO PRINCIPAL
    ======================================== */
 
 .portal-btn {
@@ -299,7 +283,6 @@
 
 .portal-btn:hover {
     background-color: var(--cor-primaria-hover);
-
     color: #ffffff;
 
     transform: translateY(-1px);
@@ -307,14 +290,12 @@
 
 .portal-btn span {
     font-size: 18px;
-
     transition: transform 0.2s ease;
 }
 
 .portal-btn:hover span {
     transform: translateX(3px);
 }
-
 
 /* ========================================
    CARDS DE INDICADORES
@@ -323,13 +304,11 @@
 .frequencia-card,
 .fatura-card {
     display: flex;
-
     flex-direction: column;
 }
 
-
 /* ========================================
-   ÃCONES
+   ÍCONES
    ======================================== */
 
 .card-icon {
@@ -344,7 +323,6 @@
     margin-bottom: 20px;
 
     background: #ecfdf5;
-
     border: 1px solid #d1fae5;
 
     border-radius: 9px;
@@ -355,9 +333,8 @@
     font-weight: 700;
 }
 
-
 /* ========================================
-   CONTEÃšDO DOS INDICADORES
+   CONTEÚDO DOS INDICADORES
    ======================================== */
 
 .card-content {
@@ -369,7 +346,7 @@
 
     margin-top: 9px;
 
-    color: #111827;
+    color: var(--ui-texto, #111827);
 
     font-size: 36px;
     font-weight: 700;
@@ -381,7 +358,7 @@
     font-size: 13px;
     font-weight: 400;
 
-    color: #64748b;
+    color: var(--ui-texto-suave, #64748b);
 }
 
 .card-content p {
@@ -393,14 +370,17 @@
     line-height: 1.45;
 }
 
+/* ========================================
+   CORES DE INFORMAÇÃO
+   ======================================== */
+
 .texto-sucesso {
     color: var(--cor-primaria) !important;
 }
 
 .texto-alerta {
-    color: #f59e0b !important;
+    color: var(--cor-aviso, #f59e0b) !important;
 }
-
 
 /* ========================================
    FATURAS
@@ -408,7 +388,6 @@
 
 .card-link {
     display: flex;
-
     align-items: center;
 
     margin-top: 18px;
@@ -427,9 +406,8 @@
     color: var(--cor-primaria-hover);
 }
 
-
 /* ========================================
-   ACESSO RÃPIDO
+   ACESSO RÁPIDO
    ======================================== */
 
 .portal-bottom {
@@ -443,15 +421,14 @@
 .section-heading h2 {
     margin: 5px 0 0;
 
-    color: #111827;
+    color: var(--ui-texto, #111827);
 
     font-size: 21px;
     font-weight: 700;
 }
 
-
 /* ========================================
-   AÃ‡Ã•ES RÃPIDAS
+   AÇÕES RÁPIDAS
    ======================================== */
 
 .quick-actions {
@@ -466,22 +443,20 @@
     position: relative;
 
     display: flex;
-
     flex-direction: column;
 
     min-height: 100px;
 
     padding: 20px 21px;
 
-    background-color: #ffffff;
+    background-color: var(--ui-fundo-card, #ffffff);
 
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
+    border: 1px solid var(--ui-borda, #e2e8f0);
+    border-radius: var(--ui-raio-md, 10px);
 
     box-sizing: border-box;
 
     text-decoration: none;
-
     overflow: hidden;
 
     transition:
@@ -491,7 +466,7 @@
 }
 
 .quick-action::after {
-    content: "â†’";
+    content: "→";
 
     position: absolute;
 
@@ -526,17 +501,16 @@
 .quick-action strong {
     margin-bottom: 6px;
 
-    color: #111827;
+    color: var(--ui-texto, #111827);
 
     font-size: 15px;
 }
 
 .quick-action span {
-    color: #64748b;
+    color: var(--ui-texto-suave, #64748b);
 
     font-size: 13px;
 }
-
 
 /* ========================================
    RESPONSIVIDADE
@@ -552,7 +526,6 @@
         grid-column: span 2;
     }
 }
-
 
 @media (max-width: 700px) {
 
@@ -574,5 +547,27 @@
 
     .quick-actions {
         grid-template-columns: 1fr;
+    }
+}
+
+/* ========================================
+   ACESSIBILIDADE
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .portal-card,
+    .portal-card::before,
+    .portal-btn,
+    .portal-btn span,
+    .quick-action,
+    .quick-action::after {
+        transition: none;
+    }
+
+    .portal-card:hover,
+    .portal-btn:hover,
+    .quick-action:hover {
+        transform: none;
     }
 }

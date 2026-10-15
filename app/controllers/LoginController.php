@@ -66,12 +66,17 @@ if ($acao === 'login') {
                     );
                     $stmtToken->execute([$token, $usuario['id']]);
 
-                    setcookie(
-                        'gymflow_remember',
-                        $token,
-                        time() + (86400 * 30),
-                        "/"
-                    );
+
+                    $https = !empty($_SERVER['HTTPS'])
+                        && $_SERVER['HTTPS'] !== 'off';
+
+                    setcookie('gymflow_remember', $token, [
+                        'expires' => time() + (86400 * 30),
+                        'path' => '/',
+                        'secure' => $https,
+                        'httponly' => true,
+                        'samesite' => 'Lax'
+                    ]);
                 }
 
                 if ($usuario['role'] === 'Aluno') {
@@ -80,7 +85,6 @@ if ($acao === 'login') {
                     header("Location: " . BASE_URL . "/app/controllers/DashboardController.php");
                 }
                 exit;
-
             } else {
                 $erro = "E-mail ou senha incorretos.";
             }
@@ -89,12 +93,12 @@ if ($acao === 'login') {
 
     require __DIR__ . '/../views/login/index.php';
 
-/* 2. LOGOUT */
+    /* 2. LOGOUT */
 } elseif ($acao === 'logout') {
 
     efetuarLogout();
 
-/* 3. ESQUECI A SENHA */
+    /* 3. ESQUECI A SENHA */
 } elseif ($acao === 'esqueci_senha') {
 
     $erro = '';
@@ -323,7 +327,6 @@ HTML;
                             . "Equipe GymFlow";
 
                         $mail->send();
-
                     } catch (\Throwable $e) {
                         // Se o envio falhar, invalida o token que não foi entregue.
                         try {
@@ -342,16 +345,15 @@ HTML;
 
                         error_log(
                             'GymFlow: falha no envio do e-mail de recuperação: '
-                            . $e->getMessage()
+                                . $e->getMessage()
                         );
                     }
                 }
-
             } catch (\Throwable $e) {
                 // Registra o erro no log, sem expor detalhes técnicos na página.
                 error_log(
                     'GymFlow: falha ao processar a recuperação de senha: '
-                    . $e->getMessage()
+                        . $e->getMessage()
                 );
             }
         }
@@ -359,7 +361,7 @@ HTML;
 
     require __DIR__ . '/../views/login/esqueci_senha.php';
 
-/* 4. REDEFINIR SENHA */
+    /* 4. REDEFINIR SENHA */
 } elseif ($acao === 'redefinir_senha') {
 
     $token = $_GET['token'] ?? '';
@@ -413,14 +415,12 @@ HTML;
                 . "<a href='" . BASE_URL
                 . "/app/controllers/LoginController.php?acao=login'>"
                 . "Fazer Login</a>";
-
         } else {
             $erro = "A senha deve ter pelo menos 6 caracteres.";
         }
     }
 
     require __DIR__ . '/../views/login/redefinir_senha.php';
-
 } else {
     header("Location: " . $baseUrl . "?acao=login");
     exit;

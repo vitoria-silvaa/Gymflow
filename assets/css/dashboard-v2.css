@@ -1,0 +1,520 @@
+/* ========================================
+   GYMFLOW - DASHBOARD
+   PADRONIZAÇÃO VISUAL
+   ======================================== */
+
+/* ========================================
+   ESTRUTURA PRINCIPAL
+   ======================================== */
+
+.dashboard-page {
+    --dash-primary: var(--cor-primaria, #10b981);
+    --dash-primary-hover: var(--cor-primaria-hover, #059669);
+
+    --dash-text: var(--ui-texto, #111827);
+    --dash-muted: var(--ui-texto-suave, #64748b);
+    --dash-border: var(--ui-borda, #e2e8f0);
+
+    --dash-card: var(--ui-fundo-card, #ffffff);
+
+    width: 100%;
+    max-width: 1500px;
+    min-width: 0;
+
+    margin: 0 auto;
+    padding: 30px 32px 45px;
+
+    color: var(--dash-text);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+}
+
+/* ========================================
+   CABEÇALHO DA DASHBOARD
+   ======================================== */
+
+.dashboard-page .dashboard-topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    gap: 20px;
+
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+
+    border-bottom: 1px solid var(--dash-border);
+}
+
+.dashboard-page .dashboard-etiqueta {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: var(--dash-primary);
+
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+.dashboard-page .dashboard-topo h1 {
+    margin: 0 0 7px;
+
+    color: var(--dash-text);
+
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: normal;
+}
+
+.dashboard-page .dashboard-topo p {
+    margin: 0;
+
+    color: var(--dash-muted);
+
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+/* ========================================
+   DATA DE ATUALIZAÇÃO
+   ======================================== */
+
+.dashboard-page .dashboard-data {
+    display: flex;
+    flex-direction: column;
+
+    gap: 4px;
+
+    padding: 12px 16px;
+
+    background-color: var(--dash-card);
+
+    border: 1px solid var(--dash-border);
+    border-radius: var(--ui-raio-md, 10px);
+
+    white-space: nowrap;
+}
+
+.dashboard-page .dashboard-data span {
+    color: var(--dash-muted);
+
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.dashboard-page .dashboard-data strong {
+    color: var(--dash-text);
+
+    font-size: 14px;
+    font-weight: 700;
+}
+
+/* ========================================
+   GRID DE INDICADORES
+   ======================================== */
+
+.dashboard-page .dashboard-indicadores {
+    display: grid;
+
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+
+    gap: 20px;
+
+    margin-bottom: 30px;
+}
+
+/* ========================================
+   CARD DE INDICADOR
+   ======================================== */
+
+.dashboard-page .dashboard-indicador {
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+
+    min-width: 0;
+    min-height: 175px;
+
+    padding: 22px 24px;
+
+    overflow: hidden;
+
+    background-color: var(--dash-card);
+
+    border: 1px solid var(--dash-border);
+    border-radius: var(--ui-raio-md, 10px);
+
+    box-shadow: var(--ui-sombra-card,
+            0 1px 3px rgba(15, 23, 42, 0.04));
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.dashboard-page .dashboard-indicador:hover {
+    transform: translateY(-2px);
+
+    border-color: #cbd5e1;
+
+    box-shadow: var(--ui-sombra-hover,
+            0 5px 14px rgba(15, 23, 42, 0.06));
+}
+
+/* Detalhe visual superior */
+
+.dashboard-page .dashboard-indicador::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 3px;
+
+    background-color: var(--dash-primary);
+
+    opacity: 0;
+
+    transition: opacity 0.2s ease;
+}
+
+.dashboard-page .dashboard-indicador:hover::before {
+    opacity: 1;
+}
+
+/* ========================================
+   CABEÇALHO DOS CARDS
+   ======================================== */
+
+.dashboard-page .dashboard-indicador-topo {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-bottom: 16px;
+}
+
+.dashboard-page .dashboard-indicador-label {
+    color: var(--dash-muted);
+
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+/* ========================================
+   ÍCONES DOS CARDS
+   ======================================== */
+
+.dashboard-page .dashboard-indicador-icone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    width: 38px;
+    height: 38px;
+
+    color: var(--dash-primary);
+
+    background-color: #f8fafc;
+
+    background-color: color-mix(in srgb,
+            var(--dash-primary) 10%,
+            white);
+
+    border: 1px solid var(--dash-border);
+
+    border-radius: var(--ui-raio-sm, 6px);
+
+    font-size: 17px;
+    font-weight: 700;
+}
+
+/* ========================================
+   VALORES DOS INDICADORES
+   ======================================== */
+
+.dashboard-page .dashboard-indicador-valor {
+    display: block;
+
+    margin: 0 0 8px;
+
+    color: var(--dash-text);
+
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+
+    overflow-wrap: anywhere;
+}
+
+/* Descrição do indicador */
+
+.dashboard-page .dashboard-indicador-info {
+    margin: auto 0 0;
+
+    color: var(--dash-muted);
+
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+/* ========================================
+   CARD DO GRÁFICO
+   ======================================== */
+
+.dashboard-page .dashboard-grafico-card {
+    width: 100%;
+    min-width: 0;
+
+    padding: 24px;
+
+    background-color: var(--dash-card);
+
+    border: 1px solid var(--dash-border);
+    border-radius: var(--ui-raio-md, 10px);
+
+    box-shadow: var(--ui-sombra-card,
+            0 1px 3px rgba(15, 23, 42, 0.04));
+}
+
+/* ========================================
+   CABEÇALHO DO GRÁFICO
+   ======================================== */
+
+.dashboard-page .dashboard-grafico-topo {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    gap: 20px;
+
+    margin-bottom: 25px;
+}
+
+.dashboard-page .dashboard-grafico-topo h2 {
+    margin: 0 0 7px;
+
+    color: var(--dash-text);
+
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: normal;
+}
+
+.dashboard-page .dashboard-grafico-topo p {
+    margin: 0;
+
+    color: var(--dash-muted);
+
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* ========================================
+   TOTAL DE NOVOS ALUNOS
+   ======================================== */
+
+.dashboard-page .dashboard-grafico-total {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+
+    gap: 4px;
+
+    min-width: 140px;
+
+    padding: 12px 16px;
+
+    background-color: #f8fafc;
+
+    background-color: color-mix(in srgb,
+            var(--dash-primary) 7%,
+            white);
+
+    border: 1px solid var(--dash-border);
+    border-radius: var(--ui-raio-sm, 6px);
+}
+
+.dashboard-page .dashboard-grafico-total span {
+    color: var(--dash-muted);
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.dashboard-page .dashboard-grafico-total strong {
+    color: var(--dash-text);
+
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.dashboard-page .dashboard-grafico-total small {
+    color: var(--dash-muted);
+
+    font-size: 12px;
+    font-weight: 400;
+}
+
+/* ========================================
+   ÁREA DO CHART.JS
+   ======================================== */
+
+.dashboard-page .dashboard-grafico-area {
+    position: relative;
+
+    width: 100%;
+    min-width: 0;
+    height: 330px;
+}
+
+.dashboard-page .dashboard-grafico-area canvas {
+    display: block;
+
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* ========================================
+   RODAPÉ DO GRÁFICO
+   ======================================== */
+
+.dashboard-page .dashboard-grafico-rodape {
+    margin: 18px 0 0;
+
+    padding-top: 15px;
+
+    color: #94a3b8;
+
+    font-size: 12px;
+    line-height: 1.5;
+
+    border-top: 1px solid #f1f5f9;
+}
+
+/* ========================================
+   RESPONSIVIDADE - NOTEBOOKS
+   ======================================== */
+
+@media (max-width: 1200px) {
+
+    .dashboard-page .dashboard-indicadores {
+        grid-template-columns: repeat(2,
+                minmax(0, 1fr));
+    }
+
+}
+
+/* ========================================
+   RESPONSIVIDADE - TABLETS
+   ======================================== */
+
+@media (max-width: 768px) {
+
+    .dashboard-page {
+        padding: 24px 20px 40px;
+    }
+
+    .dashboard-page .dashboard-topo {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .dashboard-page .dashboard-indicadores {
+        gap: 16px;
+    }
+
+    .dashboard-page .dashboard-indicador {
+        min-height: 160px;
+        padding: 20px;
+    }
+
+    .dashboard-page .dashboard-grafico-card {
+        padding: 20px;
+    }
+
+    .dashboard-page .dashboard-grafico-topo {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .dashboard-page .dashboard-grafico-total {
+        width: 100%;
+        align-items: flex-start;
+    }
+
+    .dashboard-page .dashboard-grafico-area {
+        height: 280px;
+    }
+
+}
+
+/* ========================================
+   RESPONSIVIDADE - CELULARES
+   ======================================== */
+
+@media (max-width: 480px) {
+
+    .dashboard-page {
+        padding: 20px 16px 35px;
+    }
+
+    .dashboard-page .dashboard-indicadores {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-page .dashboard-grafico-area {
+        height: 240px;
+    }
+
+    .dashboard-page .dashboard-topo h1 {
+        font-size: 26px;
+    }
+
+    .dashboard-page .dashboard-grafico-topo h2 {
+        font-size: 20px;
+    }
+
+}
+
+/* ========================================
+   ACESSIBILIDADE
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .dashboard-page .dashboard-indicador {
+        transition: none;
+    }
+
+    .dashboard-page .dashboard-indicador:hover {
+        transform: none;
+    }
+
+    .dashboard-page .dashboard-indicador::before {
+        transition: none;
+    }
+
+}

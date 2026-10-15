@@ -1,526 +1,410 @@
 ﻿/* ========================================
-   GYMFLOW
-   PORTAL DO ALUNO - TREINOS
+   GYMFLOW - PORTAL DO ALUNO
+   TREINOS - PADRONIZAÇÃO VISUAL
    ======================================== */
 
-
 /* ========================================
-   PÃGINA
+   PÁGINA
    ======================================== */
 
 .treinos-page {
+    --treinos-texto: var(--ui-texto, #111827);
+    --treinos-suave: var(--ui-texto-suave, #64748b);
+    --treinos-borda: var(--ui-borda, #e2e8f0);
+    --treinos-card: var(--ui-fundo-card, #ffffff);
+    --treinos-fundo: var(--ui-fundo-pagina, #f8fafc);
 
     width: 100%;
-
     max-width: 1500px;
 
     margin: 0 auto;
-
     padding: 34px 36px 55px;
 
+    color: var(--treinos-texto);
+    font-family: inherit;
+    font-size: 15px;
 }
-
 
 /* ========================================
-   CABEÃ‡ALHO
+   CABEÇALHO
    ======================================== */
 
-.treinos-header {
-
+.treinos-page .treinos-header {
     margin-bottom: 32px;
-
 }
 
-
-.treinos-header h1 {
-
+.treinos-page .treinos-header h1 {
     margin: 0 0 7px;
 
-    color: #111827;
+    color: var(--treinos-texto);
 
     font-size: 30px;
-
     font-weight: 700;
-
 }
 
-
-.treinos-header p {
-
+.treinos-page .treinos-header p {
     margin: 0;
 
-    color: #64748b;
+    color: var(--treinos-suave);
 
     font-size: 15px;
-
+    line-height: 1.5;
 }
 
-
-.portal-eyebrow {
-
+.treinos-page .portal-eyebrow {
     display: block;
 
     margin-bottom: 7px;
 
-    color: var(--cor-primaria);
+    color: var(--cor-primaria, #10b981);
 
     font-size: 11px;
-
     font-weight: 700;
-
     letter-spacing: 0.8px;
-
+    text-transform: uppercase;
 }
-
 
 /* ========================================
-   TÃTULOS
+   TÍTULOS DAS SEÇÕES
    ======================================== */
 
-.section-title {
-
+.treinos-page .section-title {
     margin-bottom: 18px;
-
 }
 
-
-.section-label {
-
+.treinos-page .section-label {
     display: block;
 
     margin-bottom: 6px;
 
-    color: var(--cor-primaria);
+    color: var(--cor-primaria, #10b981);
 
     font-size: 11px;
-
     font-weight: 700;
-
     letter-spacing: 0.7px;
-
 }
 
-
-.section-title h2 {
-
+.treinos-page .section-title h2 {
     margin: 0;
 
-    color: #111827;
+    color: var(--treinos-texto);
 
     font-size: 20px;
-
     font-weight: 700;
-
 }
-
 
 /* ========================================
-   FICHAS
+   SEÇÃO DAS FICHAS
    ======================================== */
 
-.fichas-section {
-
+.treinos-page .fichas-section {
     margin-bottom: 24px;
-
 }
 
-
-.fichas-nav {
-
+.treinos-page .fichas-nav {
     display: flex;
+    align-items: center;
 
     gap: 10px;
 
     overflow-x: auto;
 
     padding-bottom: 4px;
-
+    scrollbar-width: thin;
 }
 
+/* ========================================
+   ABAS DAS FICHAS
+   ======================================== */
 
-.ficha-tab {
-
+.treinos-page .ficha-tab {
     display: flex;
-
     align-items: center;
 
     gap: 9px;
 
     padding: 11px 15px;
 
-    background: #ffffff;
+    background: var(--treinos-card);
 
-    border: 1px solid #e2e8f0;
-
+    border: 1px solid var(--treinos-borda);
     border-radius: 7px;
 
     color: #475569;
 
     text-decoration: none;
-
     white-space: nowrap;
 
     transition:
         background-color 0.2s ease,
         border-color 0.2s ease,
         color 0.2s ease;
-
 }
 
-
-.ficha-tab:hover {
-
+.treinos-page .ficha-tab:hover {
     border-color: #cbd5e1;
-
-    color: #111827;
-
+    color: var(--treinos-texto);
 }
 
+.treinos-page .ficha-tab.ativo {
+    background: color-mix(in srgb,
+            var(--cor-primaria, #10b981) 9%,
+            white);
 
-.ficha-tab.ativo {
+    border-color: color-mix(in srgb,
+            var(--cor-primaria, #10b981) 35%,
+            white);
 
-    background: #ecfdf5;
-
-    border-color: #a7f3d0;
-
-    color: #047857;
-
+    color: var(--cor-primaria-hover, #059669);
 }
 
-
-.ficha-tab-titulo {
-
+.treinos-page .ficha-tab-titulo {
     font-size: 14px;
-
     font-weight: 600;
-
 }
 
-
-.ficha-tab-versao {
-
+.treinos-page .ficha-tab-versao {
     color: #94a3b8;
-
     font-size: 11px;
-
 }
 
-
-.ficha-tab.ativo .ficha-tab-versao {
-
-    color: var(--cor-primaria);
-
+.treinos-page .ficha-tab.ativo .ficha-tab-versao {
+    color: var(--cor-primaria, #10b981);
 }
-
 
 /* ========================================
-   CONTAINER DA FICHA
+   CONTAINER PRINCIPAL DA FICHA
    ======================================== */
 
-.ficha-container {
-
+.treinos-page .ficha-container {
     overflow: hidden;
 
-    background: #ffffff;
+    background: var(--treinos-card);
 
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--treinos-borda);
+    border-radius: var(--ui-raio-lg, 12px);
 
-    border-radius: 12px;
-
-    box-shadow:
-        0 1px 2px rgba(15, 23, 42, 0.03),
-        0 4px 12px rgba(15, 23, 42, 0.025);
-
+    box-shadow: var(--ui-sombra-card,
+            0 1px 3px rgba(15, 23, 42, 0.04));
 }
-
 
 /* ========================================
-   CABEÃ‡ALHO DA FICHA
+   CABEÇALHO DA FICHA
    ======================================== */
 
-.ficha-header {
-
+.treinos-page .ficha-header {
     padding: 25px 26px;
 
-    border-bottom: 1px solid #e2e8f0;
-
+    border-bottom: 1px solid var(--treinos-borda);
 }
 
-
-.ficha-header h2 {
-
+.treinos-page .ficha-header h2 {
     margin: 0 0 12px;
 
-    color: #111827;
+    color: var(--treinos-texto);
 
     font-size: 23px;
-
     font-weight: 700;
-
 }
 
-
-.ficha-meta {
-
+.treinos-page .ficha-meta {
     display: flex;
-
     flex-wrap: wrap;
 
     gap: 18px;
 
-    color: #64748b;
+    color: var(--treinos-suave);
 
     font-size: 13px;
-
 }
 
-
-.ficha-meta span {
-
+.treinos-page .ficha-meta span {
     position: relative;
-
 }
 
-
-.ficha-meta span:not(:last-child)::after {
-
-    content: "â€¢";
+.treinos-page .ficha-meta span:not(:last-child)::after {
+    content: "•";
 
     position: absolute;
 
     right: -11px;
 
     color: #cbd5e1;
-
 }
 
-
 /* ========================================
-   LISTA DE EXERCÃCIOS
+   LISTA DE EXERCÍCIOS
    ======================================== */
 
-.exercicios-list {
-
+.treinos-page .exercicios-list {
     display: flex;
-
     flex-direction: column;
-
 }
 
-
 /* ========================================
-   EXERCÃCIO
+   CARD DO EXERCÍCIO
    ======================================== */
 
-.exercicio-card {
-
+.treinos-page .exercicio-card {
     padding: 22px 26px;
 
     border-bottom: 1px solid #eef2f7;
 
     transition: background-color 0.2s ease;
-
 }
 
-
-.exercicio-card:last-child {
-
+.treinos-page .exercicio-card:last-child {
     border-bottom: none;
-
 }
 
-
-.exercicio-card:hover {
-
+.treinos-page .exercicio-card:hover {
     background: #fcfdfd;
-
 }
-
 
 /* ========================================
-   TOPO DO EXERCÃCIO
+   TOPO DO EXERCÍCIO
    ======================================== */
 
-.exercicio-top {
-
+.treinos-page .exercicio-top {
     display: flex;
-
     align-items: center;
 
     gap: 14px;
 
     margin-bottom: 20px;
-
 }
 
-
 /* ========================================
-   CHECKBOX
+   CHECKBOX PERSONALIZADO
    ======================================== */
 
-.exercicio-check {
-
+.treinos-page .exercicio-check {
     position: relative;
 
     display: flex;
 
     width: 22px;
-
     height: 22px;
 
     flex-shrink: 0;
 
     cursor: pointer;
-
 }
 
-
-.exercicio-check input {
-
+.treinos-page .exercicio-check input {
     position: absolute;
 
     opacity: 0;
 
     width: 0;
-
     height: 0;
-
 }
 
-
-.checkmark {
+.treinos-page .checkmark {
+    display: block;
 
     width: 22px;
-
     height: 22px;
 
-    background: #ffffff;
+    background: var(--treinos-card);
 
     border: 1px solid #cbd5e1;
-
-    border-radius: 6px;
+    border-radius: var(--ui-raio-sm, 6px);
 
     transition:
         background-color 0.2s ease,
         border-color 0.2s ease;
-
 }
 
-
-.exercicio-check input:checked+.checkmark {
-
-    background: var(--cor-primaria);
-
-    border-color: var(--cor-primaria);
-
+.treinos-page .exercicio-check input:checked+.checkmark {
+    background: var(--cor-primaria, #10b981);
+    border-color: var(--cor-primaria, #10b981);
 }
 
-
-.exercicio-check input:checked+.checkmark::after {
-
-    content: "âœ“";
+.treinos-page .exercicio-check input:checked+.checkmark::after {
+    content: "✓";
 
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
     height: 100%;
 
-    color: white;
+    color: #ffffff;
 
     font-size: 13px;
-
-    font-weight: bold;
-
+    font-weight: 700;
 }
 
+/* Acessibilidade: foco no checkbox */
+
+.treinos-page .exercicio-check input:focus-visible+.checkmark {
+    outline: 2px solid var(--cor-primaria, #10b981);
+    outline-offset: 3px;
+}
 
 /* ========================================
-   NUMERAÃ‡ÃƒO
+   NUMERAÇÃO
    ======================================== */
 
-.exercicio-numero {
-
+.treinos-page .exercicio-numero {
     width: 34px;
 
     color: #94a3b8;
 
     font-size: 12px;
-
     font-weight: 600;
-
 }
-
 
 /* ========================================
-   INFORMAÃ‡Ã•ES
+   INFORMAÇÕES DO EXERCÍCIO
    ======================================== */
 
-.exercicio-info {
-
+.treinos-page .exercicio-info {
     flex: 1;
-
+    min-width: 0;
 }
 
-
-.exercicio-info h3 {
-
+.treinos-page .exercicio-info h3 {
     margin: 0 0 4px;
 
-    color: #111827;
+    color: var(--treinos-texto);
 
     font-size: 16px;
-
     font-weight: 600;
-
 }
 
-
-.grupo-muscular {
-
-    color: #64748b;
+.treinos-page .grupo-muscular {
+    color: var(--treinos-suave);
 
     font-size: 12px;
-
 }
 
-
 /* ========================================
-   DADOS
+   DADOS DO EXERCÍCIO
    ======================================== */
 
-.exercicio-dados {
-
+.treinos-page .exercicio-dados {
     display: flex;
 
     gap: 12px;
 
     margin-left: 70px;
-
     margin-bottom: 18px;
-
 }
 
-
-.dado {
-
+.treinos-page .dado {
     min-width: 110px;
 
     padding: 11px 13px;
 
-    background: #f8fafc;
+    background: var(--treinos-fundo);
 
     border: 1px solid #eef2f7;
-
     border-radius: 7px;
-
 }
 
-
-.dado span {
-
+.treinos-page .dado span {
     display: block;
 
     margin-bottom: 4px;
@@ -528,111 +412,95 @@
     color: #94a3b8;
 
     font-size: 11px;
-
 }
 
-
-.dado strong {
-
+.treinos-page .dado strong {
     color: #334155;
-
     font-size: 14px;
-
 }
-
 
 /* ========================================
-   AÃ‡Ã•ES
+   AÇÕES DO EXERCÍCIO
    ======================================== */
 
-.exercicio-acoes {
-
+.treinos-page .exercicio-acoes {
     display: flex;
-
     align-items: flex-end;
 
     gap: 12px;
 
     margin-left: 70px;
-
 }
 
+/* ========================================
+   CAMPO DE CARGA
+   ======================================== */
 
-.carga-container {
-
+.treinos-page .carga-container {
     width: 220px;
-
 }
 
-
-.carga-container label {
-
+.treinos-page .carga-container label {
     display: block;
 
     margin-bottom: 6px;
 
-    color: #64748b;
+    color: var(--treinos-suave);
 
     font-size: 12px;
-
     font-weight: 600;
-
 }
 
-
-.carga-container input {
-
+.treinos-page .carga-container input {
     width: 100%;
-
     height: 38px;
 
     padding: 8px 11px;
 
-    background: #ffffff;
+    background: var(--treinos-card);
 
     border: 1px solid #dbe2ea;
-
-    border-radius: 6px;
+    border-radius: var(--ui-raio-sm, 6px);
 
     box-sizing: border-box;
 
+    font-family: inherit;
     font-size: 13px;
-
+    color: var(--treinos-texto);
 }
 
-
-.carga-container input:focus {
-
+.treinos-page .carga-container input:focus {
     outline: none;
 
-    border-color: var(--cor-primaria);
+    border-color: var(--cor-primaria, #10b981);
 
-    box-shadow:
-        0 0 0 3px rgba(16, 185, 129, 0.08);
-
+    box-shadow: 0 0 0 3px color-mix(in srgb,
+            var(--cor-primaria, #10b981) 9%,
+            transparent);
 }
 
-
 /* ========================================
-   BOTÃƒO DE PAUSA
+   BOTÃO DE PAUSA
    ======================================== */
 
-.btn-pausa {
+.treinos-page .btn-pausa {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
     height: 38px;
 
     padding: 0 15px;
 
-    background: #ffffff;
+    background: var(--treinos-card);
 
     border: 1px solid #dbe2ea;
-
-    border-radius: 6px;
+    border-radius: var(--ui-raio-sm, 6px);
 
     color: #475569;
 
+    font-family: inherit;
     font-size: 13px;
-
     font-weight: 600;
 
     cursor: pointer;
@@ -641,143 +509,112 @@
         background-color 0.2s ease,
         border-color 0.2s ease,
         color 0.2s ease;
-
 }
 
+.treinos-page .btn-pausa:hover {
+    background: var(--treinos-fundo);
 
-.btn-pausa:hover {
+    border-color: var(--cor-primaria, #10b981);
 
-    background: #f8fafc;
-
-    border-color: var(--cor-primaria);
-
-    color: var(--cor-primaria-hover);
-
+    color: var(--cor-primaria-hover, #059669);
 }
-
 
 /* ========================================
    ESTADO VAZIO
    ======================================== */
 
-.treinos-empty {
-
+.treinos-page .treinos-empty {
     display: flex;
-
     flex-direction: column;
 
     align-items: center;
-
     justify-content: center;
 
     min-height: 300px;
 
     padding: 40px;
 
-    background: #ffffff;
+    background: var(--treinos-card);
 
-    border: 1px solid #e2e8f0;
-
-    border-radius: 12px;
+    border: 1px solid var(--treinos-borda);
+    border-radius: var(--ui-raio-lg, 12px);
 
     text-align: center;
 
-    box-shadow:
-        0 1px 3px rgba(15, 23, 42, 0.04);
-
+    box-shadow: var(--ui-sombra-card,
+            0 1px 3px rgba(15, 23, 42, 0.04));
 }
 
-
-.empty-icon {
-
+.treinos-page .empty-icon {
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
     width: 48px;
-
     height: 48px;
 
     margin-bottom: 16px;
 
-    background: #ecfdf5;
+    background: color-mix(in srgb,
+            var(--cor-primaria, #10b981) 10%,
+            white);
 
-    border-radius: 10px;
+    border-radius: var(--ui-raio-md, 10px);
 
-    color: var(--cor-primaria);
+    color: var(--cor-primaria, #10b981);
 
     font-size: 25px;
-
 }
 
-
-.treinos-empty h2 {
-
+.treinos-page .treinos-empty h2 {
     margin: 0 0 7px;
 
-    color: #111827;
+    color: var(--treinos-texto);
 
     font-size: 19px;
-
+    font-weight: 700;
 }
 
-
-.treinos-empty p {
-
+.treinos-page .treinos-empty p {
     margin: 0 0 5px;
 
-    color: #64748b;
+    color: var(--treinos-suave);
 
     font-size: 14px;
-
 }
 
-
-.treinos-empty>span {
-
+.treinos-page .treinos-empty>span {
     color: #94a3b8;
 
     font-size: 13px;
-
 }
 
-
 /* ========================================
-   FICHA SEM EXERCÃCIOS
+   FICHA SEM EXERCÍCIOS
    ======================================== */
 
-.exercicios-empty {
-
+.treinos-page .exercicios-empty {
     padding: 45px 25px;
 
     text-align: center;
-
 }
 
-
-.exercicios-empty h3 {
-
+.treinos-page .exercicios-empty h3 {
     margin: 0 0 6px;
 
     color: #334155;
 
     font-size: 16px;
-
+    font-weight: 700;
 }
 
-
-.exercicios-empty p {
-
+.treinos-page .exercicios-empty p {
     margin: 0;
 
     color: #94a3b8;
 
     font-size: 13px;
-
 }
-
 
 /* ========================================
    RESPONSIVIDADE
@@ -786,59 +623,93 @@
 @media (max-width: 800px) {
 
     .treinos-page {
-
         padding: 25px 20px 40px;
-
     }
 
-
-    .ficha-meta {
-
+    .treinos-page .ficha-meta {
         flex-direction: column;
-
         gap: 6px;
-
     }
 
-
-    .ficha-meta span::after {
-
+    .treinos-page .ficha-meta span::after {
         display: none;
-
     }
 
-
-    .exercicio-dados {
-
+    .treinos-page .exercicio-dados {
         margin-left: 0;
-
         flex-wrap: wrap;
-
     }
 
-
-    .exercicio-acoes {
-
+    .treinos-page .exercicio-acoes {
         margin-left: 0;
 
         flex-direction: column;
-
         align-items: stretch;
-
     }
 
-
-    .carga-container {
-
+    .treinos-page .carga-container {
         width: 100%;
-
     }
 
-
-    .btn-pausa {
-
+    .treinos-page .btn-pausa {
         width: 100%;
+    }
+}
 
+/* ========================================
+   RESPONSIVIDADE - CELULARES
+   ======================================== */
+
+@media (max-width: 480px) {
+
+    .treinos-page {
+        padding: 20px 16px 35px;
     }
 
+    .treinos-page .treinos-header h1 {
+        font-size: 27px;
+    }
+
+    .treinos-page .ficha-header {
+        padding: 20px 18px;
+    }
+
+    .treinos-page .ficha-header h2 {
+        font-size: 21px;
+    }
+
+    .treinos-page .exercicio-card {
+        padding: 20px 18px;
+    }
+
+    .treinos-page .exercicio-top {
+        gap: 10px;
+    }
+
+    .treinos-page .exercicio-numero {
+        width: 25px;
+    }
+
+    .treinos-page .dado {
+        flex: 1;
+        min-width: 100px;
+    }
+
+    .treinos-page .treinos-empty {
+        padding: 30px 20px;
+    }
+}
+
+/* ========================================
+   ACESSIBILIDADE
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .treinos-page .ficha-tab,
+    .treinos-page .exercicio-card,
+    .treinos-page .checkmark,
+    .treinos-page .btn-pausa {
+        transition: none;
+    }
 }

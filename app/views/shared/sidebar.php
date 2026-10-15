@@ -1,15 +1,23 @@
 <?php
+// app/views/shared/sidebar.php
+
 $nomePainel = $_SESSION['nome_painel'] ?? 'Gymflow';
-$role = $_SESSION['usuario_role'] ?? 'Admin';
+$role = $_SESSION['usuario_role'] ?? '';
 ?>
 
 <aside class="sidebar" id="appSidebar">
 
-    <!-- TOPO DA SIDEBAR -->
+    <!-- TOPO -->
     <div class="sidebar-header">
 
         <h1 class="sidebar-logo">
-            <span><?= htmlspecialchars($nomePainel) ?></span>
+            <span>
+                <?= htmlspecialchars(
+                    $nomePainel,
+                    ENT_QUOTES,
+                    'UTF-8'
+                ) ?>
+            </span>
         </h1>
 
         <button
@@ -23,12 +31,13 @@ $role = $_SESSION['usuario_role'] ?? 'Admin';
 
     </div>
 
-
     <!-- MENU PRINCIPAL -->
     <nav class="sidebar-nav">
         <ul>
 
             <?php if ($role === 'Aluno'): ?>
+
+                <!-- PORTAL DO ALUNO -->
 
                 <li>
                     <a href="<?= BASE_URL ?>/app/controllers/PortalAlunoController.php?acao=aluno"
@@ -62,8 +71,11 @@ $role = $_SESSION['usuario_role'] ?? 'Admin';
                     </a>
                 </li>
 
-
-            <?php else: ?>
+            <?php elseif (in_array(
+                $role,
+                ['Admin', 'Recepcao', 'Professor'],
+                true
+            )): ?>
 
                 <!-- DASHBOARD -->
                 <li>
@@ -74,8 +86,7 @@ $role = $_SESSION['usuario_role'] ?? 'Admin';
                     </a>
                 </li>
 
-
-                <!-- ADMIN -->
+                <!-- EXCLUSIVO DO ADMIN -->
                 <?php if ($role === 'Admin'): ?>
 
                     <li>
@@ -96,9 +107,12 @@ $role = $_SESSION['usuario_role'] ?? 'Admin';
 
                 <?php endif; ?>
 
-
                 <!-- ADMIN + RECEPÇÃO -->
-                <?php if (in_array($role, ['Admin', 'Recepcao'])): ?>
+                <?php if (in_array(
+                    $role,
+                    ['Admin', 'Recepcao'],
+                    true
+                )): ?>
 
                     <li>
                         <a href="<?= BASE_URL ?>/app/controllers/AlunoController.php?acao=listar"
@@ -115,6 +129,11 @@ $role = $_SESSION['usuario_role'] ?? 'Admin';
                             <span class="menu-text">Planos</span>
                         </a>
                     </li>
+
+                <?php endif; ?>
+
+                <!-- FINANCEIRO: SOMENTE ADMIN -->
+                <?php if ($role === 'Admin'): ?>
 
                     <li>
                         <a href="<?= BASE_URL ?>/app/controllers/FinanceiroController.php"
@@ -140,12 +159,6 @@ $role = $_SESSION['usuario_role'] ?? 'Admin';
                         </a>
                     </li>
 
-                <?php endif; ?>
-
-
-                <!-- MINHA MARCA -->
-                <?php if ($role === 'Admin'): ?>
-
                     <li>
                         <a href="<?= BASE_URL ?>/app/controllers/MinhaMarcaController.php"
                             title="Minha marca">
@@ -156,9 +169,12 @@ $role = $_SESSION['usuario_role'] ?? 'Admin';
 
                 <?php endif; ?>
 
-
-                <!-- PROFESSOR + ADMIN -->
-                <?php if (in_array($role, ['Admin', 'Professor'])): ?>
+                <!-- ADMIN + PROFESSOR -->
+                <?php if (in_array(
+                    $role,
+                    ['Admin', 'Professor'],
+                    true
+                )): ?>
 
                     <li>
                         <a href="<?= BASE_URL ?>/app/controllers/ExercicioController.php"
@@ -178,8 +194,7 @@ $role = $_SESSION['usuario_role'] ?? 'Admin';
 
                 <?php endif; ?>
 
-
-                <!-- PORTFÓLIO -->
+                <!-- PORTFÓLIO: SOMENTE ADMIN -->
                 <?php if ($role === 'Admin'): ?>
 
                     <li>
@@ -197,8 +212,7 @@ $role = $_SESSION['usuario_role'] ?? 'Admin';
         </ul>
     </nav>
 
-
-    <!-- RODAPÉ DA SIDEBAR -->
+    <!-- RODAPÉ -->
     <div class="sidebar-footer">
 
         <a
@@ -220,4 +234,5 @@ $role = $_SESSION['usuario_role'] ?? 'Admin';
     </div>
 
 </aside>
+
 <script src="<?= BASE_URL ?>/assets/js/sidebar.js"></script>

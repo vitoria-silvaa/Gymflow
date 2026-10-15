@@ -1,3 +1,4 @@
+
 <?php
 // app/models/Dashboard.php
 
@@ -6,84 +7,208 @@ require_once __DIR__ . '/Database.php';
 $operacao = $operacao ?? '';
 
 if ($operacao === 'metricas_executivas') {
-    $company_id = $_SESSION['company_id'] ?? 0;
-    
-    // 1. Alunos Ativos e Inativos
-    if ($role_logado === 'Professor') {
-        $totalAlunosAtivos = (int) $pdo->query("
-            SELECT COUNT(a.id) FROM alunos a INNER JOIN filiais f ON a.filial_id = f.id 
-            WHERE a.status = 'Ativo' AND a.professor_id = $id_logado AND f.company_id = $company_id
-        ")->fetchColumn();
-        
-        $totalAlunosInativos = (int) $pdo->query("
-            SELECT COUNT(a.id) FROM alunos a INNER JOIN filiais f ON a.filial_id = f.id 
-            WHERE a.status = 'Inativo' AND a.professor_id = $id_logado AND f.company_id = $company_id
-        ")->fetchColumn();
-    } else {
-        $totalAlunosAtivos = (int) $pdo->query("
-            SELECT COUNT(a.id) FROM alunos a INNER JOIN filiais f ON a.filial_id = f.id 
-            WHERE a.status = 'Ativo' AND f.company_id = $company_id
-        ")->fetchColumn();
-        
-        $totalAlunosInativos = (int) $pdo->query("
-            SELECT COUNT(a.id) FROM alunos a INNER JOIN filiais f ON a.filial_id = f.id 
-            WHERE a.status = 'Inativo' AND f.company_id = $company_id
-        ")->fetchColumn();
+
+    $company_id = (int) ($_SESSION['company_id'] ?? 0);
+    $id_logado = (int) ($_SESSION['usuario_id'] ?? 0);
+    $role_logado = $_SESSION['usuario_role'] ?? '';
+
+    if (
+        $company_id <= 0 ||
+        $id_logado <= 0 ||
+        !in_array(
+            $role_logado,
+            ['Admin', 'Professor', 'Recepcao'],
+            true
+        )
+    ) {
+        throw new RuntimeException(
+            'Sessão ou perfil inválido.'
+        );
     }
 
-    // 2. Matrículas Ativas
-    $totalMatriculasAtivas = (int) $pdo->query("
-        SELECT COUNT(m.id) FROM matriculas m 
-        INNER JOIN alunos a ON m.aluno_id = a.id 
-        INNER JOIN filiais f ON a.filial_id = f.id 
-        WHERE m.ativa = TRUE AND f.company_id = $company_id
-    ")->fetchColumn();
+    // =================================================
+    // 1. FILTRO MULTI-TENANT
+    // =================================================
 
-    // 3. Receita Mensal Esperada (Mês Atual)
-    $receitaMensalEsperada = (float) $pdo->query("
-        SELECT COALESCE(SUM(c.valor), 0) 
-        FROM contas c
-        INNER JOIN alunos a ON c.aluno_id = a.id
-        INNER JOIN filiais f ON a.filial_id = f.id
-        WHERE MONTH(c.vencimento) = MONTH(CURDATE()) 
-          AND YEAR(c.vencimento) = YEAR(CURDATE())
-          AND f.company_id = $company_id
-    ")->fetchColumn();
+    // Nunca usamos um company_id recebido por GET.
+    // A empresa é identificada pela sessão.
 
-    // 4. Inadimplência: Contas vencidas não pagas e Total de contas vencidas
-    $contasVencidasNaoPagas = (int) $pdo->query("
-        SELECT COUNT(c.id) FROM contas c
-        INNER JOIN alunos a ON c.aluno_id = a.id
-        INNER JOIN filiais f ON a.filial_id = f.id
-        WHERE c.vencimento < CURDATE() AND c.status != 'Pago' AND f.company_id = $company_id
-    ")->fetchColumn();
+    $filtro = "f.company_id = :company_id";
 
-    $totalContasVencidas = (int) $pdo->query("
-        SELECT COUNT(c.id) FROM contas c
-        INNER JOIN alunos a ON c.aluno_id = a.id
-        INNER JOIN filiais f ON a.filial_id = f.id
-        WHERE c.vencimento < CURDATE() AND f.company_id = $company_id
-    ")->fetchColumn();
+    $parametros = [
+        ':company_id' => $company_id
+    ];
 
-    // 5. Novos Alunos agrupados por mês no ano atual
-    if ($role_logado === 'Professor') {
-        $stmtNovosAlunos = $pdo->query("
-            SELECT MONTH(a.criado_em) AS mes, COUNT(a.id) AS total
-            FROM alunos a
-            INNER JOIN filiais f ON a.filial_id = f.id
-            WHERE YEAR(a.criado_em) = YEAR(CURDATE()) AND a.professor_id = $id_logado AND f.company_id = $company_id
-            GROUP BY MONTH(a.criado_em)
-            ORDER BY MONTH(a.criado_em)
-        ");
-    } else {
-        $stmtNovosAlunos = $pdo->query("
-            SELECT MONTH(a.criado_em) AS mes, COUNT(a.id) AS total
-            FROM alunos a
-            INNER JOIN filiais f ON a.filial_id = f.id
-            WHERE YEAR(a.criado_em) = YEAR(CURDATE()) AND f.company_id = $company_id
-            GROUP BY MONTH(a.criado_em)
-            ORDER BY MONTH(a.criado_em)
-        ");
+    if ($role_logado === 'Recepcao') {
+
+        // Somente as filiais vinculadas ao usuário.
+        // EXISTS evita duplicar alunos nas contagens.
+
+        $filtro .= "
+            AND EXISTS (
+                SELECT 1
+                FROM user_filiais uf
+                WHERE uf.filial_id = f.id
+                  AND uf.user_id = :user_id
+            )
+        ";
+
+        $parametros[':user_id'] = $id_logado;
+    } elseif ($role_logado === 'Professor') {
+
+        // Apenas alunos atribuídos ao professor.
+        $filtro .= " AND a.professor_id = :professor_id";
+
+        $parametros[':professor_id'] = $id_logado;
     }
-    $novosAlunosPorMes = $stmtNovosAlunos->fetchAll(PDO::FETCH_ASSOC);
+
+    // =================================================
+    // 2. FUNÇÃO PARA CONSULTAS DE CONTAGEM
+    // =================================================
+
+    $consultarTotal = function (
+        string $sql,
+        array $params
+    ) use ($pdo): int {
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+
+        return (int) $stmt->fetchColumn();
+    };
+
+    // =================================================
+    // 3. ALUNOS ATIVOS
+    // =================================================
+
+    $totalAlunosAtivos = $consultarTotal("
+        SELECT COUNT(a.id)
+        FROM alunos a
+        INNER JOIN filiais f
+            ON f.id = a.filial_id
+        WHERE a.status = 'Ativo'
+          AND $filtro
+    ", $parametros);
+
+    // =================================================
+    // 4. ALUNOS INATIVOS
+    // =================================================
+
+    $totalAlunosInativos = $consultarTotal("
+        SELECT COUNT(a.id)
+        FROM alunos a
+        INNER JOIN filiais f
+            ON f.id = a.filial_id
+        WHERE a.status = 'Inativo'
+          AND $filtro
+    ", $parametros);
+
+    // =================================================
+    // 5. MATRÍCULAS ATIVAS
+    // =================================================
+
+    $totalMatriculasAtivas = $consultarTotal("
+        SELECT COUNT(m.id)
+        FROM matriculas m
+        INNER JOIN alunos a
+            ON a.id = m.aluno_id
+        INNER JOIN filiais f
+            ON f.id = a.filial_id
+        WHERE m.ativa = 1
+          AND $filtro
+    ", $parametros);
+
+    // =================================================
+    // 6. INDICADORES FINANCEIROS - APENAS ADMIN
+    // =================================================
+
+    // Inicializa variáveis para manter compatibilidade.
+    $receitaMensalEsperada = 0.0;
+    $contasVencidasNaoPagas = 0;
+    $totalContasVencidas = 0;
+
+    if ($role_logado === 'Admin') {
+
+        $stmt = $pdo->prepare("
+            SELECT COALESCE(SUM(c.valor), 0)
+            FROM contas c
+            INNER JOIN alunos a
+                ON a.id = c.aluno_id
+            INNER JOIN filiais f
+                ON f.id = a.filial_id
+            WHERE c.vencimento >=
+                DATE_FORMAT(CURDATE(), '%Y-%m-01')
+              AND c.vencimento <
+                DATE_FORMAT(
+                    CURDATE() + INTERVAL 1 MONTH,
+                    '%Y-%m-01'
+                )
+              AND f.company_id = :company_id
+        ");
+
+        $stmt->execute([
+            ':company_id' => $company_id
+        ]);
+
+        $receitaMensalEsperada =
+            (float) $stmt->fetchColumn();
+
+        // Contas vencidas e não pagas
+        $contasVencidasNaoPagas = $consultarTotal("
+            SELECT COUNT(c.id)
+            FROM contas c
+            INNER JOIN alunos a
+                ON a.id = c.aluno_id
+            INNER JOIN filiais f
+                ON f.id = a.filial_id
+            WHERE c.vencimento < CURDATE()
+              AND c.status != 'Pago'
+              AND f.company_id = :company_id
+        ", [
+            ':company_id' => $company_id
+        ]);
+
+        // Total de contas vencidas
+        $totalContasVencidas = $consultarTotal("
+            SELECT COUNT(c.id)
+            FROM contas c
+            INNER JOIN alunos a
+                ON a.id = c.aluno_id
+            INNER JOIN filiais f
+                ON f.id = a.filial_id
+            WHERE c.vencimento < CURDATE()
+              AND f.company_id = :company_id
+        ", [
+            ':company_id' => $company_id
+        ]);
+    }
+
+    // =================================================
+    // 7. NOVOS ALUNOS POR MÊS
+    // =================================================
+
+    $stmt = $pdo->prepare("
+        SELECT
+            MONTH(a.criado_em) AS mes,
+            COUNT(a.id) AS total
+        FROM alunos a
+        INNER JOIN filiais f
+            ON f.id = a.filial_id
+        WHERE a.criado_em >=
+            DATE_FORMAT(CURDATE(), '%Y-01-01')
+          AND a.criado_em <
+            DATE_FORMAT(
+                CURDATE() + INTERVAL 1 YEAR,
+                '%Y-01-01'
+            )
+          AND $filtro
+        GROUP BY MONTH(a.criado_em)
+        ORDER BY mes ASC
+    ");
+
+    $stmt->execute($parametros);
+
+    $novosAlunosPorMes = $stmt->fetchAll(
+        PDO::FETCH_ASSOC
+    );
 }

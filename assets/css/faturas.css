@@ -1,421 +1,341 @@
 ﻿/* ========================================
-   GYMFLOW
-   PORTAL DO ALUNO - FATURAS
+   GYMFLOW - PORTAL DO ALUNO
+   FATURAS - PADRONIZAÇÃO VISUAL
    ======================================== */
 
-
 /* ========================================
-   PÃGINA
+   PÁGINA
    ======================================== */
 
 .faturas-page {
+    --faturas-texto: var(--ui-texto, #111827);
+    --faturas-texto-suave: var(--ui-texto-suave, #64748b);
+    --faturas-borda: var(--ui-borda, #e2e8f0);
+    --faturas-card: var(--ui-fundo-card, #ffffff);
 
+    width: 100%;
     max-width: 1250px;
 
     margin: 0 auto;
-
     padding: 35px 40px 60px;
 
+    font-family: inherit;
+    font-size: 15px;
+    color: var(--faturas-texto);
 }
-
 
 /* ========================================
-   CABEÃ‡ALHO
+   CABEÇALHO
    ======================================== */
 
-.faturas-header {
-
+.faturas-page .faturas-header {
     margin-bottom: 30px;
-
 }
 
-
-.faturas-header .portal-eyebrow {
-
+.faturas-page .faturas-header .portal-eyebrow {
     display: block;
 
     margin-bottom: 6px;
 
-    color: #64748b;
+    color: var(--cor-primaria, #10b981);
 
-    font-size: 13px;
-
-    font-weight: 600;
-
-    letter-spacing: 0.08em;
-
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
 }
 
-
-.faturas-header h1 {
-
+.faturas-page .faturas-header h1 {
     margin: 0 0 8px;
 
+    color: var(--faturas-texto);
+
     font-size: 32px;
-
+    font-weight: 700;
     line-height: 1.2;
-
-    color: #111827;
-
 }
 
-
-.faturas-header p {
-
+.faturas-page .faturas-header p {
     margin: 0;
 
-    color: #64748b;
+    color: var(--faturas-texto-suave);
 
     font-size: 15px;
-
+    line-height: 1.5;
 }
 
-
-
 /* ========================================
-   RESUMO
+   RESUMO DAS FATURAS
    ======================================== */
 
-.faturas-resumo {
-
+.faturas-page .faturas-resumo {
     display: grid;
 
     grid-template-columns:
         repeat(3, minmax(0, 1fr));
 
     gap: 18px;
-
     margin-bottom: 32px;
-
 }
 
-
-.resumo-card {
-
+.faturas-page .resumo-card {
     display: flex;
-
     align-items: center;
 
     gap: 15px;
+    min-width: 0;
 
     padding: 20px;
 
-    background: #ffffff;
+    background: var(--faturas-card);
 
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--faturas-borda);
+    border-radius: var(--ui-raio-lg, 12px);
 
-    border-radius: 12px;
+    box-shadow: var(--ui-sombra-card,
+            0 1px 2px rgba(15, 23, 42, 0.03));
 
-    box-shadow:
-        0 1px 2px rgba(15, 23, 42, 0.03);
-
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
 }
 
+.faturas-page .resumo-card:hover {
+    transform: translateY(-2px);
+    border-color: #cbd5e1;
 
-.resumo-icone {
+    box-shadow: var(--ui-sombra-hover,
+            0 5px 14px rgba(15, 23, 42, 0.06));
+}
 
-    width: 42px;
+/* Ícones do resumo */
 
-    height: 42px;
-
+.faturas-page .resumo-icone {
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
     flex-shrink: 0;
 
+    width: 42px;
+    height: 42px;
+
     border-radius: 10px;
 
     font-size: 18px;
-
-    font-weight: bold;
-
+    font-weight: 700;
 }
 
-
-.resumo-icone-aberto {
-
+.faturas-page .resumo-icone-aberto {
     background: #ecfdf5;
-
-    color: var(--cor-primaria-hover);
-
+    color: var(--cor-primaria-hover, #059669);
 }
 
-
-.resumo-icone-atraso {
-
+.faturas-page .resumo-icone-atraso {
     background: #fef2f2;
-
     color: #dc2626;
-
 }
 
-
-.resumo-icone-pago {
-
+.faturas-page .resumo-icone-pago {
     background: #eff6ff;
-
     color: #2563eb;
-
 }
 
+/* Informações do resumo */
 
-.resumo-card span {
-
+.faturas-page .resumo-card span {
     display: block;
 
     margin-bottom: 4px;
 
-    color: #64748b;
+    color: var(--faturas-texto-suave);
 
     font-size: 13px;
-
 }
 
-
-.resumo-card strong {
-
+.faturas-page .resumo-card strong {
     display: block;
 
-    color: #111827;
+    color: var(--faturas-texto);
 
     font-size: 24px;
-
+    font-weight: 700;
+    line-height: 1.2;
 }
 
-
-
 /* ========================================
-   ÃREA DAS FATURAS
+   ÁREA DAS FATURAS
    ======================================== */
 
-.faturas-lista {
-
+.faturas-page .faturas-lista {
     margin-top: 10px;
-
 }
 
-
 /* ========================================
-   ABAS
+   ABAS DE NAVEGAÇÃO
    ======================================== */
 
-.faturas-tabs {
-
+.faturas-page .faturas-tabs {
     display: flex;
-
     align-items: center;
 
     gap: 8px;
 
-    margin-bottom: 22px;
+    width: fit-content;
+    max-width: 100%;
 
+    margin-bottom: 22px;
     padding: 5px;
 
-    width: fit-content;
+    background: var(--faturas-card);
 
-    background: #ffffff;
-
-    border: 1px solid #e2e8f0;
-
-    border-radius: 10px;
-
+    border: 1px solid var(--faturas-borda);
+    border-radius: var(--ui-raio-md, 10px);
 }
 
-
-.faturas-tabs a {
-
+.faturas-page .faturas-tabs a {
     display: flex;
-
     align-items: center;
 
     gap: 8px;
 
     padding: 9px 14px;
 
-    border-radius: 7px;
+    color: var(--faturas-texto-suave);
 
-    color: #64748b;
+    border-radius: 7px;
 
     text-decoration: none;
 
     font-size: 13px;
-
     font-weight: 600;
 
     transition:
         background-color 0.2s ease,
         color 0.2s ease;
-
 }
 
-
-.faturas-tabs a:hover {
-
-    background: #f8fafc;
-
-    color: #111827;
-
+.faturas-page .faturas-tabs a:hover {
+    background: var(--ui-fundo-pagina, #f8fafc);
+    color: var(--faturas-texto);
 }
 
-
-.faturas-tabs a.ativo {
-
-    background: var(--cor-primaria);
-
+.faturas-page .faturas-tabs a.ativo {
+    background: var(--cor-primaria, #10b981);
     color: #ffffff;
-
 }
 
+.faturas-page .faturas-tabs a.ativo:hover {
+    background: var(--cor-primaria-hover, #059669);
+    color: #ffffff;
+}
 
-.faturas-tabs a strong {
-
+.faturas-page .faturas-tabs a strong {
     font-size: 12px;
-
     font-weight: 700;
-
 }
-
-
 
 /* ========================================
-   GRID
+   GRID DE FATURAS
    ======================================== */
 
-.faturas-grid {
-
+.faturas-page .faturas-grid {
     display: grid;
 
     grid-template-columns:
         repeat(2, minmax(0, 1fr));
 
     gap: 18px;
-
 }
 
-
-
 /* ========================================
-   CARD DA FATURA
+   CARD INDIVIDUAL DA FATURA
    ======================================== */
 
-.fatura-card {
-
+.faturas-page .fatura-card {
     position: relative;
 
+    min-width: 0;
     padding: 22px;
 
-    background: #ffffff;
+    background: var(--faturas-card);
 
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--faturas-borda);
+    border-radius: var(--ui-raio-lg, 12px);
 
-    border-radius: 14px;
-
-    box-shadow:
-        0 2px 5px rgba(15, 23, 42, 0.04);
+    box-shadow: var(--ui-sombra-card,
+            0 1px 3px rgba(15, 23, 42, 0.04));
 
     transition:
         transform 0.2s ease,
-        box-shadow 0.2s ease;
-
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
 }
 
-
-.fatura-card:hover {
-
+.faturas-page .fatura-card:hover {
     transform: translateY(-2px);
 
-    box-shadow:
-        0 8px 20px rgba(15, 23, 42, 0.07);
-
+    box-shadow: var(--ui-sombra-hover,
+            0 5px 14px rgba(15, 23, 42, 0.06));
 }
 
-
-
 /* ========================================
-   BORDA DE STATUS
+   BORDAS DE STATUS
    ======================================== */
 
-.fatura-paga {
-
+.faturas-page .fatura-paga {
     border-left: 4px solid #2563eb;
-
 }
 
-
-.fatura-aberta {
-
-    border-left: 4px solid var(--cor-primaria);
-
+.faturas-page .fatura-aberta {
+    border-left: 4px solid var(--cor-primaria, #10b981);
 }
 
-
-.fatura-atrasada {
-
-    border-left: 4px solid #ef4444;
-
+.faturas-page .fatura-atrasada {
+    border-left: 4px solid var(--cor-perigo, #ef4444);
 }
-
-
 
 /* ========================================
-   CABEÃ‡ALHO CARD
+   CABEÇALHO DO CARD
    ======================================== */
 
-.fatura-card-header {
-
+.faturas-page .fatura-card-header {
     display: flex;
-
     align-items: flex-start;
-
     justify-content: space-between;
 
     gap: 20px;
-
     margin-bottom: 24px;
-
 }
 
-
-.fatura-label {
-
+.faturas-page .fatura-label {
     display: block;
 
     margin-bottom: 5px;
 
-    color: #64748b;
+    color: var(--faturas-texto-suave);
 
     font-size: 11px;
-
     font-weight: 700;
-
     letter-spacing: 0.08em;
-
+    text-transform: uppercase;
 }
 
-
-.fatura-data {
-
+.faturas-page .fatura-data {
     display: block;
 
     color: #94a3b8;
 
     font-size: 13px;
-
 }
 
-
-
 /* ========================================
-   STATUS
+   STATUS DAS FATURAS
    ======================================== */
 
-.status {
-
+.faturas-page .status {
     display: inline-flex;
-
     align-items: center;
 
     padding: 5px 9px;
@@ -423,86 +343,61 @@
     border-radius: 20px;
 
     font-size: 11px;
-
     font-weight: 700;
 
     white-space: nowrap;
-
 }
 
-
-.status-pago {
-
+.faturas-page .status-pago {
     background: #eff6ff;
-
     color: #2563eb;
-
 }
 
-
-.status-aberto {
-
+.faturas-page .status-aberto {
     background: #ecfdf5;
-
-    color: var(--cor-primaria-hover);
-
+    color: var(--cor-primaria-hover, #059669);
 }
 
-
-.status-atrasado {
-
+.faturas-page .status-atrasado {
     background: #fef2f2;
-
     color: #dc2626;
-
 }
-
-
 
 /* ========================================
-   VALOR
+   VALOR DA FATURA
    ======================================== */
 
-.fatura-valor {
-
+.faturas-page .fatura-valor {
     margin-bottom: 24px;
-
 }
 
-
-.fatura-valor span {
-
+.faturas-page .fatura-valor span {
     display: block;
 
     margin-bottom: 4px;
 
-    color: #64748b;
+    color: var(--faturas-texto-suave);
 
     font-size: 12px;
-
 }
 
-
-.fatura-valor strong {
-
+.faturas-page .fatura-valor strong {
     display: block;
 
-    color: #111827;
+    color: var(--faturas-texto);
 
     font-size: 29px;
-
+    font-weight: 700;
     line-height: 1.2;
 
+    overflow-wrap: anywhere;
 }
 
-
-
 /* ========================================
-   INFORMAÃ‡Ã•ES
+   INFORMAÇÕES DA FATURA
    ======================================== */
 
-.fatura-info {
-
+.faturas-page .fatura-info {
     display: grid;
 
     grid-template-columns:
@@ -513,14 +408,10 @@
     padding: 16px 0;
 
     border-top: 1px solid #f1f5f9;
-
     border-bottom: 1px solid #f1f5f9;
-
 }
 
-
-.info-item span {
-
+.faturas-page .info-item span {
     display: block;
 
     margin-bottom: 5px;
@@ -528,252 +419,205 @@
     color: #94a3b8;
 
     font-size: 11px;
-
 }
 
-
-.info-item strong {
-
+.faturas-page .info-item strong {
     display: block;
 
     color: #334155;
 
     font-size: 13px;
-
     font-weight: 600;
-
 }
 
-
-.texto-atrasado {
-
+.faturas-page .texto-atrasado {
     color: #dc2626 !important;
-
 }
-
-
 
 /* ========================================
-   AÃ‡Ã•ES
+   AÇÕES DA FATURA
    ======================================== */
 
-.fatura-acoes {
-
+.faturas-page .fatura-acoes {
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
 
     gap: 15px;
-
     margin-top: 17px;
-
 }
 
+/* Botão de recibo */
 
-.btn-recibo {
+.faturas-page .btn-recibo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
     padding: 9px 14px;
 
-    border: 1px solid #dbeafe;
-
-    border-radius: 7px;
-
     background: #eff6ff;
-
     color: #2563eb;
 
+    border: 1px solid #dbeafe;
+    border-radius: 7px;
+
     font-family: inherit;
-
     font-size: 13px;
-
     font-weight: 600;
 
+    text-decoration: none;
     cursor: pointer;
 
     transition:
         background-color 0.2s ease,
         border-color 0.2s ease;
-
 }
 
-
-.btn-recibo:hover {
-
+.faturas-page .btn-recibo:hover {
     background: #dbeafe;
-
+    color: #1d4ed8;
     border-color: #bfdbfe;
-
 }
 
+/* Avisos */
 
-.aviso-pagamento {
-
+.faturas-page .aviso-pagamento {
     color: #94a3b8;
-
     font-size: 12px;
-
+    line-height: 1.5;
 }
-
-
 
 /* ========================================
    ESTADO VAZIO
    ======================================== */
 
-.faturas-vazio {
-
+.faturas-page .faturas-vazio {
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
-
     justify-content: center;
 
     min-height: 300px;
 
     padding: 40px;
 
-    background: #ffffff;
+    background: var(--faturas-card);
 
-    border: 1px solid #e2e8f0;
-
-    border-radius: 14px;
+    border: 1px solid var(--faturas-borda);
+    border-radius: var(--ui-raio-lg, 12px);
 
     text-align: center;
-
 }
 
-
-.vazio-icone {
+.faturas-page .vazio-icone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     width: 52px;
-
     height: 52px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
 
     margin-bottom: 15px;
 
+    background: #f1f5f9;
+    color: var(--faturas-texto-suave);
+
     border-radius: 50%;
 
-    background: #f1f5f9;
-
-    color: #64748b;
-
     font-size: 20px;
-
-    font-weight: bold;
-
+    font-weight: 700;
 }
 
-
-.faturas-vazio h2 {
-
+.faturas-page .faturas-vazio h2 {
     margin: 0 0 7px;
 
-    color: #111827;
+    color: var(--faturas-texto);
 
     font-size: 20px;
-
+    font-weight: 700;
 }
 
-
-.faturas-vazio p {
-
+.faturas-page .faturas-vazio p {
     margin: 0;
 
-    color: #64748b;
+    color: var(--faturas-texto-suave);
 
     font-size: 14px;
-
+    line-height: 1.5;
 }
 
-
-
 /* ========================================
-   RESPONSIVO
+   RESPONSIVIDADE - TABLETS
    ======================================== */
 
 @media (max-width: 900px) {
 
     .faturas-page {
-
         padding: 30px 25px 50px;
-
     }
 
-
-    .faturas-resumo {
-
-        grid-template-columns:
-            1fr;
-
+    .faturas-page .faturas-resumo {
+        grid-template-columns: 1fr;
     }
 
-
-    .faturas-grid {
-
-        grid-template-columns:
-            1fr;
-
+    .faturas-page .faturas-grid {
+        grid-template-columns: 1fr;
     }
-
 }
 
+/* ========================================
+   RESPONSIVIDADE - CELULARES
+   ======================================== */
 
 @media (max-width: 600px) {
 
     .faturas-page {
-
         padding: 25px 18px 40px;
-
     }
 
-
-    .faturas-header h1 {
-
+    .faturas-page .faturas-header h1 {
         font-size: 27px;
-
     }
 
-
-    .faturas-tabs {
-
+    .faturas-page .faturas-tabs {
         width: 100%;
-
         overflow-x: auto;
-
     }
 
-
-    .faturas-tabs a {
-
+    .faturas-page .faturas-tabs a {
         white-space: nowrap;
-
     }
 
-
-    .fatura-info {
-
-        grid-template-columns:
-            1fr;
-
+    .faturas-page .fatura-info {
+        grid-template-columns: 1fr;
     }
 
-
-    .fatura-acoes {
-
+    .faturas-page .fatura-acoes {
         align-items: flex-start;
-
         flex-direction: column;
-
     }
 
+    .faturas-page .faturas-vazio {
+        padding: 30px 20px;
+    }
+}
+
+/* ========================================
+   ACESSIBILIDADE
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .faturas-page .resumo-card,
+    .faturas-page .fatura-card,
+    .faturas-page .faturas-tabs a,
+    .faturas-page .btn-recibo {
+        transition: none;
+    }
+
+    .faturas-page .resumo-card:hover,
+    .faturas-page .fatura-card:hover {
+        transform: none;
+    }
 }

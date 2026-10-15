@@ -1,48 +1,42 @@
 <?php
-if (!isset($filiais)) {
-    header("Location: " . BASE_URL . "/app/controllers/FilialController.php?acao=listar");
-    exit;
-}
-/** @var array $filiais */
-/** @var string $statusFiltro */
+// Título da página
+$tituloPagina = "Fichas de Treino";
 
-$tituloPagina = "Filiais";
+// CSS específico do módulo
+$cssEspecifico = BASE_URL . '/assets/css/fichatreino.css';
+
+// Componentes compartilhados
 include __DIR__ . '/../shared/header.php';
 include __DIR__ . '/../shared/sidebar.php';
 ?>
-<!DOCTYPE html>
-<html lang="pt-BR">
 
-<body>
+<main class="conteudo fichatreino-page">
 
-    <main>
+    <div class="fichatreino-header">
 
-        <div>
+        <div class="fichatreino-header-info">
 
+            <span class="fichatreino-etiqueta">
+                GESTÃO DE TREINOS
+            </span>
 
-            <div>
+            <h1>Fichas de Treino</h1>
 
-                <a href="<?= BASE_URL ?>/index.php">
-                    ← Voltar para o site
-                </a>
-
-                <div>
-                    <h1>
-                        Fichas de treino
-                    </h1>
-
-                    <p>
-                        Monte o treino do aluno.
-                    </p>
-                </div>
-
-            </div>
-
+            <p>
+                Monte, organize e gerencie
+                os treinos dos alunos.
+            </p>
 
         </div>
 
-    </main>
+    </div>
 
-</body>
+    <!--
+        O formulário real de criação e edição
+        das fichas será mantido aqui quando
+        analisarmos sua view completa.
+    -->
 
-</html>
+</main>
+
+<?php include __DIR__ . '/../shared/footer.php'; ?>

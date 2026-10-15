@@ -1,196 +1,545 @@
-﻿/* ========================================
-   BIBLIOTECA DE EXERCÃCIOS
-   ======================================== */
+﻿/* ==========================================
+   GYMFLOW - BIBLIOTECA DE EXERCÍCIOS
+   ADMIN / PROFESSOR
+   ========================================== */
 
-.pagina-cabecalho {
+.biblioteca-page {
+    --bib-primaria: var(--cor-primaria, #eab308);
+    --bib-texto: var(--ui-texto, #111827);
+    --bib-suave: var(--ui-texto-suave, #64748b);
+    --bib-borda: var(--ui-borda, #e2e8f0);
+    --bib-card: var(--ui-fundo-card, #ffffff);
+    --bib-fundo: var(--ui-fundo-pagina, #f8fafc);
+
+    width: 100%;
+    max-width: 1500px;
+    min-width: 0;
+    margin: 0 auto;
+    padding: 30px 32px 45px;
+
+    color: var(--bib-texto);
+    font-family: inherit;
+}
+
+/* CABEÇALHO */
+
+.biblioteca-page .biblioteca-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #e2e8f0;
+    justify-content: space-between;
+    gap: 24px;
+
+    margin-bottom: 28px;
+    padding-bottom: 22px;
+
+    border-bottom: 1px solid var(--bib-borda);
 }
 
-.pagina-cabecalho h1 {
-    margin: 0 0 5px 0;
-    font-size: 24px;
-    color: #111827;
+.biblioteca-page .biblioteca-etiqueta {
+    display: block;
+    margin-bottom: 8px;
+
+    color: var(--bib-primaria);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .8px;
 }
 
-.pagina-cabecalho p {
+.biblioteca-page .biblioteca-header h1 {
+    margin: 0 0 8px;
+
+    color: var(--bib-texto);
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.biblioteca-page .biblioteca-header p {
     margin: 0;
-    color: #6b7280;
+    color: var(--bib-suave);
     font-size: 14px;
+    line-height: 1.6;
 }
 
-.pagina-cabecalho .btn {
-    background-color: var(--cor-primaria);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 8px;
+/* BOTÕES COMPARTILHADOS DO MÓDULO */
+
+.biblioteca-page .biblioteca-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    min-height: 43px;
+    padding: 10px 18px;
+
+    border: 1px solid transparent;
+    border-radius: var(--ui-raio-sm, 7px);
+
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
     text-decoration: none;
-    font-weight: bold;
-    transition: background-color 0.2s;
+    white-space: nowrap;
+    cursor: pointer;
+
+    transition:
+        background-color .2s ease,
+        border-color .2s ease,
+        color .2s ease;
 }
 
-.pagina-cabecalho .btn:hover {
-    background-color: var(--cor-primaria-hover);
+.biblioteca-page .biblioteca-btn-primary {
+    background: var(--bib-primaria);
+    color: #ffffff;
+}
+
+.biblioteca-page .biblioteca-btn-primary:hover {
+    background: var(--cor-primaria-hover, var(--bib-primaria));
+    color: #ffffff;
+    filter: brightness(.95);
+}
+
+.biblioteca-page .biblioteca-btn-secondary {
+    background: #ffffff;
+    color: var(--bib-texto);
+    border-color: var(--bib-borda);
+}
+
+.biblioteca-page .biblioteca-btn-secondary:hover {
+    background: #f8fafc;
+    color: var(--bib-texto);
+    border-color: #cbd5e1;
+}
+
+/* ALERTAS */
+
+.biblioteca-page .biblioteca-alerta {
+    padding: 14px 18px;
+    margin-bottom: 22px;
+
+    border: 1px solid transparent;
+    border-radius: 8px;
+
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.biblioteca-page .biblioteca-alerta-sucesso {
+    background: #ecfdf5;
+    color: #047857;
+    border-color: #a7f3d0;
+}
+
+.biblioteca-page .biblioteca-alerta-erro {
+    background: #fef2f2;
+    color: #b91c1c;
+    border-color: #fecaca;
 }
 
 /* FILTROS */
-.filtros-exercicios {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    margin-bottom: 30px;
+
+.biblioteca-page .biblioteca-filtros-card {
+    margin-bottom: 28px;
+    padding: 24px;
+
+    background: var(--bib-card);
+    border: 1px solid var(--bib-borda);
+    border-radius: var(--ui-raio-md, 10px);
+    box-shadow: var(--ui-sombra-card, 0 1px 3px rgba(0, 0, 0, .04));
 }
 
-.campo-pesquisa {
-    display: flex;
-    gap: 20px;
-    align-items: flex-end;
+.biblioteca-page .biblioteca-section-title {
+    padding-bottom: 18px;
+    margin-bottom: 22px;
+    border-bottom: 1px solid #f1f5f9;
 }
 
-.campo-pesquisa div {
+.biblioteca-page .biblioteca-section-title h2,
+.biblioteca-page .biblioteca-resultados-header h2 {
+    margin: 0 0 6px;
+    color: var(--bib-texto);
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.biblioteca-page .biblioteca-section-title p,
+.biblioteca-page .biblioteca-resultados-header p {
+    margin: 0;
+    color: var(--bib-suave);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.biblioteca-page .biblioteca-filtros-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 16px;
+}
+
+.biblioteca-page .biblioteca-campo {
     display: flex;
     flex-direction: column;
-    flex: 1;
+    gap: 7px;
+    min-width: 0;
 }
 
-.campo-pesquisa label {
-    font-size: 14px;
+.biblioteca-page .biblioteca-campo label {
+    margin: 0;
+    color: var(--bib-texto);
+    font-size: 13px;
     font-weight: 600;
-    color: #374151;
-    margin-bottom: 8px;
 }
 
-.campo-pesquisa input,
-.campo-pesquisa select {
-    padding: 12px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
+.biblioteca-page .biblioteca-campo input,
+.biblioteca-page .biblioteca-campo select {
+    width: 100%;
+    min-height: 43px;
+    padding: 10px 12px;
+
+    background: #ffffff;
+    color: var(--bib-texto);
+
+    border: 1px solid var(--bib-borda);
+    border-radius: var(--ui-raio-sm, 7px);
+
+    font: inherit;
     font-size: 14px;
     outline: none;
-    transition: border-color 0.2s;
 }
 
-.campo-pesquisa input:focus,
-.campo-pesquisa select:focus {
-    border-color: var(--cor-primaria);
+.biblioteca-page .biblioteca-campo input:focus,
+.biblioteca-page .biblioteca-campo select:focus {
+    border-color: var(--bib-primaria);
+    outline: 2px solid var(--bib-primaria);
+    outline-offset: 1px;
 }
 
-.botao-pesquisa {
-    flex: 0 0 auto !important;
+.biblioteca-page .biblioteca-filtros-acoes {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.botao-pesquisa button {
-    background-color: var(--cor-primaria);
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.2s;
+.biblioteca-page .biblioteca-filtro-ajuda {
+    margin: 14px 0 0;
+    color: var(--bib-suave);
+    font-size: 12px;
+    line-height: 1.5;
 }
 
-.botao-pesquisa button:hover {
-    background-color: var(--cor-primaria-hover);
+/* RESULTADOS */
+
+.biblioteca-page .biblioteca-resultados {
+    width: 100%;
 }
 
-/* GRID DE EXERCÃCIOS */
-.exercicios-grid {
+.biblioteca-page .biblioteca-resultados-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+
+    margin-bottom: 20px;
+}
+
+.biblioteca-page .biblioteca-contador {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 7px 12px;
+
+    background: var(--bib-card);
+    color: var(--bib-suave);
+
+    border: 1px solid var(--bib-borda);
+    border-radius: 999px;
+
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* GRID DE CARDS */
+
+.biblioteca-page .exercicios-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 24px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
 }
 
-.exercicio-card {
-    background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    overflow: hidden;
-    transition: transform 0.2s, box-shadow 0.2s;
+.biblioteca-page .exercicio-card {
     display: flex;
     flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+
+    background: var(--bib-card);
+    border: 1px solid var(--bib-borda);
+    border-radius: var(--ui-raio-md, 10px);
+
+    box-shadow: var(--ui-sombra-card, 0 1px 3px rgba(0, 0, 0, .04));
+
+    transition:
+        box-shadow .2s ease,
+        border-color .2s ease;
 }
 
-.exercicio-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+.biblioteca-page .exercicio-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: var(--ui-sombra-hover, 0 5px 16px rgba(15, 23, 42, .07));
 }
 
-.exercicio-midia {
-    width: 100%;
-    height: 200px;
-    background-color: #f3f4f6;
+/* MÍDIA */
+
+.biblioteca-page .exercicio-midia {
+    position: relative;
+
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #9ca3af;
+
+    width: 100%;
+    height: 210px;
+    overflow: hidden;
+
+    background: #f1f5f9;
+    border-bottom: 1px solid var(--bib-borda);
 }
 
-.exercicio-info {
-    padding: 16px;
-    flex: 1;
+.biblioteca-page .exercicio-midia img,
+.biblioteca-page .exercicio-midia video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #f1f5f9;
 }
 
-.exercicio-info h3 {
-    margin: 0 0 8px 0;
-    font-size: 16px;
-    color: #111827;
-}
-
-.exercicio-grupo {
-    display: inline-block;
-    background-color: #e0f2fe;
-    color: #0369a1;
-    padding: 4px 10px;
-    border-radius: 9999px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.exercicio-acoes {
+.biblioteca-page .exercicio-sem-midia {
     display: flex;
-    border-top: 1px solid #f3f4f6;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+
+    color: #94a3b8;
+    text-align: center;
 }
 
-.exercicio-acoes a {
+.biblioteca-page .exercicio-sem-midia span {
+    font-size: 36px;
+    line-height: 1;
+}
+
+.biblioteca-page .exercicio-sem-midia p {
+    margin: 0;
+    font-size: 13px;
+}
+
+/* INFORMAÇÕES */
+
+.biblioteca-page .exercicio-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+
     flex: 1;
-    text-align: center;
-    padding: 12px;
-    text-decoration: none;
-    font-size: 14px;
+    min-width: 0;
+    padding: 20px;
+}
+
+.biblioteca-page .exercicio-grupo {
+    display: inline-flex;
+    align-items: center;
+
+    max-width: 100%;
+    padding: 6px 10px;
+
+    background: #f1f5f9;
+    color: #475569;
+    border-radius: 6px;
+
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.biblioteca-page .exercicio-info h3 {
+    width: 100%;
+    margin: 0;
+
+    color: var(--bib-texto);
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.4;
+
+    overflow-wrap: anywhere;
+}
+
+/* AÇÕES */
+
+.biblioteca-page .exercicio-acoes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+
+    padding: 16px 20px;
+    border-top: 1px solid var(--bib-borda);
+}
+
+.biblioteca-page .exercicio-acoes a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 39px;
+    padding: 9px 12px;
+
+    border: 1px solid transparent;
+    border-radius: 7px;
+
+    font-size: 13px;
     font-weight: 600;
-    color: #4b5563;
-    transition: background-color 0.2s, color 0.2s;
-}
-
-.exercicio-acoes a:hover {
-    background-color: #f9fafb;
-    color: var(--cor-primaria);
-}
-
-.exercicio-acoes a.excluir:hover {
-    color: #ef4444;
-}
-
-.exercicio-acoes a + a {
-    border-left: 1px solid #f3f4f6;
-}
-
-.nenhum-exercicio {
-    grid-column: 1 / -1;
+    text-decoration: none;
     text-align: center;
-    padding: 40px;
-    background: #ffffff;
-    border-radius: 12px;
-    color: #6b7280;
+    cursor: pointer;
 }
 
-.nenhum-exercicio h3 {
-    color: #111827;
-    margin-bottom: 10px;
+.biblioteca-page .exercicio-btn-editar {
+    background: #f8fafc;
+    color: var(--bib-texto);
+    border-color: var(--bib-borda) !important;
+}
+
+.biblioteca-page .exercicio-btn-editar:hover {
+    background: #f1f5f9;
+    color: var(--bib-texto);
+}
+
+.biblioteca-page .exercicio-btn-excluir {
+    background: #fef2f2;
+    color: #b91c1c;
+    border-color: #fecaca !important;
+}
+
+.biblioteca-page .exercicio-btn-excluir:hover {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* ESTADO VAZIO */
+
+.biblioteca-page .nenhum-exercicio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    gap: 12px;
+    padding: 55px 24px;
+
+    background: var(--bib-card);
+    border: 1px dashed var(--bib-borda);
+    border-radius: 10px;
+
+    text-align: center;
+}
+
+.biblioteca-page .nenhum-exercicio-icone {
+    font-size: 40px;
+    color: #94a3b8;
+}
+
+.biblioteca-page .nenhum-exercicio h3 {
+    margin: 0;
+    color: var(--bib-texto);
+    font-size: 19px;
+}
+
+.biblioteca-page .nenhum-exercicio p {
+    max-width: 440px;
+    margin: 0 0 10px;
+
+    color: var(--bib-suave);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* ACESSIBILIDADE */
+
+.biblioteca-page a:focus-visible,
+.biblioteca-page button:focus-visible {
+    outline: 2px solid var(--bib-primaria);
+    outline-offset: 3px;
+}
+
+/* RESPONSIVIDADE */
+
+@media (max-width: 1100px) {
+    .biblioteca-page .exercicios-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .biblioteca-page .biblioteca-filtros-form {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .biblioteca-page .biblioteca-filtros-acoes {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 700px) {
+    .biblioteca-page {
+        padding: 22px 18px 35px;
+    }
+
+    .biblioteca-page .biblioteca-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .biblioteca-page .biblioteca-header h1 {
+        font-size: 25px;
+    }
+
+    .biblioteca-page .biblioteca-header>.biblioteca-btn {
+        align-self: flex-start;
+    }
+
+    .biblioteca-page .biblioteca-filtros-card {
+        padding: 18px;
+    }
+
+    .biblioteca-page .biblioteca-filtros-form {
+        grid-template-columns: 1fr;
+    }
+
+    .biblioteca-page .biblioteca-filtros-acoes {
+        grid-column: auto;
+        flex-wrap: wrap;
+    }
+
+    .biblioteca-page .exercicios-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .biblioteca-page .exercicio-midia {
+        height: 230px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .biblioteca-page .exercicio-card,
+    .biblioteca-page .biblioteca-btn {
+        transition: none;
+    }
 }

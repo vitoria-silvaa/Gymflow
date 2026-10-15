@@ -1,15 +1,18 @@
-/* ==========================================================================
-   GYMFLOW - MÓDULO FINANCEIRO, FLUXO DE CAIXA & CRM
-   Estilizado por: Jorge
+/* ========================================
+   GYMFLOW - FINANCEIRO, FLUXO E CRM
+   Padronização visual - Design System
    Arquivo: jorge-financeiro.css
-   ========================================================================== */
+   ======================================== */
 
 :root {
-    --fin-primary: #10b981;
-    --fin-primary-dark: #059669;
-    --fin-primary-light: #ecfdf5;
-    --fin-primary-border: #a7f3d0;
+    /* Identidade White Label */
+    --fin-primary: var(--cor-primaria, #10b981);
+    --fin-primary-hover: var(--cor-primaria-hover, #059669);
+    --fin-primary-dark: var(--cor-primaria-hover, #059669);
+    --fin-primary-light: color-mix(in srgb, var(--fin-primary) 10%, white);
+    --fin-primary-border: color-mix(in srgb, var(--fin-primary) 28%, white);
 
+    /* Estados semânticos */
     --fin-danger: #ef4444;
     --fin-danger-dark: #dc2626;
     --fin-danger-light: #fef2f2;
@@ -30,47 +33,71 @@
     --fin-purple-light: #f5f3ff;
     --fin-purple-border: #ddd6fe;
 
-    --fin-bg-card: #ffffff;
-    --fin-bg-main: #f8fafc;
-    --fin-border-color: #e2e8f0;
+    /* Superfícies */
+    --fin-bg-card: var(--ui-fundo-card, #ffffff);
+    --fin-bg-main: var(--ui-fundo-pagina, #f8fafc);
+    --fin-border-color: var(--ui-borda, #e2e8f0);
     --fin-border-light: #f1f5f9;
 
-    --fin-text-main: #111827;
-    --fin-text-muted: #64748b;
+    /* Tipografia */
+    --fin-text-main: var(--ui-texto, #111827);
+    --fin-text-muted: var(--ui-texto-suave, #64748b);
     --fin-text-light: #94a3b8;
 
-    --fin-radius-sm: 6px;
-    --fin-radius-md: 10px;
-    --fin-radius-lg: 14px;
+    /* Bordas */
+    --fin-radius-sm: var(--ui-raio-sm, 6px);
+    --fin-radius-md: var(--ui-raio-md, 10px);
+    --fin-radius-lg: var(--ui-raio-lg, 12px);
     --fin-radius-full: 9999px;
 
-    --fin-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --fin-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-    --fin-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
-    --fin-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Sombras e animações */
+    --fin-shadow-sm: var(--ui-sombra-card,
+            0 1px 3px rgba(15, 23, 42, 0.04));
+
+    --fin-shadow-md: var(--ui-sombra-hover,
+            0 5px 14px rgba(15, 23, 42, 0.06));
+
+    --fin-shadow-lg:
+        0 10px 20px rgba(15, 23, 42, 0.08);
+
+    --fin-transition: all 0.2s ease;
 }
 
-/* ==========================================================================
-   ESTRUTURA GERAL DAS PÁGINAS
-   ========================================================================== */
+/* ========================================
+   ESTRUTURA DAS PÁGINAS
+   ======================================== */
 
 .financeiro-page,
 .fluxo-page,
 .crm-page {
     box-sizing: border-box;
-    padding: 24px 32px;
+
+    width: 100%;
+    min-width: 0;
+
+    padding: 30px 32px 45px;
+
     color: var(--fin-text-main);
+
+    font-family: inherit;
+    font-size: 15px;
 }
 
-/* CABEÇALHO DA PÁGINA */
+/* ========================================
+   CABEÇALHO
+   ======================================== */
+
 .fin-page-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     flex-wrap: wrap;
+
     gap: 16px;
+
     margin-bottom: 28px;
     padding-bottom: 20px;
+
     border-bottom: 1px solid var(--fin-border-color);
 }
 
@@ -78,65 +105,92 @@
 .financeiro-page h1,
 .fluxo-page h1,
 .crm-page h1 {
-    font-size: 26px;
-    font-weight: 700;
+    margin: 0 0 7px;
+
     color: var(--fin-text-main);
-    margin: 0 0 6px 0;
-    letter-spacing: -0.02em;
+
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: normal;
 }
 
 .fin-header-info p,
-.financeiro-page > p,
-.fluxo-page > p,
-.crm-page > p {
-    color: var(--fin-text-muted);
-    font-size: 14px;
+.financeiro-page>p,
+.fluxo-page>p,
+.crm-page>p {
     margin: 0;
+
+    color: var(--fin-text-muted);
+
+    font-size: 14px;
+    line-height: 1.5;
 }
 
 .fin-header-actions {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 12px;
 }
 
-/* ==========================================================================
-   CARDS DE MÉTRICAS (FINANCEIRO & FLUXO DE CAIXA)
-   ========================================================================== */
+/* ========================================
+   INDICADORES FINANCEIROS
+   ======================================== */
 
 .fin-metrics-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(240px, 1fr));
+
     gap: 20px;
     margin-bottom: 30px;
 }
 
 .fin-metric-card {
-    background-color: var(--fin-bg-card);
-    border: 1px solid var(--fin-border-color);
-    border-radius: var(--fin-radius-md);
-    padding: 22px 24px;
-    box-shadow: var(--fin-shadow-sm);
-    transition: var(--fin-transition);
     position: relative;
-    overflow: hidden;
+
     display: flex;
     flex-direction: column;
+
+    min-width: 0;
+
+    padding: 22px 24px;
+
+    overflow: hidden;
+
+    background-color: var(--fin-bg-card);
+
+    border: 1px solid var(--fin-border-color);
+    border-radius: var(--fin-radius-md);
+
+    box-shadow: var(--fin-shadow-sm);
+
+    transition: var(--fin-transition);
 }
 
 .fin-metric-card:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--fin-shadow-md);
+    transform: translateY(-2px);
+
     border-color: #cbd5e1;
+
+    box-shadow: var(--fin-shadow-md);
 }
 
+/* Faixa superior */
+
 .fin-metric-card::before {
-    content: '';
+    content: "";
+
     position: absolute;
+
     top: 0;
     left: 0;
+
     width: 100%;
-    height: 4px;
+    height: 3px;
+
     background-color: var(--fin-border-color);
 }
 
@@ -156,30 +210,40 @@
     background-color: var(--fin-info);
 }
 
+/* Topo dos indicadores */
+
 .fin-metric-top {
     display: flex;
-    justify-content: space-between;
     align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 12px;
     margin-bottom: 12px;
 }
 
 .fin-metric-label {
+    color: var(--fin-text-muted);
+
     font-size: 13px;
     font-weight: 600;
-    text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--fin-text-muted);
+    text-transform: uppercase;
 }
 
 .fin-metric-icon {
-    width: 38px;
-    height: 38px;
-    border-radius: var(--fin-radius-sm);
     display: flex;
     align-items: center;
     justify-content: center;
+
+    flex-shrink: 0;
+
+    width: 38px;
+    height: 38px;
+
+    border-radius: var(--fin-radius-sm);
+
     font-size: 16px;
-    font-weight: bold;
+    font-weight: 700;
 }
 
 .fin-metric-card.success .fin-metric-icon {
@@ -202,12 +266,18 @@
     color: var(--fin-info-dark);
 }
 
+/* Valores */
+
 .fin-metric-value {
+    margin: 0 0 6px;
+
+    color: var(--fin-text-main);
+
     font-size: 26px;
     font-weight: 700;
-    color: var(--fin-text-main);
-    margin: 0 0 6px 0;
-    letter-spacing: -0.02em;
+    line-height: 1.2;
+
+    overflow-wrap: anywhere;
 }
 
 .fin-metric-card.success .fin-metric-value {
@@ -219,32 +289,45 @@
 }
 
 .fin-metric-subtext {
-    font-size: 13px;
-    color: var(--fin-text-muted);
-    margin: 0;
     display: flex;
     align-items: center;
+
     gap: 6px;
+
+    margin: 0;
+
+    color: var(--fin-text-muted);
+
+    font-size: 13px;
+    line-height: 1.5;
 }
 
-/* ==========================================================================
+/* ========================================
    BOTÕES E AÇÕES
-   ========================================================================== */
+   ======================================== */
 
 .fin-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+
     gap: 8px;
+
     padding: 10px 18px;
+
+    border: 1px solid transparent;
+    border-radius: var(--fin-radius-sm);
+
+    font-family: inherit;
     font-size: 14px;
     font-weight: 600;
-    border-radius: var(--fin-radius-sm);
-    border: 1px solid transparent;
-    cursor: pointer;
-    text-decoration: none;
-    transition: var(--fin-transition);
     line-height: 1.4;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition: var(--fin-transition);
 }
 
 .fin-btn-primary {
@@ -254,18 +337,25 @@
 
 .fin-btn-primary:hover {
     background-color: var(--fin-primary-hover);
-    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+    color: #ffffff !important;
+
+    filter: brightness(0.96);
 }
 
 .fin-btn-secondary {
     background-color: #ffffff;
+
     color: var(--fin-text-main) !important;
+
     border-color: var(--fin-border-color);
 }
 
 .fin-btn-secondary:hover {
-    background-color: #f1f5f9;
+    background-color: #f8fafc;
+
     border-color: #cbd5e1;
+
+    color: var(--fin-text-main) !important;
 }
 
 .fin-btn-danger {
@@ -275,30 +365,49 @@
 
 .fin-btn-danger:hover {
     background-color: var(--fin-danger-dark);
+    color: #ffffff !important;
 }
 
 .fin-btn-sm {
     padding: 6px 12px;
-    font-size: 13px;
+
     border-radius: 5px;
+
+    font-size: 13px;
 }
 
-/* TABS DE PERÍODO (FLUXO DE CAIXA) */
+/* ========================================
+   ABAS DE PERÍODO
+   ======================================== */
+
 .fin-tabs-container {
     display: inline-flex;
-    background-color: #f1f5f9;
-    padding: 4px;
-    border-radius: var(--fin-radius-sm);
+    align-items: center;
+    flex-wrap: wrap;
+
     gap: 4px;
+    padding: 4px;
+
+    background-color: #f1f5f9;
+
+    border-radius: var(--fin-radius-sm);
 }
 
 .fin-tab-item {
+    display: inline-flex;
+    align-items: center;
+
     padding: 8px 16px;
+
+    color: var(--fin-text-muted);
+
+    border-radius: 5px;
+
     font-size: 13px;
     font-weight: 600;
-    color: var(--fin-text-muted);
+
     text-decoration: none;
-    border-radius: 5px;
+
     transition: var(--fin-transition);
 }
 
@@ -308,37 +417,50 @@
 
 .fin-tab-item.active {
     background-color: #ffffff;
+
     color: var(--fin-primary-dark);
+
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
-/* ==========================================================================
-   TABELAS MODERNAS (FINANCEIRO & FLUXO DE CAIXA)
-   ========================================================================== */
+/* ========================================
+   TABELAS FINANCEIRAS
+   ======================================== */
 
 .fin-table-card {
+    overflow: hidden;
+
+    margin-bottom: 30px;
+
     background-color: var(--fin-bg-card);
+
     border: 1px solid var(--fin-border-color);
     border-radius: var(--fin-radius-md);
+
     box-shadow: var(--fin-shadow-sm);
-    overflow: hidden;
-    margin-bottom: 30px;
 }
 
 .fin-table-header {
-    padding: 18px 24px;
-    border-bottom: 1px solid var(--fin-border-color);
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    gap: 12px;
+
+    padding: 18px 24px;
+
+    border-bottom: 1px solid var(--fin-border-color);
 }
 
 .fin-table-header h2,
 .fin-table-header h3 {
-    font-size: 17px;
-    font-weight: 700;
-    color: var(--fin-text-main);
     margin: 0;
+
+    color: var(--fin-text-main);
+
+    font-size: 18px;
+    font-weight: 700;
 }
 
 .fin-table-responsive {
@@ -348,26 +470,39 @@
 
 .fin-table {
     width: 100%;
+
     border-collapse: collapse;
+
+    background-color: #ffffff;
+
     font-size: 14px;
     text-align: left;
 }
 
 .fin-table th {
-    background-color: #f8fafc;
-    color: var(--fin-text-muted);
-    font-weight: 600;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
     padding: 14px 20px;
+
+    background-color: var(--fin-bg-main);
+
+    color: var(--fin-text-muted);
+
     border-bottom: 1px solid var(--fin-border-color);
+
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+
+    white-space: nowrap;
 }
 
 .fin-table td {
     padding: 14px 20px;
-    border-bottom: 1px solid var(--fin-border-light);
+
     color: var(--fin-text-main);
+
+    border-bottom: 1px solid var(--fin-border-light);
+
     vertical-align: middle;
 }
 
@@ -376,29 +511,40 @@
 }
 
 .fin-table tbody tr:hover {
-    background-color: #f8fafc;
+    background-color: var(--fin-bg-main);
 }
 
 .fin-table tbody tr:last-child td {
     border-bottom: none;
 }
 
-/* BADGES DE STATUS */
+/* ========================================
+   BADGES DE STATUS
+   ======================================== */
+
 .fin-badge {
     display: inline-flex;
     align-items: center;
+
     gap: 6px;
+
     padding: 4px 10px;
+
     border-radius: var(--fin-radius-full);
+
     font-size: 12px;
     font-weight: 600;
-    line-height: 1;
+    line-height: 1.2;
 }
 
 .fin-badge::before {
-    content: '';
+    content: "";
+
+    flex-shrink: 0;
+
     width: 6px;
     height: 6px;
+
     border-radius: 50%;
 }
 
@@ -407,6 +553,7 @@
     background-color: var(--fin-primary-light);
     color: var(--fin-primary-dark);
 }
+
 .fin-badge-pago::before,
 .fin-badge-success::before {
     background-color: var(--fin-primary);
@@ -417,6 +564,7 @@
     background-color: var(--fin-warning-light);
     color: var(--fin-warning-dark);
 }
+
 .fin-badge-aberto::before,
 .fin-badge-warning::before {
     background-color: var(--fin-warning);
@@ -427,67 +575,90 @@
     background-color: var(--fin-danger-light);
     color: var(--fin-danger-dark);
 }
+
 .fin-badge-danger::before,
 .fin-badge-atrasado::before {
     background-color: var(--fin-danger);
 }
 
 .fin-badge-categoria {
-    background-color: #f1f5f9;
-    color: var(--fin-text-muted);
-    border: 1px solid var(--fin-border-color);
+    display: inline-flex;
+
     padding: 4px 8px;
+
+    background-color: #f1f5f9;
+
+    color: var(--fin-text-muted);
+
+    border: 1px solid var(--fin-border-color);
     border-radius: 4px;
+
     font-size: 12px;
     font-weight: 500;
 }
 
-/* ==========================================================================
-   CARD DRE (DEMONSTRAÇÃO DO RESULTADO DO EXERCÍCIO)
-   ========================================================================== */
+/* ========================================
+   DRE - RESULTADO FINANCEIRO
+   ======================================== */
 
 .fin-dre-card {
+    margin-bottom: 30px;
+    padding: 24px;
+
     background-color: var(--fin-bg-card);
+
     border: 1px solid var(--fin-border-color);
     border-radius: var(--fin-radius-md);
+
     box-shadow: var(--fin-shadow-sm);
-    padding: 24px;
-    margin-bottom: 30px;
 }
 
 .fin-dre-header {
     margin-bottom: 20px;
     padding-bottom: 14px;
+
     border-bottom: 1px solid var(--fin-border-color);
 }
 
 .fin-dre-header h2 {
+    margin: 0 0 4px;
+
+    color: var(--fin-text-main);
+
     font-size: 18px;
     font-weight: 700;
-    margin: 0 0 4px 0;
-    color: var(--fin-text-main);
 }
 
 .fin-dre-header p {
-    font-size: 13px;
-    color: var(--fin-text-muted);
     margin: 0;
+
+    color: var(--fin-text-muted);
+
+    font-size: 13px;
 }
 
 .fin-dre-list {
     display: flex;
     flex-direction: column;
+
     gap: 12px;
 }
 
 .fin-dre-item {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    gap: 10px;
+
     padding: 12px 16px;
-    background-color: #f8fafc;
-    border-radius: var(--fin-radius-sm);
+
+    background-color: var(--fin-bg-main);
+
     border-left: 4px solid var(--fin-border-color);
+    border-radius: var(--fin-radius-sm);
+
     transition: var(--fin-transition);
 }
 
@@ -504,33 +675,38 @@
 }
 
 .fin-dre-item.resultado {
-    background-color: #f0fdf4;
-    border-left-color: var(--fin-primary-dark);
+    background-color: var(--fin-primary-light);
+
     border: 1px solid var(--fin-primary-border);
-    border-left-width: 4px;
+    border-left: 4px solid var(--fin-primary-dark);
 }
 
 .fin-dre-item.resultado.negativo {
     background-color: var(--fin-danger-light);
-    border-left-color: var(--fin-danger-dark);
+
     border: 1px solid var(--fin-danger-border);
-    border-left-width: 4px;
+    border-left: 4px solid var(--fin-danger-dark);
 }
 
 .fin-dre-item-label {
     display: flex;
     align-items: center;
+
     gap: 10px;
+
+    color: var(--fin-text-main);
+
     font-size: 14px;
     font-weight: 600;
-    color: var(--fin-text-main);
 }
 
 .fin-dre-item-tag {
+    padding: 2px 7px;
+
+    border-radius: 4px;
+
     font-size: 11px;
     font-weight: 700;
-    padding: 2px 7px;
-    border-radius: 4px;
 }
 
 .fin-dre-item.receita .fin-dre-item-tag {
@@ -549,9 +725,11 @@
 }
 
 .fin-dre-item-valor {
+    color: var(--fin-text-main);
+
+    font-family: inherit;
     font-size: 16px;
     font-weight: 700;
-    font-family: inherit;
 }
 
 .fin-dre-item.receita .fin-dre-item-valor {
@@ -563,26 +741,30 @@
 }
 
 .fin-dre-item.resultado .fin-dre-item-valor {
-    font-size: 18px;
     color: var(--fin-primary-dark);
+    font-size: 18px;
 }
 
 .fin-dre-item.resultado.negativo .fin-dre-item-valor {
     color: var(--fin-danger-dark);
 }
 
-/* ==========================================================================
-   CRM - QUADRO KANBAN DE LEADS
-   ========================================================================== */
+/* ========================================
+   CRM - QUADRO KANBAN
+   ======================================== */
 
 .crm-kanban-board {
     display: flex;
+
     gap: 20px;
-    overflow-x: auto;
-    padding-bottom: 20px;
+
     margin-top: 10px;
+    padding-bottom: 20px;
+
+    overflow-x: auto;
+
     scrollbar-width: thin;
-    scrollbar-color: #cbd5e1 #f8fafc;
+    scrollbar-color: #cbd5e1 var(--fin-bg-main);
 }
 
 .crm-kanban-board::-webkit-scrollbar {
@@ -590,7 +772,7 @@
 }
 
 .crm-kanban-board::-webkit-scrollbar-track {
-    background: #f8fafc;
+    background-color: var(--fin-bg-main);
     border-radius: 4px;
 }
 
@@ -599,55 +781,82 @@
     border-radius: 4px;
 }
 
+/* Colunas */
+
 .crm-kanban-column {
-    flex: 0 0 300px;
-    min-width: 280px;
-    background-color: #f8fafc;
-    border: 1px solid var(--fin-border-color);
-    border-radius: var(--fin-radius-md);
     display: flex;
     flex-direction: column;
-    box-shadow: var(--fin-shadow-sm);
+
+    flex: 0 0 300px;
+
+    min-width: 280px;
+
     overflow: hidden;
+
+    background-color: var(--fin-bg-main);
+
+    border: 1px solid var(--fin-border-color);
+    border-radius: var(--fin-radius-md);
+
+    box-shadow: var(--fin-shadow-sm);
 }
 
 .crm-column-header {
-    padding: 14px 16px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    background-color: #ffffff;
+    justify-content: space-between;
+
+    gap: 10px;
+
+    padding: 14px 16px;
+
+    background-color: var(--fin-bg-card);
+
     border-bottom: 2px solid transparent;
 }
 
 .crm-column-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--fin-text-main);
     display: flex;
     align-items: center;
+
     gap: 8px;
+
     margin: 0;
+
+    color: var(--fin-text-main);
+
+    font-size: 14px;
+    font-weight: 700;
 }
 
 .crm-column-count {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+
     min-width: 22px;
     height: 22px;
+
     padding: 0 6px;
+
+    background-color: #f1f5f9;
+
+    color: var(--fin-text-muted);
+
     border-radius: var(--fin-radius-full);
+
     font-size: 12px;
     font-weight: 700;
-    background-color: #f1f5f9;
-    color: var(--fin-text-muted);
 }
 
-/* CORES TEMÁTICAS POR ESTÁGIO DO FUNIL */
+/* ========================================
+   CRM - CORES DOS ESTÁGIOS
+   ======================================== */
+
 .crm-col-novo .crm-column-header {
     border-bottom-color: var(--fin-info);
 }
+
 .crm-col-novo .crm-column-count {
     background-color: var(--fin-info-light);
     color: var(--fin-info-dark);
@@ -656,6 +865,7 @@
 .crm-col-contato .crm-column-header {
     border-bottom-color: var(--fin-warning);
 }
+
 .crm-col-contato .crm-column-count {
     background-color: var(--fin-warning-light);
     color: var(--fin-warning-dark);
@@ -664,6 +874,7 @@
 .crm-col-experimental .crm-column-header {
     border-bottom-color: var(--fin-purple);
 }
+
 .crm-col-experimental .crm-column-count {
     background-color: var(--fin-purple-light);
     color: var(--fin-purple-dark);
@@ -672,6 +883,7 @@
 .crm-col-convertido .crm-column-header {
     border-bottom-color: var(--fin-primary);
 }
+
 .crm-col-convertido .crm-column-count {
     background-color: var(--fin-primary-light);
     color: var(--fin-primary-dark);
@@ -680,99 +892,141 @@
 .crm-col-perdido .crm-column-header {
     border-bottom-color: var(--fin-danger);
 }
+
 .crm-col-perdido .crm-column-count {
     background-color: var(--fin-danger-light);
     color: var(--fin-danger-dark);
 }
 
+/* ========================================
+   CRM - LISTAGEM DE LEADS
+   ======================================== */
+
 .crm-column-cards {
-    padding: 12px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+
     flex: 1;
+
+    gap: 12px;
+
+    padding: 12px;
+
     overflow-y: auto;
+
     max-height: calc(100vh - 250px);
 }
 
-/* CARD DE LEAD INDIVIDUAL */
 .crm-lead-card {
-    background-color: #ffffff;
-    border: 1px solid var(--fin-border-color);
-    border-radius: var(--fin-radius-sm);
-    padding: 14px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-    transition: var(--fin-transition);
     display: flex;
     flex-direction: column;
+
     gap: 8px;
+
+    padding: 14px;
+
+    background-color: var(--fin-bg-card);
+
+    border: 1px solid var(--fin-border-color);
+    border-radius: var(--fin-radius-sm);
+
+    box-shadow: var(--fin-shadow-sm);
+
+    transition: var(--fin-transition);
 }
 
 .crm-lead-card:hover {
     transform: translateY(-2px);
-    box-shadow: var(--fin-shadow-md);
+
     border-color: #cbd5e1;
+
+    box-shadow: var(--fin-shadow-md);
 }
 
 .crm-lead-name {
+    margin: 0;
+
+    color: var(--fin-text-main);
+
     font-size: 15px;
     font-weight: 700;
-    color: var(--fin-text-main);
-    margin: 0;
     line-height: 1.3;
 }
 
 .crm-lead-details {
     display: flex;
     flex-direction: column;
+
     gap: 4px;
-    font-size: 13px;
+
     color: var(--fin-text-muted);
+
+    font-size: 13px;
 }
 
 .crm-lead-detail-item {
     display: flex;
     align-items: center;
+
     gap: 6px;
-    word-break: break-all;
+
+    overflow-wrap: anywhere;
 }
 
 .crm-lead-detail-item strong {
     color: var(--fin-text-main);
+
     font-size: 12px;
 }
 
 .crm-lead-tag {
     display: inline-block;
+
+    max-width: fit-content;
+
     padding: 2px 7px;
-    font-size: 11px;
-    font-weight: 500;
-    border-radius: 4px;
+
     background-color: #f1f5f9;
     color: var(--fin-text-muted);
-    max-width: fit-content;
+
+    border-radius: 4px;
+
+    font-size: 11px;
+    font-weight: 500;
 }
+
+/* Ações dos leads */
 
 .crm-lead-actions {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-top: 8px;
+    flex-wrap: wrap;
+
+    gap: 8px;
+
     margin-top: 4px;
+    padding-top: 8px;
+
     border-top: 1px solid var(--fin-border-light);
+
     font-size: 12px;
 }
 
 .crm-lead-links {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
+
     gap: 8px;
 }
 
 .crm-lead-links a {
     color: var(--fin-text-muted);
-    text-decoration: none;
+
     font-weight: 600;
+    text-decoration: none;
+
     transition: var(--fin-transition);
 }
 
@@ -784,108 +1038,148 @@
     color: var(--fin-danger);
 }
 
+/* ========================================
+   CRM - FORMULÁRIO DE STATUS
+   ======================================== */
+
 .crm-status-form {
-    margin: 0;
     width: 100%;
-    margin-top: 4px;
+
+    margin: 4px 0 0;
 }
 
 .crm-status-select {
     width: 100%;
+
     padding: 6px 8px;
-    font-size: 12px;
-    font-weight: 500;
+
+    background-color: var(--fin-bg-main);
+
+    color: var(--fin-text-main);
+
     border: 1px solid var(--fin-border-color);
     border-radius: var(--fin-radius-sm);
-    background-color: #f8fafc;
-    color: var(--fin-text-main);
+
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 500;
+
     cursor: pointer;
+
     transition: var(--fin-transition);
 }
 
 .crm-status-select:hover,
 .crm-status-select:focus {
-    border-color: var(--fin-primary);
     background-color: #ffffff;
+
+    border-color: var(--fin-primary);
+
     outline: none;
 }
 
 .crm-empty-state {
     padding: 24px 12px;
-    text-align: center;
+
     color: var(--fin-text-light);
+
     font-size: 13px;
     font-style: italic;
+    text-align: center;
 }
 
-/* ==========================================================================
-   FORMULÁRIOS ESTILIZADOS (BAIXAR, LANÇAR, CADASTRAR LEAD)
-   ========================================================================== */
+/* ========================================
+   FORMULÁRIOS FINANCEIROS
+   ======================================== */
 
 .fin-form-card {
+    max-width: 650px;
+
+    margin: 0 auto 30px;
+    padding: 28px;
+
     background-color: var(--fin-bg-card);
+
     border: 1px solid var(--fin-border-color);
     border-radius: var(--fin-radius-md);
+
     box-shadow: var(--fin-shadow-sm);
-    padding: 28px;
-    max-width: 650px;
-    margin: 0 auto 30px auto;
 }
 
-.fin-form-card h2,
-.fin-form-card h1 {
+.fin-form-card h1,
+.fin-form-card h2 {
+    margin: 0 0 8px;
+
+    color: var(--fin-text-main);
+
     font-size: 20px;
     font-weight: 700;
-    color: var(--fin-text-main);
-    margin: 0 0 8px 0;
 }
 
 .fin-form-card p.subtitle {
+    margin: 0 0 20px;
+
     color: var(--fin-text-muted);
+
     font-size: 14px;
-    margin: 0 0 20px 0;
+    line-height: 1.5;
 }
 
+/* Informações do formulário */
+
 .fin-info-box {
-    background-color: #f8fafc;
-    border: 1px solid var(--fin-border-color);
-    border-radius: var(--fin-radius-sm);
-    padding: 16px 20px;
-    margin-bottom: 24px;
     display: flex;
     flex-wrap: wrap;
+
     gap: 20px;
+
+    margin-bottom: 24px;
+    padding: 16px 20px;
+
+    background-color: var(--fin-bg-main);
+
+    border: 1px solid var(--fin-border-color);
+    border-radius: var(--fin-radius-sm);
 }
 
 .fin-info-box-item {
     display: flex;
     flex-direction: column;
+
     gap: 4px;
 }
 
 .fin-info-box-item span.label {
+    color: var(--fin-text-muted);
+
     font-size: 12px;
     font-weight: 600;
-    color: var(--fin-text-muted);
     text-transform: uppercase;
 }
 
 .fin-info-box-item span.value {
+    color: var(--fin-text-main);
+
     font-size: 18px;
     font-weight: 700;
-    color: var(--fin-text-main);
 }
+
+/* Grid dos formulários */
 
 .fin-form-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
     gap: 18px;
+
     margin-bottom: 24px;
 }
 
 .fin-form-group {
     display: flex;
     flex-direction: column;
+
     gap: 6px;
 }
 
@@ -893,41 +1187,46 @@
     grid-column: span 2;
 }
 
-.fin-form-label {
+/* Labels */
+
+.fin-form-label,
+.fin-form-group label {
+    display: block;
+
+    margin-bottom: 0;
+
+    color: var(--fin-text-main);
+
     font-size: 13px;
     font-weight: 600;
-    color: var(--fin-text-main);
 }
 
 .fin-form-label span.required {
     color: var(--fin-danger);
 }
 
-.fin-form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.fin-form-group label {
-    font-size: 13px;
-    font-weight: 600;
-    color: #334155;
-    display: block;
-}
+/* Campos */
 
 .fin-form-input,
 .fin-form-select,
 .fin-input,
 .fin-select {
+    box-sizing: border-box;
+
     width: 100%;
+
     padding: 10px 14px;
-    font-size: 14px;
+
+    background-color: #ffffff;
+
+    color: var(--fin-text-main);
+
     border: 1px solid var(--fin-border-color);
     border-radius: var(--fin-radius-sm);
-    background-color: #ffffff;
-    color: var(--fin-text-main);
-    box-sizing: border-box;
+
+    font-family: inherit;
+    font-size: 14px;
+
     transition: var(--fin-transition);
 }
 
@@ -936,52 +1235,72 @@
 .fin-input:focus,
 .fin-select:focus {
     border-color: var(--fin-primary);
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
-    outline: none;
+
+    outline: 2px solid var(--fin-primary);
+    outline-offset: 1px;
 }
+
+/* Botões do formulário */
 
 .fin-form-actions {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
+
     gap: 12px;
+
     margin-top: 24px;
     padding-top: 20px;
+
     border-top: 1px solid var(--fin-border-color);
 }
 
-/* MENSAGEM DE ERRO/ALERTA */
+/* ========================================
+   MENSAGENS DE ALERTA
+   ======================================== */
+
 .fin-alert {
-    padding: 12px 16px;
-    border-radius: var(--fin-radius-sm);
-    font-size: 14px;
-    font-weight: 500;
-    margin-bottom: 20px;
     display: flex;
     align-items: center;
+
     gap: 10px;
+
+    margin-bottom: 20px;
+    padding: 12px 16px;
+
+    border-radius: var(--fin-radius-sm);
+
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
 }
 
 .fin-alert-danger {
     background-color: var(--fin-danger-light);
-    border: 1px solid var(--fin-danger-border);
+
     color: var(--fin-danger-dark);
+
+    border: 1px solid var(--fin-danger-border);
 }
 
 .fin-alert-success {
     background-color: var(--fin-primary-light);
-    border: 1px solid var(--fin-primary-border);
+
     color: var(--fin-primary-dark);
+
+    border: 1px solid var(--fin-primary-border);
 }
 
-/* ==========================================================================
-   RESPONSIVIDADE
-   ========================================================================== */
+/* ========================================
+   RESPONSIVIDADE - TABLETS
+   ======================================== */
 
 @media (max-width: 900px) {
+
     .financeiro-page,
     .fluxo-page,
     .crm-page {
-        padding: 16px;
+        padding: 24px 20px 40px;
     }
 
     .fin-page-header {
@@ -992,7 +1311,6 @@
     .fin-header-actions {
         width: 100%;
         justify-content: flex-start;
-        flex-wrap: wrap;
     }
 
     .fin-form-grid {
@@ -1001,5 +1319,90 @@
 
     .fin-form-group.col-span-2 {
         grid-column: span 1;
+    }
+
+    .fin-metrics-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* ========================================
+   RESPONSIVIDADE - CELULARES
+   ======================================== */
+
+@media (max-width: 600px) {
+
+    .financeiro-page,
+    .fluxo-page,
+    .crm-page {
+        padding: 20px 16px 35px;
+    }
+
+    .fin-header-info h1,
+    .financeiro-page h1,
+    .fluxo-page h1,
+    .crm-page h1 {
+        font-size: 26px;
+    }
+
+    .fin-metrics-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .fin-metric-card,
+    .fin-dre-card,
+    .fin-form-card {
+        padding: 20px;
+    }
+
+    .fin-table-header {
+        padding: 16px;
+    }
+
+    .fin-table th,
+    .fin-table td {
+        padding: 12px 14px;
+    }
+
+    .fin-dre-item {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .crm-kanban-column {
+        flex-basis: 280px;
+    }
+
+    .fin-form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .fin-form-actions .fin-btn {
+        width: 100%;
+    }
+}
+
+/* ========================================
+   ACESSIBILIDADE
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .fin-metric-card,
+    .fin-btn,
+    .fin-tab-item,
+    .fin-table tbody tr,
+    .fin-dre-item,
+    .crm-lead-card,
+    .crm-lead-links a,
+    .crm-status-select {
+        transition: none;
+    }
+
+    .fin-metric-card:hover,
+    .crm-lead-card:hover {
+        transform: none;
     }
 }

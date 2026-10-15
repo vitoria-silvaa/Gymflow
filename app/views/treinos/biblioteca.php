@@ -1,262 +1,445 @@
 <?php
+// ============================================
+// GYMFLOW - BIBLIOTECA DE EXERCÍCIOS
+// app/views/treinos/biblioteca.php
+// ============================================
+
 if (!isset($tituloPagina)) {
-    header("Location: " . BASE_URL . "/app/controllers/ExercicioController.php");
+    header(
+        "Location: " . BASE_URL .
+            "/app/controllers/ExercicioController.php"
+    );
     exit;
 }
 
 $tituloPagina = "Biblioteca de Exercícios";
+$cssEspecifico = BASE_URL . '/assets/css/biblioteca.css';
 
-include __DIR__ . '/../shared/header.php';
-include __DIR__ . '/../shared/sidebar.php';
+$pesquisa = (string) ($pesquisa ?? '');
+$grupo = (string) ($grupo ?? '');
+$exercicios = $exercicios ?? [];
+
+$gruposMusculares = [
+    'Abdômen',
+    'Bíceps',
+    'Costas',
+    'Glúteo',
+    'Glúteos',
+    'Ombro',
+    'Ombros',
+    'Peito',
+    'Pernas',
+    'Posterior de coxa',
+    'Quadríceps',
+    'Tríceps'
+];
+
+if ($grupo !== '' && !in_array($grupo, $gruposMusculares, true)) {
+    $gruposMusculares[] = $grupo;
+    sort($gruposMusculares, SORT_NATURAL);
+}
+
+$mensagensSucesso = [
+    'cadastrado' => 'Exercício cadastrado com sucesso!',
+    'atualizado' => 'Exercício atualizado com sucesso!',
+    'excluido' => 'Exercício desativado com sucesso!'
+];
+
+$mensagensErro = [
+    'invalido' => 'O exercício informado é inválido.',
+    'nao_encontrado' => 'O exercício não foi encontrado.',
+    'exclusao' => 'Não foi possível excluir o exercício.'
+];
+
+$codigoSucesso = (string) ($_GET['sucesso'] ?? '');
+$codigoErro = (string) ($_GET['erro'] ?? '');
+
+$mensagemSucesso = $mensagensSucesso[$codigoSucesso] ?? '';
+$mensagemErro = $mensagensErro[$codigoErro] ?? '';
+
+if ($mensagemErro === '' && $codigoErro !== '') {
+    $mensagemErro = 'Não foi possível concluir a operação.';
+}
+
+$urlController = BASE_URL .
+    '/app/controllers/ExercicioController.php';
+
+require __DIR__ . '/../shared/header.php';
+require __DIR__ . '/../shared/sidebar.php';
 ?>
-<main>
 
+<main class="conteudo biblioteca-page">
 
-    <?php if (isset($_GET['sucesso']) && $_GET['sucesso'] === 'excluido'): ?>
+    <!-- CABEÇALHO -->
 
-        <div class="mensagem-sucesso">
-            Exercício desativado com sucesso!
-        </div>
+    <header class="biblioteca-header">
 
-    <?php endif; ?>
+        <div class="biblioteca-header-info">
 
-    <div class="pagina-cabecalho">
+            <span class="biblioteca-etiqueta">
+                GESTÃO DE TREINOS
+            </span>
 
-        <div>
             <h1>Biblioteca de Exercícios</h1>
 
             <p>
-                Consulte e gerencie os exercícios disponíveis para os treinos.
+                Consulte, cadastre e gerencie os exercícios
+                disponíveis para a montagem dos treinos.
             </p>
+
         </div>
 
         <a
-            href="<?= BASE_URL ?>/app/controllers/ExercicioController.php?acao=novo"
-            class="fin-btn fin-btn-primary">
-            + Novo exercício
+            href="<?= htmlspecialchars(
+                        $urlController . '?acao=novo',
+                        ENT_QUOTES,
+                        'UTF-8'
+                    ) ?>"
+            class="biblioteca-btn biblioteca-btn-primary">
+            <span aria-hidden="true">+</span>
+            Novo exercício
         </a>
 
-    </div>
+    </header>
 
+    <!-- MENSAGENS -->
 
-    <!-- PESQUISA E FILTRO -->
+    <?php if ($mensagemSucesso !== ''): ?>
+        <div class="biblioteca-alerta biblioteca-alerta-sucesso"
+            role="status">
+            <?= htmlspecialchars(
+                $mensagemSucesso,
+                ENT_QUOTES,
+                'UTF-8'
+            ) ?>
+        </div>
+    <?php endif; ?>
 
-    <div class="filtros-exercicios">
+    <?php if ($mensagemErro !== ''): ?>
+        <div class="biblioteca-alerta biblioteca-alerta-erro"
+            role="alert">
+            <?= htmlspecialchars(
+                $mensagemErro,
+                ENT_QUOTES,
+                'UTF-8'
+            ) ?>
+        </div>
+    <?php endif; ?>
 
-        <form method="GET">
+    <!-- FILTROS -->
 
-            <div class="campo-pesquisa">
+    <section class="biblioteca-filtros-card">
 
-                <div>
+        <div class="biblioteca-section-title">
+            <div>
+                <h2>Pesquisar exercícios</h2>
+                <p>Encontre exercícios pelo nome ou grupo muscular.</p>
+            </div>
+        </div>
 
-                    <label for="pesquisa">
-                        Pesquisar exercício
-                    </label>
+        <form
+            method="GET"
+            action="<?= htmlspecialchars(
+                        $urlController,
+                        ENT_QUOTES,
+                        'UTF-8'
+                    ) ?>"
+            class="biblioteca-filtros-form">
 
-                    <input
-                        type="text"
-                        id="pesquisa"
-                        name="pesquisa"
-                        placeholder="Digite o nome do exercício..."
-                        value="<?= htmlspecialchars($pesquisa ?? '') ?>">
+            <div class="biblioteca-campo">
 
-                </div>
+                <label for="pesquisa">
+                    Pesquisar pelo nome
+                </label>
 
+                <input
+                    type="search"
+                    id="pesquisa"
+                    name="pesquisa"
+                    placeholder="Ex.: Agachamento"
+                    value="<?= htmlspecialchars(
+                                $pesquisa,
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>">
 
-                <div>
+            </div>
 
-                    <label for="grupo">
-                        Grupo muscular
-                    </label>
+            <div class="biblioteca-campo">
 
-                    <select id="grupo" name="grupo">
+                <label for="grupo">
+                    Grupo muscular
+                </label>
 
-                        <option value="">
-                            Todos
+                <select id="grupo" name="grupo">
+
+                    <option value="">
+                        Todos os grupos
+                    </option>
+
+                    <?php foreach ($gruposMusculares as $opcao): ?>
+                        <option
+                            value="<?= htmlspecialchars(
+                                        $opcao,
+                                        ENT_QUOTES,
+                                        'UTF-8'
+                                    ) ?>"
+                            <?= $grupo === $opcao
+                                ? 'selected'
+                                : '' ?>>
+                            <?= htmlspecialchars(
+                                $opcao,
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>
                         </option>
+                    <?php endforeach; ?>
 
-                        <option value="Bíceps"
-                            <?= ($grupo ?? '') === 'Bíceps' ? 'selected' : '' ?>>
-                            Bíceps
-                        </option>
+                </select>
 
-                        <option value="Costas"
-                            <?= ($grupo ?? '') === 'Costas' ? 'selected' : '' ?>>
-                            Costas
-                        </option>
+            </div>
 
-                        <option value="Glúteo"
-                            <?= ($grupo ?? '') === 'Glúteo' ? 'selected' : '' ?>>
-                            Glúteo
-                        </option>
+            <div class="biblioteca-filtros-acoes">
 
-                        <option value="Ombro"
-                            <?= ($grupo ?? '') === 'Ombro' ? 'selected' : '' ?>>
-                            Ombro
-                        </option>
+                <button
+                    type="submit"
+                    class="biblioteca-btn biblioteca-btn-primary">
+                    Buscar
+                </button>
 
-                        <option value="Peito"
-                            <?= ($grupo ?? '') === 'Peito' ? 'selected' : '' ?>>
-                            Peito
-                        </option>
-
-                        <option value="Posterior de coxa"
-                            <?= ($grupo ?? '') === 'Posterior de coxa' ? 'selected' : '' ?>>
-                            Posterior de coxa
-                        </option>
-
-                        <option value="Quadríceps"
-                            <?= ($grupo ?? '') === 'Quadríceps' ? 'selected' : '' ?>>
-                            Quadríceps
-                        </option>
-
-                        <option value="Tríceps"
-                            <?= ($grupo ?? '') === 'Tríceps' ? 'selected' : '' ?>>
-                            Tríceps
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <div class="botao-pesquisa">
-
-                    <button type="submit">
-                        Buscar
-                    </button>
-
-                </div>
+                <a
+                    href="<?= htmlspecialchars(
+                                $urlController,
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>"
+                    class="biblioteca-btn biblioteca-btn-secondary">
+                    Limpar
+                </a>
 
             </div>
 
         </form>
 
-    </div>
+        <p class="biblioteca-filtro-ajuda">
+            A pesquisa por nome tem prioridade sobre o filtro
+            de grupo muscular na versão atual do sistema.
+        </p>
 
+    </section>
 
-    <!-- LISTA DE EXERCÍCIOS -->
+    <!-- RESULTADOS -->
 
-    <div class="exercicios-grid">
+    <section class="biblioteca-resultados">
+
+        <div class="biblioteca-resultados-header">
+
+            <div>
+                <h2>Exercícios cadastrados</h2>
+                <p>
+                    Gerencie os exercícios da sua biblioteca.
+                </p>
+            </div>
+
+            <span class="biblioteca-contador">
+                <?= count($exercicios) ?>
+                <?= count($exercicios) === 1
+                    ? ' exercício'
+                    : ' exercícios' ?>
+            </span>
+
+        </div>
 
         <?php if (!empty($exercicios)): ?>
 
-            <?php foreach ($exercicios as $exercicio): ?>
+            <div class="exercicios-grid">
 
-                <div class="exercicio-card">
+                <?php foreach ($exercicios as $exercicio): ?>
 
+                    <?php
+                    $id = (int) ($exercicio['id'] ?? 0);
+                    $nome = (string) ($exercicio['nome'] ?? '');
+                    $grupoExercicio = (string) ($exercicio['grupo'] ?? '');
+                    $tipoMidia = (string) ($exercicio['tipo_midia'] ?? '');
+                    $midia = (string) ($exercicio['midia'] ?? '');
 
-                    <!-- MÍDIA -->
+                    $urlEditar = $urlController .
+                        '?acao=editar&id=' . $id;
 
-                    <div class="exercicio-midia">
+                    $urlExcluir = $urlController .
+                        '?acao=excluir&id=' . $id;
 
-                        <?php if (!empty($exercicio['midia'])): ?>
+                    $extensao = strtolower(
+                        pathinfo(
+                            parse_url($midia, PHP_URL_PATH) ?: '',
+                            PATHINFO_EXTENSION
+                        )
+                    );
 
+                    $mimeVideo = $extensao === 'webm'
+                        ? 'video/webm'
+                        : 'video/mp4';
+                    ?>
 
-                            <?php if ($exercicio['tipo_midia'] === 'video'): ?>
+                    <article class="exercicio-card">
+
+                        <!-- MÍDIA -->
+
+                        <div class="exercicio-midia">
+
+                            <?php if ($midia === ''): ?>
+
+                                <div class="exercicio-sem-midia">
+                                    <span aria-hidden="true">▧</span>
+                                    <p>Sem mídia disponível</p>
+                                </div>
+
+                            <?php elseif ($tipoMidia === 'video'): ?>
 
                                 <video
                                     controls
-                                    style="
-                                        width: 100%;
-                                        height: 200px;
-                                        object-fit: cover;
-                                        border-radius: 8px;
-                                    ">
-
+                                    preload="metadata"
+                                    playsinline
+                                    aria-label="Vídeo do exercício <?= htmlspecialchars(
+                                                                        $nome,
+                                                                        ENT_QUOTES,
+                                                                        'UTF-8'
+                                                                    ) ?>">
                                     <source
-                                        src="<?= htmlspecialchars($exercicio['midia']) ?>"
-                                        type="video/mp4">
-
-                                    Seu navegador não suporta vídeo.
-
+                                        src="<?= htmlspecialchars(
+                                                    $midia,
+                                                    ENT_QUOTES,
+                                                    'UTF-8'
+                                                ) ?>"
+                                        type="<?= $mimeVideo ?>">
+                                    Seu navegador não suporta vídeos.
                                 </video>
 
+                            <?php elseif ($tipoMidia === 'imagem'): ?>
+
+                                <img
+                                    src="<?= htmlspecialchars(
+                                                $midia,
+                                                ENT_QUOTES,
+                                                'UTF-8'
+                                            ) ?>"
+                                    alt="Demonstração do exercício <?= htmlspecialchars(
+                                                                        $nome,
+                                                                        ENT_QUOTES,
+                                                                        'UTF-8'
+                                                                    ) ?>"
+                                    loading="lazy">
 
                             <?php else: ?>
 
-                                <img
-                                    src="<?= htmlspecialchars($exercicio['midia']) ?>"
-                                    alt="<?= htmlspecialchars($exercicio['nome']) ?>"
-                                    style="
-                                        width: 100%;
-                                        height: 200px;
-                                        object-fit: cover;
-                                        border-radius: 8px;
-                                    ">
+                                <div class="exercicio-sem-midia">
+                                    <span aria-hidden="true">▧</span>
+                                    <p>Mídia indisponível</p>
+                                </div>
 
                             <?php endif; ?>
 
+                        </div>
 
-                        <?php else: ?>
+                        <!-- INFORMAÇÕES -->
 
-                            <span>
-                                Sem mídia
+                        <div class="exercicio-info">
+
+                            <span class="exercicio-grupo">
+                                <?= htmlspecialchars(
+                                    $grupoExercicio !== ''
+                                        ? $grupoExercicio
+                                        : 'Sem grupo',
+                                    ENT_QUOTES,
+                                    'UTF-8'
+                                ) ?>
                             </span>
 
-                        <?php endif; ?>
+                            <h3>
+                                <?= htmlspecialchars(
+                                    $nome,
+                                    ENT_QUOTES,
+                                    'UTF-8'
+                                ) ?>
+                            </h3>
 
-                    </div>
+                        </div>
 
+                        <!-- AÇÕES -->
 
-                    <!-- INFORMAÇÕES -->
+                        <div class="exercicio-acoes">
 
-                    <div class="exercicio-info">
+                            <a
+                                href="<?= htmlspecialchars(
+                                            $urlEditar,
+                                            ENT_QUOTES,
+                                            'UTF-8'
+                                        ) ?>"
+                                class="exercicio-btn-editar">
+                                Editar
+                            </a>
 
-                        <h3>
-                            <?= htmlspecialchars($exercicio['nome']) ?>
-                        </h3>
+                            <!--
+                              Mantido via GET para não quebrar
+                              o controller atual.
 
-                        <span class="exercicio-grupo">
-                            <?= htmlspecialchars($exercicio['grupo']) ?>
-                        </span>
+                              Próxima etapa:
+                              substituir por POST + CSRF.
+                            -->
+                            <a
+                                href="<?= htmlspecialchars(
+                                            $urlExcluir,
+                                            ENT_QUOTES,
+                                            'UTF-8'
+                                        ) ?>"
+                                class="exercicio-btn-excluir"
+                                onclick="return confirm('Tem certeza que deseja desativar este exercício?');">
+                                Excluir
+                            </a>
 
-                    </div>
+                        </div>
 
+                    </article>
 
-                    <!-- AÇÕES -->
+                <?php endforeach; ?>
 
-                    <div class="exercicio-acoes">
-
-                        <a
-                            href="<?= BASE_URL ?>/app/controllers/ExercicioController.php?acao=editar&id=<?= (int) $exercicio['id'] ?>">
-                            Editar
-                        </a>
-
-                        <a
-                            href="<?= BASE_URL ?>/app/controllers/ExercicioController.php?acao=excluir&id=<?= (int) $exercicio['id'] ?>"
-                            class="excluir"
-                            onclick="return confirm('Tem certeza que deseja excluir este exercício?');">
-                            Excluir
-                        </a>
-
-                    </div>
-
-
-                </div>
-
-            <?php endforeach; ?>
-
+            </div>
 
         <?php else: ?>
 
             <div class="nenhum-exercicio">
 
-                <h3>
-                    Nenhum exercício encontrado
-                </h3>
+                <div class="nenhum-exercicio-icone"
+                    aria-hidden="true">
+                    ▧
+                </div>
+
+                <h3>Nenhum exercício encontrado</h3>
 
                 <p>
-                    Não existem exercícios cadastrados ou nenhum exercício
-                    corresponde à sua pesquisa.
+                    Não existem exercícios cadastrados
+                    ou nenhum resultado corresponde
+                    aos filtros informados.
                 </p>
+
+                <a
+                    href="<?= htmlspecialchars(
+                                $urlController,
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>"
+                    class="biblioteca-btn biblioteca-btn-secondary">
+                    Limpar filtros
+                </a>
 
             </div>
 
         <?php endif; ?>
 
-    </div>
+    </section>
 
 </main>
 
-<?php require __DIR__ . '/../shared/footer.php'; ?>
+<?php
+require __DIR__ . '/../shared/footer.php';
+?>
