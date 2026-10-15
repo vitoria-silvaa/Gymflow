@@ -1406,3 +1406,51 @@
         transform: none;
     }
 }
+
+/* =========================================
+   MODIFICAÇÕES DO KANBAN (GEAN) - SIMPLIFICADO
+   ========================================= */
+.crm-lead-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.crm-card-topo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.crm-avatar-simples {
+    width: 36px;
+    height: 36px;
+    background: #e2e8f0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #475569;
+    flex-shrink: 0;
+}
+
+.crm-info-simples h4 { margin: 0; font-size: 14px; color: #1e293b; }
+.crm-info-simples p { margin: 0; font-size: 12px; color: #64748b; }
+
+.crm-tags-simples { display: flex; gap: 4px; flex-wrap: wrap; }
+.crm-tag-min { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 10px; border: 1px solid #e2e8f0; }
+
+.crm-rodape-simples {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 4px;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 8px;
+}

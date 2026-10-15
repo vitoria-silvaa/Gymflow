@@ -23,11 +23,7 @@ $colunasStatus = ['Novo', 'Contato Agendado', 'Experimental', 'Convertido', 'Per
             <p><?= $isEdicao ? 'Atualize as informações de contato e interesse do lead.' : 'Adicione um novo lead interessado em treinar na Gymflow.' ?></p>
         </div>
 
-        <div class="fin-header-actions">
-            <a href="<?= $baseUrl ?>" class="fin-btn fin-btn-secondary fin-btn-sm">
-                ← Voltar ao Quadro
-            </a>
-        </div>
+    
     </div>
 
     <section class="fin-form-card">
@@ -36,8 +32,7 @@ $colunasStatus = ['Novo', 'Contato Agendado', 'Experimental', 'Convertido', 'Per
 
         <?php if (!empty($erro)): ?>
             <div class="fin-alert fin-alert-danger">
-                <span>⚠️</span>
-                <span><?= htmlspecialchars($erro) ?></span>
+                   <span><?= htmlspecialchars($erro) ?></span>
             </div>
         <?php endif; ?>
 
@@ -87,16 +82,7 @@ $colunasStatus = ['Novo', 'Contato Agendado', 'Experimental', 'Convertido', 'Per
                     >
                 </div>
 
-                <div class="fin-form-group">
-                    <label class="fin-form-label">E-mail</label>
-                    <input
-                        type="email"
-                        name="email"
-                        class="fin-form-input"
-                        placeholder="Ex: joao@email.com"
-                        value="<?= htmlspecialchars($dados['email'] ?? '') ?>"
-                    >
-                </div>
+        
 
                 <div class="fin-form-group">
                     <label class="fin-form-label">Objetivo Principal</label>

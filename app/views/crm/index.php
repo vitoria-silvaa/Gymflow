@@ -1,4 +1,5 @@
 <?php
+// Se alguém abrir esta página direto, sem passar pelo controller, manda de volta pro controller
 if (!isset($tituloPagina)) {
     header("Location: " . BASE_URL . "/app/controllers/CrmController.php");
     exit;
@@ -9,29 +10,28 @@ $cssEspecifico = BASE_URL . '/assets/css/jorge-financeiro.css';
 include __DIR__ . '/../shared/header.php';
 include __DIR__ . '/../shared/sidebar.php';
 
-$colunasStatus = ['Novo', 'Contato Agendado', 'Experimental', 'Convertido', 'Perdido'];
-$leadsPorStatus = array_fill_keys($colunasStatus, []);
-
-foreach ($leads ?? [] as $lead) {
-    $st = $lead['status'] ?? 'Novo';
-    $leadsPorStatus[$st][] = $lead;
+// Se o controller não mandou nenhum lead, começa com a lista vazia
+if (!isset($leads)) {
+    $leads = [];
 }
 
-$columnClassMap = [
-    'Novo' => 'crm-col-novo',
+// Etapas do funil (colunas do quadro) e a classe CSS de cada uma, que define a cor
+$colunas = [
+    'Novo'             => 'crm-col-novo',
     'Contato Agendado' => 'crm-col-contato',
-    'Experimental' => 'crm-col-experimental',
-    'Convertido' => 'crm-col-convertido',
-    'Perdido' => 'crm-col-perdido',
+    'Experimental'     => 'crm-col-experimental',
+    'Convertido'       => 'crm-col-convertido',
+    'Perdido'          => 'crm-col-perdido',
 ];
 
-$totalLeads = count($leads ?? []);
+$totalLeads = count($leads);
 ?>
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/jorge-financeiro.css">
 
 <main class="conteudo crm-page">
 
+    <!-- Título da página e botão de novo lead -->
     <div class="fin-page-header">
         <div class="fin-header-info">
             <h1>CRM / Quadro de Leads</h1>
@@ -39,132 +39,130 @@ $totalLeads = count($leads ?? []);
         </div>
 
         <div class="fin-header-actions">
-            <a href="<?= $baseUrl ?>?acao=cadastrar" class="fin-btn fin-btn-primary">
-                + Novo Lead
-            </a>
+            <a href="<?= $baseUrl ?>?acao=cadastrar" class="fin-btn fin-btn-primary">+ Novo Lead</a>
         </div>
     </div>
 
-    <!-- Quadro Kanban de Leads -->
+    <!-- Quadro com uma coluna para cada etapa -->
     <div class="crm-kanban-board">
-        <?php foreach ($colunasStatus as $coluna): ?>
-            <?php 
-                $colClass = $columnClassMap[$coluna] ?? 'crm-col-novo'; 
-                $quantidade = count($leadsPorStatus[$coluna]);
+
+        <?php foreach ($colunas as $status => $classe): ?>
+
+            <?php
+            // Separa só os leads que estão nesta etapa
+            $leadsDaColuna = [];
+            foreach ($leads as $lead) {
+                if ($lead['status'] == $status) {
+                    $leadsDaColuna[] = $lead;
+                }
+            }
             ?>
-            <div class="crm-kanban-column <?= $colClass ?>" ondragover="permitirDrop(event)" ondrop="soltar(event, '<?= $coluna ?>')">
+
+            <div class="crm-kanban-column <?= $classe ?>" ondragover="permitirDrop(event)" ondrop="soltar(event, '<?= $status ?>')">
+
+                <!-- Cabeçalho da coluna: nome da etapa e quantidade -->
                 <div class="crm-column-header">
-                    <h3 class="crm-column-title">
-                        <?= htmlspecialchars($coluna) ?>
-                    </h3>
-                    <span class="crm-column-count"><?= $quantidade ?></span>
+                    <h3 class="crm-column-title"><?= $status ?></h3>
+                    <span class="crm-column-count"><?= count($leadsDaColuna) ?></span>
                 </div>
 
                 <div class="crm-column-cards">
-                    <?php if ($quantidade === 0): ?>
-                        <div class="crm-empty-state">
-                            Nenhum lead nesta etapa
-                        </div>
-                    <?php else: ?>
-                        <?php foreach ($leadsPorStatus[$coluna] as $lead): ?>
-                            <div class="crm-lead-card" draggable="true" ondragstart="iniciarDrag(event, <?= $lead['id'] ?>)" style="cursor: grab;">
-                                <h4 class="crm-lead-name">
-                                    <?= htmlspecialchars($lead['nome']) ?>
-                                </h4>
 
-                                <div class="crm-lead-details">
-                                    <div class="crm-lead-detail-item">
-                                        <span>📞</span>
-                                        <strong><?= htmlspecialchars($lead['telefone'] ?? '-') ?></strong>
-                                    </div>
+                    <?php if (count($leadsDaColuna) == 0): ?>
+                        <div class="crm-empty-state">Nenhum lead nesta etapa</div>
+                    <?php endif; ?>
 
-                                    <?php if (!empty($lead['objetivo'])): ?>
-                                        <div class="crm-lead-detail-item">
-                                            <span class="crm-lead-tag">
-                                                🎯 <?= htmlspecialchars($lead['objetivo']) ?>
-                                            </span>
-                                        </div>
-                                    <?php endif; ?>
+                    <?php foreach ($leadsDaColuna as $lead): ?>
 
-                                    <?php if (!empty($lead['campanha'])): ?>
-                                        <div class="crm-lead-detail-item">
-                                            <span class="crm-lead-tag">
-                                                📢 <?= htmlspecialchars($lead['campanha']) ?>
-                                            </span>
-                                        </div>
-                                    <?php endif; ?>
+                        <?php
+                        // htmlspecialchars evita que alguém coloque código HTML no nome e quebre a página
+                        $nome     = htmlspecialchars($lead['nome']);
+                        $telefone = htmlspecialchars($lead['telefone']);
+                        $inicial  = strtoupper(substr($lead['nome'], 0, 1));
+
+                        // Para o link do WhatsApp, o telefone precisa ter só números
+                        $numeroWhats = str_replace([' ', '(', ')', '-'], '', $lead['telefone']);
+                        ?>
+
+                        <!-- Card do lead (pode ser arrastado para outra coluna) -->
+                        <div class="crm-lead-card" draggable="true" ondragstart="iniciarDrag(event, <?= $lead['id'] ?>)">
+
+                            <div class="crm-card-topo">
+                                <!-- Bolinha com a primeira letra do nome -->
+                                <div class="crm-avatar-simples"><?= $inicial ?></div>
+
+                                <div class="crm-info-simples">
+                                    <h4><?= $nome ?></h4>
+                                    <p><?= $telefone != '' ? $telefone : '-' ?></p>
                                 </div>
 
-                                <div class="crm-lead-actions" style="display: flex; flex-direction: column; gap: 10px; border-top: 1px solid #e2e8f0; padding-top: 12px; margin-top: 12px;">
-                                    <div style="display: flex; gap: 6px; flex-wrap: wrap; width: 100%;">
-                                        <?php 
-                                            $whatsappNumber = preg_replace('/\D/', '', $lead['telefone'] ?? '');
-                                            if (!empty($whatsappNumber)): 
-                                                $wppMsg = '';
-                                                $nomeLead = htmlspecialchars(explode(' ', trim($lead['nome'] ?? ''))[0]);
-                                                switch (strtolower($coluna)) {
-                                                    case 'novo':
-                                                        $wppMsg = "Olá {$nomeLead}, tudo bem? Vimos o seu interesse pela GymFlow! Gostaria de saber mais sobre nossos planos e estrutura?";
-                                                        break;
-                                                    case 'contato agendado':
-                                                        $wppMsg = "Olá {$nomeLead}, tudo bem? Estou entrando em contato para confirmarmos nossa conversa. Qual o melhor horário para você?";
-                                                        break;
-                                                    case 'experimental':
-                                                        $wppMsg = "Olá {$nomeLead}, tudo pronto para sua aula experimental na GymFlow? Estamos te aguardando, não esqueça a garrafinha!";
-                                                        break;
-                                                    case 'convertido':
-                                                        $wppMsg = "Olá {$nomeLead}, seja muito bem-vindo(a) à família GymFlow! Qualquer dúvida sobre o app ou treinos, estamos à disposição por aqui!";
-                                                        break;
-                                                    case 'perdido':
-                                                        $wppMsg = "Olá {$nomeLead}, faz um tempo que não nos falamos. Sentimos sua falta! Temos uma condição especial caso decida treinar conosco, topa conversar?";
-                                                        break;
-                                                }
-                                                $wppUrl = "https://wa.me/55{$whatsappNumber}?text=" . urlencode($wppMsg);
-                                        ?>
-                                            <a href="<?= $wppUrl ?>" target="_blank" style="display:inline-flex; align-items:center; gap:4px; background: #25D366; color: white; text-decoration: none; padding: 6px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; white-space: nowrap; flex: 1; justify-content: center;">
-                                                <span>💬</span> WhatsApp
-                                            </a>
-                                        <?php endif; ?>
-                                        
-                                        <?php if (!empty($lead['email'])): ?>
-                                            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=<?= urlencode($lead['email']) ?>" target="_blank" style="display:inline-flex; align-items:center; gap:4px; background: #EA4335; color: white; text-decoration: none; padding: 6px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; white-space: nowrap; flex: 1; justify-content: center;">
-                                                <span>✉️</span> E-mail
-                                            </a>
-                                        <?php endif; ?>
-                                    </div>
-                                    
-                                    <div class="crm-lead-links" style="display: flex; justify-content: center; gap: 8px; width: 100%; font-size: 13px;">
-                                        <a href="<?= $baseUrl ?>?acao=editar&id=<?= $lead['id'] ?>">Editar</a>
-                                        <span>•</span>
-                                        <a
-                                            href="<?= $baseUrl ?>?acao=excluir&id=<?= $lead['id'] ?>"
-                                            class="crm-delete-link"
-                                            onclick="return confirm('Deseja realmente excluir este lead?');"
-                                        >
-                                            Excluir
-                                        </a>
-                                    </div>
-                                </div>
+                                <!-- Botão do WhatsApp (só aparece se tiver telefone) -->
+                                <?php if ($numeroWhats != ''): ?>
+                                    <a href="https://wa.me/55<?= $numeroWhats ?>" target="_blank" class="crm-icon-btn crm-icon-wpp" style="margin-left:auto;" title="WhatsApp">
+                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#25D366" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                                        </svg>
+                                    </a>
+                                <?php endif; ?>
+                            </div>
 
-                                <form method="POST" action="<?= $baseUrl ?>?acao=atualizar_status" class="crm-status-form">
-                                    <input type="hidden" name="id" value="<?= (int) $lead['id'] ?>">
-                                    <select name="status" class="crm-status-select" onchange="this.form.submit()">
-                                        <?php foreach ($colunasStatus as $st): ?>
-                                            <option value="<?= $st ?>" <?= $lead['status'] === $st ? 'selected' : '' ?>>
-                                                Mover: <?= $st ?>
-                                            </option>
+                            <!-- Etiquetas de objetivo e campanha -->
+                            <div class="crm-tags-simples">
+                                <?php if ($lead['objetivo'] != ''): ?>
+                                    <span class="crm-tag-min"><?= htmlspecialchars($lead['objetivo']) ?></span>
+                                <?php endif; ?>
+
+                                <?php if ($lead['campanha'] != ''): ?>
+                                    <span class="crm-tag-min"><?= htmlspecialchars($lead['campanha']) ?></span>
+                                <?php endif; ?>
+                            </div>
+
+                            <!-- Rodapé: trocar etapa, editar e excluir -->
+                            <div class="crm-rodape-simples">
+
+                                <!-- Ao escolher outra etapa, o formulário é enviado sozinho -->
+                                <form method="POST" action="<?= $baseUrl ?>?acao=atualizar_status" style="margin:0;">
+                                    <input type="hidden" name="id" value="<?= $lead['id'] ?>">
+                                    <select name="status" onchange="this.form.submit()" style="border:none; background:transparent; font-size:12px; color:#64748b; cursor:pointer; outline:none; font-weight:500;">
+                                        <?php foreach ($colunas as $opcao => $classeOpcao): ?>
+                                            <?php if ($lead['status'] == $opcao): ?>
+                                                <option value="<?= $opcao ?>" selected><?= $opcao ?></option>
+                                            <?php else: ?>
+                                                <option value="<?= $opcao ?>"><?= $opcao ?></option>
+                                            <?php endif; ?>
                                         <?php endforeach; ?>
                                     </select>
                                 </form>
+
+                                <div style="display:flex; gap:12px; align-items:center;">
+                                    <!-- Editar -->
+                                    <a href="<?= $baseUrl ?>?acao=editar&id=<?= $lead['id'] ?>" class="crm-icon-btn" title="Editar">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                        </svg>
+                                    </a>
+
+                                    <!-- Excluir (pede confirmação antes) -->
+                                    <a href="<?= $baseUrl ?>?acao=excluir&id=<?= $lead['id'] ?>" onclick="return confirm('Deseja excluir?');" class="crm-icon-btn" title="Excluir">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                        </svg>
+                                    </a>
+                                </div>
                             </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
+
+                        </div>
+                    <?php endforeach; ?>
+
                 </div>
             </div>
         <?php endforeach; ?>
+
     </div>
 
-    <!-- Form oculto para atualizar via Drag & Drop -->
+    <!-- Formulário escondido: usado quando o card é arrastado para outra coluna -->
     <form id="form-drag-drop" method="POST" action="<?= $baseUrl ?>?acao=atualizar_status" style="display: none;">
         <input type="hidden" name="id" id="dd_lead_id">
         <input type="hidden" name="status" id="dd_lead_status">
@@ -173,28 +171,32 @@ $totalLeads = count($leads ?? []);
 </main>
 
 <script>
-    function permitirDrop(ev) {
-        ev.preventDefault(); // Necessário para permitir o drop
+    // Deixa soltar o card em cima da coluna
+    function permitirDrop(evento) {
+        evento.preventDefault();
     }
 
-    function iniciarDrag(ev, leadId) {
-        ev.dataTransfer.setData("leadId", leadId);
-        ev.target.style.opacity = "0.5";
+    // Quando começa a arrastar, guarda o id do lead
+    function iniciarDrag(evento, idLead) {
+        evento.dataTransfer.setData("idLead", idLead);
+        evento.target.style.opacity = "0.5";
     }
 
-    function soltar(ev, novoStatus) {
-        ev.preventDefault();
-        var leadId = ev.dataTransfer.getData("leadId");
-        
-        if (leadId) {
-            document.getElementById('dd_lead_id').value = leadId;
+    // Quando solta na coluna, preenche o formulário escondido e envia
+    function soltar(evento, novoStatus) {
+        evento.preventDefault();
+        var idLead = evento.dataTransfer.getData("idLead");
+
+        if (idLead) {
+            document.getElementById('dd_lead_id').value = idLead;
             document.getElementById('dd_lead_status').value = novoStatus;
             document.getElementById('form-drag-drop').submit();
         }
     }
 
-    document.addEventListener("dragend", function(ev) {
-        ev.target.style.opacity = "1";
+    // Quando termina de arrastar, o card volta ao normal
+    document.addEventListener("dragend", function (evento) {
+        evento.target.style.opacity = "1";
     });
 </script>
 
