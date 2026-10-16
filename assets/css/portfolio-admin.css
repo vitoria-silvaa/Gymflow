@@ -1,0 +1,557 @@
+/* ========================================================
+   GYMFLOW | SITE / PORTFÓLIO — EDITOR ADMINISTRATIVO
+   Estilos exclusivos do painel; não alteram o site público.
+   ======================================================== */
+.portfolio-admin-page {
+  --pa-brand: var(--cor-primaria, #eab308);
+  --pa-brand-hover: var(--cor-primaria-hover, var(--pa-brand));
+  --pa-bg: var(--ui-fundo-pagina, #f8fafc);
+  --pa-card: var(--ui-fundo-card, #fff);
+  --pa-ink: var(--ui-texto, #111827);
+  --pa-muted: var(--ui-texto-suave, #64748b);
+  --pa-line: var(--ui-borda, #e2e8f0);
+  --pa-radius: var(--ui-raio-md, 12px);
+  width: 100%;
+  max-width: 1500px;
+  min-width: 0;
+  margin: 0 auto;
+  padding: 28px 32px 52px;
+  color: var(--pa-ink);
+  font-size: 14px;
+}
+
+.portfolio-admin-page *,
+.portfolio-admin-page *::before,
+.portfolio-admin-page *::after {
+  box-sizing: border-box;
+}
+
+.portfolio-admin-page .portfolio-admin-form {
+  width: 100%;
+  min-width: 0;
+}
+
+.portfolio-admin-page .portfolio-admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin: 0 0 24px;
+  padding: 0 0 22px;
+  border-bottom: 1px solid var(--pa-line);
+  background: transparent;
+}
+
+.portfolio-admin-page .portfolio-admin-header h1 {
+  margin: 4px 0 7px;
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 750;
+  color: var(--pa-ink);
+}
+
+.portfolio-admin-page .portfolio-admin-header p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--pa-muted);
+}
+
+.portfolio-admin-page .portfolio-admin-eyebrow {
+  color: var(--pa-brand);
+  letter-spacing: .09em;
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.portfolio-admin-page .portfolio-admin-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.portfolio-admin-page .portfolio-admin-save,
+.portfolio-admin-page .portfolio-admin-preview-link,
+.portfolio-admin-page .portfolio-admin-add {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 17px;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: filter .16s;
+}
+
+.portfolio-admin-page .portfolio-admin-save {
+  background: var(--pa-brand);
+  color: #fff;
+  border: 1px solid transparent;
+}
+
+.portfolio-admin-page .portfolio-admin-save:hover {
+  background: var(--pa-brand-hover);
+  filter: brightness(.96);
+  color: #fff;
+}
+
+.portfolio-admin-page .portfolio-admin-preview-link {
+  background: var(--pa-card);
+  color: var(--pa-ink);
+  border: 1px solid var(--pa-line);
+}
+
+.portfolio-admin-page .portfolio-admin-preview-link:hover {
+  background: var(--pa-bg);
+  color: var(--pa-ink);
+}
+
+.portfolio-admin-page .portfolio-admin-editor {
+  width: 100%;
+  min-width: 0;
+}
+
+.portfolio-admin-page .portfolio-admin-editor-content {
+  width: 100%;
+  min-width: 0;
+}
+
+.portfolio-admin-page .portfolio-admin-tabs {
+  overflow-x: auto;
+  margin: 0 0 22px;
+  padding: 0;
+  border-bottom: 1px solid var(--pa-line);
+}
+
+.portfolio-admin-page .portfolio-admin-tabs ul {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  min-width: 100%;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.portfolio-admin-page .portfolio-admin-tabs li {
+  margin: 0;
+  padding: 0;
+}
+
+.portfolio-admin-page .portfolio-admin-tabs .tab-btn {
+  appearance: none;
+  display: block;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  padding: 12px 17px;
+  margin: 0;
+  border-radius: 7px 7px 0 0;
+  background: transparent;
+  color: var(--pa-muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.portfolio-admin-page .portfolio-admin-tabs .tab-btn:hover {
+  background: var(--pa-card);
+  color: var(--pa-ink);
+}
+
+.portfolio-admin-page .portfolio-admin-tabs .tab-btn.is-active {
+  background: var(--pa-card);
+  color: var(--pa-ink);
+  border-bottom-color: var(--pa-brand);
+}
+
+.portfolio-admin-page .tab-content {
+  display: none;
+  min-width: 0;
+  padding: 25px 28px 30px;
+  background: var(--pa-card);
+  border: 1px solid var(--pa-line);
+  border-radius: var(--pa-radius);
+  box-shadow: var(--ui-sombra-card, 0 2px 5px rgba(15, 23, 42, .03));
+}
+
+.portfolio-admin-page .tab-content.is-active {
+  display: block;
+}
+
+.portfolio-admin-page .tab-content>h2,
+.portfolio-admin-page .tab-content>header h2,
+.portfolio-admin-page .tab-content>header>h2 {
+  margin: 0 0 22px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--pa-ink);
+}
+
+.portfolio-admin-page .tab-content>header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding-bottom: 14px;
+  margin-bottom: 17px;
+  border-bottom: 1px solid var(--pa-line);
+}
+
+.portfolio-admin-page .tab-content>header h2 {
+  margin: 0;
+}
+
+.portfolio-admin-page .tab-content>header p {
+  margin: 5px 0 0;
+  color: var(--pa-muted);
+}
+
+.portfolio-admin-page .tab-content h3 {
+  margin: 24px 0 12px;
+  color: var(--pa-ink);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.portfolio-admin-page .tab-content h4 {
+  margin: 22px 0 12px;
+  color: var(--pa-ink);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.portfolio-admin-page .tab-content>div:not([id]):not(.portfolio-admin-items) {
+  margin-bottom: 18px;
+}
+
+.portfolio-admin-page .tab-content label {
+  display: block;
+  margin: 0 0 7px;
+  color: var(--pa-ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.portfolio-admin-page .tab-content input:not([type=checkbox]):not([type=hidden]),
+.portfolio-admin-page .tab-content textarea,
+.portfolio-admin-page .tab-content select {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid var(--pa-line);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--pa-ink);
+  font: inherit;
+  font-size: 14px;
+}
+
+.portfolio-admin-page .tab-content input[type=color] {
+  width: 85px !important;
+  height: 45px;
+  padding: 4px !important;
+  cursor: pointer;
+}
+
+.portfolio-admin-page .tab-content input[type=file] {
+  padding: 7px 10px !important;
+  cursor: pointer;
+}
+
+.portfolio-admin-page .tab-content textarea {
+  min-height: 93px;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.portfolio-admin-page .tab-content input:focus-visible,
+.portfolio-admin-page .tab-content select:focus-visible,
+.portfolio-admin-page .tab-content textarea:focus-visible,
+.portfolio-admin-page .tab-content button:focus-visible,
+.portfolio-admin-page .portfolio-admin-tabs button:focus-visible {
+  outline: 2px solid var(--pa-brand);
+  outline-offset: 2px;
+}
+
+.portfolio-admin-page .tab-content input[type=checkbox] {
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  accent-color: var(--pa-brand);
+  cursor: pointer;
+}
+
+.portfolio-admin-page .tab-content label:has(> input[type=checkbox]) {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: fit-content;
+  cursor: pointer;
+  margin: 0;
+}
+
+.portfolio-admin-page .tab-content label:has(> .toggle-switch) {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.portfolio-admin-page .tab-content img {
+  display: block;
+  width: auto;
+  max-width: min(100%, 240px);
+  max-height: 150px;
+  object-fit: contain;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.portfolio-admin-page .tab-content hr {
+  height: 1px;
+  margin: 25px 0;
+  border: 0;
+  background: var(--pa-line);
+}
+
+.portfolio-admin-page .tab-content fieldset {
+  min-width: 0;
+  margin: 0 0 16px;
+  padding: 20px;
+  background: var(--pa-card);
+  border: 1px solid var(--pa-line);
+  border-radius: 10px;
+}
+
+.portfolio-admin-page .tab-content fieldset legend {
+  padding: 0 9px;
+  font-weight: 700;
+  color: var(--pa-ink);
+}
+
+.portfolio-admin-page .tab-content fieldset>div {
+  margin: 0 0 15px;
+  min-width: 0;
+}
+
+.portfolio-admin-page .tab-content fieldset>div:last-child {
+  margin-bottom: 0;
+}
+
+.portfolio-admin-page .portfolio-admin-items {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.portfolio-admin-page .portfolio-admin-items .portfolio-admin-item {
+  margin: 0;
+}
+
+.portfolio-admin-page .portfolio-admin-add {
+  background: var(--pa-card);
+  color: var(--pa-brand);
+  border: 1px solid var(--pa-brand);
+}
+
+.portfolio-admin-page .portfolio-admin-add:hover {
+  filter: brightness(.92);
+}
+
+.portfolio-admin-page .portfolio-admin-remove,
+.portfolio-admin-page .portfolio-admin-item button[onclick^="removerItem"] {
+  padding: 8px 12px;
+  font: inherit;
+  font-weight: 650;
+  font-size: 12px;
+  color: #b91c1c;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.portfolio-admin-page .portfolio-admin-item>div:first-child:has(> button[onclick^="removerItem"]) {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.portfolio-admin-page .portfolio-admin-item button[onclick^="removerItem"]:hover {
+  background: #ffe4e6;
+}
+
+.portfolio-admin-page #tab-feedbacks .portfolio-admin-item>div:first-child {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.portfolio-admin-page #tab-feedbacks .portfolio-admin-item>p {
+  margin: 12px 0;
+  padding: 12px;
+  border-radius: 7px;
+  background: var(--pa-bg);
+  font-style: italic;
+  white-space: normal;
+}
+
+.portfolio-admin-page #tab-feedbacks .portfolio-admin-item small {
+  color: var(--pa-muted);
+}
+
+.portfolio-admin-page #tab-feedbacks .portfolio-admin-item label:has(.toggle-switch) {
+  border: 1px solid var(--pa-line);
+  border-radius: 8px;
+  padding: 9px 12px;
+  background: #fff;
+}
+
+.portfolio-admin-page .toggle-switch {
+  display: inline-block;
+  width: 42px;
+  height: 24px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.portfolio-admin-page .toggle-switch input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+
+.portfolio-admin-page .toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: #cbd5e1;
+  border-radius: 30px;
+  transition: background .2s;
+  pointer-events: none;
+}
+
+.portfolio-admin-page .toggle-slider::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  bottom: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform .2s;
+}
+
+.portfolio-admin-page .toggle-switch input:checked+.toggle-slider {
+  background: var(--pa-brand);
+}
+
+.portfolio-admin-page .toggle-switch input:checked+.toggle-slider::before {
+  transform: translateX(18px);
+}
+
+.portfolio-admin-page .toggle-switch input:focus-visible+.toggle-slider {
+  outline: 2px solid var(--pa-brand);
+  outline-offset: 2px;
+}
+
+.portfolio-admin-page .mensagem-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 9px;
+  max-width: 560px;
+}
+
+.portfolio-admin-page .mensagem-status strong {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.portfolio-admin-page .mensagem-status p {
+  margin: 0;
+  font-size: 13px;
+}
+
+.portfolio-admin-page .mensagem-icone {
+  flex-shrink: 0;
+  font-weight: 800;
+}
+
+.portfolio-admin-page .mensagem-sucesso {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #047857;
+}
+
+.portfolio-admin-page .mensagem-erro {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+}
+
+.portfolio-admin-page #removidos-container {
+  display: none;
+}
+
+@media (max-width: 1080px) {
+  .portfolio-admin-page .portfolio-admin-items {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .portfolio-admin-page {
+    padding: 20px 16px 35px;
+  }
+
+  .portfolio-admin-page .portfolio-admin-header h1 {
+    font-size: 24px;
+  }
+
+  .portfolio-admin-page .portfolio-admin-header-actions {
+    width: 100%;
+  }
+
+  .portfolio-admin-page .portfolio-admin-header-actions>* {
+    flex: 1;
+  }
+
+  .portfolio-admin-page .tab-content {
+    padding: 18px 15px 24px;
+  }
+
+  .portfolio-admin-page .tab-content fieldset {
+    padding: 16px 12px;
+  }
+
+  .portfolio-admin-page .portfolio-admin-items {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .portfolio-admin-page .toggle-slider,
+  .portfolio-admin-page .toggle-slider::before,
+  .portfolio-admin-page .portfolio-admin-save {
+    transition: none;
+  }
+}
