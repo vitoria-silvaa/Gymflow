@@ -1,3 +1,4 @@
+
 <?php
 // app/controllers/LoginController.php
 
@@ -9,7 +10,7 @@ $acao = $_GET['acao'] ?? 'login';
 /* 1. LOGIN */
 if ($acao === 'login') {
 
-    // Redireciona se o usuário já estiver logado
+    // Redireciona se o usuário já estiver logado.
     if (isset($_SESSION['usuario_id'])) {
         if (($_SESSION['usuario_role'] ?? '') === 'Aluno') {
             header("Location: " . BASE_URL . "/app/controllers/PortalAlunoController.php?acao=aluno");
@@ -57,7 +58,7 @@ if ($acao === 'login') {
                     $_SESSION['logo_url'] = null;
                 }
 
-                // Lógica de "Lembrar-me"
+                // Lógica de "Lembrar-me".
                 if (!empty($_POST['lembrar'])) {
                     $token = bin2hex(random_bytes(32));
 
@@ -65,7 +66,6 @@ if ($acao === 'login') {
                         "UPDATE users SET remember_token = ? WHERE id = ?"
                     );
                     $stmtToken->execute([$token, $usuario['id']]);
-
 
                     $https = !empty($_SERVER['HTTPS'])
                         && $_SERVER['HTTPS'] !== 'off';
@@ -93,12 +93,12 @@ if ($acao === 'login') {
 
     require __DIR__ . '/../views/login/index.php';
 
-    /* 2. LOGOUT */
+/* 2. LOGOUT */
 } elseif ($acao === 'logout') {
 
     efetuarLogout();
 
-    /* 3. ESQUECI A SENHA */
+/* 3. ESQUECI A SENHA */
 } elseif ($acao === 'esqueci_senha') {
 
     $erro = '';
@@ -116,13 +116,115 @@ if ($acao === 'login') {
             try {
                 require_once __DIR__ . '/../../config/conexao.php';
 
+                // Obtém a empresa associada à conta, sem depender da sessão.
                 $stmt = $pdo->prepare(
-                    "SELECT id, email FROM users WHERE email = ?"
+                    "SELECT id, email, company_id
+                    FROM users
+                    WHERE email = ?
+                    LIMIT 1"
                 );
                 $stmt->execute([$email]);
                 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
                 if ($user) {
+
+                    /*
+                     * CORES DO E-MAIL
+                     * Os valores padrão são usados se não houver configuração.
+                     */
+                    $coresEmail = [
+                        'fundo' => '#0b0b0b',
+                        'cartao' => '#151515',
+                        'destaque' => '#ffb000',
+                        'botao' => '#ffb000',
+                        'texto_botao' => '#151515',
+                    ];
+
+                    $empresaId = (int) ($user['company_id'] ?? 0);
+
+                    if ($empresaId > 0) {
+                        try {
+                            $stmtCores = $pdo->prepare("
+                                SELECT
+                                    ce.modo_cores_email,
+                                    ce.cor_email_fundo,
+                                    ce.cor_email_cartao,
+                                    ce.cor_email_destaque,
+                                    ce.cor_email_botao,
+                                    ce.cor_email_texto_botao,
+                                    p.cor_primaria,
+                                    p.cor_secundaria
+                                FROM configuracoes_email ce
+                                LEFT JOIN preferencias_usuario p
+                                    ON p.user_id = ce.atualizado_por
+                                WHERE ce.company_id = ?
+                                LIMIT 1
+                            ");
+
+                            $stmtCores->execute([$empresaId]);
+                            $configCores = $stmtCores->fetch(PDO::FETCH_ASSOC);
+
+                            if ($configCores) {
+                                $modoCores = $configCores['modo_cores_email'] ?? 'personalizado';
+
+                                if ($modoCores === 'personalizado') {
+                                    $camposCores = [
+                                        'fundo' => 'cor_email_fundo',
+                                        'cartao' => 'cor_email_cartao',
+                                        'destaque' => 'cor_email_destaque',
+                                        'botao' => 'cor_email_botao',
+                                        'texto_botao' => 'cor_email_texto_botao',
+                                    ];
+
+                                    foreach ($camposCores as $destino => $origem) {
+                                        $cor = $configCores[$origem] ?? '';
+
+                                        if (
+                                            is_string($cor) &&
+                                            preg_match('/^#[0-9a-fA-F]{6}$/', $cor)
+                                        ) {
+                                            $coresEmail[$destino] = strtolower($cor);
+                                        }
+                                    }
+                                } elseif ($modoCores === 'marca') {
+                                    $corPrimaria = $configCores['cor_primaria'] ?? '';
+                                    $corSecundaria = $configCores['cor_secundaria'] ?? '';
+
+                                    // Cor secundária da marca no fundo externo.
+                                    if (
+                                        is_string($corSecundaria) &&
+                                        preg_match('/^#[0-9a-fA-F]{6}$/', $corSecundaria)
+                                    ) {
+                                        $coresEmail['fundo'] = strtolower($corSecundaria);
+                                    }
+
+                                    // Cor primária da marca nos destaques e no botão.
+                                    if (
+                                        is_string($corPrimaria) &&
+                                        preg_match('/^#[0-9a-fA-F]{6}$/', $corPrimaria)
+                                    ) {
+                                        $coresEmail['destaque'] = strtolower($corPrimaria);
+                                        $coresEmail['botao'] = strtolower($corPrimaria);
+
+                                        // Escolhe uma cor de texto com contraste básico.
+                                        $hex = ltrim($coresEmail['botao'], '#');
+                                        $r = hexdec(substr($hex, 0, 2));
+                                        $g = hexdec(substr($hex, 2, 2));
+                                        $b = hexdec(substr($hex, 4, 2));
+
+                                        $brilho = (299 * $r + 587 * $g + 114 * $b) / 1000;
+
+                                        $coresEmail['texto_botao'] =
+                                            $brilho >= 150 ? '#151515' : '#ffffff';
+                                    }
+                                }
+                            }
+                        } catch (\Throwable $e) {
+                            // Se a configuração falhar, conserva as cores padrão.
+                            error_log('GymFlow: falha ao carregar as cores do e-mail.');
+                        }
+                    }
+
                     // Cria um token aleatório válido por uma hora.
                     $token = bin2hex(random_bytes(32));
                     $expires = date(
@@ -132,8 +234,8 @@ if ($acao === 'login') {
 
                     $stmtToken = $pdo->prepare(
                         "UPDATE users
-                         SET reset_token = ?, reset_token_expires_at = ?
-                         WHERE id = ?"
+                        SET reset_token = ?, reset_token_expires_at = ?
+                        WHERE id = ?"
                     );
                     $stmtToken->execute([
                         $token,
@@ -147,34 +249,161 @@ if ($acao === 'login') {
                         require_once __DIR__ . '/../../vendor/PHPMailer/PHPMailer/src/PHPMailer.php';
                         require_once __DIR__ . '/../../vendor/PHPMailer/PHPMailer/src/SMTP.php';
 
-                        // Carrega as configurações privadas do Gmail.
+                        /*
+                         * CONFIGURAÇÃO SMTP
+                         *
+                         * O arquivo local continua sendo a alternativa.
+                         * Se a empresa tiver SMTP personalizado ativado,
+                         * seus dados serão usados no lugar dos dados locais.
+                         */
                         $emailConfig = require __DIR__ . '/../../config/email.local.php';
 
+                        if (!is_array($emailConfig)) {
+                            throw new \RuntimeException(
+                                'Configuração local de e-mail inválida.'
+                            );
+                        }
+
+                        // Configuração padrão: SMTP local existente.
+                        $smtpHost = trim((string) ($emailConfig['host'] ?? ''));
+                        $smtpUsuario = trim((string) ($emailConfig['username'] ?? ''));
+                        $smtpSenha = (string) ($emailConfig['password'] ?? '');
+                        $smtpPorta = (int) ($emailConfig['port'] ?? 587);
+                        $smtpSeguranca = 'tls';
+
+                        $remetenteEmail = $smtpUsuario;
+                        $remetenteNome = 'GymFlow';
+
+                        // Carrega as funções de criptografia e configuração SMTP.
+                        require_once __DIR__ . '/../models/ConfiguracaoEmail.php';
+
+                        $configEmpresa = null;
+
+                        if ($empresaId > 0) {
+                            $configEmpresa = buscarConfiguracaoEmail(
+                                $pdo,
+                                $empresaId
+                            );
+                        }
+
+                        // Usa o SMTP personalizado se estiver ativado para a empresa.
+                        if (
+                            $configEmpresa &&
+                            (int) ($configEmpresa['usar_personalizado'] ?? 0) === 1
+                        ) {
+                            $stmtSenhaSmtp = $pdo->prepare(
+                                'SELECT smtp_senha_criptografada
+                                 FROM configuracoes_email
+                                 WHERE company_id = ?
+                                 LIMIT 1'
+                            );
+                            $stmtSenhaSmtp->execute([$empresaId]);
+                            $senhaCriptografada = $stmtSenhaSmtp->fetchColumn();
+
+                            if (
+                                !is_string($senhaCriptografada) ||
+                                $senhaCriptografada === ''
+                            ) {
+                                throw new \RuntimeException(
+                                    'A senha SMTP da empresa não está configurada.'
+                                );
+                            }
+
+                            // Descriptografa a senha somente durante o envio.
+                            $smtpSenha = gymflowDescriptografarSenhaSmtp(
+                                $senhaCriptografada
+                            );
+
+                            $smtpHost = trim(
+                                (string) ($configEmpresa['smtp_host'] ?? '')
+                            );
+                            $smtpUsuario = trim(
+                                (string) ($configEmpresa['smtp_usuario'] ?? '')
+                            );
+                            $smtpPorta = (int) (
+                                $configEmpresa['smtp_porta'] ?? 0
+                            );
+                            $smtpSeguranca = (string) (
+                                $configEmpresa['smtp_seguranca'] ?? 'tls'
+                            );
+
+                            $remetenteEmail = trim(
+                                (string) ($configEmpresa['email_remetente'] ?? '')
+                            );
+                            $remetenteNome = trim(
+                                (string) ($configEmpresa['nome_remetente'] ?? '')
+                            );
+                        }
+
+                        // Valida os dados antes de iniciar a conexão SMTP.
+                        if (
+                            $smtpHost === '' ||
+                            $smtpUsuario === '' ||
+                            $smtpSenha === '' ||
+                            $smtpPorta < 1 ||
+                            $smtpPorta > 65535 ||
+                            !in_array($smtpSeguranca, ['tls', 'ssl', 'none'], true) ||
+                            !filter_var($remetenteEmail, FILTER_VALIDATE_EMAIL) ||
+                            $remetenteNome === ''
+                        ) {
+                            throw new \RuntimeException(
+                                'Os dados SMTP estão incompletos ou são inválidos.'
+                            );
+                        }
+
+                        // Evita inserir texto arbitrário como nome no cabeçalho do e-mail.
+                        $remetenteNome = trim(
+                            preg_replace('/[\r\n]+/', ' ', $remetenteNome)
+                        );
+
+                        // Nome seguro para exibição dentro do HTML.
+                        $nomeAcademiaHtml = htmlspecialchars(
+                            $remetenteNome,
+                            ENT_QUOTES,
+                            'UTF-8'
+                        );
+
+                        // A URL da aplicação permanece na configuração local.
+                        $appUrl = trim((string) ($emailConfig['app_url'] ?? ''));
+
+                        if ($appUrl === '') {
+                            throw new \RuntimeException(
+                                'A URL da aplicação não está configurada.'
+                            );
+                        }
+
                         // Monta o link de recuperação.
-                        $link = rtrim($emailConfig['app_url'], '/')
+                        $link = rtrim($appUrl, '/')
                             . '/app/controllers/LoginController.php?acao=redefinir_senha&token='
                             . urlencode($token);
 
                         $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
 
                         $mail->isSMTP();
-                        $mail->Host = $emailConfig['host'];
+                        $mail->Host = $smtpHost;
                         $mail->SMTPAuth = true;
-                        $mail->Username = $emailConfig['username'];
-                        $mail->Password = $emailConfig['password'];
-                        $mail->SMTPSecure =
-                            \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
-                        $mail->Port = (int) $emailConfig['port'];
-
+                        $mail->Username = $smtpUsuario;
+                        $mail->Password = $smtpSenha;
+                        $mail->Port = $smtpPorta;
                         $mail->CharSet = 'UTF-8';
-                        $mail->setFrom(
-                            $emailConfig['username'],
-                            'GymFlow'
-                        );
+
+                        // Aplica a segurança SMTP escolhida pela empresa.
+                        if ($smtpSeguranca === 'ssl') {
+                            $mail->SMTPSecure =
+                                \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
+                        } elseif ($smtpSeguranca === 'tls') {
+                            $mail->SMTPSecure =
+                                \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+                        } else {
+                            $mail->SMTPSecure = '';
+                            $mail->SMTPAutoTLS = false;
+                        }
+
+                        $mail->setFrom($remetenteEmail, $remetenteNome);
                         $mail->addAddress($user['email']);
 
                         $mail->isHTML(true);
-                        $mail->Subject = 'Redefinição de senha do GymFlow';
+                        $mail->Subject = 'Redefinição de senha - ' . $remetenteNome;
 
                         $linkSeguro = htmlspecialchars(
                             $link,
@@ -182,41 +411,48 @@ if ($acao === 'login') {
                             'UTF-8'
                         );
 
+                        // Prepara as cores para inserção segura no HTML.
+                        $corFundo = htmlspecialchars($coresEmail['fundo'], ENT_QUOTES, 'UTF-8');
+                        $corCartao = htmlspecialchars($coresEmail['cartao'], ENT_QUOTES, 'UTF-8');
+                        $corDestaque = htmlspecialchars($coresEmail['destaque'], ENT_QUOTES, 'UTF-8');
+                        $corBotao = htmlspecialchars($coresEmail['botao'], ENT_QUOTES, 'UTF-8');
+                        $corTextoBotao = htmlspecialchars($coresEmail['texto_botao'], ENT_QUOTES, 'UTF-8');
+
                         $mail->Body = <<<HTML
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recuperação de senha - GymFlow</title>
+    <title>Recuperação de senha - {$nomeAcademiaHtml}</title>
 </head>
-<body style="margin:0; padding:0; background-color:#0b0b0b; font-family:Arial,Helvetica,sans-serif; color:#f5f5f5;">
+<body style="margin:0; padding:0; background-color:{$corFundo}; font-family:Arial,Helvetica,sans-serif; color:#f5f5f5;">
 
     <div style="display:none; max-height:0; overflow:hidden; opacity:0;">
-        Recupere seu acesso ao GymFlow de forma segura.
+        Recupere seu acesso à {$nomeAcademiaHtml} de forma segura.
     </div>
 
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-        style="width:100%; background-color:#0b0b0b;">
+        style="width:100%; background-color:{$corFundo};">
         <tr>
             <td align="center" style="padding:36px 14px;">
 
                 <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"
-                    style="width:100%; max-width:600px; background-color:#151515; border:1px solid #303030; border-radius:14px;">
+                    style="width:100%; max-width:600px; background-color:{$corCartao}; border:1px solid #303030; border-radius:14px;">
 
                     <tr>
-                        <td style="height:5px; background-color:#ffb000; font-size:0; line-height:0;">
+                        <td style="height:5px; background-color:{$corDestaque}; font-size:0; line-height:0;">
                             &nbsp;
                         </td>
                     </tr>
 
                     <tr>
                         <td align="center" style="padding:34px 24px 22px;">
-                            <p style="margin:0; font-size:30px; font-weight:bold; letter-spacing:2px; color:#ffffff;">
-                                GYM<span style="color:#ffb000;">FLOW</span>
+                            <p style="margin:0; font-size:30px; font-weight:bold; letter-spacing:1px; color:#ffffff;">
+                                {$nomeAcademiaHtml}
                             </p>
-                            <p style="margin:10px 0 0; font-size:11px; letter-spacing:3px; color:#a3a3a3;">
-                                SEU TREINO, SEU RITMO
+                            <p style="margin:10px 0 0; font-size:11px; letter-spacing:2px; color:#a3a3a3;">
+                                RECUPERAÇÃO DE ACESSO
                             </p>
                         </td>
                     </tr>
@@ -233,11 +469,11 @@ if ($acao === 'login') {
                             </p>
 
                             <p style="margin:0; font-size:15px; line-height:1.8; color:#d1d1d1;">
-                                Recebemos uma solicitação para redefinir sua senha do GymFlow.
-                                Clique no botão abaixo para criar uma nova senha e voltar a acessar sua conta.
+                                Recebemos uma solicitação para redefinir sua senha na
+                                {$nomeAcademiaHtml}. Clique no botão abaixo para criar
+                                uma nova senha e voltar a acessar sua conta.
                             </p>
 
-                            <!-- Espaço antes do botão -->
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                                 <tr>
                                     <td height="18" style="height:18px; font-size:0; line-height:18px;">
@@ -246,19 +482,17 @@ if ($acao === 'login') {
                                 </tr>
                             </table>
 
-                            <!-- Botão de recuperação -->
                             <table role="presentation" align="center" cellpadding="0" cellspacing="0" border="0">
                                 <tr>
-                                    <td align="center" bgcolor="#ffb000" style="border-radius:8px;">
+                                    <td align="center" bgcolor="{$corBotao}" style="border-radius:8px;">
                                         <a href="{$linkSeguro}"
-                                            style="display:inline-block; padding:16px 28px; font-size:15px; font-weight:bold; color:#151515; text-decoration:none; border-radius:8px;">
+                                            style="display:inline-block; padding:16px 28px; font-size:15px; font-weight:bold; color:{$corTextoBotao}; text-decoration:none; border-radius:8px;">
                                             REDEFINIR MINHA SENHA
                                         </a>
                                     </td>
                                 </tr>
                             </table>
 
-                            <!-- Espaço entre o botão e o aviso -->
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                                 <tr>
                                     <td height="18" style="height:18px; font-size:0; line-height:18px;">
@@ -267,13 +501,12 @@ if ($acao === 'login') {
                                 </tr>
                             </table>
 
-                            <!-- Aviso de segurança -->
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-                                style="background-color:#202020; border:1px solid #353535; border-radius:8px;">
+                                style="background-color:{$corCartao}; border:1px solid #353535; border-radius:8px;">
                                 <tr>
                                     <td style="padding:16px;">
                                         <p style="margin:0; font-size:13px; line-height:1.8; color:#f0f0f0;">
-                                            <strong style="color:#ffb000;">ATENÇÃO</strong><br>
+                                            <strong style="color:{$corDestaque};">ATENÇÃO</strong><br>
                                             Este link expira em 1 hora por segurança.
                                         </p>
                                     </td>
@@ -290,10 +523,10 @@ if ($acao === 'login') {
 
                     <tr>
                         <td align="center"
-                            style="padding:22px 20px; border-top:1px solid #303030; background-color:#111111; border-radius:0 0 14px 14px;">
+                            style="padding:22px 20px; border-top:1px solid #303030; background-color:{$corFundo}; border-radius:0 0 14px 14px;">
 
-                            <p style="margin:0 0 8px; font-size:13px; font-weight:bold; color:#ffb000;">
-                                GYMFLOW
+                            <p style="margin:0 0 8px; font-size:13px; font-weight:bold; color:{$corDestaque};">
+                                {$nomeAcademiaHtml}
                             </p>
 
                             <p style="margin:0; font-size:11px; line-height:1.8; color:#888888;">
@@ -307,7 +540,7 @@ if ($acao === 'login') {
                 </table>
 
                 <p style="margin:18px 0 0; font-size:11px; color:#777777; text-align:center;">
-                    GymFlow &copy; Todos os direitos reservados.
+                    {$nomeAcademiaHtml} &copy; Todos os direitos reservados.
                 </p>
 
             </td>
@@ -318,23 +551,26 @@ if ($acao === 'login') {
 </html>
 HTML;
 
+                        // Versão em texto simples para clientes que não exibem HTML.
                         $mail->AltBody = "Olá!\n\n"
-                            . "Recebemos uma solicitação para redefinir sua senha do GymFlow.\n\n"
+                            . "Recebemos uma solicitação para redefinir sua senha na "
+                            . $remetenteNome . ".\n\n"
                             . "Para criar uma nova senha, acesse o link abaixo:\n"
                             . $link . "\n\n"
                             . "Este link expira em 1 hora por segurança.\n"
                             . "Se você não solicitou a recuperação, ignore este e-mail.\n\n"
-                            . "Equipe GymFlow";
+                            . "Equipe " . $remetenteNome;
 
                         $mail->send();
+
                     } catch (\Throwable $e) {
                         // Se o envio falhar, invalida o token que não foi entregue.
                         try {
                             $stmtInvalidar = $pdo->prepare(
                                 "UPDATE users
-                                 SET reset_token = NULL,
-                                     reset_token_expires_at = NULL
-                                 WHERE id = ?"
+                                SET reset_token = NULL,
+                                    reset_token_expires_at = NULL
+                                WHERE id = ?"
                             );
                             $stmtInvalidar->execute([$user['id']]);
                         } catch (\Throwable $erroInvalidacao) {
@@ -350,7 +586,7 @@ HTML;
                     }
                 }
             } catch (\Throwable $e) {
-                // Registra o erro no log, sem expor detalhes técnicos na página.
+                // Registra o erro sem expor detalhes técnicos na página.
                 error_log(
                     'GymFlow: falha ao processar a recuperação de senha: '
                         . $e->getMessage()
@@ -361,7 +597,7 @@ HTML;
 
     require __DIR__ . '/../views/login/esqueci_senha.php';
 
-    /* 4. REDEFINIR SENHA */
+/* 4. REDEFINIR SENHA */
 } elseif ($acao === 'redefinir_senha') {
 
     $token = $_GET['token'] ?? '';
@@ -373,12 +609,12 @@ HTML;
 
     require_once __DIR__ . '/../../config/conexao.php';
 
-    // Confere o token e sua validade
+    // Confere o token e sua validade.
     $stmt = $pdo->prepare(
         "SELECT id
-         FROM users
-         WHERE reset_token = ?
-         AND reset_token_expires_at > NOW()"
+        FROM users
+        WHERE reset_token = ?
+        AND reset_token_expires_at > NOW()"
     );
     $stmt->execute([$token]);
     $user = $stmt->fetch();
@@ -398,13 +634,13 @@ HTML;
         if (strlen($nova_senha) >= 6) {
             $hash = password_hash($nova_senha, PASSWORD_DEFAULT);
 
-            // Salva a nova senha e invalida o token usado
+            // Salva a nova senha e invalida o token usado.
             $stmtUpdate = $pdo->prepare(
                 "UPDATE users
-                 SET password = ?,
-                     reset_token = NULL,
-                     reset_token_expires_at = NULL
-                 WHERE id = ?"
+                SET password = ?,
+                    reset_token = NULL,
+                    reset_token_expires_at = NULL
+                WHERE id = ?"
             );
             $stmtUpdate->execute([
                 $hash,
@@ -421,6 +657,7 @@ HTML;
     }
 
     require __DIR__ . '/../views/login/redefinir_senha.php';
+
 } else {
     header("Location: " . $baseUrl . "?acao=login");
     exit;

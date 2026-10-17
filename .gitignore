@@ -1,1 +1,2 @@
 config/email.local.php
+config/email.encryption.local.php

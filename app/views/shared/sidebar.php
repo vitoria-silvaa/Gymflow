@@ -1,3 +1,4 @@
+
 <?php
 // app/views/shared/sidebar.php
 
@@ -194,7 +195,7 @@ $role = $_SESSION['usuario_role'] ?? '';
 
                 <?php endif; ?>
 
-                <!-- PORTFÓLIO: SOMENTE ADMIN -->
+                <!-- PORTFÓLIO E CONFIGURAÇÕES DE E-MAIL: SOMENTE ADMIN -->
                 <?php if ($role === 'Admin'): ?>
 
                     <li>
@@ -202,6 +203,14 @@ $role = $_SESSION['usuario_role'] ?? '';
                             title="Site / Portfólio">
                             <span class="menu-icon">◈</span>
                             <span class="menu-text">Site / Portfólio</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="<?= BASE_URL ?>/app/controllers/ConfiguracaoEmailController.php"
+                            title="Configurações de e-mail">
+                            <span class="menu-icon">✉</span>
+                            <span class="menu-text">Configurações de e-mail</span>
                         </a>
                     </li>
 

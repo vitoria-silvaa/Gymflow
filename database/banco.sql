@@ -24,6 +24,45 @@ CREATE TABLE companies (
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+
+-- ---------- CONFIGURAÇÕES DE E-MAIL POR EMPRESA -------------------------
+
+CREATE TABLE configuracoes_email (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    company_id INT NOT NULL,
+    usar_personalizado BOOLEAN NOT NULL DEFAULT FALSE,
+    email_remetente VARCHAR(255) DEFAULT NULL,
+    nome_remetente VARCHAR(100) DEFAULT NULL,
+    smtp_host VARCHAR(255) DEFAULT NULL,
+    smtp_porta SMALLINT UNSIGNED NOT NULL DEFAULT 587,
+    smtp_seguranca ENUM('tls', 'ssl', 'none') NOT NULL DEFAULT 'tls',
+    smtp_usuario VARCHAR(255) DEFAULT NULL,
+    smtp_senha_criptografada TEXT DEFAULT NULL,
+-- Personalização das cores dos e-mails
+    modo_cores_email ENUM('marca', 'personalizado')
+    NOT NULL DEFAULT 'personalizado',
+    cor_email_fundo CHAR(7) NOT NULL DEFAULT '#0b0b0b',
+    cor_email_cartao CHAR(7) NOT NULL DEFAULT '#151515',
+    cor_email_destaque CHAR(7) NOT NULL DEFAULT '#ffb000',
+    cor_email_botao CHAR(7) NOT NULL DEFAULT '#ffb000',
+    cor_email_texto_botao CHAR(7) NOT NULL DEFAULT '#151515',
+    atualizado_por INT DEFAULT NULL,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT uq_configuracoes_email_empresa
+        UNIQUE (company_id),
+    CONSTRAINT fk_configuracoes_email_empresa
+        FOREIGN KEY (company_id)
+        REFERENCES companies(id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_configuracoes_email_usuario
+        FOREIGN KEY (atualizado_por)
+        REFERENCES users(id)
+        ON DELETE SET NULL
+);
+
+
 -- ---------- 2. FILIAIS --------------------------------------------------
 
 CREATE TABLE filiais (

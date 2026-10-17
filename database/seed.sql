@@ -26,6 +26,7 @@ DELETE FROM contas;
 DELETE FROM matriculas;
 DELETE FROM planos;
 DELETE FROM user_filiais;
+DELETE FROM configuracoes_email;
 DELETE FROM users;
 DELETE FROM alunos;
 DELETE FROM filiais;
