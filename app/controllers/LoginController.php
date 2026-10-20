@@ -6,16 +6,56 @@ require_once __DIR__ . '/../../config/sessao.php';
 $baseUrl = BASE_URL . '/app/controllers/LoginController.php';
 $acao = $_GET['acao'] ?? 'login';
 
+
+/*
+ * Destino seguro após o login.
+ *
+ * Aceitamos somente a intenção "avaliacao".
+ * Nunca redirecionamos para uma URL
+ * informada livremente pelo visitante.
+ */
+$destinoAvaliacao = BASE_URL .
+    '/app/controllers/PortalAlunoController.php?acao=avaliacao';
+
+$destinoPortal = BASE_URL .
+    '/app/controllers/PortalAlunoController.php?acao=aluno';
+
+$destinoDashboard = BASE_URL .
+    '/app/controllers/DashboardController.php';
+
+if ($acao === 'login' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    if (($_GET['destino'] ?? '') === 'avaliacao') {
+        $_SESSION['login_destino'] = 'avaliacao';
+    } else {
+        // Login comum não reutiliza uma intenção antiga.
+        unset($_SESSION['login_destino']);
+    }
+}
+
+
+
 /* 1. LOGIN */
 if ($acao === 'login') {
 
-    // Redireciona se o usuário já estiver logado
+    // Usuário já autenticado.
     if (isset($_SESSION['usuario_id'])) {
-        if (($_SESSION['usuario_role'] ?? '') === 'Aluno') {
-            header("Location: " . BASE_URL . "/app/controllers/PortalAlunoController.php?acao=aluno");
+
+        $role = $_SESSION['usuario_role'] ?? '';
+
+        if ($role === 'Aluno') {
+
+            $destino = (
+                ($_SESSION['login_destino'] ?? '') === 'avaliacao'
+            )
+                ? $destinoAvaliacao
+                : $destinoPortal;
         } else {
-            header("Location: " . BASE_URL . "/app/controllers/DashboardController.php");
+            $destino = $destinoDashboard;
         }
+
+        unset($_SESSION['login_destino']);
+
+        header("Location: " . $destino);
         exit;
     }
 
@@ -23,16 +63,29 @@ if ($acao === 'login') {
     $email = '';
 
     if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
+
         $email = trim($_POST['email'] ?? '');
         $senha = $_POST['senha'] ?? '';
 
         if ($email === '' || $senha === '') {
+
             $erro = "Por favor, preencha todos os campos.";
         } else {
+
             $operacao = 'buscar_por_email';
             require __DIR__ . '/../models/Funcionario.php';
 
-            if (!empty($usuario) && password_verify($senha, $usuario['password'])) {
+            if (
+                !empty($usuario) &&
+                password_verify($senha, $usuario['password'])
+            ) {
+
+                // Captura o destino antes de iniciar uma
+                // nova sessão de usuário.
+                $querAvaliar = (
+                    ($_SESSION['login_destino'] ?? '') === 'avaliacao'
+                );
+
                 iniciarSessao($usuario);
 
                 $user_id = $usuario['id'];
@@ -42,13 +95,26 @@ if ($acao === 'login') {
                 require __DIR__ . '/../models/MinhaMarca.php';
 
                 if ($preferencias) {
-                    $_SESSION['nome_painel'] = $preferencias['nome_painel'];
-                    $_SESSION['tema'] = $preferencias['tema'];
-                    $_SESSION['cor_primaria'] = $preferencias['cor_primaria'];
-                    $_SESSION['cor_secundaria'] = $preferencias['cor_secundaria'];
-                    $_SESSION['tema_predefinido'] = $preferencias['tema_predefinido'];
-                    $_SESSION['logo_url'] = $preferencias['logo_url'];
+
+                    $_SESSION['nome_painel'] =
+                        $preferencias['nome_painel'];
+
+                    $_SESSION['tema'] =
+                        $preferencias['tema'];
+
+                    $_SESSION['cor_primaria'] =
+                        $preferencias['cor_primaria'];
+
+                    $_SESSION['cor_secundaria'] =
+                        $preferencias['cor_secundaria'];
+
+                    $_SESSION['tema_predefinido'] =
+                        $preferencias['tema_predefinido'];
+
+                    $_SESSION['logo_url'] =
+                        $preferencias['logo_url'];
                 } else {
+
                     $_SESSION['nome_painel'] = 'Gymflow';
                     $_SESSION['tema'] = 'dark';
                     $_SESSION['cor_primaria'] = '#ffb000';
@@ -57,15 +123,21 @@ if ($acao === 'login') {
                     $_SESSION['logo_url'] = null;
                 }
 
-                // Lógica de "Lembrar-me"
+                // Preserva a funcionalidade Lembrar-me.
                 if (!empty($_POST['lembrar'])) {
+
                     $token = bin2hex(random_bytes(32));
 
                     $stmtToken = $pdo->prepare(
-                        "UPDATE users SET remember_token = ? WHERE id = ?"
+                        "UPDATE users
+                         SET remember_token = ?
+                         WHERE id = ?"
                     );
-                    $stmtToken->execute([$token, $usuario['id']]);
 
+                    $stmtToken->execute([
+                        $token,
+                        $usuario['id']
+                    ]);
 
                     $https = !empty($_SERVER['HTTPS'])
                         && $_SERVER['HTTPS'] !== 'off';
@@ -79,19 +151,32 @@ if ($acao === 'login') {
                     ]);
                 }
 
+                // Limpa a intenção após autenticar.
+                unset($_SESSION['login_destino']);
+
                 if ($usuario['role'] === 'Aluno') {
-                    header("Location: " . BASE_URL . "/app/controllers/PortalAlunoController.php?acao=aluno");
+
+                    $destino = $querAvaliar
+                        ? $destinoAvaliacao
+                        : $destinoPortal;
                 } else {
-                    header("Location: " . BASE_URL . "/app/controllers/DashboardController.php");
+
+                    // Nunca enviamos administradores ou
+                    // funcionários ao portal do aluno.
+                    $destino = $destinoDashboard;
                 }
+
+                header("Location: " . $destino);
                 exit;
             } else {
+
                 $erro = "E-mail ou senha incorretos.";
             }
         }
     }
 
     require __DIR__ . '/../views/login/index.php';
+
 
     /* 2. LOGOUT */
 } elseif ($acao === 'logout') {

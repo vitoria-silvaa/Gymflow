@@ -88,7 +88,7 @@ include __DIR__ . '/../shared/portfolio_header.php';
                         <br><br>
 
                         <div class="hero-acoes">
-                            <a href="<?= BASE_URL ?>/index.php" class="hero-btn hero-btn-secundario">← Voltar ao Portfólio</a>
+                            <a href="<?= BASE_URL ?>/index.php?id=<?= (int) $company_id ?>" class="hero-btn hero-btn-secundario">← Voltar ao Portfólio</a>
                             <button type="submit" class="hero-btn hero-btn-principal">Continuar para Filial →</button>
                         </div>
                     </form>

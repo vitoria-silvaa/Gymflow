@@ -1,59 +1,159 @@
 <?php
+// ==========================================
+// GYMFLOW - ESQUECI MINHA SENHA
 // app/views/login/esqueci_senha.php
+// ==========================================
+
+if (!defined('BASE_URL')) {
+    http_response_code(403);
+    exit('Acesso não permitido.');
+}
+
+$erro = $erro ?? '';
+$sucesso = $sucesso ?? '';
+
+$loginUrl = BASE_URL .
+    '/app/controllers/LoginController.php?acao=login';
+
+$actionUrl = BASE_URL .
+    '/app/controllers/LoginController.php?acao=esqueci_senha';
+
+$cssPath = __DIR__ .
+    '/../../../assets/css/auth-recovery.css';
+
+$cssVersion = is_file($cssPath)
+    ? filemtime($cssPath)
+    : '1';
+
+$escapar = static function ($valor) {
+    return htmlspecialchars(
+        (string) $valor,
+        ENT_QUOTES,
+        'UTF-8'
+    );
+};
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Esqueci a Senha - GymCore</title>
-    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/global.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/login.css?v=<?= time() ?>">
-    <style>
-        .login-page { justify-content: center; align-items: center; }
-        .login-container { max-width: 500px; width: 100%; min-height: auto; border-radius: 12px; }
-        .login-second-column { width: 100% !important; min-height: auto !important; padding: 40px; }
-        .success-box { background: #d1fae5; color: #065f46; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; }
-        .success-box a { color: #047857; font-weight: bold; text-decoration: underline; }
-        .error-box {background: #fee2e2; color: #991b1b; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 14px;}
-    </style>
-</head>
-<body>
-    <main class="login-page">
-        <div class="login-container">
-            <section class="login-second-column">
-                <div class="login-form-container">
-                    <header class="login-header">
-                        <h2 class="login-form-title">Recuperar Senha</h2>
-                        <p class="login-form-description">Digite seu e-mail para receber o link de recuperação.</p>
-                    </header>
-                    <?php if (!empty($erro)): ?>
-                 <div class="error-box" role="alert">
-                   <?= htmlspecialchars($erro, ENT_QUOTES, 'UTF-8') ?>
-                     </div>
-                        <?php endif; ?>
-                    <?php if (!empty($sucesso)): ?>
-                        <div class="success-box"><?= $sucesso ?></div>
-                    <?php endif; ?>
 
-                    <form action="<?= BASE_URL ?>/app/controllers/LoginController.php?acao=esqueci_senha" method="POST" class="login-form">
-                        <div class="form-group">
-                            <label for="email" class="form-label">E-mail</label>
-                            <div class="input-wrapper">
-                                <span class="input-icon">@</span>
-                                <input type="email" class="form-input" id="email" name="email" required placeholder="Seu e-mail cadastrado">
-                            </div>
-                        </div>
-                        <button type="submit" class="login-submit-button">
-                            <span>Enviar Link</span>
-                        </button>
-                    </form>
-                    <div class="login-footer" style="margin-top: 20px; text-align: center;">
-                        <a href="<?= BASE_URL ?>/app/controllers/LoginController.php?acao=login">← Voltar para o Login</a>
-                    </div>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Recuperar acesso | GymFlow</title>
+
+    <link
+        rel="stylesheet"
+        href="<?= BASE_URL ?>/assets/css/global.css">
+
+    <link
+        rel="stylesheet"
+        href="<?= BASE_URL ?>/assets/css/auth-recovery.css?v=<?= $cssVersion ?>">
+</head>
+
+<body>
+
+    <main class="auth-recovery">
+
+        <section
+            class="auth-card"
+            aria-labelledby="auth-title">
+
+            <div class="auth-brand">
+                GYM<span>FLOW</span>
+            </div>
+
+            <header class="auth-header">
+
+                <h1 id="auth-title">
+                    Recuperar acesso
+                </h1>
+
+                <p>
+                    Informe o e-mail cadastrado na sua conta.
+                    Se ele estiver registrado, enviaremos
+                    um link para redefinir sua senha.
+                </p>
+
+            </header>
+
+            <!-- ERRO -->
+
+            <?php if ($erro !== ''): ?>
+
+                <div
+                    class="auth-message auth-message-error"
+                    role="alert">
+                    <p>
+                        <?= $escapar($erro) ?>
+                    </p>
                 </div>
-            </section>
-        </div>
+
+            <?php endif; ?>
+
+            <!-- SUCESSO -->
+
+            <?php if ($sucesso !== ''): ?>
+
+                <div
+                    class="auth-message auth-message-success"
+                    role="status">
+                    <p>
+                        <?= $escapar($sucesso) ?>
+                    </p>
+                </div>
+
+            <?php endif; ?>
+
+            <!-- FORMULÁRIO -->
+
+            <form
+                action="<?= $escapar($actionUrl) ?>"
+                method="POST"
+                class="auth-form">
+
+                <div class="auth-field">
+
+                    <label for="email">
+                        E-mail
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Digite seu e-mail cadastrado"
+                        autocomplete="email"
+                        inputmode="email"
+                        maxlength="255"
+                        required>
+
+                </div>
+
+                <button
+                    type="submit"
+                    class="auth-action">
+                    Enviar link de recuperação
+                </button>
+
+            </form>
+
+            <footer class="auth-footer">
+
+                <a href="<?= $escapar($loginUrl) ?>">
+                    ← Voltar para o login
+                </a>
+
+            </footer>
+
+        </section>
+
     </main>
+
 </body>
+
 </html>

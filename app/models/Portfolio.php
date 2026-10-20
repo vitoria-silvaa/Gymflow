@@ -1,14 +1,16 @@
+
 <?php
+// ================================================
+// GYMFLOW - MODEL DO SITE / PORTFÓLIO
 // app/models/Portfolio.php
+// ================================================
 
 require_once __DIR__ . '/Database.php';
 
-/** @var PDO $pdo */
 $operacao = $operacao ?? 'buscar_publico';
-$company_id = (int) ($company_id ?? 1);
+$company_id = (int) ($company_id ?? 0);
 $erroModel = '';
 
-// Definições padrão para evitar variáveis e índices indefinidos
 $configPadrao = [
     'app_name'             => 'GymCore',
     'theme_mode'           => 'dark',
@@ -42,701 +44,1005 @@ $configPadrao = [
     'totalpass_icon'       => ''
 ];
 
-// ======================================================
-// 1. BUSCAR DADOS PARA O SITE PÚBLICO (index.php)
-// ======================================================
-if ($operacao === 'buscar_publico' || $operacao === 'buscar') {
-    try {
-        // Configurações do Portfólio
-        $stmt = $pdo->prepare("SELECT * FROM portfolio_config WHERE company_id = ?");
-        $stmt->execute([$company_id]);
-        $configBanco = $stmt->fetch(PDO::FETCH_ASSOC);
-        $config = array_merge($configPadrao, is_array($configBanco) ? $configBanco : []);
+// ================================================
+// FUNÇÕES AUXILIARES
+// ================================================
 
-        // Planos
-        $stmtPlanos = $pdo->prepare("SELECT * FROM planos WHERE company_id = ? ORDER BY id ASC");
-        $stmtPlanos->execute([$company_id]);
-        $planos = $stmtPlanos->fetchAll(PDO::FETCH_ASSOC) ?: [];
+if (!function_exists('portfolioConsultar')) {
+    function portfolioConsultar(
+        PDO $pdo,
+        string $sql,
+        array $params = []
+    ): array {
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
 
-        // Filiais ativas + imagem de apresentação do portfólio
-        $stmtFiliais = $pdo->prepare("
-            SELECT
-                f.*,
-                pfi.image_url AS image_url
-            FROM filiais f
-            LEFT JOIN portfolio_filial_images pfi
-                ON pfi.filial_id = f.id
-                AND pfi.company_id = f.company_id
-            WHERE f.company_id = ?
-            AND f.ativo = 1
-            ORDER BY f.id ASC
-        ");
-        $stmtFiliais->execute([$company_id]);
-        $filiais = $stmtFiliais->fetchAll(PDO::FETCH_ASSOC) ?: [];
-
-        // Modalidades
-        $stmtModais = $pdo->prepare("SELECT * FROM portfolio_modalities ORDER BY id ASC");
-        $stmtModais->execute();
-        $modalidades = $stmtModais->fetchAll(PDO::FETCH_ASSOC) ?: [];
-
-        // Slides ativos do carrossel
-        $stmtSlides = $pdo->prepare("
-            SELECT *
-            FROM portfolio_slides
-            WHERE company_id = ?
-            AND ativo = 1
-            ORDER BY ordem ASC, id ASC
-        ");
-        $stmtSlides->execute([$company_id]);
-        $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC) ?: [];
-
-        // Feedbacks ativos mais recentes
-        $stmtFeedbacks = $pdo->prepare("
-            SELECT *
-            FROM portfolio_feedbacks
-            WHERE company_id = ?
-            AND ativo = 1
-            ORDER BY criado_em DESC, id DESC
-            LIMIT 3
-        ");
-        $stmtFeedbacks->execute([$company_id]);
-        $feedbacks = $stmtFeedbacks->fetchAll(PDO::FETCH_ASSOC) ?: [];
-
-        $tituloPagina = $config['app_name'] ?? 'GymCore';
-    } catch (Throwable $e) {
-        $erroModel = $e->getMessage();
-        $config = $configPadrao;
-        $planos = [];
-        $filiais = [];
-        $modalidades = [];
-        $slides = [];
-        $feedbacks = [];
-        $tituloPagina = 'GymCore';
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 }
 
-// ======================================================
-// 2. BUSCAR DADOS COMPLETOS PARA O ADMIN (PortfolioController.php)
-// ======================================================
-elseif ($operacao === 'buscar_admin') {
-    try {
-        // Configurações do Portfólio
-        $stmt = $pdo->prepare("SELECT * FROM portfolio_config WHERE company_id = ?");
-        $stmt->execute([$company_id]);
-        $configBanco = $stmt->fetch(PDO::FETCH_ASSOC);
-        $config = array_merge($configPadrao, is_array($configBanco) ? $configBanco : []);
+if (!function_exists('portfolioExecutar')) {
+    function portfolioExecutar(
+        PDO $pdo,
+        string $sql,
+        array $params = []
+    ): PDOStatement {
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
 
-        // Planos
-        $stmtPlanos = $pdo->prepare("SELECT * FROM planos WHERE company_id = ? ORDER BY id ASC");
-        $stmtPlanos->execute([$company_id]);
-        $planos = $stmtPlanos->fetchAll(PDO::FETCH_ASSOC) ?: [];
-
-        // Filiais + imagem de apresentação do portfólio
-        $stmtFiliais = $pdo->prepare("
-            SELECT
-                f.*,
-                pfi.image_url AS image_url
-            FROM filiais f
-            LEFT JOIN portfolio_filial_images pfi
-                ON pfi.filial_id = f.id
-                AND pfi.company_id = f.company_id
-            WHERE f.company_id = ?
-            AND f.ativo = 1
-            ORDER BY f.id ASC
-        ");
-        $stmtFiliais->execute([$company_id]);
-        $filiais = $stmtFiliais->fetchAll(PDO::FETCH_ASSOC) ?: [];
-
-        // Modalidades
-        $stmtModais = $pdo->prepare("SELECT * FROM portfolio_modalities ORDER BY id ASC");
-        $stmtModais->execute();
-        $modalidades = $stmtModais->fetchAll(PDO::FETCH_ASSOC) ?: [];
-
-        // Todos os slides (incluindo inativos para edição)
-        $stmtSlides = $pdo->prepare("
-            SELECT *
-            FROM portfolio_slides
-            WHERE company_id = ?
-            ORDER BY ordem ASC, id ASC
-        ");
-        $stmtSlides->execute([$company_id]);
-        $slides = $stmtSlides->fetchAll(PDO::FETCH_ASSOC) ?: [];
-
-        // Feedbacks cadastrados
-        $stmtFeedbacks = $pdo->prepare("
-            SELECT *
-            FROM portfolio_feedbacks
-            WHERE company_id = ?
-            ORDER BY criado_em DESC, id DESC
-        ");
-        $stmtFeedbacks->execute([$company_id]);
-        $feedbacks = $stmtFeedbacks->fetchAll(PDO::FETCH_ASSOC) ?: [];
-
-        $tituloPagina = "Portfólio";
-    } catch (Throwable $e) {
-        $erroModel = $e->getMessage();
-        $config = $configPadrao;
-        $planos = [];
-        $filiais = [];
-        $modalidades = [];
-        $slides = [];
-        $feedbacks = [];
-        $tituloPagina = "Portfólio";
+        return $stmt;
     }
 }
 
-// ======================================================
-// 3. SALVAR ALTERAÇÕES DO PORTFÓLIO (Admin)
-// ======================================================
-elseif ($operacao === 'salvar') {
-    $dadosPost = $dadosPost ?? $_POST;
-    $dadosFiles = $dadosFiles ?? $_FILES;
+if (!function_exists('portfolioArquivoLista')) {
+    function portfolioArquivoLista(
+        array $grupo,
+        string $chave
+    ): ?array {
+        if (!isset($grupo['error'][$chave])) {
+            return null;
+        }
 
-    try {
-        // ======================================================
-        // UPLOAD DE IMAGENS
-        // ======================================================
-        $raizProjeto = dirname(__DIR__, 2);
-        $pastaUploads = $raizProjeto . '/assets/uploads/portfolio/';
-        $urlBaseUploads = BASE_URL . '/assets/uploads/portfolio/';
+        return [
+            'name'     => $grupo['name'][$chave] ?? '',
+            'type'     => $grupo['type'][$chave] ?? '',
+            'tmp_name' => $grupo['tmp_name'][$chave] ?? '',
+            'error'    => $grupo['error'][$chave],
+            'size'     => $grupo['size'][$chave] ?? 0
+        ];
+    }
+}
 
-        if (!is_dir($pastaUploads)) {
-            if (!mkdir($pastaUploads, 0775, true) && !is_dir($pastaUploads)) {
-                throw new RuntimeException('Não foi possível criar a pasta de uploads do portfólio.');
+if (!function_exists('portfolioSalvarImagem')) {
+    function portfolioSalvarImagem(
+        array $arquivo,
+        string $prefixo
+    ): ?string {
+        $erro = $arquivo['error'] ?? UPLOAD_ERR_NO_FILE;
+
+        if ($erro === UPLOAD_ERR_NO_FILE) {
+            return null;
+        }
+
+        if ($erro !== UPLOAD_ERR_OK) {
+            throw new RuntimeException(
+                'Erro no envio da imagem: ' . $prefixo
+            );
+        }
+
+        $tamanho = (int) ($arquivo['size'] ?? 0);
+
+        if ($tamanho <= 0 || $tamanho > 5 * 1024 * 1024) {
+            throw new RuntimeException(
+                'A imagem deve ter no máximo 5 MB.'
+            );
+        }
+
+        $tmp = $arquivo['tmp_name'] ?? '';
+
+        if (
+            $tmp === '' ||
+            !is_uploaded_file($tmp)
+        ) {
+            throw new RuntimeException(
+                'Arquivo de upload inválido.'
+            );
+        }
+
+        $info = @getimagesize($tmp);
+        $mime = is_array($info) ? ($info['mime'] ?? '') : '';
+
+        $permitidos = [
+            'image/jpeg' => 'jpg',
+            'image/png'  => 'png',
+            'image/webp' => 'webp'
+        ];
+
+        if (!isset($permitidos[$mime])) {
+            throw new RuntimeException(
+                'Formato inválido. Utilize JPG, PNG ou WEBP.'
+            );
+        }
+
+        $raiz = dirname(__DIR__, 2);
+        $pasta = $raiz . '/assets/uploads/portfolio/';
+
+        if (
+            !is_dir($pasta) &&
+            !mkdir($pasta, 0775, true) &&
+            !is_dir($pasta)
+        ) {
+            throw new RuntimeException(
+                'Não foi possível criar a pasta de uploads.'
+            );
+        }
+
+        $nome = $prefixo . '_' .
+            bin2hex(random_bytes(8)) . '.' .
+            $permitidos[$mime];
+
+        if (!move_uploaded_file($tmp, $pasta . $nome)) {
+            throw new RuntimeException(
+                'Não foi possível salvar a imagem.'
+            );
+        }
+
+        return BASE_URL . '/assets/uploads/portfolio/' . $nome;
+    }
+}
+
+if (!function_exists('portfolioImagemCampo')) {
+    function portfolioImagemCampo(
+        array $post,
+        array $files,
+        string $campoUrl,
+        string $campoArquivo,
+        string $prefixo
+    ): string {
+        $url = trim((string) ($post[$campoUrl] ?? ''));
+
+        if (
+            isset($files[$campoArquivo]) &&
+            is_array($files[$campoArquivo])
+        ) {
+            $nova = portfolioSalvarImagem(
+                $files[$campoArquivo],
+                $prefixo
+            );
+
+            if ($nova !== null) {
+                $url = $nova;
             }
         }
 
-        // Recebe um arquivo individual e devolve a URL salva no projeto.
-        $salvarImagem = function (array $arquivo, string $prefixo) use ($pastaUploads, $urlBaseUploads): ?string {
-            $erro = $arquivo['error'] ?? UPLOAD_ERR_NO_FILE;
+        return $url;
+    }
+}
 
-            // Nenhum arquivo novo foi escolhido: mantém a imagem antiga.
-            if ($erro === UPLOAD_ERR_NO_FILE) {
-                return null;
-            }
+if (!function_exists('portfolioImagemItem')) {
+    function portfolioImagemItem(
+        array $dados,
+        array $files,
+        string $tipo,
+        string $id,
+        string $prefixo
+    ): string {
+        $url = trim((string) ($dados['image_url'] ?? ''));
 
-            if ($erro !== UPLOAD_ERR_OK) {
-                throw new RuntimeException('Ocorreu um erro ao enviar uma das imagens.');
-            }
+        $campoArquivo = $tipo . '_arquivo';
 
-            $tamanho = (int) ($arquivo['size'] ?? 0);
-            if ($tamanho <= 0 || $tamanho > 5 * 1024 * 1024) {
-                throw new RuntimeException('A imagem deve ter no máximo 5 MB.');
-            }
+        if (
+            isset($files[$campoArquivo]) &&
+            is_array($files[$campoArquivo])
+        ) {
+            $arquivo = portfolioArquivoLista(
+                $files[$campoArquivo],
+                $id
+            );
 
-            $tmpName = $arquivo['tmp_name'] ?? '';
-            $infoImagem = $tmpName !== '' ? @getimagesize($tmpName) : false;
-            $mime = is_array($infoImagem) ? ($infoImagem['mime'] ?? '') : '';
+            if ($arquivo !== null) {
+                $nova = portfolioSalvarImagem(
+                    $arquivo,
+                    $prefixo
+                );
 
-            $extensoesPermitidas = [
-                'image/jpeg' => 'jpg',
-                'image/png'  => 'png',
-                'image/webp' => 'webp'
-            ];
-
-            if (!isset($extensoesPermitidas[$mime])) {
-                throw new RuntimeException('Formato de imagem inválido. Use JPG, PNG ou WEBP.');
-            }
-
-            $extensao = $extensoesPermitidas[$mime];
-            $nomeArquivo = $prefixo . '_' . bin2hex(random_bytes(8)) . '.' . $extensao;
-            $destino = $pastaUploads . $nomeArquivo;
-
-            if (!move_uploaded_file($tmpName, $destino)) {
-                throw new RuntimeException('Não foi possível salvar a imagem no projeto.');
-            }
-
-            return $urlBaseUploads . $nomeArquivo;
-        };
-
-        // Converte um campo múltiplo de $_FILES em um arquivo individual.
-        $obterArquivoDaLista = function (array $grupo, string $chave): ?array {
-            if (!isset($grupo['error'][$chave])) {
-                return null;
-            }
-
-            return [
-                'name'     => $grupo['name'][$chave] ?? '',
-                'type'     => $grupo['type'][$chave] ?? '',
-                'tmp_name' => $grupo['tmp_name'][$chave] ?? '',
-                'error'    => $grupo['error'][$chave] ?? UPLOAD_ERR_NO_FILE,
-                'size'     => $grupo['size'][$chave] ?? 0
-            ];
-        };
-
-        // 3.1 Configurações gerais
-        $corPrimaria   = $dadosPost['corPrimaria'] ?? '#C9A227';
-        $corSecundaria = $dadosPost['corSecundaria'] ?? '#000000';
-
-        $urlLogotipo = $dadosPost['urlLogotipo'] ?? '';
-        if (!empty($dadosFiles['logo_arquivo']) && is_array($dadosFiles['logo_arquivo'])) {
-            $novaLogo = $salvarImagem($dadosFiles['logo_arquivo'], 'logo');
-            if ($novaLogo !== null) {
-                $urlLogotipo = $novaLogo;
-            }
-        }
-
-        $tituloHero    = $dadosPost['tituloHero'] ?? '';
-        $subtituloHero = $dadosPost['subtituloHero'] ?? '';
-        $textoBotao    = $dadosPost['textoBotao'] ?? '';
-
-        $sobreNos = $dadosPost['sobreNos'] ?? '';
-
-        $urlImagemSobre = $dadosPost['urlImagemSobre'] ?? '';
-        if (!empty($dadosFiles['sobre_arquivo']) && is_array($dadosFiles['sobre_arquivo'])) {
-            $novaImagemSobre = $salvarImagem($dadosFiles['sobre_arquivo'], 'sobre');
-            if ($novaImagemSobre !== null) {
-                $urlImagemSobre = $novaImagemSobre;
-            }
-        }
-
-        $nossosValores      = $dadosPost['nossosValores'] ?? '';
-        $nossasCompetencias = $dadosPost['nossasCompetencias'] ?? '';
-
-        // Dados da seção de Contato
-        $tituloContato = trim($dadosPost['tituloContato'] ?? '');
-        $subtituloContato = trim($dadosPost['subtituloContato'] ?? '');
-        $tituloFormularioContato = trim($dadosPost['tituloFormularioContato'] ?? '');
-        $emailContato = trim($dadosPost['emailContato'] ?? '');
-        $telefoneContato = trim($dadosPost['telefoneContato'] ?? '');
-        $horarioContato = trim($dadosPost['horarioContato'] ?? '');
-
-        // Redes sociais
-        $instagramUrl = trim($dadosPost['instagramUrl'] ?? '');
-        $facebookUrl = trim($dadosPost['facebookUrl'] ?? '');
-        $tiktokUrl = trim($dadosPost['tiktokUrl'] ?? '');
-        $whatsappUrl = trim($dadosPost['whatsappUrl'] ?? '');
-
-        // Imagem da seção de Contato
-        $urlImagemContato = $dadosPost['urlImagemContato'] ?? '';
-
-        if (!empty($dadosFiles['contato_arquivo']) && is_array($dadosFiles['contato_arquivo'])) {
-            $novaImagemContato = $salvarImagem($dadosFiles['contato_arquivo'], 'contato');
-
-            if ($novaImagemContato !== null) {
-                $urlImagemContato = $novaImagemContato;
-            }
-        }
-
-        // Dados da seção de Feedback
-        $tituloFeedback = trim($dadosPost['tituloFeedback'] ?? '');
-        $subtituloFeedback = trim($dadosPost['subtituloFeedback'] ?? '');
-        $urlImagemFeedback = $dadosPost['urlImagemFeedback'] ?? '';
-
-        if (!empty($dadosFiles['feedback_arquivo']) && is_array($dadosFiles['feedback_arquivo'])) {
-            $novaImagemFeedback = $salvarImagem($dadosFiles['feedback_arquivo'], 'feedback');
-
-            if ($novaImagemFeedback !== null) {
-                $urlImagemFeedback = $novaImagemFeedback;
-            }
-        }
-
-        // Benefícios aceitos no portfólio
-        $aceitaWellhub = isset($dadosPost['aceitaWellhub']) ? 1 : 0;
-        $urlIconeWellhub = trim($dadosPost['urlIconeWellhub'] ?? '');
-
-        if (!empty($dadosFiles['wellhub_arquivo']) && is_array($dadosFiles['wellhub_arquivo'])) {
-            $novoIconeWellhub = $salvarImagem($dadosFiles['wellhub_arquivo'], 'wellhub');
-
-            if ($novoIconeWellhub !== null) {
-                $urlIconeWellhub = $novoIconeWellhub;
-            }
-        }
-
-        $aceitaTotalpass = isset($dadosPost['aceitaTotalpass']) ? 1 : 0;
-        $urlIconeTotalpass = trim($dadosPost['urlIconeTotalpass'] ?? '');
-
-        if (!empty($dadosFiles['totalpass_arquivo']) && is_array($dadosFiles['totalpass_arquivo'])) {
-            $novoIconeTotalpass = $salvarImagem($dadosFiles['totalpass_arquivo'], 'totalpass');
-
-            if ($novoIconeTotalpass !== null) {
-                $urlIconeTotalpass = $novoIconeTotalpass;
-            }
-        }
-
-        $stmt = $pdo->prepare("
-            INSERT INTO portfolio_config (
-                company_id,
-                primary_color,
-                secondary_color,
-                logo_url,
-                hero_title,
-                hero_subtitle,
-                hero_cta,
-                about_text,
-                about_image,
-                company_values,
-                company_competencies,
-                contact_title,
-                contact_subtitle,
-                contact_form_title,
-                contact_email,
-                contact_phone,
-                contact_hours,
-                contact_image,
-                instagram_url,
-                facebook_url,
-                tiktok_url,
-                whatsapp_url,
-                feedback_title,
-                feedback_subtitle,
-                feedback_image,
-                accepts_wellhub,
-                wellhub_icon,
-                accepts_totalpass,
-                totalpass_icon
-            ) VALUES (
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                ?, ?, ?, ?, ?, ?, ?
-            )
-            ON DUPLICATE KEY UPDATE
-                primary_color = VALUES(primary_color),
-                secondary_color = VALUES(secondary_color),
-                logo_url = VALUES(logo_url),
-                hero_title = VALUES(hero_title),
-                hero_subtitle = VALUES(hero_subtitle),
-                hero_cta = VALUES(hero_cta),
-                about_text = VALUES(about_text),
-                about_image = VALUES(about_image),
-                company_values = VALUES(company_values),
-                company_competencies = VALUES(company_competencies),
-                contact_title = VALUES(contact_title),
-                contact_subtitle = VALUES(contact_subtitle),
-                contact_form_title = VALUES(contact_form_title),
-                contact_email = VALUES(contact_email),
-                contact_phone = VALUES(contact_phone),
-                contact_hours = VALUES(contact_hours),
-                contact_image = VALUES(contact_image),
-                instagram_url = VALUES(instagram_url),
-                facebook_url = VALUES(facebook_url),
-                tiktok_url = VALUES(tiktok_url),
-                whatsapp_url = VALUES(whatsapp_url),
-                feedback_title = VALUES(feedback_title),
-                feedback_subtitle = VALUES(feedback_subtitle),
-                feedback_image = VALUES(feedback_image),
-                accepts_wellhub = VALUES(accepts_wellhub),
-                wellhub_icon = VALUES(wellhub_icon),
-                accepts_totalpass = VALUES(accepts_totalpass),
-                totalpass_icon = VALUES(totalpass_icon)
-        ");
-
-        $stmt->execute([
-            $company_id,
-            $corPrimaria,
-            $corSecundaria,
-            $urlLogotipo,
-            $tituloHero,
-            $subtituloHero,
-            $textoBotao,
-            $sobreNos,
-            $urlImagemSobre,
-            $nossosValores,
-            $nossasCompetencias,
-            $tituloContato,
-            $subtituloContato,
-            $tituloFormularioContato,
-            $emailContato,
-            $telefoneContato,
-            $horarioContato,
-            $urlImagemContato,
-            $instagramUrl,
-            $facebookUrl,
-            $tiktokUrl,
-            $whatsappUrl,
-            $tituloFeedback,
-            $subtituloFeedback,
-            $urlImagemFeedback,
-            $aceitaWellhub,
-            $urlIconeWellhub,
-            $aceitaTotalpass,
-            $urlIconeTotalpass
-        ]);
-
-        // 3.2 Remover Planos
-        if (!empty($dadosPost['planos_remover']) && is_array($dadosPost['planos_remover'])) {
-            $stmtDel = $pdo->prepare("DELETE FROM planos WHERE id = ? AND company_id = ?");
-            foreach ($dadosPost['planos_remover'] as $id) {
-                try {
-                    $stmtDel->execute([(int)$id, $company_id]);
-                } catch (PDOException $e) {
+                if ($nova !== null) {
+                    $url = $nova;
                 }
             }
         }
 
-        // 3.3 Remover Filiais
-        if (!empty($dadosPost['filiais_remover']) && is_array($dadosPost['filiais_remover'])) {
-            $stmtDel = $pdo->prepare("DELETE FROM filiais WHERE id = ? AND company_id = ?");
-            foreach ($dadosPost['filiais_remover'] as $id) {
-                try {
-                    $stmtDel->execute([(int)$id, $company_id]);
-                } catch (PDOException $e) {
-                }
-            }
+        return $url;
+    }
+}
+
+// ================================================
+// VALIDAÇÃO MULTI-TENANT
+// ================================================
+
+try {
+    if ($company_id <= 0) {
+        throw new RuntimeException(
+            'Academia não identificada.'
+        );
+    }
+
+    $empresa = portfolioConsultar(
+        $pdo,
+        'SELECT id FROM companies WHERE id = ? LIMIT 1',
+        [$company_id]
+    );
+
+    if (empty($empresa)) {
+        throw new RuntimeException(
+            'Academia não encontrada.'
+        );
+    }
+
+    // ============================================
+    // 1. CONSULTAR SITE PÚBLICO OU ADMINISTRATIVO
+    // ============================================
+
+    if (
+        $operacao === 'buscar_publico' ||
+        $operacao === 'buscar' ||
+        $operacao === 'buscar_admin'
+    ) {
+        $administrativo = $operacao === 'buscar_admin';
+
+        // CONFIGURAÇÕES
+
+        $configBanco = portfolioConsultar(
+            $pdo,
+            'SELECT * FROM portfolio_config
+             WHERE company_id = ?
+             LIMIT 1',
+            [$company_id]
+        );
+
+        $config = array_merge(
+            $configPadrao,
+            $configBanco[0] ?? []
+        );
+
+        // PLANOS - FONTE OFICIAL
+
+        $planos = portfolioConsultar(
+            $pdo,
+            'SELECT * FROM planos
+             WHERE company_id = ?
+             ORDER BY id ASC',
+            [$company_id]
+        );
+
+        // FILIAIS - FONTE OFICIAL
+
+        $filiais = portfolioConsultar(
+            $pdo,
+            'SELECT
+                f.*,
+                pfi.image_url
+             FROM filiais f
+             LEFT JOIN portfolio_filial_images pfi
+                ON pfi.filial_id = f.id
+                AND pfi.company_id = f.company_id
+             WHERE f.company_id = ?
+                AND f.ativo = 1
+             ORDER BY f.id ASC',
+            [$company_id]
+        );
+
+        // MODALIDADES - ISOLAMENTO MULTI-TENANT
+        //
+        // A modalidade pertence a uma filial.
+        // A filial pertence a uma academia.
+        //
+        // Portanto, filtramos pelo company_id
+        // através da tabela filiais.
+
+        $modalidades = portfolioConsultar(
+            $pdo,
+            'SELECT
+                pm.id,
+                pm.filial_id,
+                pm.name,
+                pm.description,
+                pm.image_url
+             FROM portfolio_modalities pm
+             INNER JOIN filiais f
+                ON f.id = pm.filial_id
+             WHERE f.company_id = ?
+                AND f.ativo = 1
+             ORDER BY pm.id ASC',
+            [$company_id]
+        );
+
+        // SLIDES
+
+        $sqlSlides = '
+            SELECT *
+            FROM portfolio_slides
+            WHERE company_id = ?
+        ';
+
+        if (!$administrativo) {
+            $sqlSlides .= ' AND ativo = 1';
         }
 
-        // 3.4 Remover Modalidades
-        if (!empty($dadosPost['modalidades_remover']) && is_array($dadosPost['modalidades_remover'])) {
-            $stmtDel = $pdo->prepare("DELETE FROM portfolio_modalities WHERE id = ?");
-            foreach ($dadosPost['modalidades_remover'] as $id) {
-                try {
-                    $stmtDel->execute([(int)$id]);
-                } catch (PDOException $e) {
-                }
-            }
+        $sqlSlides .= ' ORDER BY ordem ASC, id ASC';
+
+        $slides = portfolioConsultar(
+            $pdo,
+            $sqlSlides,
+            [$company_id]
+        );
+
+        // AVALIAÇÕES
+
+        if ($administrativo) {
+            $feedbacks = portfolioConsultar(
+                $pdo,
+                'SELECT *
+                 FROM portfolio_feedbacks
+                 WHERE company_id = ?
+                 ORDER BY criado_em DESC, id DESC',
+                [$company_id]
+            );
+        } else {
+            $feedbacks = portfolioConsultar(
+                $pdo,
+                'SELECT *
+                 FROM portfolio_feedbacks
+                 WHERE company_id = ?
+                    AND ativo = 1
+                 ORDER BY criado_em DESC, id DESC
+                 LIMIT 3',
+                [$company_id]
+            );
         }
 
-        // 3.5 Remover Slides
-        if (!empty($dadosPost['slides_remover']) && is_array($dadosPost['slides_remover'])) {
-            $stmtDel = $pdo->prepare("DELETE FROM portfolio_slides WHERE id = ? AND company_id = ?");
-            foreach ($dadosPost['slides_remover'] as $id) {
-                try {
-                    $stmtDel->execute([(int)$id, $company_id]);
-                } catch (PDOException $e) {
-                }
-            }
+        $tituloPagina = $administrativo
+            ? 'Portfólio'
+            : ($config['app_name'] ?? 'GymCore');
+    }
+
+    // ============================================
+    // 2. SALVAR CONFIGURAÇÕES DO PORTFÓLIO
+    // ============================================
+
+    elseif ($operacao === 'salvar') {
+        $dadosPost = $dadosPost ?? $_POST;
+        $dadosFiles = $dadosFiles ?? $_FILES;
+
+        // Apenas o painel Admin deve executar
+        // esta operação. O controller já valida
+        // a role e a empresa da sessão.
+
+        // ========================================
+        // 2.1 CONFIGURAÇÕES GERAIS
+        // ========================================
+
+        $corPrimaria = trim(
+            (string) ($dadosPost['corPrimaria'] ?? '#C9A227')
+        );
+
+        $corSecundaria = trim(
+            (string) ($dadosPost['corSecundaria'] ?? '#000000')
+        );
+
+        if (
+            !preg_match('/^#[0-9a-fA-F]{6}$/', $corPrimaria) ||
+            !preg_match('/^#[0-9a-fA-F]{6}$/', $corSecundaria)
+        ) {
+            throw new RuntimeException(
+                'As cores informadas são inválidas.'
+            );
         }
 
-        // 3.5.1 Remover Feedbacks
-        if (!empty($dadosPost['feedbacks_remover']) && is_array($dadosPost['feedbacks_remover'])) {
-            $stmtDel = $pdo->prepare("DELETE FROM portfolio_feedbacks WHERE id = ? AND company_id = ?");
-            foreach ($dadosPost['feedbacks_remover'] as $id) {
-                try {
-                    $stmtDel->execute([(int)$id, $company_id]);
-                } catch (PDOException $e) {
-                }
-            }
-        }
+        $urlLogotipo = portfolioImagemCampo(
+            $dadosPost,
+            $dadosFiles,
+            'urlLogotipo',
+            'logo_arquivo',
+            'logo'
+        );
 
-        // 3.5.2 Atualizar Feedbacks (visibilidade)
-        if (isset($dadosPost['feedbacks']) && is_array($dadosPost['feedbacks'])) {
-            $stmtUpdateFb = $pdo->prepare("
-                UPDATE portfolio_feedbacks
-                SET ativo = ?
-                WHERE id = ? AND company_id = ?
-            ");
+        $urlImagemSobre = portfolioImagemCampo(
+            $dadosPost,
+            $dadosFiles,
+            'urlImagemSobre',
+            'sobre_arquivo',
+            'sobre'
+        );
 
-            foreach ($dadosPost['feedbacks'] as $id => $data) {
-                $ativo = isset($data['ativo']) ? 1 : 0;
-                $stmtUpdateFb->execute([$ativo, (int)$id, $company_id]);
-            }
-        }
+        $urlImagemContato = portfolioImagemCampo(
+            $dadosPost,
+            $dadosFiles,
+            'urlImagemContato',
+            'contato_arquivo',
+            'contato'
+        );
 
-        // 3.6 Atualizar / Inserir Planos
-        if (isset($dadosPost['planos']) && is_array($dadosPost['planos'])) {
-            $stmtUpdate = $pdo->prepare("
-                UPDATE planos
-                SET nome = ?, valor = ?, categoria = ?, duracao = ?
-                WHERE id = ? AND company_id = ?
-            ");
+        $urlImagemFeedback = portfolioImagemCampo(
+            $dadosPost,
+            $dadosFiles,
+            'urlImagemFeedback',
+            'feedback_arquivo',
+            'feedback'
+        );
 
-            $stmtInsert = $pdo->prepare("
-                INSERT INTO planos
-                (company_id, nome, categoria, valor, duracao)
-                VALUES (?, ?, ?, ?, ?)
-            ");
+        $urlIconeWellhub = portfolioImagemCampo(
+            $dadosPost,
+            $dadosFiles,
+            'urlIconeWellhub',
+            'wellhub_arquivo',
+            'wellhub'
+        );
 
-            foreach ($dadosPost['planos'] as $id => $data) {
-                $nome = trim($data['nome'] ?? '');
-                $categoria = trim($data['categoria'] ?? '');
-                $valor = (float) str_replace(',', '.', (string)($data['valor'] ?? 0));
-                $duracao = trim($data['duracao'] ?? '');
+        $urlIconeTotalpass = portfolioImagemCampo(
+            $dadosPost,
+            $dadosFiles,
+            'urlIconeTotalpass',
+            'totalpass_arquivo',
+            'totalpass'
+        );
 
-                if (strpos((string)$id, 'new_') === 0) {
-                    $stmtInsert->execute([$company_id, $nome, $categoria, $valor, $duracao]);
-                } else {
-                    $stmtUpdate->execute([$nome, $valor, $categoria, $duracao, (int)$id, $company_id]);
-                }
-            }
-        }
+        $camposConfig = [
+            'primary_color'        => $corPrimaria,
+            'secondary_color'      => $corSecundaria,
+            'logo_url'             => $urlLogotipo,
+            'hero_title'           => $dadosPost['tituloHero'] ?? '',
+            'hero_subtitle'        => $dadosPost['subtituloHero'] ?? '',
+            'hero_cta'             => $dadosPost['textoBotao'] ?? '',
+            'about_text'           => $dadosPost['sobreNos'] ?? '',
+            'about_image'          => $urlImagemSobre,
+            'company_values'       => $dadosPost['nossosValores'] ?? '',
+            'company_competencies' => $dadosPost['nossasCompetencias'] ?? '',
+            'contact_title'        => $dadosPost['tituloContato'] ?? '',
+            'contact_subtitle'     => $dadosPost['subtituloContato'] ?? '',
+            'contact_form_title'   => $dadosPost['tituloFormularioContato'] ?? '',
+            'contact_email'        => $dadosPost['emailContato'] ?? '',
+            'contact_phone'        => $dadosPost['telefoneContato'] ?? '',
+            'contact_hours'        => $dadosPost['horarioContato'] ?? '',
+            'contact_image'        => $urlImagemContato,
+            'instagram_url'        => $dadosPost['instagramUrl'] ?? '',
+            'facebook_url'         => $dadosPost['facebookUrl'] ?? '',
+            'tiktok_url'           => $dadosPost['tiktokUrl'] ?? '',
+            'whatsapp_url'         => $dadosPost['whatsappUrl'] ?? '',
+            'feedback_title'       => $dadosPost['tituloFeedback'] ?? '',
+            'feedback_subtitle'    => $dadosPost['subtituloFeedback'] ?? '',
+            'feedback_image'       => $urlImagemFeedback,
+            'accepts_wellhub'      => isset($dadosPost['aceitaWellhub']) ? 1 : 0,
+            'wellhub_icon'         => $urlIconeWellhub,
+            'accepts_totalpass'    => isset($dadosPost['aceitaTotalpass']) ? 1 : 0,
+            'totalpass_icon'       => $urlIconeTotalpass
+        ];
 
-        // 3.7 Atualizar / Inserir Filiais
-        // A foto da unidade NÃO fica na tabela filiais.
-        // Ela é salva fisicamente em assets/uploads/portfolio/
-        // e a URL é registrada em portfolio_filial_images.
-        if (isset($dadosPost['filiais']) && is_array($dadosPost['filiais'])) {
-            $stmtUpdate = $pdo->prepare("
-                UPDATE filiais
-                SET nome = ?, telefone = ?, cnpj = ?, responsavel = ?, latitude = ?, longitude = ?
-                WHERE id = ? AND company_id = ?
-            ");
+        // ========================================
+        // 2.2 TRANSAÇÃO DO BANCO
+        // ========================================
 
-            $stmtInsert = $pdo->prepare("
-                INSERT INTO filiais
-                (company_id, nome, cnpj, telefone, responsavel, ativo, latitude, longitude)
-                VALUES (?, ?, ?, ?, ?, 1, ?, ?)
-            ");
+        $pdo->beginTransaction();
 
-            $stmtImagemFilial = $pdo->prepare("
-                INSERT INTO portfolio_filial_images
-                    (company_id, filial_id, image_url)
-                VALUES (?, ?, ?)
+        try {
+            // Configurações da academia
+
+            $colunas = array_keys($camposConfig);
+
+            $colunasInsert = implode(', ', $colunas);
+            $placeholders = implode(
+                ', ',
+                array_fill(0, count($colunas), '?')
+            );
+
+            $atualizacoes = implode(
+                ', ',
+                array_map(
+                    static fn($coluna) =>
+                    "$coluna = VALUES($coluna)",
+                    $colunas
+                )
+            );
+
+            $sqlConfig = "
+                INSERT INTO portfolio_config (
+                    company_id,
+                    $colunasInsert
+                ) VALUES (
+                    ?,
+                    $placeholders
+                )
                 ON DUPLICATE KEY UPDATE
-                    company_id = VALUES(company_id),
-                    image_url = VALUES(image_url)
-            ");
+                    $atualizacoes
+            ";
 
-            foreach ($dadosPost['filiais'] as $id => $data) {
-                $nome = trim($data['nome'] ?? '');
-                $cnpj = trim($data['cnpj'] ?? '');
-                $telefone = trim($data['telefone'] ?? '');
-                $responsavel = trim($data['responsavel'] ?? '');
+            portfolioExecutar(
+                $pdo,
+                $sqlConfig,
+                array_merge(
+                    [$company_id],
+                    array_values($camposConfig)
+                )
+            );
 
-                $latitude =
-                    isset($data['latitude']) && $data['latitude'] !== ''
-                    ? (float) str_replace(',', '.', (string)$data['latitude'])
-                    : null;
+            // ====================================
+            // 2.3 PLANOS
+            // ====================================
+            //
+            // Mantidos temporariamente para
+            // preservar a compatibilidade com
+            // o formulário atual.
+            //
+            // Na próxima etapa, vamos centralizar
+            // o CRUD no módulo Planos.
 
-                $longitude =
-                    isset($data['longitude']) && $data['longitude'] !== ''
-                    ? (float) str_replace(',', '.', (string)$data['longitude'])
-                    : null;
+            if (
+                isset($dadosPost['planos_remover']) &&
+                is_array($dadosPost['planos_remover'])
+            ) {
+                $stmt = $pdo->prepare(
+                    'DELETE FROM planos
+                     WHERE id = ? AND company_id = ?'
+                );
 
-                // URL atual da imagem de apresentação, vinda da tabela separada.
-                $imageUrl = trim($data['image_url'] ?? '');
-
-                // Se o Admin selecionar uma nova imagem, salva no projeto.
-                if (!empty($dadosFiles['filiais_arquivo']) && is_array($dadosFiles['filiais_arquivo'])) {
-                    $arquivoFilial = $obterArquivoDaLista(
-                        $dadosFiles['filiais_arquivo'],
-                        (string)$id
-                    );
-
-                    if ($arquivoFilial !== null) {
-                        $novaImagemFilial = $salvarImagem($arquivoFilial, 'filial');
-
-                        if ($novaImagemFilial !== null) {
-                            $imageUrl = $novaImagemFilial;
-                        }
+                foreach ($dadosPost['planos_remover'] as $id) {
+                    try {
+                        $stmt->execute([
+                            (int) $id,
+                            $company_id
+                        ]);
+                    } catch (PDOException $e) {
+                        // Compatibilidade temporária:
+                        // FK pode impedir a exclusão.
+                        error_log(
+                            '[GymFlow][Portfolio] Plano não removido: ' .
+                                $e->getMessage()
+                        );
                     }
-                }
-
-                if (strpos((string)$id, 'new_') === 0) {
-                    $stmtInsert->execute([
-                        $company_id,
-                        $nome,
-                        $cnpj,
-                        $telefone,
-                        $responsavel,
-                        $latitude,
-                        $longitude
-                    ]);
-
-                    $filialId = (int)$pdo->lastInsertId();
-                } else {
-                    $filialId = (int)$id;
-
-                    $stmtUpdate->execute([
-                        $nome,
-                        $telefone,
-                        $cnpj,
-                        $responsavel,
-                        $latitude,
-                        $longitude,
-                        $filialId,
-                        $company_id
-                    ]);
-                }
-
-                // Só cria/atualiza o registro da imagem se houver uma imagem definida.
-                if ($imageUrl !== '') {
-                    $stmtImagemFilial->execute([
-                        $company_id,
-                        $filialId,
-                        $imageUrl
-                    ]);
                 }
             }
-        }
 
-        // 3.8 Atualizar / Inserir Modalidades
-        if (isset($dadosPost['modalidades']) && is_array($dadosPost['modalidades'])) {
-            $stmtUpdate = $pdo->prepare("
-                UPDATE portfolio_modalities
-                SET name = ?, description = ?, image_url = ?
-                WHERE id = ?
-            ");
-
-            $stmtInsert = $pdo->prepare("
-                INSERT INTO portfolio_modalities
-                (filial_id, name, description, image_url)
-                VALUES (1, ?, ?, ?)
-            ");
-
-            foreach ($dadosPost['modalidades'] as $id => $data) {
-                $name = trim($data['name'] ?? '');
-                $description = trim($data['description'] ?? '');
-                $imageUrl = trim($data['image_url'] ?? '');
-
-                if (!empty($dadosFiles['modalidades_arquivo']) && is_array($dadosFiles['modalidades_arquivo'])) {
-                    $arquivoModalidade = $obterArquivoDaLista(
-                        $dadosFiles['modalidades_arquivo'],
-                        (string)$id
+            if (
+                isset($dadosPost['planos']) &&
+                is_array($dadosPost['planos'])
+            ) {
+                foreach ($dadosPost['planos'] as $id => $data) {
+                    $nome = trim($data['nome'] ?? '');
+                    $categoria = trim($data['categoria'] ?? '');
+                    $valor = (float) str_replace(
+                        ',',
+                        '.',
+                        (string) ($data['valor'] ?? 0)
                     );
+                    $duracao = trim($data['duracao'] ?? '');
 
-                    if ($arquivoModalidade !== null) {
-                        $novaImagemModalidade = $salvarImagem($arquivoModalidade, 'modalidade');
-
-                        if ($novaImagemModalidade !== null) {
-                            $imageUrl = $novaImagemModalidade;
-                        }
+                    if (str_starts_with((string) $id, 'new_')) {
+                        portfolioExecutar(
+                            $pdo,
+                            'INSERT INTO planos
+                             (company_id, nome, categoria, valor, duracao)
+                             VALUES (?, ?, ?, ?, ?)',
+                            [
+                                $company_id,
+                                $nome,
+                                $categoria,
+                                $valor,
+                                $duracao
+                            ]
+                        );
+                    } else {
+                        portfolioExecutar(
+                            $pdo,
+                            'UPDATE planos
+                             SET nome = ?, valor = ?,
+                                 categoria = ?, duracao = ?
+                             WHERE id = ? AND company_id = ?',
+                            [
+                                $nome,
+                                $valor,
+                                $categoria,
+                                $duracao,
+                                (int) $id,
+                                $company_id
+                            ]
+                        );
                     }
-                }
-
-                if (strpos((string)$id, 'new_') === 0) {
-                    $stmtInsert->execute([$name, $description, $imageUrl]);
-                } else {
-                    $stmtUpdate->execute([$name, $description, $imageUrl, (int)$id]);
                 }
             }
-        }
 
-        // 3.9 Atualizar / Inserir Slides
-        if (isset($dadosPost['slides']) && is_array($dadosPost['slides'])) {
-            $stmtUpdate = $pdo->prepare("
-                UPDATE portfolio_slides
-                SET image_url = ?, ordem = ?, ativo = ?
-                WHERE id = ? AND company_id = ?
-            ");
+            // ====================================
+            // 2.4 FILIAIS
+            // ====================================
+            //
+            // Também mantidas temporariamente
+            // para não quebrar a view atual.
 
-            $stmtInsert = $pdo->prepare("
-                INSERT INTO portfolio_slides
-                (company_id, image_url, ordem, ativo)
-                VALUES (?, ?, ?, ?)
-            ");
+            if (
+                isset($dadosPost['filiais_remover']) &&
+                is_array($dadosPost['filiais_remover'])
+            ) {
+                $stmt = $pdo->prepare(
+                    'DELETE FROM filiais
+                     WHERE id = ? AND company_id = ?'
+                );
 
-            foreach ($dadosPost['slides'] as $id => $data) {
-                $imageUrl = trim($data['image_url'] ?? '');
-                $ordem = (int) ($data['ordem'] ?? 0);
-                $ativo = isset($data['ativo']) ? 1 : 0;
-
-                if (!empty($dadosFiles['slides_arquivo']) && is_array($dadosFiles['slides_arquivo'])) {
-                    $arquivoSlide = $obterArquivoDaLista(
-                        $dadosFiles['slides_arquivo'],
-                        (string)$id
-                    );
-
-                    if ($arquivoSlide !== null) {
-                        $novaImagemSlide = $salvarImagem($arquivoSlide, 'slide');
-
-                        if ($novaImagemSlide !== null) {
-                            $imageUrl = $novaImagemSlide;
-                        }
+                foreach ($dadosPost['filiais_remover'] as $id) {
+                    try {
+                        $stmt->execute([
+                            (int) $id,
+                            $company_id
+                        ]);
+                    } catch (PDOException $e) {
+                        error_log(
+                            '[GymFlow][Portfolio] Filial não removida: ' .
+                                $e->getMessage()
+                        );
                     }
-                }
-
-                if (strpos((string)$id, 'new_') === 0) {
-                    if ($imageUrl === '') {
-                        throw new RuntimeException('Selecione uma imagem para o novo slide.');
-                    }
-
-                    $stmtInsert->execute([$company_id, $imageUrl, $ordem, $ativo]);
-                } else {
-                    $stmtUpdate->execute([$imageUrl, $ordem, $ativo, (int)$id, $company_id]);
                 }
             }
+
+            if (
+                isset($dadosPost['filiais']) &&
+                is_array($dadosPost['filiais'])
+            ) {
+                foreach ($dadosPost['filiais'] as $id => $data) {
+                    $nome = trim($data['nome'] ?? '');
+                    $cnpj = trim($data['cnpj'] ?? '');
+                    $telefone = trim($data['telefone'] ?? '');
+                    $responsavel = trim($data['responsavel'] ?? '');
+
+                    $latitude = (
+                        isset($data['latitude']) &&
+                        $data['latitude'] !== ''
+                    )
+                        ? (float) $data['latitude']
+                        : null;
+
+                    $longitude = (
+                        isset($data['longitude']) &&
+                        $data['longitude'] !== ''
+                    )
+                        ? (float) $data['longitude']
+                        : null;
+
+                    $imageUrl = portfolioImagemItem(
+                        $data,
+                        $dadosFiles,
+                        'filiais',
+                        (string) $id,
+                        'filial'
+                    );
+
+                    if (str_starts_with((string) $id, 'new_')) {
+                        portfolioExecutar(
+                            $pdo,
+                            'INSERT INTO filiais
+                             (
+                                company_id, nome, cnpj,
+                                telefone, responsavel,
+                                ativo, latitude, longitude
+                             )
+                             VALUES (?, ?, ?, ?, ?, 1, ?, ?)',
+                            [
+                                $company_id,
+                                $nome,
+                                $cnpj,
+                                $telefone,
+                                $responsavel,
+                                $latitude,
+                                $longitude
+                            ]
+                        );
+
+                        $filialId = (int) $pdo->lastInsertId();
+                    } else {
+                        $filialId = (int) $id;
+
+                        portfolioExecutar(
+                            $pdo,
+                            'UPDATE filiais
+                             SET nome = ?, telefone = ?,
+                                 cnpj = ?, responsavel = ?,
+                                 latitude = ?, longitude = ?
+                             WHERE id = ? AND company_id = ?',
+                            [
+                                $nome,
+                                $telefone,
+                                $cnpj,
+                                $responsavel,
+                                $latitude,
+                                $longitude,
+                                $filialId,
+                                $company_id
+                            ]
+                        );
+                    }
+
+                    // Verifica a propriedade da filial
+                    // antes de associar a imagem.
+
+                    if ($imageUrl !== '') {
+                        $filialPermitida = portfolioConsultar(
+                            $pdo,
+                            'SELECT id FROM filiais
+                             WHERE id = ? AND company_id = ?
+                             LIMIT 1',
+                            [$filialId, $company_id]
+                        );
+
+                        if (empty($filialPermitida)) {
+                            throw new RuntimeException(
+                                'Filial inválida para esta academia.'
+                            );
+                        }
+
+                        portfolioExecutar(
+                            $pdo,
+                            'INSERT INTO portfolio_filial_images
+                             (company_id, filial_id, image_url)
+                             VALUES (?, ?, ?)
+                             ON DUPLICATE KEY UPDATE
+                                image_url = VALUES(image_url)',
+                            [
+                                $company_id,
+                                $filialId,
+                                $imageUrl
+                            ]
+                        );
+                    }
+                }
+            }
+
+            // ====================================
+            // 2.5 MODALIDADES - MULTI-TENANT
+            // ====================================
+
+            // Exclusão restrita à academia dona
+            // da filial vinculada à modalidade.
+
+            if (
+                isset($dadosPost['modalidades_remover']) &&
+                is_array($dadosPost['modalidades_remover'])
+            ) {
+                foreach ($dadosPost['modalidades_remover'] as $id) {
+                    portfolioExecutar(
+                        $pdo,
+                        'DELETE pm
+                         FROM portfolio_modalities pm
+                         INNER JOIN filiais f
+                            ON f.id = pm.filial_id
+                         WHERE pm.id = ?
+                            AND f.company_id = ?',
+                        [(int) $id, $company_id]
+                    );
+                }
+            }
+
+            if (
+                isset($dadosPost['modalidades']) &&
+                is_array($dadosPost['modalidades'])
+            ) {
+                // Filial padrão provisória:
+                // primeira filial ativa da empresa.
+
+                $filialPadrao = portfolioConsultar(
+                    $pdo,
+                    'SELECT id
+                     FROM filiais
+                     WHERE company_id = ?
+                       AND ativo = 1
+                     ORDER BY id ASC
+                     LIMIT 1',
+                    [$company_id]
+                );
+
+                $filialPadraoId = (int) (
+                    $filialPadrao[0]['id'] ?? 0
+                );
+
+                foreach ($dadosPost['modalidades'] as $id => $data) {
+                    $nome = trim($data['name'] ?? '');
+                    $descricao = trim(
+                        $data['description'] ?? ''
+                    );
+
+                    $imagem = portfolioImagemItem(
+                        $data,
+                        $dadosFiles,
+                        'modalidades',
+                        (string) $id,
+                        'modalidade'
+                    );
+
+                    if ($nome === '') {
+                        throw new RuntimeException(
+                            'Informe o nome da modalidade.'
+                        );
+                    }
+
+                    if (str_starts_with((string) $id, 'new_')) {
+                        if ($filialPadraoId <= 0) {
+                            throw new RuntimeException(
+                                'Cadastre uma filial ativa antes de adicionar modalidades.'
+                            );
+                        }
+
+                        portfolioExecutar(
+                            $pdo,
+                            'INSERT INTO portfolio_modalities
+                             (
+                                filial_id,
+                                name,
+                                description,
+                                image_url
+                             )
+                             VALUES (?, ?, ?, ?)',
+                            [
+                                $filialPadraoId,
+                                $nome,
+                                $descricao,
+                                $imagem
+                            ]
+                        );
+                    } else {
+                        // Atualização limitada à
+                        // academia proprietária.
+
+                        portfolioExecutar(
+                            $pdo,
+                            'UPDATE portfolio_modalities pm
+                             INNER JOIN filiais f
+                                ON f.id = pm.filial_id
+                             SET
+                                pm.name = ?,
+                                pm.description = ?,
+                                pm.image_url = ?
+                             WHERE pm.id = ?
+                               AND f.company_id = ?',
+                            [
+                                $nome,
+                                $descricao,
+                                $imagem,
+                                (int) $id,
+                                $company_id
+                            ]
+                        );
+                    }
+                }
+            }
+
+            // ====================================
+            // 2.6 SLIDES
+            // ====================================
+
+            if (
+                isset($dadosPost['slides_remover']) &&
+                is_array($dadosPost['slides_remover'])
+            ) {
+                foreach ($dadosPost['slides_remover'] as $id) {
+                    portfolioExecutar(
+                        $pdo,
+                        'DELETE FROM portfolio_slides
+                         WHERE id = ? AND company_id = ?',
+                        [(int) $id, $company_id]
+                    );
+                }
+            }
+
+            if (
+                isset($dadosPost['slides']) &&
+                is_array($dadosPost['slides'])
+            ) {
+                foreach ($dadosPost['slides'] as $id => $data) {
+                    $imagem = portfolioImagemItem(
+                        $data,
+                        $dadosFiles,
+                        'slides',
+                        (string) $id,
+                        'slide'
+                    );
+
+                    $ordem = (int) ($data['ordem'] ?? 0);
+                    $ativo = isset($data['ativo']) ? 1 : 0;
+
+                    if (str_starts_with((string) $id, 'new_')) {
+                        if ($imagem === '') {
+                            throw new RuntimeException(
+                                'Selecione uma imagem para o slide.'
+                            );
+                        }
+
+                        portfolioExecutar(
+                            $pdo,
+                            'INSERT INTO portfolio_slides
+                             (
+                                company_id,
+                                image_url,
+                                ordem,
+                                ativo
+                             )
+                             VALUES (?, ?, ?, ?)',
+                            [
+                                $company_id,
+                                $imagem,
+                                $ordem,
+                                $ativo
+                            ]
+                        );
+                    } else {
+                        portfolioExecutar(
+                            $pdo,
+                            'UPDATE portfolio_slides
+                             SET image_url = ?,
+                                 ordem = ?,
+                                 ativo = ?
+                             WHERE id = ?
+                               AND company_id = ?',
+                            [
+                                $imagem,
+                                $ordem,
+                                $ativo,
+                                (int) $id,
+                                $company_id
+                            ]
+                        );
+                    }
+                }
+            }
+
+            // ====================================
+            // 2.7 AVALIAÇÕES
+            // ====================================
+
+            if (
+                isset($dadosPost['feedbacks_remover']) &&
+                is_array($dadosPost['feedbacks_remover'])
+            ) {
+                foreach ($dadosPost['feedbacks_remover'] as $id) {
+                    portfolioExecutar(
+                        $pdo,
+                        'DELETE FROM portfolio_feedbacks
+                         WHERE id = ? AND company_id = ?',
+                        [(int) $id, $company_id]
+                    );
+                }
+            }
+
+            if (
+                isset($dadosPost['feedbacks']) &&
+                is_array($dadosPost['feedbacks'])
+            ) {
+                foreach ($dadosPost['feedbacks'] as $id => $data) {
+                    $ativo = isset($data['ativo']) ? 1 : 0;
+
+                    portfolioExecutar(
+                        $pdo,
+                        'UPDATE portfolio_feedbacks
+                         SET ativo = ?
+                         WHERE id = ? AND company_id = ?',
+                        [
+                            $ativo,
+                            (int) $id,
+                            $company_id
+                        ]
+                    );
+                }
+            }
+
+            $pdo->commit();
+        } catch (Throwable $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+
+            throw $e;
         }
-    } catch (Throwable $e) {
-        $erroModel = $e->getMessage();
+    } else {
+        throw new RuntimeException(
+            'Operação do Portfólio desconhecida.'
+        );
+    }
+} catch (Throwable $e) {
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+
+    $erroModel = $e->getMessage();
+
+    error_log(
+        '[GymFlow][Portfolio] Empresa ' .
+            $company_id . ': ' .
+            $erroModel
+    );
+
+    // Evita dados parcialmente carregados.
+    if ($operacao !== 'salvar') {
+        $config = $configPadrao;
+        $planos = [];
+        $filiais = [];
+        $modalidades = [];
+        $slides = [];
+        $feedbacks = [];
+        $tituloPagina = 'Portfólio';
     }
 }

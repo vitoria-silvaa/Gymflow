@@ -1,26 +1,103 @@
-/* ========================================
-   GYMFLOW - ESTILOS GERAIS
-   ======================================== */
+/* ==========================================
+   GYMFLOW - DESIGN SYSTEM GLOBAL
+   Base preparada para White Label / Multi-Tenant
+   ========================================== */
+
+/* ==========================================
+   1. IDENTIDADE VISUAL PADRÃO
+   ========================================== */
 
 :root {
-    --cor-primaria: #10b981;
-    --cor-primaria-hover: #059669;
+    /*
+     * CORES DA MARCA
+     *
+     * Estes valores são apenas o padrão.
+     * Futuramente, o Minha Marca substituirá
+     * essas variáveis conforme a academia.
+     */
+
+    --cor-primaria: #ffb000;
+    --cor-secundaria: #111827;
+
+    /*
+     * TEXTO SOBRE AS CORES DA MARCA
+     *
+     * Separado para garantir contraste.
+     * Uma cor clara pode precisar de texto escuro;
+     * uma cor escura pode precisar de texto branco.
+     */
+
+    --cor-sobre-primaria: #111827;
+    --cor-sobre-secundaria: #ffffff;
+
+    /*
+     * VARIAÇÕES AUTOMÁTICAS
+     *
+     * A mudança da cor principal também
+     * atualiza o hover e fundos suaves.
+     */
+
+    --cor-primaria-hover:
+        color-mix(in srgb,
+            var(--cor-primaria) 85%,
+            #000000);
+
+    --cor-primaria-suave:
+        color-mix(in srgb,
+            var(--cor-primaria) 12%,
+            #ffffff);
+
+    --cor-primaria-borda:
+        color-mix(in srgb,
+            var(--cor-primaria) 35%,
+            #ffffff);
+
+    /* ======================================
+       2. CORES NEUTRAS
+       ====================================== */
+
+    --cor-branca: #ffffff;
 
     --cor-fundo: #ffffff;
-    --cor-branca: #ffffff;
+    --cor-fundo-pagina: #f8fafc;
+    --cor-superficie: #ffffff;
+    --cor-superficie-secundaria: #f1f5f9;
 
     --cor-texto: #111827;
     --cor-texto-secundario: #64748b;
+    --cor-texto-discreto: #94a3b8;
 
     --cor-borda: #e2e8f0;
+    --cor-borda-forte: #cbd5e1;
 
-    --cor-sucesso: #10b981;
-    --cor-aviso: #f59e0b;
-    --cor-perigo: #ef4444;
+    /* ======================================
+       3. ESTADOS DO SISTEMA
+       ====================================== */
 
-    /* Design System compartilhado */
-    --ui-fundo-pagina: #f8fafc;
-    --ui-fundo-card: #ffffff;
+    /*
+     * Estas cores indicam estados funcionais.
+     * Não devem ser substituídas livremente
+     * pela cor escolhida para a marca.
+     */
+
+    --cor-sucesso: #16a34a;
+    --cor-sucesso-fundo: #f0fdf4;
+
+    --cor-aviso: #d97706;
+    --cor-aviso-fundo: #fffbeb;
+
+    --cor-perigo: #dc2626;
+    --cor-perigo-fundo: #fef2f2;
+
+    --cor-info: #2563eb;
+    --cor-info-fundo: #eff6ff;
+
+    /* ======================================
+       4. COMPONENTES
+       ====================================== */
+
+    --ui-fundo-pagina: var(--cor-fundo-pagina);
+    --ui-fundo-card: var(--cor-superficie);
 
     --ui-texto: var(--cor-texto);
     --ui-texto-suave: var(--cor-texto-secundario);
@@ -29,6 +106,7 @@
     --ui-raio-sm: 6px;
     --ui-raio-md: 10px;
     --ui-raio-lg: 12px;
+    --ui-raio-xl: 16px;
 
     --ui-sombra-card:
         0 1px 2px rgba(15, 23, 42, 0.03),
@@ -39,14 +117,49 @@
         0 10px 20px rgba(15, 23, 42, 0.045);
 
     --ui-transicao: 0.2s ease;
+
+    /* ======================================
+       5. BOTÕES E FORMULÁRIOS
+       ====================================== */
+
+    --ui-botao-fundo: var(--cor-primaria);
+
+    --ui-botao-fundo-hover:
+        var(--cor-primaria-hover);
+
+    --ui-botao-texto:
+        var(--cor-sobre-primaria);
+
+    --ui-input-fundo: var(--cor-superficie);
+    --ui-input-texto: var(--cor-texto);
+    --ui-input-borda: var(--cor-borda);
+    --ui-input-foco: var(--cor-primaria);
+
+    /* ======================================
+       6. COMPATIBILIDADE
+       ====================================== */
+
+    /*
+     * Mantemos esses nomes porque outros
+     * arquivos do GymFlow podem utilizá-los.
+     */
+
+    --fin-primary: var(--cor-primaria);
+    --fin-primary-dark: var(--cor-primaria-hover);
 }
 
-/* ========================================
-   CONFIGURAÇÃO GERAL
-   ======================================== */
+/* ==========================================
+   7. CONFIGURAÇÕES GERAIS
+   ========================================== */
 
-* {
+*,
+*::before,
+*::after {
     box-sizing: border-box;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -55,14 +168,26 @@ body {
 
     font-family: Arial, Helvetica, sans-serif;
     font-size: 15px;
+    line-height: 1.5;
 
-    background-color: white;
+    background-color: var(--cor-fundo);
     color: var(--cor-texto);
 }
 
-/* ========================================
-   TÍTULOS
-   ======================================== */
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
+}
+
+img {
+    max-width: 100%;
+}
+
+/* ==========================================
+   8. TIPOGRAFIA
+   ========================================== */
 
 h1,
 h2,
@@ -88,10 +213,6 @@ h4 {
     font-size: 16px;
 }
 
-/* ========================================
-   TEXTOS
-   ======================================== */
-
 p {
     line-height: 1.5;
 }
@@ -100,22 +221,23 @@ small {
     color: var(--cor-texto-secundario);
 }
 
-/* ========================================
-   LINKS
-   ======================================== */
+/* ==========================================
+   9. LINKS
+   ========================================== */
 
 a {
     color: var(--cor-primaria);
     text-decoration: none;
+    transition: color var(--ui-transicao);
 }
 
 a:hover {
     color: var(--cor-primaria-hover);
 }
 
-/* ========================================
-   FORMULÁRIOS
-   ======================================== */
+/* ==========================================
+   10. FORMULÁRIOS
+   ========================================== */
 
 label {
     display: block;
@@ -123,7 +245,7 @@ label {
     font-weight: bold;
 }
 
-input,
+input:not([type="checkbox"]):not([type="radio"]):not([type="color"]),
 select,
 textarea {
     width: 100%;
@@ -132,11 +254,32 @@ textarea {
     font-family: inherit;
     font-size: 14px;
 
-    color: var(--cor-texto);
-    background-color: var(--cor-branca);
+    color: var(--ui-input-texto);
+    background-color: var(--ui-input-fundo);
 
-    border: 1px solid var(--cor-borda);
-    border-radius: 6px;
+    border: 1px solid var(--ui-input-borda);
+    border-radius: var(--ui-raio-sm);
+
+    transition:
+        border-color var(--ui-transicao),
+        box-shadow var(--ui-transicao);
+}
+
+/*
+ * Mantém os campos de seleção nativos,
+ * sem obrigar checkboxes a ocupar 100%.
+ */
+
+input[type="checkbox"],
+input[type="radio"] {
+    width: auto;
+    padding: 0;
+    accent-color: var(--cor-primaria);
+}
+
+input[type="color"] {
+    padding: 3px;
+    cursor: pointer;
 }
 
 textarea {
@@ -144,16 +287,23 @@ textarea {
     resize: vertical;
 }
 
-input:focus,
-select:focus,
-textarea:focus {
-    outline: none;
-    border-color: var(--cor-primaria);
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--ui-input-foco);
+    outline-offset: 1px;
 }
 
-/* ========================================
-   BOTÕES
-   ======================================== */
+input:disabled,
+select:disabled,
+textarea:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+/* ==========================================
+   11. BOTÕES
+   ========================================== */
 
 button,
 input[type="submit"],
@@ -162,41 +312,106 @@ input[type="button"],
     padding: 10px 18px;
 
     border: none;
-    border-radius: 6px;
+    border-radius: var(--ui-raio-sm);
 
-    background-color: var(--cor-primaria);
-    color: white;
+    background-color: var(--ui-botao-fundo);
+    color: var(--ui-botao-texto);
 
     font-family: inherit;
     font-size: 14px;
 
     cursor: pointer;
+
+    transition:
+        background-color var(--ui-transicao),
+        border-color var(--ui-transicao),
+        box-shadow var(--ui-transicao),
+        transform var(--ui-transicao);
 }
 
-button:hover,
-input[type="submit"]:hover,
-input[type="button"]:hover,
+button:hover:not(:disabled),
+input[type="submit"]:hover:not(:disabled),
+input[type="button"]:hover:not(:disabled),
 .btn:hover {
-    background-color: var(--cor-primaria-hover);
+    background-color: var(--ui-botao-fundo-hover);
 }
 
-/* ========================================
-   TABELAS
-   ======================================== */
+button:focus-visible,
+input[type="submit"]:focus-visible,
+input[type="button"]:focus-visible,
+.btn:focus-visible {
+    outline: 2px solid var(--cor-primaria);
+    outline-offset: 3px;
+}
+
+button:disabled,
+input[type="submit"]:disabled,
+input[type="button"]:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ==========================================
+   12. TABELAS
+   ========================================== */
 
 table {
     width: 100%;
     border-collapse: collapse;
-    background-color: white;
+    background-color: var(--cor-superficie);
 }
 
 th,
 td {
     padding: 10px;
     text-align: left;
-    border-bottom: 1px solid var(--cor-borda);
+    border-bottom: 1px solid var(--ui-borda);
 }
 
 th {
-    background-color: #f8fafc;
+    background-color: var(--cor-superficie-secundaria);
+    color: var(--ui-texto);
+}
+
+td {
+    color: var(--ui-texto);
+}
+
+/* ==========================================
+   13. ELEMENTOS UTILITÁRIOS
+   ========================================== */
+
+.ui-texto-suave {
+    color: var(--ui-texto-suave);
+}
+
+.ui-superficie {
+    background-color: var(--ui-fundo-card);
+    color: var(--ui-texto);
+    border: 1px solid var(--ui-borda);
+}
+
+.ui-cor-primaria {
+    color: var(--cor-primaria);
+}
+
+.ui-fundo-primario {
+    background-color: var(--cor-primaria);
+    color: var(--cor-sobre-primaria);
+}
+
+/* ==========================================
+   14. ACESSIBILIDADE
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
 }

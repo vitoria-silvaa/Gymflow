@@ -1,14 +1,54 @@
-/* ========================================
-   GYMFLOW - TELA DE LOGIN
-   PADRÃO VISUAL DO PORTFÓLIO
-   ======================================== */
+/* ==========================================
+   GYMFLOW - LOGIN
+   Design System / White Label
+   ========================================== */
 
-
-/* =========================
-   PÁGINA
-========================= */
+/* ==========================================
+   1. VARIÁVEIS DO LOGIN
+   ========================================== */
 
 .login-page {
+    /*
+     * As variáveis --portfolio-primary e
+     * --portfolio-secondary podem ser definidas
+     * dinamicamente pelo PHP da academia.
+     */
+
+    --login-primaria: var(--portfolio-primary,
+            var(--cor-primaria, #ffb000));
+
+    --login-secundaria: var(--portfolio-secondary,
+            #0b0b0b);
+
+    --login-sobre-primaria: var(--portfolio-on-primary,
+            #111827);
+
+    --login-primaria-hover: color-mix(in srgb,
+            var(--login-primaria) 85%,
+            #000000);
+
+    --login-primaria-suave: color-mix(in srgb,
+            var(--login-primaria) 10%,
+            transparent);
+
+    --login-fundo-esquerdo: #050505;
+    --login-fundo-direito: #101010;
+    --login-fundo-card: #111111;
+    --login-fundo-input: #080808;
+
+    --login-texto: #ffffff;
+    --login-texto-suave: #c0c0c0;
+    --login-texto-discreto: #999999;
+
+    --login-borda: rgba(255, 255, 255, 0.12);
+    --login-borda-input: rgba(255, 255, 255, 0.18);
+
+    --login-raio-card: 12px;
+    --login-raio-input: 7px;
+    --login-raio-botao: 6px;
+
+    --login-transicao: 0.2s ease;
+
     width: 100%;
     min-height: 100vh;
 
@@ -16,259 +56,209 @@
     align-items: center;
     justify-content: center;
 
-    background-color: var(--portfolio-secondary, #0b0b0b);
+    background-color: var(--login-secundaria);
+    color: var(--login-texto);
 }
 
+/* ==========================================
+   2. CONTAINER PRINCIPAL
+   ========================================== */
 
-/* =========================
-   CONTAINER
-========================= */
-
-.login-container {
+.login-page .login-container {
     width: 100%;
     min-height: 100vh;
 
     display: flex;
-
     overflow: hidden;
 
-    background-color: var(--portfolio-secondary, #0b0b0b);
+    background-color: var(--login-secundaria);
 }
 
+/* ==========================================
+   3. COLUNA ESQUERDA
+   ========================================== */
 
-/* =========================
-   LADO ESQUERDO
-========================= */
-
-.login-first-column {
-    width: 50%;
-    min-height: 100vh;
-
-    padding: 60px;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-
-    position: relative;
-    overflow: hidden;
-
-    background-color: #050505;
+.login-page .login-first-column {
+    background-color: var(--login-secundaria, #0b0b0b);
 
     background-image:
-        linear-gradient(90deg,
-            rgba(0, 0, 0, 0.90),
-            rgba(0, 0, 0, 0.68)),
-        url("../img/academia.jpg");
-
-    background-size: cover;
-    background-position: center;
+        radial-gradient(circle at 15% 85%,
+            color-mix(in srgb,
+                var(--login-primaria, #ffb000) 9%,
+                transparent),
+            transparent 55%);
 }
 
+/* ==========================================
+   4. MARCA
+   ========================================== */
 
-/* =========================
-   MARCA
-========================= */
-
-.login-brand {
+.login-page .login-brand {
     position: absolute;
-
     top: 38px;
     left: 60px;
 
-    color: #ffffff;
+    z-index: 2;
+
+    color: var(--login-texto);
 
     font-size: 19px;
     font-weight: 700;
-
     letter-spacing: 2px;
-
-    z-index: 2;
 }
 
-.login-brand span {
-    color: var(--portfolio-primary, #ffb000);
+.login-page .login-brand span,
+.login-page .form-brand span {
+    color: var(--login-primaria);
 }
 
-
-/* =========================
-   CONTEÚDO
-========================= */
-
-.login-left-content {
-    width: 100%;
-    max-width: 620px;
-
+.login-page .login-left-content {
     position: relative;
     z-index: 2;
+
+    width: 100%;
+    max-width: 620px;
 }
 
+/* ==========================================
+   5. VOLTAR AO SITE
+   ========================================== */
 
-/* =========================
-   LINK VOLTAR
-========================= */
-
-.login-back-link {
+.login-page .login-back-link {
     display: inline-flex;
     align-items: center;
     justify-content: center;
 
     gap: 8px;
 
-    margin-bottom: 35px;
-
     min-height: 38px;
-
+    margin-bottom: 35px;
     padding: 0 15px;
 
-    color: #ffffff;
-
+    color: var(--login-texto);
     background-color: rgba(0, 0, 0, 0.25);
 
     border: 1px solid rgba(255, 255, 255, 0.30);
-
     border-radius: 6px;
 
     font-size: 13px;
     font-weight: 600;
-
     text-decoration: none;
 
-    transition: 0.2s ease;
+    transition:
+        background-color var(--login-transicao),
+        color var(--login-transicao),
+        border-color var(--login-transicao);
 }
 
-.login-back-link:hover {
-    color: #000000;
-
-    background-color: var(--portfolio-primary, #ffb000);
-
-    border-color: var(--portfolio-primary, #ffb000);
+.login-page .login-back-link:hover {
+    color: var(--login-sobre-primaria);
+    background-color: var(--login-primaria);
+    border-color: var(--login-primaria);
 }
 
-.back-arrow {
+.login-page .back-arrow {
     font-size: 16px;
 }
 
+/* ==========================================
+   6. TÍTULO E DESCRIÇÃO
+   ========================================== */
 
-/* =========================
-   LINHA DE DESTAQUE
-========================= */
-
-.login-title-line {
+.login-page .login-title-line {
     width: 45px;
     height: 2px;
 
     margin-bottom: 20px;
 
-    background-color: var(--portfolio-primary, #ffb000);
+    background-color: var(--login-primaria);
 }
 
-
-/* =========================
-   TÍTULO
-========================= */
-
-.login-title {
+.login-page .login-title {
     max-width: 600px;
-
     margin: 0 0 20px;
 
-    color: #ffffff;
+    color: var(--login-texto);
 
     font-family: Arial, Helvetica, sans-serif;
-
     font-size: clamp(40px, 4vw, 60px);
-
-    line-height: 1.02;
-
     font-weight: 800;
-
+    line-height: 1.02;
     letter-spacing: -1px;
 }
 
-.login-title span {
-    color: var(--portfolio-primary, #ffb000);
+.login-page .login-title span {
+    color: var(--login-primaria);
 }
 
-
-/* =========================
-   DESCRIÇÃO
-========================= */
-
-.login-description {
+.login-page .login-description {
     max-width: 520px;
-
     margin: 0;
 
-    color: #c0c0c0;
+    color: var(--login-texto-suave);
 
     font-size: 16px;
-
     line-height: 1.7;
 }
 
+/* ==========================================
+   7. BENEFÍCIOS
+   ========================================== */
 
-/* =========================
-   BENEFÍCIOS
-========================= */
-
-.login-features {
+.login-page .login-features {
     display: flex;
     align-items: center;
 
     margin-top: 40px;
 }
 
-.login-feature {
+.login-page .login-feature {
     display: flex;
     align-items: center;
 
     gap: 10px;
-
     padding: 0 20px;
 
     border-right: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-.login-feature:first-child {
+.login-page .login-feature:first-child {
     padding-left: 0;
 }
 
-.login-feature:last-child {
+.login-page .login-feature:last-child {
     border-right: none;
 }
 
-.feature-icon {
-    color: var(--portfolio-primary, #ffb000);
-
+.login-page .feature-icon {
+    color: var(--login-primaria);
     font-size: 17px;
 }
 
-.login-feature strong {
+.login-page .login-feature strong {
     display: block;
-
     margin-bottom: 3px;
 
-    color: #ffffff;
+    color: var(--login-texto);
 
     font-size: 13px;
     font-weight: 700;
 }
 
-.login-feature span {
+.login-page .login-feature span {
     display: block;
 
     color: #8f8f8f;
-
     font-size: 11px;
 }
 
+/* ==========================================
+   8. COLUNA DIREITA
+   ========================================== */
 
-/* =========================
-   LADO DIREITO
-========================= */
+.login-page .login-second-column {
+    position: relative;
 
-.login-second-column {
     width: 50%;
     min-height: 100vh;
 
@@ -278,67 +268,56 @@
     align-items: center;
     justify-content: center;
 
-    position: relative;
     overflow: hidden;
 
-    background-color: #101010;
+    background-color: var(--login-fundo-direito);
 }
 
-
-/* =========================
-   DETALHE DE FUNDO
-========================= */
-
-.login-background-glow {
+.login-page .login-background-glow {
     position: absolute;
-
-    width: 450px;
-    height: 450px;
 
     top: 50%;
     left: 50%;
 
+    width: 450px;
+    height: 450px;
+
     transform: translate(-50%, -50%);
 
     border-radius: 50%;
-
-    background-color: rgba(255, 176, 0, 0.035);
+    background-color: var(--login-primaria-suave);
 
     filter: blur(80px);
+    opacity: 0.45;
 
     pointer-events: none;
 }
 
+/* ==========================================
+   9. CARD DO FORMULÁRIO
+   ========================================== */
 
-/* =========================
-   FORMULÁRIO
-========================= */
+.login-page .login-form-container {
+    position: relative;
+    z-index: 2;
 
-.login-form-container {
     width: 100%;
     max-width: 470px;
 
     padding: 45px;
 
-    position: relative;
-    z-index: 2;
+    background-color: var(--login-fundo-card);
 
-    background-color: #111111;
-
-    border: 1px solid rgba(255, 255, 255, 0.12);
-
-    border-radius: 12px;
+    border: 1px solid var(--login-borda);
+    border-radius: var(--login-raio-card);
 
     box-shadow:
         0 18px 45px rgba(0, 0, 0, 0.35);
+
+    animation: loginEntrada 0.4s ease-out;
 }
 
-
-/* =========================
-   LINHA SUPERIOR DO CARD
-========================= */
-
-.login-card-glow {
+.login-page .login-card-glow {
     position: absolute;
 
     top: 0;
@@ -347,94 +326,67 @@
     width: 100%;
     height: 2px;
 
-    background-color: var(--portfolio-primary, #ffb000);
+    background-color: var(--login-primaria);
 }
 
-
-/* =========================
-   MARCA DO FORM
-========================= */
-
-.form-brand {
+.login-page .form-brand {
     margin-bottom: 30px;
 
-    color: #ffffff;
+    color: var(--login-texto);
 
     font-size: 17px;
     font-weight: 700;
-
     letter-spacing: 2px;
 }
 
-.form-brand span {
-    color: var(--portfolio-primary, #ffb000);
-}
+/* ==========================================
+   10. CABEÇALHO DO FORMULÁRIO
+   ========================================== */
 
-
-/* =========================
-   CABEÇALHO
-========================= */
-
-.login-header {
+.login-page .login-header {
     margin-bottom: 30px;
 }
 
-.login-form-title {
+.login-page .login-form-title {
     margin: 0 0 10px;
 
-    color: #ffffff;
+    color: var(--login-texto);
 
     font-size: 30px;
-
-    line-height: 1.1;
-
     font-weight: 800;
+    line-height: 1.1;
 }
 
-.login-form-description {
+.login-page .login-form-description {
     margin: 0;
 
-    color: #999999;
+    color: var(--login-texto-discreto);
 
     font-size: 14px;
-
     line-height: 1.6;
 }
 
+/* ==========================================
+   11. ESTRUTURA DO FORMULÁRIO
+   ========================================== */
 
-/* =========================
-   FORM
-========================= */
-
-.login-form {
-    width: 100%;
-
+.login-page .login-form {
     display: flex;
     flex-direction: column;
 
+    width: 100%;
     gap: 20px;
 }
 
-
-/* =========================
-   GRUPO
-========================= */
-
-.form-group {
-    width: 100%;
-
+.login-page .form-group {
     display: flex;
     flex-direction: column;
 
+    width: 100%;
     gap: 8px;
 }
 
-
-/* =========================
-   LABEL
-========================= */
-
-.form-label {
+.login-page .form-label {
     margin: 0;
 
     color: #eeeeee;
@@ -443,55 +395,40 @@
     font-weight: 700;
 }
 
-
-/* =========================
-   WRAPPER INPUT
-========================= */
-
-.input-wrapper {
-    width: 100%;
-
+.login-page .input-wrapper {
     position: relative;
 
     display: flex;
     align-items: center;
+
+    width: 100%;
 }
 
-
-/* =========================
-   ÍCONE INPUT
-========================= */
-
-.input-icon {
+.login-page .input-icon {
     position: absolute;
-
     left: 15px;
 
-    color: #777777;
-
-    font-size: 14px;
-
     z-index: 2;
+
+    color: #777777;
+    font-size: 14px;
 }
 
+/* ==========================================
+   12. CAMPOS DO LOGIN
+   ========================================== */
 
-/* =========================
-   INPUT
-========================= */
-
-.form-input {
+.login-page .form-input {
     width: 100%;
     min-height: 48px;
 
     padding: 12px 14px 12px 40px;
 
-    color: #ffffff;
+    color: var(--login-texto);
+    background-color: var(--login-fundo-input);
 
-    background-color: #080808;
-
-    border: 1px solid rgba(255, 255, 255, 0.18);
-
-    border-radius: 7px;
+    border: 1px solid var(--login-borda-input);
+    border-radius: var(--login-raio-input);
 
     outline: none;
 
@@ -499,272 +436,212 @@
     font-size: 14px;
 
     transition:
-        border-color 0.2s ease,
-        background-color 0.2s ease,
-        box-shadow 0.2s ease;
+        border-color var(--login-transicao),
+        background-color var(--login-transicao),
+        box-shadow var(--login-transicao);
 }
 
-
-/* =========================
-   PLACEHOLDER
-========================= */
-
-.form-input::placeholder {
-    color: #666666;
+.login-page .form-input::placeholder {
+    color: #777777;
 }
 
-
-/* =========================
-   HOVER
-========================= */
-
-.form-input:hover {
+.login-page .form-input:hover {
     border-color: rgba(255, 255, 255, 0.30);
 }
 
+.login-page .form-input:focus,
+.login-page .form-input:focus-visible {
+    outline: none;
 
-/* =========================
-   FOCO
-========================= */
-
-.form-input:focus {
     background-color: #0c0c0c;
-
-    border-color: var(--portfolio-primary, #ffb000);
+    border-color: var(--login-primaria);
 
     box-shadow:
-        0 0 0 3px rgba(255, 176, 0, 0.08);
+        0 0 0 3px var(--login-primaria-suave);
 }
 
-
-/* =========================
-   SENHA
-========================= */
-
-.password-input {
+.login-page .password-input {
     padding-right: 48px;
 }
 
+/* ==========================================
+   13. MOSTRAR / OCULTAR SENHA
+   ========================================== */
 
-/* =========================
-   BOTÃO MOSTRAR SENHA
-========================= */
-
-.password-toggle {
+.login-page .password-toggle {
     position: absolute;
-
     right: 10px;
-
-    width: 32px;
-    height: 32px;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
+    width: 32px;
+    height: 32px;
+
     padding: 0;
 
-    color: #777777;
-
+    color: #999999;
     background-color: transparent;
 
     border: none;
-
     border-radius: 5px;
 
     font-size: 13px;
-
     cursor: pointer;
 
-    transition: 0.2s ease;
+    transition:
+        background-color var(--login-transicao),
+        color var(--login-transicao);
 }
 
-.password-toggle:hover {
-    color: var(--portfolio-primary, #ffb000);
-
-    background-color: rgba(255, 176, 0, 0.08);
+.login-page .password-toggle:hover {
+    color: var(--login-primaria);
+    background-color: var(--login-primaria-suave);
 }
 
+/* ==========================================
+   14. OPÇÕES DE LOGIN
+   ========================================== */
 
-/* =========================
-   OPÇÕES
-========================= */
-
-.login-options {
+.login-page .login-options {
     display: flex;
     align-items: center;
     justify-content: space-between;
 
     gap: 15px;
-
     margin-top: -2px;
 }
 
-
-/* =========================
-   LEMBRAR
-========================= */
-
-.remember-me {
+.login-page .remember-me {
     display: flex;
     align-items: center;
 
     gap: 8px;
-
     margin: 0;
 
-    color: #999999;
+    color: var(--login-texto-discreto);
 
     font-size: 12px;
-
     font-weight: 500;
 
     cursor: pointer;
 }
 
-.remember-me input {
+.login-page .remember-me input {
     width: 14px;
     height: 14px;
 
     margin: 0;
 
-    accent-color: var(--portfolio-primary, #ffb000);
-
+    accent-color: var(--login-primaria);
     cursor: pointer;
 }
 
-
-/* =========================
-   ESQUECEU SENHA
-========================= */
-
-.forgot-password {
-    color: var(--portfolio-primary, #ffb000);
+.login-page .forgot-password {
+    color: var(--login-primaria);
 
     font-size: 12px;
     font-weight: 600;
 
     text-decoration: none;
-
-    transition: 0.2s ease;
+    transition: color var(--login-transicao);
 }
 
-.forgot-password:hover {
-    color: #ffffff;
+.login-page .forgot-password:hover {
+    color: var(--login-texto);
 }
 
+/* ==========================================
+   15. BOTÃO ENTRAR
+   ========================================== */
 
-/* =========================
-   BOTÃO ENTRAR
-========================= */
-
-.login-submit-button {
-    width: 100%;
-    min-height: 48px;
-
+.login-page .login-submit-button {
     display: flex;
     align-items: center;
     justify-content: center;
 
+    width: 100%;
+    min-height: 48px;
+
     gap: 10px;
-
     margin-top: 5px;
-
     padding: 0 20px;
 
-    color: #000000;
+    color: var(--login-sobre-primaria);
+    background-color: var(--login-primaria);
 
-    background-color: var(--portfolio-primary, #ffb000);
-
-    border: 1px solid var(--portfolio-primary, #ffb000);
-
-    border-radius: 6px;
+    border: 1px solid var(--login-primaria);
+    border-radius: var(--login-raio-botao);
 
     font-family: inherit;
-
     font-size: 14px;
     font-weight: 800;
 
     cursor: pointer;
 
-    transition: 0.25s ease;
+    transition:
+        background-color 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease,
+        transform 0.25s ease;
 }
 
+.login-page .login-submit-button:hover:not(:disabled) {
+    color: var(--login-sobre-primaria);
 
-/* =========================
-   HOVER BOTÃO
-========================= */
-
-.login-submit-button:hover {
-    color: #000000;
-
-    background-color: var(--portfolio-primary, #ffb000);
-
-    border-color: var(--portfolio-primary, #ffb000);
-
-    filter: brightness(0.9);
+    background-color: var(--login-primaria-hover);
+    border-color: var(--login-primaria-hover);
 
     transform: translateY(-2px);
 
     box-shadow:
-        0 8px 20px rgba(255, 176, 0, 0.12);
+        0 8px 20px var(--login-primaria-suave);
 }
 
-
-/* =========================
-   CLIQUE
-========================= */
-
-.login-submit-button:active {
+.login-page .login-submit-button:active {
     transform: translateY(0);
 }
 
-
-/* =========================
-   SETA DO BOTÃO
-========================= */
-
-.button-arrow {
-    font-size: 16px;
-
-    transition: 0.2s ease;
+.login-page .login-submit-button:focus-visible {
+    outline: 2px solid var(--login-primaria);
+    outline-offset: 3px;
 }
 
-.login-submit-button:hover .button-arrow {
+.login-page .button-arrow {
+    font-size: 16px;
+    transition: transform var(--login-transicao);
+}
+
+.login-page .login-submit-button:hover .button-arrow {
     transform: translateX(3px);
 }
 
+/* ==========================================
+   16. ALERTAS DE ERRO
+   ========================================== */
 
-/* =========================
-   ALERTA DE ERRO
-========================= */
-
-.login-alert-error {
+.login-page .login-alert-error {
     width: 100%;
 
     margin-bottom: 20px;
-
     padding: 12px 14px;
 
     color: #fca5a5;
-
     background-color: rgba(239, 68, 68, 0.08);
 
     border: 1px solid rgba(239, 68, 68, 0.30);
-
     border-radius: 7px;
 
     font-size: 13px;
-
     line-height: 1.5;
 }
 
+/* ==========================================
+   17. RODAPÉ DO FORMULÁRIO
+   ========================================== */
 
-/* =========================
-   RODAPÉ DO FORM
-========================= */
-
-.login-footer {
+.login-page .login-footer {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -776,36 +653,28 @@
 
     border-top: 1px solid rgba(255, 255, 255, 0.08);
 
-    color: #777777;
-
+    color: #999999;
     font-size: 12px;
 }
 
-.login-footer a {
-    color: var(--portfolio-primary, #ffb000);
+.login-page .login-footer a {
+    color: var(--login-primaria);
 
     font-weight: 600;
-
     text-decoration: none;
 
-    transition: 0.2s ease;
+    transition: color var(--login-transicao);
 }
 
-.login-footer a:hover {
-    color: #ffffff;
+.login-page .login-footer a:hover {
+    color: var(--login-texto);
 }
 
-
-/* =========================
-   ANIMAÇÃO DISCRETA
-========================= */
-
-.login-form-container {
-    animation: loginEntrada 0.4s ease-out;
-}
+/* ==========================================
+   18. ANIMAÇÃO
+   ========================================== */
 
 @keyframes loginEntrada {
-
     from {
         opacity: 0;
         transform: translateY(8px);
@@ -815,164 +684,311 @@
         opacity: 1;
         transform: translateY(0);
     }
-
 }
 
-
-/* =========================
-   TABLET
-========================= */
+/* ==========================================
+   19. TABLETS
+   ========================================== */
 
 @media (max-width: 1000px) {
 
-    .login-first-column,
-    .login-second-column {
+    .login-page .login-first-column,
+    .login-page .login-second-column {
         padding: 45px;
     }
 
-    .login-brand {
+    .login-page .login-brand {
         left: 45px;
     }
 
-    .login-title {
+    .login-page .login-title {
         font-size: clamp(36px, 5vw, 50px);
     }
 
-    .login-form-container {
+    .login-page .login-form-container {
         padding: 38px;
     }
-
 }
 
-
-/* =========================
-   TABLET MENOR
-========================= */
+/* ==========================================
+   20. TABLETS MENORES
+   ========================================== */
 
 @media (max-width: 800px) {
-
-    .login-container {
+    .login-page .login-container {
         flex-direction: column;
     }
 
-    .login-first-column,
-    .login-second-column {
+    .login-page .login-first-column,
+    .login-page .login-second-column {
         width: 100%;
     }
 
-    .login-first-column {
+    .login-page .login-first-column {
         min-height: 480px;
-
         padding: 45px;
     }
 
-    .login-second-column {
+    .login-page .login-second-column {
         min-height: auto;
-
         padding: 60px 45px;
     }
 
-    .login-brand {
+    .login-page .login-brand {
         top: 30px;
         left: 45px;
     }
 
-    .login-left-content {
+    .login-page .login-left-content {
         margin-top: 35px;
     }
-
 }
 
-
-/* =========================
-   CELULAR
-========================= */
+/* ==========================================
+   21. CELULARES
+   ========================================== */
 
 @media (max-width: 600px) {
-
-    .login-first-column {
+    .login-page .login-first-column {
         min-height: 430px;
-
         padding: 35px 25px;
     }
 
-    .login-second-column {
+    .login-page .login-second-column {
         padding: 45px 25px;
     }
 
-    .login-brand {
+    .login-page .login-brand {
         top: 25px;
         left: 25px;
-
         font-size: 17px;
     }
 
-    .login-title {
+    .login-page .login-title {
         font-size: 38px;
-
         letter-spacing: -0.8px;
     }
 
-    .login-description {
+    .login-page .login-description {
         font-size: 14px;
     }
 
-    .login-features {
+    .login-page .login-features {
         display: none;
     }
 
-    .login-back-link {
+    .login-page .login-back-link {
         margin-bottom: 25px;
     }
 
-    .login-form-container {
+    .login-page .login-form-container {
         padding: 30px 25px;
-
         border-radius: 10px;
     }
 
-    .login-form-title {
+    .login-page .login-form-title {
         font-size: 27px;
     }
 
-    .login-form-description {
+    .login-page .login-form-description {
         font-size: 13px;
     }
-
 }
 
-
-/* =========================
-   CELULARES PEQUENOS
-========================= */
+/* ==========================================
+   22. CELULARES PEQUENOS
+   ========================================== */
 
 @media (max-width: 400px) {
-
-    .login-first-column {
+    .login-page .login-first-column {
         min-height: 400px;
-
         padding: 30px 20px;
     }
 
-    .login-second-column {
+    .login-page .login-second-column {
         padding: 35px 20px;
     }
 
-    .login-brand {
+    .login-page .login-brand {
         left: 20px;
     }
 
-    .login-title {
+    .login-page .login-title {
         font-size: 34px;
     }
 
-    .login-form-container {
+    .login-page .login-form-container {
         padding: 25px 20px;
     }
 
-    .login-options {
+    .login-page .login-options {
         flex-direction: column;
         align-items: flex-start;
     }
+}
 
+/* ==========================================
+   23. ACESSIBILIDADE
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .login-page .login-form-container {
+        animation: none;
+    }
+
+    .login-page .login-submit-button,
+    .login-page .button-arrow,
+    .login-page .login-back-link,
+    .login-page .form-input {
+        transition: none;
+    }
+
+    .login-page .login-submit-button:hover {
+        transform: none;
+    }
+}
+
+
+/* ==========================================
+   GYMFLOW - CORREÇÃO DO LAYOUT DO LOGIN
+   ========================================== */
+
+/* Remove interferências do layout administrativo */
+body {
+    margin: 0;
+}
+
+main.login-page {
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+/* Mantém a divisão equilibrada */
+.login-page .login-container {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+}
+
+/* Restaura o espaçamento da coluna esquerda */
+.login-page .login-first-column {
+    position: relative;
+    flex: 0 0 50%;
+    width: 50%;
+    min-width: 0;
+    min-height: 100vh;
+    padding: 60px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    box-sizing: border-box;
+}
+
+/* Posicionamento correto da marca */
+.login-page .login-brand {
+    position: absolute;
+    top: 38px;
+    left: 60px;
+}
+
+/* Conteúdo centralizado verticalmente */
+.login-page .login-left-content {
+    position: relative;
+    width: 100%;
+    max-width: 620px;
+    margin: 0;
+}
+
+/* Botão Voltar volta ao fluxo normal */
+.login-page .login-back-link {
+    position: static;
+    display: inline-flex;
+    width: fit-content;
+    margin-bottom: 35px;
+}
+
+/* Coluna direita mantém metade da tela */
+.login-page .login-second-column {
+    flex: 0 0 50%;
+    width: 50%;
+    min-width: 0;
+    padding: 60px;
+}
+
+/* Evita textos encostados nas bordas */
+.login-page .login-title,
+.login-page .login-description {
+    max-width: 100%;
+}
+
+/* Tablets e celulares */
+@media (max-width: 1000px) {
+
+    .login-page .login-first-column,
+    .login-page .login-second-column {
+        padding: 45px;
+    }
+
+    .login-page .login-brand {
+        left: 45px;
+    }
+}
+
+@media (max-width: 800px) {
+    .login-page .login-container {
+        flex-direction: column;
+    }
+
+    .login-page .login-first-column,
+    .login-page .login-second-column {
+        flex: none;
+        width: 100%;
+        min-height: auto;
+    }
+
+    .login-page .login-first-column {
+        min-height: 480px;
+        padding: 45px;
+    }
+
+    .login-page .login-second-column {
+        padding: 60px 45px;
+    }
+
+    .login-page .login-brand {
+        left: 45px;
+    }
+}
+
+@media (max-width: 600px) {
+    .login-page .login-first-column {
+        min-height: 430px;
+        padding: 35px 25px;
+    }
+
+    .login-page .login-second-column {
+        padding: 45px 25px;
+    }
+
+    .login-page .login-brand {
+        left: 25px;
+    }
+}
+
+@media (max-width: 400px) {
+    .login-page .login-first-column {
+        padding: 30px 20px;
+    }
+
+    .login-page .login-second-column {
+        padding: 35px 20px;
+    }
+
+    .login-page .login-brand {
+        left: 20px;
+    }
 }

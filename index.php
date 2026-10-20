@@ -25,8 +25,7 @@ include __DIR__ . '/app/views/shared/portfolio_header.php';
                     <div class="hero-slide <?= $index === 0 ? 'ativo' : '' ?>">
                         <img
                             src="<?= htmlspecialchars($slide['image_url'] ?? '') ?>"
-                            alt="Imagem do portfólio"
-                        >
+                            alt="Imagem do portfólio">
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
@@ -64,16 +63,14 @@ include __DIR__ . '/app/views/shared/portfolio_header.php';
             <button
                 type="button"
                 class="hero-seta hero-seta-anterior"
-                aria-label="Imagem anterior"
-            >
+                aria-label="Imagem anterior">
                 &#10094;
             </button>
 
             <button
                 type="button"
                 class="hero-seta hero-seta-proxima"
-                aria-label="Próxima imagem"
-            >
+                aria-label="Próxima imagem">
                 &#10095;
             </button>
 
@@ -84,8 +81,7 @@ include __DIR__ . '/app/views/shared/portfolio_header.php';
                         type="button"
                         class="hero-indicador <?= $index === 0 ? 'ativo' : '' ?>"
                         data-slide="<?= $index ?>"
-                        aria-label="Ir para imagem <?= $index + 1 ?>"
-                    ></button>
+                        aria-label="Ir para imagem <?= $index + 1 ?>"></button>
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>
@@ -120,8 +116,7 @@ include __DIR__ . '/app/views/shared/portfolio_header.php';
                             <div class="modalidade-imagem">
                                 <img
                                     src="<?= htmlspecialchars($mod['image_url']) ?>"
-                                    alt="<?= htmlspecialchars($mod['name'] ?? '') ?>"
-                                >
+                                    alt="<?= htmlspecialchars($mod['name'] ?? '') ?>">
                             </div>
                         <?php endif; ?>
 
@@ -143,409 +138,421 @@ include __DIR__ . '/app/views/shared/portfolio_header.php';
         <?php endif; ?>
     </section>
 
-   
+
     <!-- planos -->
-<section id="planos" class="portfolio-planos">
+    <section id="planos" class="portfolio-planos">
 
-    <div class="planos-cabecalho">
+        <div class="planos-cabecalho">
 
-        <span class="secao-destaque">
-            Nossos Planos
-        </span>
+            <span class="secao-destaque">
+                Nossos Planos
+            </span>
 
-        <h2>
-            Escolha o plano ideal para sua evolução
-        </h2>
+            <h2>
+                Escolha o plano ideal para sua evolução
+            </h2>
 
-        <p>
-            Encontre a opção que mais combina com seus objetivos.
-        </p>
-
-    </div>
-
-    <?php if (empty($planos)): ?>
-
-        <p class="mensagem-vazia">
-            Nenhum plano disponível no momento.
-        </p>
-
-    <?php else: ?>
-
-        <div class="planos-grid">
-
-            <?php foreach ($planos as $plano): ?>
-
-                <article class="plano-card">
-                    <?php if (($plano['id'] ?? 0) == ($planos[1]['id'] ?? 0)): ?>
-                    <span class="plano-destaque">Mais escolhido</span>
-                    <?php endif; ?>
-
-                    <span class="plano-categoria">
-                        <?= htmlspecialchars($plano['categoria'] ?? '') ?>
-                    </span>
-
-                    <h3>
-                        <?= htmlspecialchars($plano['nome'] ?? '') ?>
-                    </h3>
-
-                    <div class="plano-preco">
-                        <span>R$</span>
-
-                        <strong>
-                            <?= number_format(
-                                (float)($plano['valor'] ?? 0),
-                                2,
-                                ',',
-                                '.'
-                            ) ?>
-                        </strong>
-                    </div>
-
-                    <p class="plano-duracao">
-                        <?= htmlspecialchars($plano['duracao'] ?? '') ?>
-                    </p>
-
-                    <div class="plano-separador"></div>
-
-                    <a
-                        class="plano-btn"
-                        href="<?= BASE_URL ?>/app/controllers/MatriculaController.php?plano_id=<?= (int)($plano['id'] ?? 0) ?>"
-                    >
-                        Matricule-se agora
-                    </a>
-
-                </article>
-
-            <?php endforeach; ?>
+            <p>
+                Encontre a opção que mais combina com seus objetivos.
+            </p>
 
         </div>
 
-    <?php endif; ?>
+        <?php if (empty($planos)): ?>
 
-    <!-- parceiros dos planos -->
-    <?php
-        $aceitaWellhub = !empty($config['accepts_wellhub']);
-        $aceitaTotalpass = !empty($config['accepts_totalpass']);
-    ?>
+            <p class="mensagem-vazia">
+                Nenhum plano disponível no momento.
+            </p>
 
-    <?php if ($aceitaWellhub || $aceitaTotalpass): ?>
-        <div class="portfolio-parceiros" aria-labelledby="parceiros-titulo">
-            <div class="parceiros-conteudo">
-                <div class="parceiros-texto">
-                    <span class="secao-destaque">Benefícios</span>
-                    <h2 id="parceiros-titulo">Nossas unidades aceitam</h2>
-                    <p>Use seu benefício fitness e treine com a gente.</p>
-                </div>
+        <?php else: ?>
 
-                <div class="parceiros-marcas">
-                    <?php if ($aceitaWellhub): ?>
-                        <div class="parceiro-marca">
-                            <?php if (!empty($config['wellhub_icon'])): ?>
-                                <span class="parceiro-icone parceiro-icone-imagem">
-                                    <img
-                                        src="<?= htmlspecialchars($config['wellhub_icon']) ?>"
-                                        alt="Wellhub"
-                                        style="width: 100%; height: 100%; object-fit: contain;"
-                                    >
-                                </span>
-                            <?php else: ?>
-                                <span class="parceiro-icone parceiro-icone-wellhub" aria-hidden="true">✦</span>
-                            <?php endif; ?>
+            <div class="planos-grid">
 
-                            <div>
-                                <strong>Wellhub</strong>
-                                <small>(Gympass)</small>
-                            </div>
-                        </div>
-                    <?php endif; ?>
+                <?php foreach ($planos as $plano): ?>
 
-                    <?php if ($aceitaWellhub && $aceitaTotalpass): ?>
-                        <span class="parceiro-divisor" aria-hidden="true"></span>
-                    <?php endif; ?>
-
-                    <?php if ($aceitaTotalpass): ?>
-                        <div class="parceiro-marca">
-                            <?php if (!empty($config['totalpass_icon'])): ?>
-                                <span class="parceiro-icone parceiro-icone-imagem">
-                                    <img
-                                        src="<?= htmlspecialchars($config['totalpass_icon']) ?>"
-                                        alt="TotalPass"
-                                        style="width: 100%; height: 100%; object-fit: contain;"
-                                    >
-                                </span>
-                            <?php else: ?>
-                                <span class="parceiro-icone parceiro-icone-totalpass" aria-hidden="true">TP</span>
-                            <?php endif; ?>
-
-                            <div>
-                                <strong>TotalPass</strong>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
-    <?php endif; ?>
-
-</section>
-
-    <!-- unidades -->
-<section id="unidades" class="portfolio-unidades">
-
-    <div class="unidades-cabecalho">
-        <span class="secao-destaque">Nossas Unidades</span>
-
-        <h2>
-            Conheça nossas unidades
-        </h2>
-
-        <p>
-            Encontre a unidade ideal para treinar com conforto, estrutura e qualidade.
-        </p>
-    </div>
-
-    <?php if (empty($filiais)): ?>
-
-        <p class="mensagem-vazia">
-            Nenhuma unidade cadastrada no momento.
-        </p>
-
-    <?php else: ?>
-
-        <div class="unidades-grid">
-
-            <?php foreach ($filiais as $filial): ?>
-
-                <article class="unidade-card">
-
-                    <div class="unidade-imagem">
-                        <?php if (!empty($filial['image_url'])): ?>
-                            <img
-                                src="<?= htmlspecialchars($filial['image_url']) ?>"
-                                alt="<?= htmlspecialchars($filial['nome'] ?? 'Unidade') ?>"
-                                style="width: 100%; height: 100%; object-fit: cover; display: block;"
-                            >
+                    <article class="plano-card">
+                        <?php if (($plano['id'] ?? 0) == ($planos[1]['id'] ?? 0)): ?>
+                            <span class="plano-destaque">Mais escolhido</span>
                         <?php endif; ?>
-                    </div>
 
-                    <div class="unidade-conteudo">
+                        <span class="plano-categoria">
+                            <?= htmlspecialchars($plano['categoria'] ?? '') ?>
+                        </span>
 
                         <h3>
-                            <?= htmlspecialchars($filial['nome'] ?? '') ?>
+                            <?= htmlspecialchars($plano['nome'] ?? '') ?>
                         </h3>
 
-                        <ul class="unidade-info">
-                            <li>
-                                <span>📍</span>
-                                <span>
-                                    <?= !empty($filial['endereco']) ? htmlspecialchars($filial['endereco']) : 'Endereço não cadastrado' ?>
-                                    <?= !empty($filial['numero']) ? ', ' . htmlspecialchars($filial['numero']) : '' ?>
-                                    <?= !empty($filial['complemento']) ? ' (' . htmlspecialchars($filial['complemento']) . ')' : '' ?>
-                                </span>
-                            </li>
+                        <div class="plano-preco">
+                            <span>R$</span>
 
-                            <li>
-                                <span>🕒</span>
-                                <span>24 Horas</span>
-                            </li>
+                            <strong>
+                                <?= number_format(
+                                    (float)($plano['valor'] ?? 0),
+                                    2,
+                                    ',',
+                                    '.'
+                                ) ?>
+                            </strong>
+                        </div>
 
-                            <li>
-                                <span>🏋</span>
-                                <span>Responsável: <?= htmlspecialchars($filial['responsavel'] ?? '') ?></span>
-                            </li>
-                        </ul>
+                        <p class="plano-duracao">
+                            <?= htmlspecialchars($plano['duracao'] ?? '') ?>
+                        </p>
 
-                        <a class="unidade-btn" href="https://www.google.com/maps/search/?api=1&query=<?= urlencode(($filial['latitude'] ?? '') . ',' . ($filial['longitude'] ?? '')) ?>" target="_blank" style="display: inline-flex; align-items: center; gap: 6px;">
-                            <span aria-hidden="true">📍</span> Abrir no Google Maps
+                        <div class="plano-separador"></div>
+
+                        <a
+                            class="plano-btn"
+                            href="<?= BASE_URL ?>/app/controllers/MatriculaController.php?acao=identificacao&amp;company_id=<?= (int)$company_id ?>&amp;plano_id=<?= (int)($plano['id'] ?? 0) ?>">
+                            Matricule-se agora
                         </a>
 
+                    </article>
+
+                <?php endforeach; ?>
+
+            </div>
+
+        <?php endif; ?>
+
+        <!-- parceiros dos planos -->
+        <?php
+        $aceitaWellhub = !empty($config['accepts_wellhub']);
+        $aceitaTotalpass = !empty($config['accepts_totalpass']);
+        ?>
+
+        <?php if ($aceitaWellhub || $aceitaTotalpass): ?>
+            <div class="portfolio-parceiros" aria-labelledby="parceiros-titulo">
+                <div class="parceiros-conteudo">
+                    <div class="parceiros-texto">
+                        <span class="secao-destaque">Benefícios</span>
+                        <h2 id="parceiros-titulo">Nossas unidades aceitam</h2>
+                        <p>Use seu benefício fitness e treine com a gente.</p>
                     </div>
 
-                </article>
+                    <div class="parceiros-marcas">
+                        <?php if ($aceitaWellhub): ?>
+                            <div class="parceiro-marca">
+                                <?php if (!empty($config['wellhub_icon'])): ?>
+                                    <span class="parceiro-icone parceiro-icone-imagem">
+                                        <img
+                                            src="<?= htmlspecialchars($config['wellhub_icon']) ?>"
+                                            alt="Wellhub"
+                                            style="width: 100%; height: 100%; object-fit: contain;">
+                                    </span>
+                                <?php else: ?>
+                                    <span class="parceiro-icone parceiro-icone-wellhub" aria-hidden="true">✦</span>
+                                <?php endif; ?>
 
-            <?php endforeach; ?>
+                                <div>
+                                    <strong>Wellhub</strong>
+                                    <small>(Gympass)</small>
+                                </div>
+                            </div>
+                        <?php endif; ?>
 
+                        <?php if ($aceitaWellhub && $aceitaTotalpass): ?>
+                            <span class="parceiro-divisor" aria-hidden="true"></span>
+                        <?php endif; ?>
+
+                        <?php if ($aceitaTotalpass): ?>
+                            <div class="parceiro-marca">
+                                <?php if (!empty($config['totalpass_icon'])): ?>
+                                    <span class="parceiro-icone parceiro-icone-imagem">
+                                        <img
+                                            src="<?= htmlspecialchars($config['totalpass_icon']) ?>"
+                                            alt="TotalPass"
+                                            style="width: 100%; height: 100%; object-fit: contain;">
+                                    </span>
+                                <?php else: ?>
+                                    <span class="parceiro-icone parceiro-icone-totalpass" aria-hidden="true">TP</span>
+                                <?php endif; ?>
+
+                                <div>
+                                    <strong>TotalPass</strong>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
+
+    </section>
+
+    <!-- unidades -->
+    <section id="unidades" class="portfolio-unidades">
+
+        <div class="unidades-cabecalho">
+            <span class="secao-destaque">Nossas Unidades</span>
+
+            <h2>
+                Conheça nossas unidades
+            </h2>
+
+            <p>
+                Encontre a unidade ideal para treinar com conforto, estrutura e qualidade.
+            </p>
         </div>
 
-        <div class="unidades-acao">
-            <span class="unidades-texto-geral">
-                Conheça todas as nossas unidades
-            </span>
-        </div>
+        <?php if (empty($filiais)): ?>
 
-        <div class="unidades-mapa">
-            <div class="unidades-mapa-conteudo">
-                <div class="unidades-mapa-texto">
-                    <h3>Veja a mais próxima de você</h3>
-                    <p>
-                        Use nosso mapa e descubra a unidade mais perto de você.
-                    </p>
+            <p class="mensagem-vazia">
+                Nenhuma unidade cadastrada no momento.
+            </p>
 
-                    <button type="button" class="unidades-mapa-btn" id="abrir-mapa-completo">
-                        <span class="unidades-mapa-btn-icone" aria-hidden="true">⌖</span>
-                        Ver mapa completo
-                    </button>
+        <?php else: ?>
+
+            <div class="unidades-grid">
+
+                <?php foreach ($filiais as $filial): ?>
+
+                    <article class="unidade-card">
+
+                        <div class="unidade-imagem">
+                            <?php if (!empty($filial['image_url'])): ?>
+                                <img
+                                    src="<?= htmlspecialchars($filial['image_url']) ?>"
+                                    alt="<?= htmlspecialchars($filial['nome'] ?? 'Unidade') ?>"
+                                    style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="unidade-conteudo">
+
+                            <h3>
+                                <?= htmlspecialchars($filial['nome'] ?? '') ?>
+                            </h3>
+
+                            <ul class="unidade-info">
+                                <li>
+                                    <span>📍</span>
+                                    <span>
+                                        <?= !empty($filial['endereco']) ? htmlspecialchars($filial['endereco']) : 'Endereço não cadastrado' ?>
+                                        <?= !empty($filial['numero']) ? ', ' . htmlspecialchars($filial['numero']) : '' ?>
+                                        <?= !empty($filial['complemento']) ? ' (' . htmlspecialchars($filial['complemento']) . ')' : '' ?>
+                                    </span>
+                                </li>
+
+                                <li>
+                                    <span>🕒</span>
+                                    <span>24 Horas</span>
+                                </li>
+
+                                <li>
+                                    <span>🏋</span>
+                                    <span>Responsável: <?= htmlspecialchars($filial['responsavel'] ?? '') ?></span>
+                                </li>
+                            </ul>
+
+                            <a class="unidade-btn" href="https://www.google.com/maps/search/?api=1&query=<?= urlencode(($filial['latitude'] ?? '') . ',' . ($filial['longitude'] ?? '')) ?>" target="_blank" style="display: inline-flex; align-items: center; gap: 6px;">
+                                <span aria-hidden="true">📍</span> Abrir no Google Maps
+                            </a>
+
+                        </div>
+
+                    </article>
+
+                <?php endforeach; ?>
+
+            </div>
+
+            <div class="unidades-acao">
+                <span class="unidades-texto-geral">
+                    Conheça todas as nossas unidades
+                </span>
+            </div>
+
+            <div class="unidades-mapa">
+                <div class="unidades-mapa-conteudo">
+                    <div class="unidades-mapa-texto">
+                        <h3>Veja a mais próxima de você</h3>
+                        <p>
+                            Use nosso mapa e descubra a unidade mais perto de você.
+                        </p>
+
+                        <button type="button" class="unidades-mapa-btn" id="abrir-mapa-completo">
+                            <span class="unidades-mapa-btn-icone" aria-hidden="true">⌖</span>
+                            Ver mapa completo
+                        </button>
+                    </div>
+
+                    <div
+                        class="unidades-mapa-box"
+                        id="mapa-unidades"
+                        aria-label="Mapa com as unidades da GymFlow"></div>
+                </div>
+            </div>
+
+        <?php endif; ?>
+
+    </section>
+
+    <div class="mapa-modal" id="mapa-modal" aria-hidden="true">
+        <div class="mapa-modal-overlay" data-fechar-mapa></div>
+
+        <div class="mapa-modal-conteudo" role="dialog" aria-modal="true" aria-labelledby="mapa-modal-titulo">
+            <div class="mapa-modal-topo">
+                <div>
+                    <span class="mapa-modal-destaque">Nossas Unidades</span>
+                    <h2 id="mapa-modal-titulo">Mapa completo</h2>
                 </div>
 
-                <div
-                    class="unidades-mapa-box"
-                    id="mapa-unidades"
-                    aria-label="Mapa com as unidades da GymFlow"
-                ></div>
-            </div>
-        </div>
-
-    <?php endif; ?>
-
-</section>
-
-<div class="mapa-modal" id="mapa-modal" aria-hidden="true">
-    <div class="mapa-modal-overlay" data-fechar-mapa></div>
-
-    <div class="mapa-modal-conteudo" role="dialog" aria-modal="true" aria-labelledby="mapa-modal-titulo">
-        <div class="mapa-modal-topo">
-            <div>
-                <span class="mapa-modal-destaque">Nossas Unidades</span>
-                <h2 id="mapa-modal-titulo">Mapa completo</h2>
+                <button
+                    type="button"
+                    class="mapa-modal-fechar"
+                    id="fechar-mapa-completo"
+                    aria-label="Fechar mapa">
+                    ×
+                </button>
             </div>
 
-            <button
-                type="button"
-                class="mapa-modal-fechar"
-                id="fechar-mapa-completo"
-                aria-label="Fechar mapa"
-            >
-                ×
-            </button>
+            <div id="mapa-unidades-completo" aria-label="Mapa completo com as unidades da GymFlow"></div>
         </div>
-
-        <div id="mapa-unidades-completo" aria-label="Mapa completo com as unidades da GymFlow"></div>
     </div>
-</div>
 
-<style>
-.mapa-modal {
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 30px;
-}
-.mapa-modal.ativo {
-    display: flex;
-}
-.mapa-modal-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,.84);
-    backdrop-filter: blur(7px);
-}
-.mapa-modal-conteudo {
-    width: min(1180px, 96vw);
-    height: min(760px, 88vh);
-    position: relative;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    background: #070707;
-    border: 1px solid rgba(255,255,255,.28);
-    border-radius: 22px;
-    box-shadow: 0 28px 80px rgba(0,0,0,.58);
-}
-.mapa-modal-topo {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    padding: 22px 26px;
-    background: #090909;
-    border-bottom: 1px solid rgba(255,255,255,.1);
-}
-.mapa-modal-destaque {
-    display: block;
-    margin-bottom: 4px;
-    color: var(--portfolio-primary);
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .11em;
-}
-.mapa-modal-topo h2 {
-    margin: 0;
-    color: #fff;
-    font-size: clamp(22px, 3vw, 34px);
-    line-height: 1.1;
-}
-.mapa-modal-fechar {
-    width: 42px;
-    height: 42px;
-    flex: 0 0 42px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    background: transparent;
-    border: 1px solid rgba(255,255,255,.28);
-    border-radius: 50%;
-    font-size: 27px;
-    line-height: 1;
-    cursor: pointer;
-    transition: .25s ease;
-}
-.mapa-modal-fechar:hover {
-    color: #000;
-    background: var(--portfolio-primary);
-    border-color: var(--portfolio-primary);
-    transform: rotate(90deg);
-}
-#mapa-unidades-completo {
-    width: 100%;
-    flex: 1;
-    min-height: 0;
-    background: #050505;
-}
-#mapa-unidades-completo .leaflet-tile-pane {
-    filter: grayscale(100%) invert(100%) brightness(0.95) contrast(1.2) hue-rotate(180deg);
-}
-#mapa-unidades-completo .leaflet-popup-content-wrapper,
-#mapa-unidades-completo .leaflet-popup-tip {
-    background: #111;
-    color: #fff;
-}
-#mapa-unidades-completo .leaflet-popup-content strong {
-    display: block;
-    margin-bottom: 6px;
-    color: var(--portfolio-primary);
-}
-#mapa-unidades-completo .leaflet-control-attribution {
-    padding: 1px 5px;
-    color: #8f8f8f;
-    background: rgba(0,0,0,.72);
-    font-size: 8px;
-}
-#mapa-unidades-completo .leaflet-control-attribution a {
-    color: #b7b7b7;
-}
-body.mapa-modal-aberto {
-    overflow: hidden;
-}
-@media (max-width: 700px) {
-    .mapa-modal {
-        padding: 14px;
-    }
-    .mapa-modal-conteudo {
-        width: 100%;
-        height: 88vh;
-        border-radius: 16px;
-    }
-    .mapa-modal-topo {
-        padding: 18px;
-    }
-}
-</style>
+    <style>
+        .mapa-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+        }
+
+        .mapa-modal.ativo {
+            display: flex;
+        }
+
+        .mapa-modal-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, .84);
+            backdrop-filter: blur(7px);
+        }
+
+        .mapa-modal-conteudo {
+            width: min(1180px, 96vw);
+            height: min(760px, 88vh);
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #070707;
+            border: 1px solid rgba(255, 255, 255, .28);
+            border-radius: 22px;
+            box-shadow: 0 28px 80px rgba(0, 0, 0, .58);
+        }
+
+        .mapa-modal-topo {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 22px 26px;
+            background: #090909;
+            border-bottom: 1px solid rgba(255, 255, 255, .1);
+        }
+
+        .mapa-modal-destaque {
+            display: block;
+            margin-bottom: 4px;
+            color: var(--portfolio-primary);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .11em;
+        }
+
+        .mapa-modal-topo h2 {
+            margin: 0;
+            color: #fff;
+            font-size: clamp(22px, 3vw, 34px);
+            line-height: 1.1;
+        }
+
+        .mapa-modal-fechar {
+            width: 42px;
+            height: 42px;
+            flex: 0 0 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, .28);
+            border-radius: 50%;
+            font-size: 27px;
+            line-height: 1;
+            cursor: pointer;
+            transition: .25s ease;
+        }
+
+        .mapa-modal-fechar:hover {
+            color: #000;
+            background: var(--portfolio-primary);
+            border-color: var(--portfolio-primary);
+            transform: rotate(90deg);
+        }
+
+        #mapa-unidades-completo {
+            width: 100%;
+            flex: 1;
+            min-height: 0;
+            background: #050505;
+        }
+
+        #mapa-unidades-completo .leaflet-tile-pane {
+            filter: grayscale(100%) invert(100%) brightness(0.95) contrast(1.2) hue-rotate(180deg);
+        }
+
+        #mapa-unidades-completo .leaflet-popup-content-wrapper,
+        #mapa-unidades-completo .leaflet-popup-tip {
+            background: #111;
+            color: #fff;
+        }
+
+        #mapa-unidades-completo .leaflet-popup-content strong {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--portfolio-primary);
+        }
+
+        #mapa-unidades-completo .leaflet-control-attribution {
+            padding: 1px 5px;
+            color: #8f8f8f;
+            background: rgba(0, 0, 0, .72);
+            font-size: 8px;
+        }
+
+        #mapa-unidades-completo .leaflet-control-attribution a {
+            color: #b7b7b7;
+        }
+
+        body.mapa-modal-aberto {
+            overflow: hidden;
+        }
+
+        @media (max-width: 700px) {
+            .mapa-modal {
+                padding: 14px;
+            }
+
+            .mapa-modal-conteudo {
+                width: 100%;
+                height: 88vh;
+                border-radius: 16px;
+            }
+
+            .mapa-modal-topo {
+                padding: 18px;
+            }
+        }
+    </style>
 
 
     <!-- sobre Nós -->
@@ -575,8 +582,7 @@ body.mapa-modal-aberto {
                     <img
                         src="<?= htmlspecialchars($config['about_image']) ?>"
                         alt="Ambiente da academia"
-                        class="sobre-imagem"
-                    >
+                        class="sobre-imagem">
                 <?php else: ?>
                     <div class="sobre-imagem-vazia">
                         Adicione uma imagem no Admin
@@ -628,8 +634,7 @@ body.mapa-modal-aberto {
                         <img
                             src="<?= htmlspecialchars($config['contact_image']) ?>"
                             alt="Atendimento GymFlow"
-                            class="contato-imagem"
-                        >
+                            class="contato-imagem">
                     <?php else: ?>
                         <div class="contato-imagem-vazia">
                             Adicione uma imagem no Admin
@@ -684,8 +689,7 @@ body.mapa-modal-aberto {
                             id="contato-nome"
                             name="nome"
                             placeholder="Digite seu nome"
-                            required
-                        >
+                            required>
                     </div>
 
                     <div class="contato-campo">
@@ -695,8 +699,7 @@ body.mapa-modal-aberto {
                             id="contato-email"
                             name="email"
                             placeholder="Digite seu e-mail"
-                            required
-                        >
+                            required>
                     </div>
 
                     <div class="contato-campo">
@@ -706,8 +709,7 @@ body.mapa-modal-aberto {
                             id="contato-telefone"
                             name="telefone"
                             placeholder="(11) 99999-9999"
-                            required
-                        >
+                            required>
                     </div>
 
                     <div class="contato-campo">
@@ -730,8 +732,7 @@ body.mapa-modal-aberto {
                             name="mensagem"
                             rows="5"
                             placeholder="Como podemos ajudar?"
-                            required
-                        ></textarea>
+                            required></textarea>
                     </div>
 
                     <button type="submit" class="contato-btn">
@@ -740,205 +741,511 @@ body.mapa-modal-aberto {
                 </form>
 
                 <script>
-                function enviarWhatsApp(event, telefoneZap) {
-                    event.preventDefault();
-                    if (!telefoneZap) {
-                        alert("O número de WhatsApp da academia ainda não foi configurado.");
-                        return;
-                    }
+                    function enviarWhatsApp(event, telefoneZap) {
+                        event.preventDefault();
+                        if (!telefoneZap) {
+                            alert("O número de WhatsApp da academia ainda não foi configurado.");
+                            return;
+                        }
 
-                    const nome = document.getElementById('contato-nome').value;
-                    const email = document.getElementById('contato-email').value;
-                    const fone = document.getElementById('contato-telefone').value;
-                    
-                    const unidadeSelect = document.getElementById('contato-unidade');
-                    let unidadeNome = 'Nenhuma específica';
-                    if (unidadeSelect.selectedIndex > 0) {
-                        unidadeNome = unidadeSelect.options[unidadeSelect.selectedIndex].text.trim();
-                    }
-                    
-                    const mensagem = document.getElementById('contato-mensagem').value;
+                        const nome = document.getElementById('contato-nome').value;
+                        const email = document.getElementById('contato-email').value;
+                        const fone = document.getElementById('contato-telefone').value;
 
-                    const textoZap = `Olá! Meu nome é *${nome}*.\nE-mail: ${email}\nTelefone de Contato: ${fone}\nUnidade de interesse: *${unidadeNome}*\n\nMensagem: ${mensagem}`;
-                    
-                    const url = `https://wa.me/55${telefoneZap}?text=${encodeURIComponent(textoZap)}`;
-                    window.open(url, '_blank');
-                }
+                        const unidadeSelect = document.getElementById('contato-unidade');
+                        let unidadeNome = 'Nenhuma específica';
+                        if (unidadeSelect.selectedIndex > 0) {
+                            unidadeNome = unidadeSelect.options[unidadeSelect.selectedIndex].text.trim();
+                        }
+
+                        const mensagem = document.getElementById('contato-mensagem').value;
+
+                        const textoZap = `Olá! Meu nome é *${nome}*.\nE-mail: ${email}\nTelefone de Contato: ${fone}\nUnidade de interesse: *${unidadeNome}*\n\nMensagem: ${mensagem}`;
+
+                        const url = `https://wa.me/55${telefoneZap}?text=${encodeURIComponent(textoZap)}`;
+                        window.open(url, '_blank');
+                    }
                 </script>
             </div>
         </div>
     </section>
 
 
-    <!-- feedback -->
+    <!-- ============================================
+     GYMFLOW - AVALIAÇÕES DO SITE PÚBLICO
+     ============================================ -->
+
+    <?php
+    // Empresa exibida no site público.
+    // $company_id já é definido no início do index.php.
+    $empresaDoSite = (int) ($company_id ?? 0);
+
+    // Identificação da sessão, usada somente para
+    // decidir qual interface mostrar.
+    // A autorização real ocorre no FeedbackController.
+    $usuarioIdFeedback = (int) ($_SESSION['usuario_id'] ?? 0);
+    $empresaDoUsuario = (int) ($_SESSION['company_id'] ?? 0);
+    $papelUsuario = $_SESSION['usuario_role'] ?? '';
+
+    $ehAluno = $usuarioIdFeedback > 0
+        && $papelUsuario === 'Aluno';
+
+    $alunoDaAcademia = $ehAluno
+        && $empresaDoSite > 0
+        && $empresaDoUsuario === $empresaDoSite;
+
+    $usuarioDeOutraAcademia = $ehAluno
+        && $empresaDoSite > 0
+        && $empresaDoUsuario !== $empresaDoSite;
+
+    // Gera token apenas quando o aluno pode avaliar
+    // esta academia. A sessão já foi iniciada
+    // por config/sessao.php no começo do index.php.
+    if ($alunoDaAcademia) {
+        if (
+            empty($_SESSION['feedback_csrf_token']) ||
+            !is_string($_SESSION['feedback_csrf_token'])
+        ) {
+            $_SESSION['feedback_csrf_token'] =
+                bin2hex(random_bytes(32));
+        }
+    }
+
+    $statusFeedback = $_GET['feedback'] ?? '';
+
+    $nomeExibicao = trim(
+        (string) ($_SESSION['usuario_nome'] ?? '')
+    );
+    ?>
+
     <section id="feedback" class="portfolio-feedback">
+
         <div class="feedback-topo">
+
             <div class="feedback-formulario-area">
-                <span class="secao-destaque">Sua opinião importa</span>
+
+                <span class="secao-destaque">
+                    Sua opinião importa
+                </span>
 
                 <h2>
-                    <?= htmlspecialchars($config['feedback_title'] ?? '') ?>
+                    <?= htmlspecialchars(
+                        $config['feedback_title'] ?? '',
+                        ENT_QUOTES,
+                        'UTF-8'
+                    ) ?>
                 </h2>
 
                 <p>
-                    <?= nl2br(htmlspecialchars($config['feedback_subtitle'] ?? '')) ?>
+                    <?= nl2br(htmlspecialchars(
+                        $config['feedback_subtitle'] ?? '',
+                        ENT_QUOTES,
+                        'UTF-8'
+                    )) ?>
                 </p>
 
-                <?php if (($_GET['feedback'] ?? '') === 'sucesso'): ?>
-                    <div class="feedback-status feedback-status-sucesso">
-                        Feedback enviado com sucesso! Obrigado pela sua avaliação.
+                <!-- MENSAGENS DE RETORNO -->
+
+                <?php if ($statusFeedback === 'sucesso'): ?>
+
+                    <div
+                        class="feedback-status feedback-status-sucesso"
+                        role="status">
+                        Sua avaliação foi salva com sucesso!
+                        Ela está aguardando aprovação para
+                        aparecer no site.
                     </div>
-                <?php elseif (($_GET['feedback'] ?? '') === 'erro'): ?>
-                    <div class="feedback-status feedback-status-erro">
-                        Escolha uma nota de 1 a 5 estrelas e escreva uma mensagem.
+
+                <?php elseif ($statusFeedback === 'dados_invalidos'): ?>
+
+                    <div
+                        class="feedback-status feedback-status-erro"
+                        role="alert">
+                        Escolha uma nota de 1 a 5 estrelas
+                        e escreva um comentário válido.
                     </div>
+
+                <?php elseif ($statusFeedback === 'erro'): ?>
+
+                    <div
+                        class="feedback-status feedback-status-erro"
+                        role="alert">
+                        Não foi possível salvar sua avaliação.
+                        Tente novamente.
+                    </div>
+
                 <?php endif; ?>
 
-                <?php if ($usuarioLogado): ?>
+                <!-- ALUNO DA ACADEMIA -->
+
+                <?php if ($alunoDaAcademia): ?>
+
                     <form
                         class="feedback-formulario"
                         method="POST"
                         action="<?= BASE_URL ?>/app/controllers/FeedbackController.php"
-                    >
-                        <?php if ($nomeUsuarioLogado !== ''): ?>
+                        id="feedbackFormularioPublico">
+
+                        <!-- Identifica a origem do envio -->
+                        <input
+                            type="hidden"
+                            name="origem"
+                            value="site">
+
+                        <!-- Proteção CSRF -->
+                        <input
+                            type="hidden"
+                            name="csrf_token"
+                            value="<?= htmlspecialchars(
+                                        $_SESSION['feedback_csrf_token'],
+                                        ENT_QUOTES,
+                                        'UTF-8'
+                                    ) ?>">
+
+                        <?php if ($nomeExibicao !== ''): ?>
+
                             <div class="feedback-usuario-logado">
                                 Avaliando como
-                                <strong><?= htmlspecialchars($nomeUsuarioLogado) ?></strong>
+
+                                <strong>
+                                    <?= htmlspecialchars(
+                                        $nomeExibicao,
+                                        ENT_QUOTES,
+                                        'UTF-8'
+                                    ) ?>
+                                </strong>
                             </div>
+
                         <?php endif; ?>
 
-                        <div class="feedback-avaliacao">
-                            <span class="feedback-avaliacao-label">Sua avaliação</span>
+                        <!-- NOTA -->
 
-                            <div class="feedback-estrelas" role="radiogroup" aria-label="Escolha uma nota de 1 a 5 estrelas">
+                        <div class="feedback-avaliacao">
+
+                            <span
+                                class="feedback-avaliacao-label"
+                                id="feedbackRotuloNota">
+                                Sua avaliação
+                            </span>
+
+                            <div
+                                class="feedback-estrelas"
+                                role="group"
+                                aria-labelledby="feedbackRotuloNota">
+
                                 <?php for ($estrela = 1; $estrela <= 5; $estrela++): ?>
+
                                     <button
                                         type="button"
                                         class="feedback-estrela"
                                         data-nota="<?= $estrela ?>"
                                         aria-label="<?= $estrela ?> estrela<?= $estrela > 1 ? 's' : '' ?>"
-                                    >☆</button>
+                                        aria-pressed="false">
+                                        ☆
+                                    </button>
+
                                 <?php endfor; ?>
+
                             </div>
 
-                            <input type="hidden" name="nota" id="feedback-nota" value="">
+                            <input
+                                type="hidden"
+                                name="nota"
+                                id="feedback-nota"
+                                value="">
+
                         </div>
 
+                        <!-- COMENTÁRIO -->
+
                         <div class="feedback-campo">
-                            <label for="feedback-mensagem">Mensagem</label>
+
+                            <label for="feedback-mensagem">
+                                Mensagem
+                            </label>
+
                             <textarea
                                 id="feedback-mensagem"
                                 name="mensagem"
                                 rows="5"
-                                placeholder="Conte pra gente como foi sua experiência..."
-                            ></textarea>
+                                maxlength="1000"
+                                required
+                                placeholder="Conte pra gente como foi sua experiência..."></textarea>
+
                         </div>
 
-                        <button type="submit" class="feedback-btn">
-                            Enviar feedback
+                        <!-- ENVIO -->
+
+                        <button
+                            type="submit"
+                            class="feedback-btn"
+                            id="feedbackBotaoEnviar">
+                            Enviar avaliação
                         </button>
+
+                        <p
+                            style="
+                            margin-top: 12px;
+                            font-size: 12px;
+                            opacity: 0.8;
+                            line-height: 1.6;
+                        ">
+                            Seu comentário será analisado
+                            antes de aparecer no site.
+                            Se você já avaliou, este envio
+                            atualizará sua avaliação anterior.
+                        </p>
+
                     </form>
-                <?php else: ?>
+
+                    <!-- ALUNO DE OUTRA ACADEMIA -->
+
+                <?php elseif ($usuarioDeOutraAcademia): ?>
+
                     <div class="feedback-login-aviso">
-                        <strong>Quer deixar sua avaliação?</strong>
-                        <p>Entre na sua conta para enviar seu feedback.</p>
+
+                        <strong>
+                            Avaliação disponível para alunos desta academia
+                        </strong>
+
+                        <p>
+                            Sua conta está vinculada a outra academia.
+                            Somente alunos desta unidade empresarial
+                            podem enviar avaliações aqui.
+                        </p>
+
+                    </div>
+
+                    <!-- USUÁRIO LOGADO, MAS NÃO ALUNO -->
+
+                <?php elseif ($usuarioIdFeedback > 0): ?>
+
+                    <div class="feedback-login-aviso">
+
+                        <strong>
+                            Avaliações dos alunos
+                        </strong>
+
+                        <p>
+                            Apenas alunos cadastrados nesta academia
+                            podem enviar avaliações.
+                        </p>
+
+                    </div>
+
+                    <!-- VISITANTE -->
+
+                <?php else: ?>
+
+                    <div class="feedback-login-aviso">
+
+                        <strong>
+                            Quer deixar sua avaliação?
+                        </strong>
+
+                        <p>
+                            Entre na sua conta de aluno
+                            para enviar seu feedback.
+                        </p>
 
                         <a
-                            href="<?= BASE_URL ?>/app/controllers/LoginController.php?acao=login"
+                            href="<?= BASE_URL ?>/app/controllers/LoginController.php?acao=login&amp;destino=avaliacao"
                             class="feedback-btn"
-                            style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none;"
-                        >
+                            style="
+                            display: inline-flex;
+                            align-items: center;
+                            justify-content: center;
+                            text-decoration: none;
+                        ">
                             Entrar para avaliar
                         </a>
+
                     </div>
+
                 <?php endif; ?>
+
             </div>
 
+            <!-- IMAGEM DA SEÇÃO -->
+
             <div class="feedback-imagem-wrap">
+
                 <?php if (!empty($config['feedback_image'])): ?>
+
                     <img
-                        src="<?= htmlspecialchars($config['feedback_image']) ?>"
-                        alt="Experiência na GymFlow"
-                        class="feedback-imagem"
-                    >
+                        src="<?= htmlspecialchars(
+                                    $config['feedback_image'],
+                                    ENT_QUOTES,
+                                    'UTF-8'
+                                ) ?>"
+                        alt="Experiência na academia"
+                        class="feedback-imagem">
+
                 <?php else: ?>
+
                     <div class="feedback-imagem-vazia">
                         Adicione uma imagem no Admin
                     </div>
+
                 <?php endif; ?>
+
             </div>
+
         </div>
 
+        <!-- ========================================
+         AVALIAÇÕES PUBLICADAS
+         ======================================== -->
+
         <div class="feedback-recentes">
+
             <div class="feedback-lista-cabecalho">
-                <span class="secao-destaque">Feedbacks recentes</span>
-                <h3>O que estão dizendo sobre a GymFlow</h3>
+
+                <span class="secao-destaque">
+                    Feedbacks recentes
+                </span>
+
+                <h3>
+                    O que nossos alunos estão dizendo
+                </h3>
+
             </div>
 
             <?php if (empty($feedbacks)): ?>
+
                 <div class="feedback-vazio">
-                    Ainda não há feedbacks publicados.
+                    Ainda não há avaliações publicadas.
                 </div>
+
             <?php else: ?>
+
                 <div class="feedback-lista">
+
                     <?php foreach ($feedbacks as $feedback): ?>
+
                         <?php
-                            $nomeFeedback = trim($feedback['nome'] ?? 'Visitante');
-                            $notaFeedback = max(1, min(5, (int)($feedback['nota'] ?? 0)));
-                            $dataFeedback = !empty($feedback['criado_em'])
-                                ? date('d/m/Y', strtotime($feedback['criado_em']))
-                                : '';
-                            $inicialFeedback = function_exists('mb_substr')
-                                ? mb_strtoupper(mb_substr($nomeFeedback, 0, 1, 'UTF-8'), 'UTF-8')
-                                : strtoupper(substr($nomeFeedback, 0, 1));
+                        $nomeFeedback = trim(
+                            (string) ($feedback['nome'] ?? 'Aluno')
+                        );
+
+                        $notaFeedback = max(
+                            1,
+                            min(
+                                5,
+                                (int) ($feedback['nota'] ?? 0)
+                            )
+                        );
+
+                        $dataFeedback = !empty($feedback['criado_em'])
+                            ? date(
+                                'd/m/Y',
+                                strtotime($feedback['criado_em'])
+                            )
+                            : '';
+
+                        $inicialFeedback = function_exists('mb_substr')
+                            ? mb_strtoupper(
+                                mb_substr(
+                                    $nomeFeedback,
+                                    0,
+                                    1,
+                                    'UTF-8'
+                                ),
+                                'UTF-8'
+                            )
+                            : strtoupper(
+                                substr($nomeFeedback, 0, 1)
+                            );
                         ?>
 
                         <article class="feedback-card">
+
                             <div class="feedback-autor">
+
                                 <div class="feedback-avatar">
-                                    <?= htmlspecialchars($inicialFeedback) ?>
+                                    <?= htmlspecialchars(
+                                        $inicialFeedback,
+                                        ENT_QUOTES,
+                                        'UTF-8'
+                                    ) ?>
                                 </div>
 
                                 <div class="feedback-autor-info">
-                                    <strong><?= htmlspecialchars($nomeFeedback) ?></strong>
+
+                                    <strong>
+                                        <?= htmlspecialchars(
+                                            $nomeFeedback,
+                                            ENT_QUOTES,
+                                            'UTF-8'
+                                        ) ?>
+                                    </strong>
 
                                     <?php if ($dataFeedback !== ''): ?>
-                                        <span><?= htmlspecialchars($dataFeedback) ?></span>
+
+                                        <span>
+                                            <?= htmlspecialchars(
+                                                $dataFeedback,
+                                                ENT_QUOTES,
+                                                'UTF-8'
+                                            ) ?>
+                                        </span>
+
                                     <?php endif; ?>
+
                                 </div>
+
                             </div>
 
                             <div
                                 class="feedback-card-estrelas"
-                                aria-label="<?= $notaFeedback ?> de 5 estrelas"
-                            >
+                                aria-label="<?= $notaFeedback ?> de 5 estrelas">
+
                                 <?php for ($estrela = 1; $estrela <= 5; $estrela++): ?>
-                                    <span class="<?= $estrela <= $notaFeedback ? 'ativa' : '' ?>">★</span>
+
+                                    <span
+                                        class="<?= $estrela <= $notaFeedback
+                                                    ? 'ativa'
+                                                    : '' ?>">
+                                        ★
+                                    </span>
+
                                 <?php endfor; ?>
+
                             </div>
 
                             <p>
-                                <?= nl2br(htmlspecialchars($feedback['mensagem'] ?? '')) ?>
+                                <?= nl2br(htmlspecialchars(
+                                    $feedback['mensagem'] ?? '',
+                                    ENT_QUOTES,
+                                    'UTF-8'
+                                )) ?>
                             </p>
+
                         </article>
+
                     <?php endforeach; ?>
+
                 </div>
+
             <?php endif; ?>
+
         </div>
+
     </section>
+
 
 </main>
 
 <script>
     window.GYMFLOW_UNIDADES = <?= json_encode(
-        $filiais ?? [],
-        JSON_UNESCAPED_UNICODE |
-        JSON_UNESCAPED_SLASHES |
-        JSON_HEX_TAG |
-        JSON_HEX_AMP |
-        JSON_HEX_APOS |
-        JSON_HEX_QUOT
-    ) ?>;
+                                    $filiais ?? [],
+                                    JSON_UNESCAPED_UNICODE |
+                                        JSON_UNESCAPED_SLASHES |
+                                        JSON_HEX_TAG |
+                                        JSON_HEX_AMP |
+                                        JSON_HEX_APOS |
+                                        JSON_HEX_QUOT
+                                ) ?>;
 </script>
 <script src="<?= BASE_URL ?>/assets/js/portfolio.js?v=1"></script>
 

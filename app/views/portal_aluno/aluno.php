@@ -1,6 +1,9 @@
 <?php
 if (!isset($aluno)) {
-    header("Location: " . BASE_URL . "/app/controllers/PortalAlunoController.php?acao=aluno");
+    header(
+        "Location: " . BASE_URL .
+            "/app/controllers/PortalAlunoController.php?acao=aluno"
+    );
     exit;
 }
 
@@ -14,11 +17,9 @@ $frequencia = $frequencia ?? 0;
 $faturas_abertas = $faturas_abertas ?? 0;
 
 $tituloPagina = "Portal do Aluno";
-?>
 
-<?php 
-include __DIR__ . '/../shared/header.php'; 
-include __DIR__ . '/../shared/sidebar.php'; 
+include __DIR__ . '/../shared/header.php';
+include __DIR__ . '/../shared/sidebar.php';
 ?>
 
 <main class="portal-aluno">
@@ -26,16 +27,21 @@ include __DIR__ . '/../shared/sidebar.php';
     <!-- CABEÇALHO -->
     <header class="portal-header">
         <div>
-            <span class="portal-eyebrow">PORTAL DO ALUNO</span>
+            <span class="portal-eyebrow">
+                PORTAL DO ALUNO
+            </span>
 
             <h1>
-                Olá, <?php echo htmlspecialchars($aluno['nome'] ?? 'Aluno'); ?>!
+                Olá, <?= htmlspecialchars(
+                            $aluno['nome'] ?? 'Aluno',
+                            ENT_QUOTES,
+                            'UTF-8'
+                        ) ?>!
             </h1>
 
             <p>Pronto para o treino de hoje?</p>
         </div>
     </header>
-
 
     <!-- RESUMO -->
     <section class="portal-grid">
@@ -45,12 +51,18 @@ include __DIR__ . '/../shared/sidebar.php';
 
             <div class="card-top">
                 <div>
-                    <span class="card-label">MEU PLANO</span>
+                    <span class="card-label">
+                        MEU PLANO
+                    </span>
 
                     <?php if (!empty($matricula)): ?>
 
                         <h2>
-                            <?php echo htmlspecialchars($matricula['nome_plano']); ?>
+                            <?= htmlspecialchars(
+                                $matricula['nome_plano'] ?? '',
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>
                         </h2>
 
                         <span class="status status-ativo">
@@ -69,19 +81,21 @@ include __DIR__ . '/../shared/sidebar.php';
                 </div>
             </div>
 
-
             <?php if (!empty($matricula)): ?>
 
                 <div class="plano-info">
-
                     <div>
                         <span>Validade</span>
 
                         <strong>
-                            <?php echo date('d/m/Y', strtotime($matricula['fim'])); ?>
+                            <?= !empty($matricula['fim'])
+                                ? date(
+                                    'd/m/Y',
+                                    strtotime($matricula['fim'])
+                                )
+                                : 'Não informada' ?>
                         </strong>
                     </div>
-
                 </div>
 
                 <a
@@ -94,13 +108,13 @@ include __DIR__ . '/../shared/sidebar.php';
             <?php else: ?>
 
                 <p class="card-description">
-                    Procure a recepção para realizar sua matrícula.
+                    Procure a recepção para realizar
+                    sua matrícula.
                 </p>
 
             <?php endif; ?>
 
         </article>
-
 
         <!-- FREQUÊNCIA -->
         <article class="portal-card frequencia-card">
@@ -116,20 +130,19 @@ include __DIR__ . '/../shared/sidebar.php';
                 </span>
 
                 <strong class="metric">
-                    <?php echo (int)$frequencia; ?>
+                    <?= (int) $frequencia ?>
+
                     <small>
-                        dia<?php echo $frequencia != 1 ? 's' : ''; ?>
+                        dia<?= $frequencia != 1 ? 's' : '' ?>
                     </small>
                 </strong>
 
                 <p>
-                    Treinados em <?php echo date('F'); ?>
+                    Treinados em <?= date('F') ?>
                 </p>
 
             </div>
-
         </article>
-
 
         <!-- FATURAS -->
         <article class="portal-card fatura-card">
@@ -147,10 +160,9 @@ include __DIR__ . '/../shared/sidebar.php';
                 <?php if ($faturas_abertas > 0): ?>
 
                     <strong class="metric">
-                        <?php echo (int)$faturas_abertas; ?>
-                        <small>
-                            em aberto
-                        </small>
+                        <?= (int) $faturas_abertas ?>
+
+                        <small>em aberto</small>
                     </strong>
 
                     <p class="texto-alerta">
@@ -161,9 +173,7 @@ include __DIR__ . '/../shared/sidebar.php';
 
                     <strong class="metric">
                         0
-                        <small>
-                            pendentes
-                        </small>
+                        <small>pendentes</small>
                     </strong>
 
                     <p class="texto-sucesso">
@@ -184,19 +194,22 @@ include __DIR__ . '/../shared/sidebar.php';
 
     </section>
 
-
     <!-- ÁREA INFERIOR -->
     <section class="portal-bottom">
 
         <div class="section-heading">
             <div>
-                <span class="portal-eyebrow">ACESSO RÁPIDO</span>
+                <span class="portal-eyebrow">
+                    ACESSO RÁPIDO
+                </span>
+
                 <h2>O que você deseja fazer?</h2>
             </div>
         </div>
 
         <div class="quick-actions">
 
+            <!-- TREINOS -->
             <a
                 href="<?= BASE_URL ?>/app/controllers/PortalAlunoController.php?acao=treinos"
                 class="quick-action">
@@ -204,11 +217,22 @@ include __DIR__ . '/../shared/sidebar.php';
                 <span>Visualizar seus treinos →</span>
             </a>
 
+            <!-- FINANCEIRO -->
             <a
                 href="<?= BASE_URL ?>/app/controllers/PortalAlunoController.php?acao=faturas"
                 class="quick-action">
                 <strong>Financeiro</strong>
                 <span>Consultar pagamentos →</span>
+            </a>
+
+            <!-- MINHA AVALIAÇÃO -->
+            <a
+                href="<?= BASE_URL ?>/app/controllers/PortalAlunoController.php?acao=avaliacao"
+                class="quick-action">
+                <strong>Minha Avaliação</strong>
+                <span>
+                    Avaliar minha academia →
+                </span>
             </a>
 
         </div>
