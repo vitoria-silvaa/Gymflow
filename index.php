@@ -14,7 +14,6 @@ $nomeUsuarioLogado = $usuarioLogado ? trim($_SESSION['usuario_nome'] ?? '') : ''
 $tituloPagina = $config['app_name'] ?? "GymCore";
 include __DIR__ . '/app/views/shared/portfolio_header.php';
 ?>
-
 <main>
     <section id="inicio" class="portfolio-hero">
 
