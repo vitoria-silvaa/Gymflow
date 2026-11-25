@@ -1,11 +1,7 @@
-
 <?php
 // ===============================================
 // GYMFLOW - MODEL DE TREINOS
 // app/models/Treino.php
-//
-// Isolamento por empresa e usuário.
-// Mantém as operações e retornos existentes.
 // ===============================================
 
 require_once __DIR__ . '/Database.php';
@@ -15,53 +11,57 @@ $operacao = $operacao ?? '';
 $company_id = (int) ($_SESSION['company_id'] ?? 0);
 $usuario_id = (int) ($_SESSION['usuario_id'] ?? 0);
 $usuario_role = $_SESSION['usuario_role'] ?? '';
-
 $aluno_id = (int) ($aluno_id ?? 0);
 
 // ===============================================
-// 1. LISTAR FICHAS DE UM ALUNO
+// 1. VALIDAR CONTEXTO DE ACESSO
+// ===============================================
+
+$acessoPermitido = (
+    $company_id > 0 &&
+    $usuario_id > 0 &&
+    $aluno_id > 0
+);
+
+if ($usuario_role === 'Aluno') {
+
+    $alunoLogado = (int) ($_SESSION['aluno_id'] ?? 0);
+
+    $acessoPermitido = (
+        $acessoPermitido &&
+        $alunoLogado > 0 &&
+        $alunoLogado === $aluno_id
+    );
+} elseif (!in_array(
+    $usuario_role,
+    ['Admin', 'Professor'],
+    true
+)) {
+
+    $acessoPermitido = false;
+}
+
+// ===============================================
+// 2. LISTAR FICHAS DE UM ALUNO
 // ===============================================
 
 if ($operacao === 'listar_fichas_aluno') {
 
     $fichas = [];
 
-    $acessoPermitido = (
-        $company_id > 0 &&
-        $usuario_id > 0 &&
-        $aluno_id > 0
-    );
-
-    // Aluno só pode consultar suas próprias fichas.
-    if ($usuario_role === 'Aluno') {
-
-        $alunoLogado = (int) (
-            $_SESSION['aluno_id'] ?? 0
-        );
-
-        $acessoPermitido = (
-            $acessoPermitido &&
-            $alunoLogado > 0 &&
-            $alunoLogado === $aluno_id
-        );
-    } elseif (!in_array(
-        $usuario_role,
-        ['Admin', 'Professor'],
-        true
-    )) {
-
-        $acessoPermitido = false;
-    }
-
     if ($acessoPermitido) {
 
         $stmt_fichas = $pdo->prepare("
             SELECT
                 ft.id,
+                ft.aluno_id,
+                ft.professor_id,
                 ft.objetivo,
                 ft.versao,
                 ft.criada_em,
-                u.name AS nome_professor
+                u.name AS nome_professor,
+                a.nome AS nome_aluno,
+                f.nome AS nome_filial
 
             FROM fichas_treino ft
 
@@ -73,12 +73,12 @@ if ($operacao === 'listar_fichas_aluno') {
 
             INNER JOIN users u
                 ON u.id = ft.professor_id
-               AND u.company_id = f.company_id
+                AND u.company_id = f.company_id
 
             WHERE ft.aluno_id = :aluno_id
               AND f.company_id = :company_id
 
-            ORDER BY ft.criada_em DESC
+            ORDER BY ft.criada_em DESC, ft.id DESC
         ");
 
         $stmt_fichas->execute([
@@ -93,7 +93,7 @@ if ($operacao === 'listar_fichas_aluno') {
 }
 
 // ===============================================
-// 2. BUSCAR ITENS DE UMA FICHA
+// 3. BUSCAR EXERCÍCIOS DE UMA FICHA
 // ===============================================
 
 elseif ($operacao === 'buscar_itens_ficha') {
@@ -102,44 +102,23 @@ elseif ($operacao === 'buscar_itens_ficha') {
 
     $ficha_id = (int) ($ficha_id ?? 0);
 
-    $acessoPermitido = (
-        $company_id > 0 &&
-        $usuario_id > 0 &&
-        $aluno_id > 0 &&
-        $ficha_id > 0
-    );
-
-    if ($usuario_role === 'Aluno') {
-
-        $alunoLogado = (int) (
-            $_SESSION['aluno_id'] ?? 0
-        );
-
-        $acessoPermitido = (
-            $acessoPermitido &&
-            $alunoLogado > 0 &&
-            $alunoLogado === $aluno_id
-        );
-    } elseif (!in_array(
-        $usuario_role,
-        ['Admin', 'Professor'],
-        true
-    )) {
-
-        $acessoPermitido = false;
-    }
-
-    if ($acessoPermitido) {
+    if ($acessoPermitido && $ficha_id > 0) {
 
         $stmt_itens = $pdo->prepare("
             SELECT
+                fi.id AS item_id,
+                fi.ficha_id,
+                fi.exercicio_id,
                 fi.ordem,
                 fi.series,
                 fi.repeticoes,
                 fi.carga,
                 fi.intervalo,
+
                 e.nome AS nome_exercicio,
-                e.grupo
+                e.grupo,
+                e.midia,
+                e.tipo_midia
 
             FROM ficha_itens fi
 
@@ -157,14 +136,14 @@ elseif ($operacao === 'buscar_itens_ficha') {
 
             INNER JOIN users u
                 ON u.id = ft.professor_id
-               AND u.company_id = f.company_id
+                AND u.company_id = f.company_id
 
             WHERE fi.ficha_id = :ficha_id
-            AND ft.aluno_id = :aluno_id
-            AND f.company_id = :company_id
-            AND e.company_id = :empresa_exercicio
+              AND ft.aluno_id = :aluno_id
+              AND f.company_id = :company_id
+              AND e.company_id = :empresa_exercicio
 
-            ORDER BY fi.ordem ASC
+            ORDER BY fi.ordem ASC, fi.id ASC
         ");
 
         $stmt_itens->execute([
@@ -181,14 +160,12 @@ elseif ($operacao === 'buscar_itens_ficha') {
 }
 
 // ===============================================
-// 3. SALVAR NOVA FICHA DE TREINO
+// 4. SALVAR NOVA FICHA DE TREINO
 // ===============================================
 
 elseif ($operacao === 'salvar_ficha') {
 
-    $professor_id = (int) (
-        $professor_id ?? 0
-    );
+    $professor_id = (int) ($professor_id ?? 0);
 
     $objetivo = trim(
         (string) ($objetivo ?? '')
@@ -196,13 +173,10 @@ elseif ($operacao === 'salvar_ficha') {
 
     $itens = $itens ?? [];
 
-    // -------------------------------------------
-    // Validações iniciais
-    // -------------------------------------------
+    // PERMISSÕES
 
     if (
-        $company_id <= 0 ||
-        $usuario_id <= 0 ||
+        !$acessoPermitido ||
         !in_array(
             $usuario_role,
             ['Admin', 'Professor'],
@@ -213,6 +187,8 @@ elseif ($operacao === 'salvar_ficha') {
             'Você não possui permissão para salvar fichas.'
         );
     }
+
+    // VALIDAÇÃO DOS DADOS
 
     if (
         $aluno_id <= 0 ||
@@ -226,9 +202,6 @@ elseif ($operacao === 'salvar_ficha') {
         );
     }
 
-    // Professor não pode cadastrar uma ficha
-    // utilizando a identidade de outro professor.
-
     if (
         $usuario_role === 'Professor' &&
         $professor_id !== $usuario_id
@@ -238,23 +211,17 @@ elseif ($operacao === 'salvar_ficha') {
         );
     }
 
-    // -------------------------------------------
-    // Transação SQL
-    // -------------------------------------------
+    // TRANSAÇÃO SQL
 
     try {
 
         $pdo->beginTransaction();
 
-        // ---------------------------------------
-        // Confirmar aluno e empresa
-        //
-        // FOR UPDATE bloqueia o registro do aluno
-        // durante a geração da próxima versão.
-        // ---------------------------------------
+        // CONFIRMAR ALUNO E EMPRESA
 
         $stmtAluno = $pdo->prepare("
             SELECT a.id
+
             FROM alunos a
 
             INNER JOIN filiais f
@@ -273,21 +240,22 @@ elseif ($operacao === 'salvar_ficha') {
         ]);
 
         if (!$stmtAluno->fetch(PDO::FETCH_ASSOC)) {
+
             throw new RuntimeException(
                 'Aluno não encontrado nesta academia.'
             );
         }
 
-        // ---------------------------------------
-        // Confirmar professor e empresa
-        // ---------------------------------------
+        // CONFIRMAR PROFESSOR E EMPRESA
 
         $stmtProfessor = $pdo->prepare("
             SELECT id
             FROM users
+
             WHERE id = :professor_id
               AND company_id = :company_id
               AND role = 'Professor'
+
             LIMIT 1
         ");
 
@@ -297,22 +265,22 @@ elseif ($operacao === 'salvar_ficha') {
         ]);
 
         if (!$stmtProfessor->fetch(PDO::FETCH_ASSOC)) {
+
             throw new RuntimeException(
                 'Professor inválido para esta academia.'
             );
         }
 
-        // ---------------------------------------
-        // Validar todos os exercícios
-        // antes de inserir a ficha.
-        // ---------------------------------------
+        // VALIDAR EXERCÍCIOS
 
         $stmtExercicio = $pdo->prepare("
             SELECT id
             FROM exercicios
+
             WHERE id = :exercicio_id
               AND company_id = :company_id
               AND ativo = 1
+
             LIMIT 1
         ");
 
@@ -321,6 +289,7 @@ elseif ($operacao === 'salvar_ficha') {
         foreach ($itens as $item) {
 
             if (!is_array($item)) {
+
                 throw new RuntimeException(
                     'Item de treino inválido.'
                 );
@@ -354,6 +323,7 @@ elseif ($operacao === 'salvar_ficha') {
             ]);
 
             if (!$stmtExercicio->fetch(PDO::FETCH_ASSOC)) {
+
                 throw new RuntimeException(
                     'Um dos exercícios não está disponível nesta academia.'
                 );
@@ -379,14 +349,14 @@ elseif ($operacao === 'salvar_ficha') {
             ];
         }
 
-        // ---------------------------------------
-        // Próxima versão da ficha
-        // ---------------------------------------
+        // GERAR PRÓXIMA VERSÃO DA FICHA
 
         $stmtVersao = $pdo->prepare("
             SELECT
                 COALESCE(MAX(versao), 0) + 1
+
             FROM fichas_treino
+
             WHERE aluno_id = :aluno_id
         ");
 
@@ -394,13 +364,9 @@ elseif ($operacao === 'salvar_ficha') {
             ':aluno_id' => $aluno_id
         ]);
 
-        $versao = (int) (
-            $stmtVersao->fetchColumn()
-        );
+        $versao = (int) $stmtVersao->fetchColumn();
 
-        // ---------------------------------------
-        // Criar ficha
-        // ---------------------------------------
+        // CRIAR FICHA
 
         $stmtFicha = $pdo->prepare("
             INSERT INTO fichas_treino (
@@ -410,6 +376,7 @@ elseif ($operacao === 'salvar_ficha') {
                 criada_em,
                 versao
             )
+
             VALUES (
                 :aluno_id,
                 :professor_id,
@@ -428,9 +395,7 @@ elseif ($operacao === 'salvar_ficha') {
 
         $ficha_id = (int) $pdo->lastInsertId();
 
-        // ---------------------------------------
-        // Inserir itens da ficha
-        // ---------------------------------------
+        // INSERIR EXERCÍCIOS
 
         $stmtItem = $pdo->prepare("
             INSERT INTO ficha_itens (
@@ -442,6 +407,7 @@ elseif ($operacao === 'salvar_ficha') {
                 carga,
                 intervalo
             )
+
             VALUES (
                 :ficha_id,
                 :exercicio_id,
@@ -468,7 +434,6 @@ elseif ($operacao === 'salvar_ficha') {
 
         $pdo->commit();
 
-        // Mantém o retorno esperado pelo controller.
         return $ficha_id;
     } catch (Throwable $e) {
 

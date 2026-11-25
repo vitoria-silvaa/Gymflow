@@ -1,0 +1,1395 @@
+/* =============================================
+   GYMFLOW - TREINOS DO ALUNO
+   assets/css/treino-guiado.css
+============================================= */
+
+.tg-page {
+    --tg-bg: var(--ui-fundo-pagina, #f8fafc);
+    --tg-card: var(--ui-fundo-card, #ffffff);
+    --tg-text: var(--ui-texto, #111827);
+    --tg-muted: var(--ui-texto-suave, #64748b);
+    --tg-border: var(--ui-borda, #e2e8f0);
+    --tg-primary: var(--cor-primaria, #ffb000);
+    --tg-contrast: var(--cor-sobre-primaria, #111827);
+    --tg-primary-soft: var(--cor-primaria-suave, #f1f5f9);
+    --tg-success: #15803d;
+    --tg-danger: #b91c1c;
+
+    width: 100%;
+    max-width: 1100px;
+    min-width: 0;
+
+    margin: 0 auto;
+    padding: 24px 28px 40px;
+
+    color: var(--tg-text);
+}
+
+[data-theme="dark"] .tg-page {
+    --tg-success: #86efac;
+    --tg-danger: #fca5a5;
+}
+
+.tg-page *,
+.tg-page *::before,
+.tg-page *::after {
+    box-sizing: border-box;
+}
+
+.tg-page [hidden] {
+    display: none !important;
+}
+
+.tg-page h1,
+.tg-page h2,
+.tg-page h3 {
+    margin: 0;
+    color: var(--tg-text);
+    line-height: 1.4;
+}
+
+.tg-page p {
+    color: var(--tg-muted);
+    line-height: 1.5;
+}
+
+.tg-page svg {
+    flex-shrink: 0;
+}
+
+.tg-muted {
+    color: var(--tg-muted);
+    font-size: 12px;
+}
+
+/* =============================================
+   1. CABEÇALHO
+============================================= */
+
+.tg-page-header {
+    margin-bottom: 22px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--tg-border);
+}
+
+.tg-eyebrow {
+    display: block;
+    margin-bottom: 6px;
+
+    color: var(--tg-muted);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.tg-page-header h1 {
+    font-size: clamp(24px, 3vw, 30px);
+    font-weight: 750;
+}
+
+.tg-page-header p {
+    margin: 6px 0 0;
+    font-size: 13px;
+}
+
+/* =============================================
+   2. BOTÕES
+============================================= */
+
+.tg-page .tg-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+    min-height: 40px;
+    padding: 9px 15px;
+
+    border: 1px solid transparent;
+    border-radius: 8px;
+
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 650;
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+        background 150ms ease,
+        border-color 150ms ease;
+}
+
+.tg-page .tg-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.tg-page .tg-btn-primary {
+    color: var(--tg-contrast);
+    background: var(--tg-primary);
+    border-color: var(--tg-primary);
+}
+
+.tg-page .tg-btn-primary:hover {
+    filter: brightness(0.95);
+}
+
+.tg-page .tg-btn-secondary {
+    color: var(--tg-text);
+    background: var(--tg-card);
+    border-color: var(--tg-border);
+}
+
+.tg-page .tg-btn-secondary:hover {
+    background: var(--tg-primary-soft);
+}
+
+.tg-page .tg-btn-danger {
+    color: var(--tg-danger);
+    background: transparent;
+    border-color: var(--tg-border);
+}
+
+.tg-page .tg-btn-danger:hover {
+    border-color: var(--tg-danger);
+}
+
+.tg-page .tg-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.tg-page button:focus-visible,
+.tg-page input:focus-visible,
+.tg-page a:focus-visible {
+    outline: 2px solid var(--tg-primary);
+    outline-offset: 3px;
+}
+
+.tg-full {
+    width: 100%;
+}
+
+/* =============================================
+   3. ESTADOS VAZIOS
+============================================= */
+
+.tg-empty {
+    padding: 30px 20px;
+
+    background: var(--tg-card);
+    border: 1px solid var(--tg-border);
+    border-radius: 12px;
+
+    text-align: center;
+}
+
+.tg-empty-icon {
+    display: grid;
+    place-items: center;
+
+    width: 48px;
+    height: 48px;
+
+    margin: 0 auto 14px;
+
+    background: var(--tg-bg);
+    border: 1px solid var(--tg-border);
+    border-radius: 12px;
+}
+
+.tg-empty-icon svg {
+    width: 24px;
+    height: 24px;
+    color: var(--tg-muted);
+}
+
+.tg-empty h2 {
+    font-size: 18px;
+}
+
+.tg-empty p {
+    margin: 8px auto 0;
+    max-width: 400px;
+    font-size: 12px;
+}
+
+/* =============================================
+   4. SELEÇÃO DE FICHAS
+============================================= */
+
+.tg-fichas {
+    margin-bottom: 20px;
+}
+
+.tg-fichas>h2 {
+    margin-bottom: 12px;
+    font-size: 16px;
+}
+
+.tg-ficha-tabs {
+    display: flex;
+    gap: 10px;
+
+    padding: 3px 2px 8px;
+
+    overflow-x: auto;
+}
+
+.tg-page .tg-ficha-tab {
+    display: flex;
+    align-items: center;
+
+    flex: 0 0 auto;
+    min-width: 150px;
+    max-width: 280px;
+
+    gap: 10px;
+    padding: 12px 14px;
+
+    color: var(--tg-text);
+    background: var(--tg-card);
+
+    border: 1px solid var(--tg-border);
+    border-radius: 9px;
+
+    text-decoration: none;
+}
+
+.tg-page .tg-ficha-tab:hover,
+.tg-page .tg-ficha-tab.is-active {
+    background: var(--tg-primary-soft);
+    border-color: var(--tg-primary);
+}
+
+.tg-ficha-tab svg {
+    width: 18px;
+    height: 18px;
+}
+
+.tg-ficha-tab strong {
+    display: block;
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}
+
+.tg-ficha-tab small {
+    display: block;
+    margin-top: 4px;
+
+    color: var(--tg-muted);
+    font-size: 10px;
+}
+
+/* =============================================
+   5. RESUMO DA FICHA
+============================================= */
+
+.tg-ficha-summary {
+    margin-bottom: 24px;
+    padding: 20px;
+
+    background: var(--tg-card);
+    border: 1px solid var(--tg-border);
+    border-radius: 12px;
+}
+
+.tg-summary-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.tg-summary-top h2 {
+    font-size: 20px;
+    overflow-wrap: anywhere;
+}
+
+.tg-meta {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.tg-meta span {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 5px;
+
+    color: var(--tg-muted);
+    font-size: 11px;
+}
+
+.tg-meta svg {
+    width: 14px;
+    height: 14px;
+}
+
+.tg-summary-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.tg-summary-stats>div {
+    display: grid;
+    gap: 5px;
+
+    min-width: 0;
+    padding: 12px;
+
+    background: var(--tg-bg);
+    border: 1px solid var(--tg-border);
+    border-radius: 8px;
+}
+
+.tg-summary-stats svg {
+    width: 17px;
+    height: 17px;
+    color: var(--tg-muted);
+}
+
+.tg-summary-stats span {
+    color: var(--tg-muted);
+    font-size: 11px;
+}
+
+.tg-summary-stats strong {
+    font-size: 21px;
+    font-weight: 750;
+}
+
+.tg-summary-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.tg-summary-actions p {
+    margin: 0;
+    font-size: 11px;
+}
+
+/* =============================================
+   6. LISTAGEM COMPACTA DE EXERCÍCIOS
+============================================= */
+
+.tg-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    flex-wrap: wrap;
+    gap: 10px;
+
+    margin-bottom: 14px;
+}
+
+.tg-section-heading h2 {
+    font-size: 18px;
+}
+
+.tg-section-heading p {
+    margin: 4px 0 0;
+    font-size: 12px;
+}
+
+.tg-count {
+    color: var(--tg-muted);
+    font-size: 12px;
+}
+
+/* Um exercício por linha */
+
+.tg-exercise-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+}
+
+/* Imagem à esquerda, dados à direita */
+
+.tg-exercise-card {
+    display: grid;
+
+    grid-template-columns: 150px minmax(0, 1fr);
+    align-items: center;
+
+    gap: 16px;
+
+    min-width: 0;
+    padding: 14px;
+
+    background: var(--tg-card);
+    border: 1px solid var(--tg-border);
+    border-radius: 12px;
+}
+
+/* =============================================
+   7. MÍDIAS
+============================================= */
+
+.tg-media {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+
+    min-width: 0;
+    min-height: 0;
+
+    background: var(--tg-bg);
+
+    border: 1px solid var(--tg-border);
+    border-radius: 9px;
+
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.tg-media img,
+.tg-media video {
+    position: absolute;
+    inset: 0;
+
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    max-width: 100%;
+    max-height: 100%;
+
+    object-fit: contain;
+    object-position: center;
+
+    margin: 0;
+    padding: 0;
+}
+
+.tg-media-empty {
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+    padding: 8px;
+
+    width: 100%;
+    height: 100%;
+
+    color: var(--tg-muted);
+
+    text-align: center;
+    font-size: 10px;
+}
+
+.tg-media-empty svg {
+    width: 22px;
+    height: 22px;
+}
+
+/* =============================================
+   8. INFORMAÇÕES DOS EXERCÍCIOS
+============================================= */
+
+.tg-exercise-content {
+    display: flex;
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    min-width: 0;
+    padding: 0;
+}
+
+.tg-muscle {
+    display: inline-flex;
+    align-self: flex-start;
+
+    padding: 3px 7px;
+
+    color: var(--tg-text);
+    background: var(--tg-primary-soft);
+
+    border: 1px solid var(--tg-border);
+    border-radius: 5px;
+
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.tg-exercise-content h3 {
+    margin: 5px 0 10px;
+
+    font-size: 16px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+/* Sem quatro grandes blocos dentro do card */
+
+.tg-exercise-data {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    width: 100%;
+
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.tg-exercise-data>div,
+.tg-prescription>div {
+    display: flex;
+    flex-direction: column;
+
+    align-items: flex-start;
+    justify-content: flex-start;
+
+    gap: 3px;
+
+    min-width: 0;
+    padding: 0;
+
+    background: transparent;
+    border: none;
+}
+
+.tg-exercise-data span,
+.tg-prescription span {
+    color: var(--tg-muted);
+    font-size: 10px;
+}
+
+.tg-exercise-data strong,
+.tg-prescription strong {
+    color: var(--tg-text);
+    font-size: 12px;
+    font-weight: 650;
+    overflow-wrap: anywhere;
+}
+
+.tg-exercise-card .tg-start-exercise {
+    width: auto;
+    min-height: 34px;
+
+    padding: 7px 12px;
+    margin-top: auto;
+
+    font-size: 11px;
+}
+
+/* =============================================
+   9. TREINO GUIADO
+============================================= */
+
+.tg-guide {
+    width: 100%;
+    max-width: 640px;
+
+    margin: 0 auto;
+}
+
+.tg-guide-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+    flex-wrap: wrap;
+
+    margin-bottom: 14px;
+}
+
+/* Progresso mais discreto */
+
+.tg-progress-card {
+    margin-bottom: 14px;
+    padding: 12px 15px;
+
+    background: transparent;
+    border: 1px solid var(--tg-border);
+    border-radius: 9px;
+}
+
+.tg-progress-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+    margin-bottom: 9px;
+}
+
+.tg-progress-heading .tg-eyebrow {
+    display: none;
+}
+
+.tg-progress-heading h2 {
+    font-size: 14px;
+}
+
+.tg-progress-heading>strong {
+    font-size: 14px;
+}
+
+.tg-progress-card progress {
+    display: block;
+
+    appearance: none;
+    -webkit-appearance: none;
+
+    width: 100%;
+    height: 5px;
+
+    border: none;
+    border-radius: 20px;
+
+    background: var(--tg-border);
+    accent-color: var(--tg-primary);
+
+    overflow: hidden;
+}
+
+.tg-progress-card progress::-webkit-progress-bar {
+    background: var(--tg-border);
+}
+
+.tg-progress-card progress::-webkit-progress-value {
+    background: var(--tg-primary);
+    border-radius: 20px;
+}
+
+.tg-progress-card progress::-moz-progress-bar {
+    background: var(--tg-primary);
+    border-radius: 20px;
+}
+
+.tg-progress-labels {
+    display: flex;
+    justify-content: space-between;
+
+    gap: 8px;
+    margin-top: 7px;
+
+    color: var(--tg-muted);
+    font-size: 10px;
+}
+
+/* =============================================
+   10. CARD ATUAL + CRONÔMETRO ABAIXO
+============================================= */
+
+/* Nunca mais duas colunas gigantes */
+
+.tg-guide-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+}
+
+.tg-guide-card {
+    min-width: 0;
+
+    background: var(--tg-card);
+    border: 1px solid var(--tg-border);
+    border-radius: 12px;
+}
+
+/* Card do exercício em andamento */
+
+.tg-guide-grid>.tg-guide-card:not(.tg-execution) {
+    display: grid;
+
+    grid-template-columns: 150px minmax(0, 1fr);
+
+    align-items: center;
+    gap: 16px;
+
+    padding: 14px;
+}
+
+.tg-guide-media {
+    aspect-ratio: 4 / 3;
+}
+
+.tg-guide-content {
+    min-width: 0;
+    padding: 0;
+}
+
+.tg-guide-content h2 {
+    margin: 6px 0 12px;
+
+    font-size: 18px;
+    overflow-wrap: anywhere;
+}
+
+.tg-prescription {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+}
+
+/* =============================================
+   11. PAINEL DE EXECUÇÃO
+============================================= */
+
+.tg-execution {
+    display: flex;
+    flex-direction: column;
+
+    padding: 18px;
+}
+
+.tg-execution-heading {
+    order: 0;
+    text-align: center;
+}
+
+.tg-execution-heading .tg-eyebrow {
+    display: none;
+}
+
+.tg-execution-heading h2 {
+    font-size: 18px;
+}
+
+.tg-execution-heading p {
+    margin: 6px auto 13px;
+    max-width: 400px;
+    font-size: 11px;
+}
+
+/* Indicadores das séries */
+
+.tg-set-indicators {
+    order: 1;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+
+    gap: 7px;
+    margin-bottom: 14px;
+}
+
+.tg-set-indicator {
+    display: grid;
+    place-items: center;
+
+    width: 28px;
+    height: 28px;
+
+    background: var(--tg-bg);
+    color: var(--tg-muted);
+
+    border: 1px solid var(--tg-border);
+    border-radius: 50%;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.tg-set-indicator.is-current {
+    background: var(--tg-primary);
+    color: var(--tg-contrast);
+    border-color: var(--tg-primary);
+}
+
+.tg-set-indicator.is-complete {
+    color: var(--tg-success);
+    border-color: var(--tg-success);
+}
+
+/* Cronômetro acima dos campos de registro */
+
+#tgRestPanel {
+    order: 2;
+}
+
+#tgWorkPanel,
+#tgNextPanel {
+    order: 3;
+}
+
+/* Campos compactos */
+
+.tg-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.tg-fields>div {
+    min-width: 0;
+}
+
+.tg-fields label {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: var(--tg-text);
+
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.tg-page .tg-fields input {
+    width: 100%;
+    min-width: 0;
+    min-height: 40px;
+
+    padding: 9px 10px;
+
+    background: var(--tg-bg);
+    color: var(--tg-text);
+
+    border: 1px solid var(--tg-border);
+    border-radius: 7px;
+
+    font: inherit;
+    font-size: 13px;
+}
+
+.tg-error {
+    color: var(--tg-danger) !important;
+    font-size: 11px;
+}
+
+/* =============================================
+   12. CRONÔMETRO CIRCULAR
+============================================= */
+
+.tg-timer {
+    position: relative;
+
+    width: min(100%, 185px);
+    aspect-ratio: 1;
+
+    margin: 0 auto 14px;
+}
+
+.tg-timer>svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.tg-timer-track,
+.tg-timer-ring {
+    fill: none;
+    stroke-width: 6;
+}
+
+.tg-timer-track {
+    stroke: var(--tg-border);
+}
+
+.tg-timer-ring {
+    stroke: var(--tg-primary);
+    stroke-linecap: round;
+    stroke-dasharray: 358.142;
+
+    transition: stroke-dashoffset 200ms linear;
+}
+
+.tg-timer-label {
+    position: absolute;
+    inset: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 3px;
+
+    text-align: center;
+}
+
+.tg-timer-label strong {
+    color: var(--tg-text);
+
+    font-size: 34px;
+    font-weight: 750;
+
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -1px;
+}
+
+.tg-timer-label span {
+    color: var(--tg-muted);
+    font-size: 10px;
+}
+
+.tg-timer-actions {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 8px;
+}
+
+.tg-timer-actions .tg-btn {
+    min-height: 36px;
+    padding: 8px;
+
+    font-size: 11px;
+}
+
+/* =============================================
+   13. CONFIRMAÇÃO DE ENCERRAMENTO
+============================================= */
+
+.tg-end-confirm {
+    display: flex;
+    flex-direction: column;
+
+    gap: 12px;
+
+    margin-bottom: 14px;
+    padding: 14px;
+
+    background: var(--tg-card);
+
+    border: 1px solid var(--tg-danger);
+    border-radius: 9px;
+}
+
+.tg-end-confirm strong {
+    color: var(--tg-text);
+    font-size: 13px;
+}
+
+.tg-end-confirm p {
+    margin: 5px 0 0;
+    font-size: 11px;
+}
+
+.tg-button-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* =============================================
+   14. RESUMO DA SESSÃO
+============================================= */
+
+.tg-finish {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 24px;
+
+    background: var(--tg-card);
+
+    border: 1px solid var(--tg-border);
+    border-radius: 12px;
+
+    text-align: center;
+}
+
+.tg-finish-icon {
+    display: grid;
+    place-items: center;
+
+    width: 54px;
+    height: 54px;
+
+    margin: 0 auto 12px;
+
+    background: var(--tg-primary-soft);
+
+    border: 1px solid var(--tg-border);
+    border-radius: 50%;
+}
+
+.tg-finish-icon svg {
+    width: 26px;
+    height: 26px;
+}
+
+.tg-finish>h2 {
+    font-size: 22px;
+}
+
+.tg-finish>p {
+    font-size: 12px;
+}
+
+.tg-finish-stats {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 8px;
+    margin: 18px 0;
+}
+
+.tg-finish-stats>div {
+    display: grid;
+    gap: 6px;
+
+    min-width: 0;
+    padding: 12px 6px;
+
+    background: var(--tg-bg);
+
+    border: 1px solid var(--tg-border);
+    border-radius: 8px;
+}
+
+.tg-finish-stats span {
+    color: var(--tg-muted);
+    font-size: 10px;
+}
+
+.tg-finish-stats strong {
+    font-size: 18px;
+    overflow-wrap: anywhere;
+}
+
+.tg-finish-details {
+    display: grid;
+    gap: 10px;
+
+    margin-bottom: 16px;
+
+    text-align: left;
+}
+
+.tg-result-card {
+    padding: 12px;
+
+    background: var(--tg-bg);
+
+    border: 1px solid var(--tg-border);
+    border-radius: 8px;
+}
+
+.tg-result-card h3 {
+    margin-bottom: 8px;
+    font-size: 13px;
+}
+
+.tg-result-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+
+    gap: 8px;
+    padding: 8px 0;
+
+    border-top: 1px solid var(--tg-border);
+
+    color: var(--tg-muted);
+    font-size: 11px;
+}
+
+.tg-result-row span {
+    overflow-wrap: anywhere;
+}
+
+/* =============================================
+   15. RESPONSIVIDADE
+============================================= */
+
+@media (max-width: 900px) {
+
+    .tg-page {
+        padding: 20px;
+    }
+
+    .tg-exercise-data {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+
+    .tg-page {
+        padding: 14px 12px 24px;
+    }
+
+    .tg-page-header {
+        margin-bottom: 16px;
+    }
+
+    .tg-ficha-summary {
+        padding: 14px;
+    }
+
+    .tg-summary-stats {
+        gap: 6px;
+    }
+
+    .tg-summary-stats>div {
+        padding: 8px;
+    }
+
+    .tg-summary-stats strong {
+        font-size: 18px;
+    }
+
+    .tg-summary-stats span {
+        font-size: 10px;
+    }
+
+    .tg-summary-actions {
+        flex-direction: column;
+        align-items: stretch;
+
+        gap: 8px;
+    }
+
+    .tg-summary-actions .tg-btn {
+        width: 100%;
+    }
+
+    /* A imagem continua à esquerda */
+
+    .tg-exercise-card,
+    .tg-guide-grid>.tg-guide-card:not(.tg-execution) {
+        grid-template-columns: 105px minmax(0, 1fr);
+
+        gap: 12px;
+        padding: 10px;
+    }
+
+    .tg-media,
+    .tg-guide-media {
+        aspect-ratio: 1;
+    }
+
+    .tg-exercise-content h3,
+    .tg-guide-content h2 {
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .tg-exercise-data,
+    .tg-prescription {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 6px;
+    }
+
+    .tg-exercise-card .tg-start-exercise {
+        width: 100%;
+
+        min-height: 32px;
+        padding: 6px 8px;
+
+        font-size: 10px;
+    }
+
+    .tg-guide-header .tg-btn {
+        min-height: 34px;
+        padding: 7px 10px;
+
+        font-size: 11px;
+    }
+
+    .tg-execution {
+        padding: 14px;
+    }
+
+    .tg-timer {
+        width: 165px;
+    }
+
+    .tg-timer-label strong {
+        font-size: 30px;
+    }
+
+    .tg-finish {
+        padding: 16px;
+    }
+}
+
+@media (max-width: 360px) {
+
+    .tg-exercise-card,
+    .tg-guide-grid>.tg-guide-card:not(.tg-execution) {
+        grid-template-columns: 78px minmax(0, 1fr);
+
+        gap: 8px;
+    }
+
+    .tg-fields {
+        grid-template-columns: 1fr;
+    }
+
+    .tg-media-empty {
+        font-size: 9px;
+    }
+
+    .tg-finish-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =============================================
+   16. IMPRESSÃO
+============================================= */
+
+.tg-print {
+    display: none;
+}
+
+@page {
+    size: A4 portrait;
+    margin: 15mm;
+}
+
+@media print {
+
+    html,
+    body.perfil-aluno {
+        margin: 0 !important;
+        padding: 0 !important;
+
+        min-height: 0 !important;
+
+        background: #ffffff !important;
+        color: #111827 !important;
+
+        overflow: visible !important;
+    }
+
+    body.perfil-aluno> :not(.tg-page):not(:has(.tg-page)) {
+        display: none !important;
+    }
+
+    .tg-page {
+        width: 100% !important;
+        max-width: none !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+
+        background: #ffffff !important;
+    }
+
+    .tg-page> :not(.tg-print) {
+        display: none !important;
+    }
+
+    .tg-print {
+        display: block !important;
+
+        font-family: Arial, sans-serif;
+        font-size: 10pt;
+        color: #111827;
+    }
+
+    .tg-print header {
+        padding-bottom: 15px;
+        margin-bottom: 18px;
+        border-bottom: 2px solid #111827;
+    }
+
+    .tg-print header strong {
+        font-size: 12pt;
+    }
+
+    .tg-print h1 {
+        margin: 8px 0;
+        color: #111827;
+        font-size: 19pt;
+    }
+
+    .tg-print dl {
+        display: grid;
+        grid-template-columns: 110px 1fr;
+
+        gap: 7px 12px;
+        margin-bottom: 24px;
+    }
+
+    .tg-print dt {
+        font-weight: bold;
+    }
+
+    .tg-print dd {
+        margin: 0;
+    }
+
+    .tg-print table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 9pt;
+    }
+
+    .tg-print thead {
+        display: table-header-group;
+    }
+
+    .tg-print tr {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .tg-print th,
+    .tg-print td {
+        padding: 9px 7px;
+
+        border: 1px solid #d1d5db;
+
+        color: #111827;
+
+        text-align: left;
+        vertical-align: top;
+        overflow-wrap: anywhere;
+    }
+
+    .tg-print th {
+        background: #f3f4f6;
+    }
+
+    .tg-print p {
+        margin-top: 20px;
+        color: #374151;
+        font-size: 9pt;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tg-page * {
+        transition: none !important;
+    }
+}

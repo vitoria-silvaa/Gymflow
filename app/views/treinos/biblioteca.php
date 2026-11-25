@@ -1,23 +1,39 @@
 <?php
-// ============================================
+// ========================================
 // GYMFLOW - BIBLIOTECA DE EXERCÍCIOS
 // app/views/treinos/biblioteca.php
-// ============================================
+// ========================================
 
 if (!isset($tituloPagina)) {
+
     header(
-        "Location: " . BASE_URL .
-            "/app/controllers/ExercicioController.php"
+        'Location: ' . BASE_URL .
+            '/app/controllers/ExercicioController.php'
     );
+
     exit;
 }
 
-$tituloPagina = "Biblioteca de Exercícios";
-$cssEspecifico = BASE_URL . '/assets/css/biblioteca.css';
+$tituloPagina = 'Biblioteca de Exercícios';
+
+$cssEspecifico = BASE_URL .
+    '/assets/css/biblioteca-midia.css';
 
 $pesquisa = (string) ($pesquisa ?? '');
 $grupo = (string) ($grupo ?? '');
 $exercicios = $exercicios ?? [];
+
+$urlController = BASE_URL .
+    '/app/controllers/ExercicioController.php';
+
+$esc = static function ($valor): string {
+
+    return htmlspecialchars(
+        (string) $valor,
+        ENT_QUOTES,
+        'UTF-8'
+    );
+};
 
 $gruposMusculares = [
     'Abdômen',
@@ -34,10 +50,15 @@ $gruposMusculares = [
     'Tríceps'
 ];
 
-if ($grupo !== '' && !in_array($grupo, $gruposMusculares, true)) {
+if (
+    $grupo !== '' &&
+    !in_array($grupo, $gruposMusculares, true)
+) {
+
     $gruposMusculares[] = $grupo;
-    sort($gruposMusculares, SORT_NATURAL);
 }
+
+sort($gruposMusculares, SORT_NATURAL);
 
 $mensagensSucesso = [
     'cadastrado' => 'Exercício cadastrado com sucesso!',
@@ -46,23 +67,22 @@ $mensagensSucesso = [
 ];
 
 $mensagensErro = [
-    'invalido' => 'O exercício informado é inválido.',
-    'nao_encontrado' => 'O exercício não foi encontrado.',
+    'invalido' => 'Exercício inválido.',
+    'nao_encontrado' => 'Exercício não encontrado.',
     'exclusao' => 'Não foi possível excluir o exercício.'
 ];
 
-$codigoSucesso = (string) ($_GET['sucesso'] ?? '');
-$codigoErro = (string) ($_GET['erro'] ?? '');
+$codigoSucesso = $_GET['sucesso'] ?? '';
+$codigoErro = $_GET['erro'] ?? '';
 
-$mensagemSucesso = $mensagensSucesso[$codigoSucesso] ?? '';
-$mensagemErro = $mensagensErro[$codigoErro] ?? '';
+$mensagemSucesso = is_string($codigoSucesso)
+    ? ($mensagensSucesso[$codigoSucesso] ?? '')
+    : '';
 
-if ($mensagemErro === '' && $codigoErro !== '') {
-    $mensagemErro = 'Não foi possível concluir a operação.';
-}
-
-$urlController = BASE_URL .
-    '/app/controllers/ExercicioController.php';
+$mensagemErro = is_string($codigoErro) && $codigoErro !== ''
+    ? ($mensagensErro[$codigoErro] ??
+        'Não foi possível concluir a operação.')
+    : '';
 
 require __DIR__ . '/../shared/header.php';
 require __DIR__ . '/../shared/sidebar.php';
@@ -83,21 +103,18 @@ require __DIR__ . '/../shared/sidebar.php';
             <h1>Biblioteca de Exercícios</h1>
 
             <p>
-                Consulte, cadastre e gerencie os exercícios
-                disponíveis para a montagem dos treinos.
+                Gerencie os exercícios e as mídias
+                demonstrativas utilizadas nas fichas.
             </p>
 
         </div>
 
         <a
-            href="<?= htmlspecialchars(
-                        $urlController . '?acao=novo',
-                        ENT_QUOTES,
-                        'UTF-8'
-                    ) ?>"
+            href="<?= $esc($urlController . '?acao=novo') ?>"
             class="biblioteca-btn biblioteca-btn-primary">
-            <span aria-hidden="true">+</span>
-            Novo exercício
+
+            + Novo exercício
+
         </a>
 
     </header>
@@ -105,25 +122,27 @@ require __DIR__ . '/../shared/sidebar.php';
     <!-- MENSAGENS -->
 
     <?php if ($mensagemSucesso !== ''): ?>
-        <div class="biblioteca-alerta biblioteca-alerta-sucesso"
+
+        <div
+            class="biblioteca-alerta biblioteca-alerta-sucesso"
             role="status">
-            <?= htmlspecialchars(
-                $mensagemSucesso,
-                ENT_QUOTES,
-                'UTF-8'
-            ) ?>
+
+            <?= $esc($mensagemSucesso) ?>
+
         </div>
+
     <?php endif; ?>
 
     <?php if ($mensagemErro !== ''): ?>
-        <div class="biblioteca-alerta biblioteca-alerta-erro"
+
+        <div
+            class="biblioteca-alerta biblioteca-alerta-erro"
             role="alert">
-            <?= htmlspecialchars(
-                $mensagemErro,
-                ENT_QUOTES,
-                'UTF-8'
-            ) ?>
+
+            <?= $esc($mensagemErro) ?>
+
         </div>
+
     <?php endif; ?>
 
     <!-- FILTROS -->
@@ -131,19 +150,23 @@ require __DIR__ . '/../shared/sidebar.php';
     <section class="biblioteca-filtros-card">
 
         <div class="biblioteca-section-title">
+
             <div>
+
                 <h2>Pesquisar exercícios</h2>
-                <p>Encontre exercícios pelo nome ou grupo muscular.</p>
+
+                <p>
+                    Encontre exercícios pelo nome
+                    ou grupo muscular.
+                </p>
+
             </div>
+
         </div>
 
         <form
             method="GET"
-            action="<?= htmlspecialchars(
-                        $urlController,
-                        ENT_QUOTES,
-                        'UTF-8'
-                    ) ?>"
+            action="<?= $esc($urlController) ?>"
             class="biblioteca-filtros-form">
 
             <div class="biblioteca-campo">
@@ -157,19 +180,13 @@ require __DIR__ . '/../shared/sidebar.php';
                     id="pesquisa"
                     name="pesquisa"
                     placeholder="Ex.: Agachamento"
-                    value="<?= htmlspecialchars(
-                                $pesquisa,
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>">
+                    value="<?= $esc($pesquisa) ?>">
 
             </div>
 
             <div class="biblioteca-campo">
 
-                <label for="grupo">
-                    Grupo muscular
-                </label>
+                <label for="grupo">Grupo muscular</label>
 
                 <select id="grupo" name="grupo">
 
@@ -178,21 +195,17 @@ require __DIR__ . '/../shared/sidebar.php';
                     </option>
 
                     <?php foreach ($gruposMusculares as $opcao): ?>
+
                         <option
-                            value="<?= htmlspecialchars(
-                                        $opcao,
-                                        ENT_QUOTES,
-                                        'UTF-8'
-                                    ) ?>"
+                            value="<?= $esc($opcao) ?>"
                             <?= $grupo === $opcao
                                 ? 'selected'
                                 : '' ?>>
-                            <?= htmlspecialchars(
-                                $opcao,
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>
+
+                            <?= $esc($opcao) ?>
+
                         </option>
+
                     <?php endforeach; ?>
 
                 </select>
@@ -204,17 +217,17 @@ require __DIR__ . '/../shared/sidebar.php';
                 <button
                     type="submit"
                     class="biblioteca-btn biblioteca-btn-primary">
+
                     Buscar
+
                 </button>
 
                 <a
-                    href="<?= htmlspecialchars(
-                                $urlController,
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>"
+                    href="<?= $esc($urlController) ?>"
                     class="biblioteca-btn biblioteca-btn-secondary">
+
                     Limpar
+
                 </a>
 
             </div>
@@ -222,8 +235,10 @@ require __DIR__ . '/../shared/sidebar.php';
         </form>
 
         <p class="biblioteca-filtro-ajuda">
-            A pesquisa por nome tem prioridade sobre o filtro
-            de grupo muscular na versão atual do sistema.
+
+            A pesquisa por nome tem prioridade
+            sobre o filtro de grupo muscular.
+
         </p>
 
     </section>
@@ -235,17 +250,23 @@ require __DIR__ . '/../shared/sidebar.php';
         <div class="biblioteca-resultados-header">
 
             <div>
+
                 <h2>Exercícios cadastrados</h2>
+
                 <p>
                     Gerencie os exercícios da sua biblioteca.
                 </p>
+
             </div>
 
             <span class="biblioteca-contador">
+
                 <?= count($exercicios) ?>
+
                 <?= count($exercicios) === 1
-                    ? ' exercício'
-                    : ' exercícios' ?>
+                    ? 'exercício'
+                    : 'exercícios' ?>
+
             </span>
 
         </div>
@@ -257,17 +278,24 @@ require __DIR__ . '/../shared/sidebar.php';
                 <?php foreach ($exercicios as $exercicio): ?>
 
                     <?php
+
                     $id = (int) ($exercicio['id'] ?? 0);
-                    $nome = (string) ($exercicio['nome'] ?? '');
-                    $grupoExercicio = (string) ($exercicio['grupo'] ?? '');
-                    $tipoMidia = (string) ($exercicio['tipo_midia'] ?? '');
-                    $midia = (string) ($exercicio['midia'] ?? '');
 
-                    $urlEditar = $urlController .
-                        '?acao=editar&id=' . $id;
+                    $nome = (string) (
+                        $exercicio['nome'] ?? ''
+                    );
 
-                    $urlExcluir = $urlController .
-                        '?acao=excluir&id=' . $id;
+                    $grupoExercicio = (string) (
+                        $exercicio['grupo'] ?? ''
+                    );
+
+                    $midia = trim(
+                        (string) ($exercicio['midia'] ?? '')
+                    );
+
+                    $tipo = (string) (
+                        $exercicio['tipo_midia'] ?? ''
+                    );
 
                     $extensao = strtolower(
                         pathinfo(
@@ -276,68 +304,64 @@ require __DIR__ . '/../shared/sidebar.php';
                         )
                     );
 
-                    $mimeVideo = $extensao === 'webm'
-                        ? 'video/webm'
-                        : 'video/mp4';
+                    $possuiMidia =
+                        $midia !== '' &&
+                        in_array(
+                            $tipo,
+                            ['imagem', 'video'],
+                            true
+                        );
+
+                    $urlEditar = $urlController .
+                        '?acao=editar&id=' . $id;
+
+                    $urlExcluir = $urlController .
+                        '?acao=excluir&id=' . $id;
+
                     ?>
 
                     <article class="exercicio-card">
 
-                        <!-- MÍDIA -->
+                        <!-- MÍDIA RESPONSIVA -->
 
                         <div class="exercicio-midia">
 
-                            <?php if ($midia === ''): ?>
-
-                                <div class="exercicio-sem-midia">
-                                    <span aria-hidden="true">▧</span>
-                                    <p>Sem mídia disponível</p>
-                                </div>
-
-                            <?php elseif ($tipoMidia === 'video'): ?>
+                            <?php if (
+                                $possuiMidia &&
+                                $tipo === 'video'
+                            ): ?>
 
                                 <video
+                                    src="<?= $esc($midia) ?>"
                                     controls
-                                    preload="metadata"
                                     playsinline
-                                    aria-label="Vídeo do exercício <?= htmlspecialchars(
-                                                                        $nome,
-                                                                        ENT_QUOTES,
-                                                                        'UTF-8'
-                                                                    ) ?>">
-                                    <source
-                                        src="<?= htmlspecialchars(
-                                                    $midia,
-                                                    ENT_QUOTES,
-                                                    'UTF-8'
-                                                ) ?>"
-                                        type="<?= $mimeVideo ?>">
-                                    Seu navegador não suporta vídeos.
+                                    preload="metadata"
+                                    aria-label="Vídeo de <?= $esc($nome) ?>"
+                                    onerror="this.hidden=true;this.nextElementSibling.hidden=false;">
                                 </video>
 
-                            <?php elseif ($tipoMidia === 'imagem'): ?>
+                            <?php elseif (
+                                $possuiMidia &&
+                                $tipo === 'imagem'
+                            ): ?>
 
                                 <img
-                                    src="<?= htmlspecialchars(
-                                                $midia,
-                                                ENT_QUOTES,
-                                                'UTF-8'
-                                            ) ?>"
-                                    alt="Demonstração do exercício <?= htmlspecialchars(
-                                                                        $nome,
-                                                                        ENT_QUOTES,
-                                                                        'UTF-8'
-                                                                    ) ?>"
-                                    loading="lazy">
-
-                            <?php else: ?>
-
-                                <div class="exercicio-sem-midia">
-                                    <span aria-hidden="true">▧</span>
-                                    <p>Mídia indisponível</p>
-                                </div>
+                                    src="<?= $esc($midia) ?>"
+                                    alt="Demonstração de <?= $esc($nome) ?>"
+                                    loading="lazy"
+                                    onerror="this.hidden=true;this.nextElementSibling.hidden=false;">
 
                             <?php endif; ?>
+
+                            <div
+                                class="exercicio-sem-midia"
+                                <?= $possuiMidia ? 'hidden' : '' ?>>
+
+                                <i data-lucide="image-off"></i>
+
+                                <p>Mídia indisponível</p>
+
+                            </div>
 
                         </div>
 
@@ -346,21 +370,39 @@ require __DIR__ . '/../shared/sidebar.php';
                         <div class="exercicio-info">
 
                             <span class="exercicio-grupo">
-                                <?= htmlspecialchars(
+
+                                <?= $esc(
                                     $grupoExercicio !== ''
                                         ? $grupoExercicio
-                                        : 'Sem grupo',
-                                    ENT_QUOTES,
-                                    'UTF-8'
+                                        : 'Sem grupo'
                                 ) ?>
+
                             </span>
 
+                            <?php if (in_array(
+                                $extensao,
+                                [
+                                    'jpg',
+                                    'jpeg',
+                                    'png',
+                                    'webp',
+                                    'gif',
+                                    'mp4',
+                                    'webm'
+                                ],
+                                true
+                            )): ?>
+
+                                <span class="exercicio-formato">
+
+                                    <?= $esc(strtoupper($extensao)) ?>
+
+                                </span>
+
+                            <?php endif; ?>
+
                             <h3>
-                                <?= htmlspecialchars(
-                                    $nome,
-                                    ENT_QUOTES,
-                                    'UTF-8'
-                                ) ?>
+                                <?= $esc($nome) ?>
                             </h3>
 
                         </div>
@@ -370,31 +412,20 @@ require __DIR__ . '/../shared/sidebar.php';
                         <div class="exercicio-acoes">
 
                             <a
-                                href="<?= htmlspecialchars(
-                                            $urlEditar,
-                                            ENT_QUOTES,
-                                            'UTF-8'
-                                        ) ?>"
+                                href="<?= $esc($urlEditar) ?>"
                                 class="exercicio-btn-editar">
+
                                 Editar
+
                             </a>
 
-                            <!--
-                              Mantido via GET para não quebrar
-                              o controller atual.
-
-                              Próxima etapa:
-                              substituir por POST + CSRF.
-                            -->
                             <a
-                                href="<?= htmlspecialchars(
-                                            $urlExcluir,
-                                            ENT_QUOTES,
-                                            'UTF-8'
-                                        ) ?>"
+                                href="<?= $esc($urlExcluir) ?>"
                                 class="exercicio-btn-excluir"
-                                onclick="return confirm('Tem certeza que deseja desativar este exercício?');">
+                                onclick="return confirm('Deseja desativar este exercício?');">
+
                                 Excluir
+
                             </a>
 
                         </div>
@@ -409,27 +440,24 @@ require __DIR__ . '/../shared/sidebar.php';
 
             <div class="nenhum-exercicio">
 
-                <div class="nenhum-exercicio-icone"
-                    aria-hidden="true">
-                    ▧
+                <div class="nenhum-exercicio-icone">
+
+                    <i data-lucide="dumbbell"></i>
+
                 </div>
 
                 <h3>Nenhum exercício encontrado</h3>
 
                 <p>
-                    Não existem exercícios cadastrados
-                    ou nenhum resultado corresponde
-                    aos filtros informados.
+                    Nenhum resultado corresponde aos filtros.
                 </p>
 
                 <a
-                    href="<?= htmlspecialchars(
-                                $urlController,
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>"
+                    href="<?= $esc($urlController) ?>"
                     class="biblioteca-btn biblioteca-btn-secondary">
+
                     Limpar filtros
+
                 </a>
 
             </div>
@@ -440,6 +468,4 @@ require __DIR__ . '/../shared/sidebar.php';
 
 </main>
 
-<?php
-require __DIR__ . '/../shared/footer.php';
-?>
+<?php require __DIR__ . '/../shared/footer.php'; ?>

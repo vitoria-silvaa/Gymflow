@@ -1,4 +1,3 @@
-
 <?php
 // ========================================
 // GYMFLOW - PORTAL DO ALUNO
@@ -7,10 +6,11 @@
 
 require_once __DIR__ . '/../../config/sessao.php';
 
-// Apenas alunos autenticados
 verificarRole(['Aluno']);
 
-$baseUrl = BASE_URL . '/app/controllers/PortalAlunoController.php';
+$baseUrl = BASE_URL .
+    '/app/controllers/PortalAlunoController.php';
+
 $acao = $_GET['acao'] ?? 'aluno';
 
 // ========================================
@@ -23,34 +23,39 @@ $aluno_id = filter_var(
 );
 
 if (!$aluno_id || $aluno_id <= 0) {
+
     $_SESSION = [];
     session_destroy();
 
     header(
-        "Location: " . BASE_URL .
-            "/app/controllers/LoginController.php?acao=login"
+        'Location: ' . BASE_URL .
+            '/app/controllers/LoginController.php?acao=login'
     );
+
     exit;
 }
 
 $aluno_id = (int) $aluno_id;
 
 // ========================================
-// 1. HOME DO PORTAL DO ALUNO
+// 1. HOME
 // ========================================
 
 if ($acao === 'aluno') {
 
     $alunoId = $aluno_id;
+
     $operacao = 'dados_portal_aluno';
 
     require __DIR__ . '/../models/Aluno.php';
 
     require __DIR__ . '/../views/portal_aluno/aluno.php';
+
+    exit;
 }
 
 // ========================================
-// 2. FATURAS DO ALUNO
+// 2. FATURAS
 // ========================================
 
 elseif ($acao === 'faturas') {
@@ -68,21 +73,34 @@ elseif ($acao === 'faturas') {
     foreach ($todas_contas as $conta) {
 
         if ($conta['status'] === 'Pago') {
+
             $pagas[] = $conta;
         } elseif ($conta['vencimento'] < $hoje) {
+
             $em_atraso[] = $conta;
         } else {
+
             $a_vencer[] = $conta;
         }
     }
 
     $aba = $_GET['aba'] ?? 'vencer';
 
+    if (!in_array(
+        $aba,
+        ['vencer', 'atraso', 'pagas'],
+        true
+    )) {
+        $aba = 'vencer';
+    }
+
     require __DIR__ . '/../views/portal_aluno/faturas.php';
+
+    exit;
 }
 
 // ========================================
-// 3. TREINOS DO ALUNO
+// 3. TREINOS
 // ========================================
 
 elseif ($acao === 'treinos') {
@@ -91,23 +109,74 @@ elseif ($acao === 'treinos') {
 
     require __DIR__ . '/../models/Treino.php';
 
-    $ficha_id_selecionada =
-        $_GET['ficha'] ?? ($fichas[0]['id'] ?? null);
-
     $itens = [];
     $ficha_atual = null;
+    $ficha_id_selecionada = null;
 
-    if ($ficha_id_selecionada) {
+    // Seleciona a ficha solicitada ou a mais recente.
 
-        foreach ($fichas as $f) {
+    if (isset($_GET['ficha'])) {
 
-            if ($f['id'] == $ficha_id_selecionada) {
-                $ficha_atual = $f;
-                break;
-            }
+        $fichaSolicitada = filter_var(
+            $_GET['ficha'],
+            FILTER_VALIDATE_INT,
+            [
+                'options' => [
+                    'min_range' => 1
+                ]
+            ]
+        );
+
+        if (!$fichaSolicitada) {
+
+            header(
+                'Location: ' . $baseUrl .
+                    '?acao=treinos'
+            );
+
+            exit;
         }
+    } else {
 
-        $ficha_id = (int) $ficha_id_selecionada;
+        $fichaSolicitada = (int) (
+            $fichas[0]['id'] ?? 0
+        );
+    }
+
+    // Confirma que a ficha pertence ao aluno.
+
+    foreach ($fichas as $f) {
+
+        if ((int) $f['id'] === $fichaSolicitada) {
+
+            $ficha_atual = $f;
+
+            $ficha_id_selecionada = (int) $f['id'];
+
+            break;
+        }
+    }
+
+    // Uma ficha desconhecida não pode ser consultada.
+
+    if (
+        isset($_GET['ficha']) &&
+        !$ficha_atual
+    ) {
+
+        header(
+            'Location: ' . $baseUrl .
+                '?acao=treinos'
+        );
+
+        exit;
+    }
+
+    // Consulta exclusivamente a ficha validada.
+
+    if ($ficha_atual !== null) {
+
+        $ficha_id = $ficha_id_selecionada;
 
         $operacao = 'buscar_itens_ficha';
 
@@ -115,21 +184,23 @@ elseif ($acao === 'treinos') {
     }
 
     require __DIR__ . '/../views/portal_aluno/treinos.php';
+
+    exit;
 }
 
 // ========================================
-// 4. CONTRATOS DO ALUNO
+// 4. CONTRATOS
 // ========================================
 
 elseif ($acao === 'contratos') {
-
-    $aluno_id = (int) $_SESSION['aluno_id'];
 
     $operacao = 'listar_contratos';
 
     require __DIR__ . '/../models/Aluno.php';
 
     require __DIR__ . '/../views/portal_aluno/contratos.php';
+
+    exit;
 }
 
 // ========================================
@@ -140,19 +211,24 @@ elseif ($acao === 'imprimir_contrato') {
 
     $contrato_id = (int) ($_GET['id'] ?? 0);
 
-    $aluno_id = (int) $_SESSION['aluno_id'];
-
     $operacao = 'buscar_contrato_impressao';
 
     require __DIR__ . '/../models/Aluno.php';
 
     if (!$contrato) {
 
-        header("Location: $baseUrl?acao=contratos");
+        header(
+            'Location: ' . $baseUrl .
+                '?acao=contratos'
+        );
+
         exit;
     }
 
-    require __DIR__ . '/../views/portal_aluno/imprimir_contrato.php';
+    require __DIR__ .
+        '/../views/portal_aluno/imprimir_contrato.php';
+
+    exit;
 }
 
 // ========================================
@@ -160,9 +236,6 @@ elseif ($acao === 'imprimir_contrato') {
 // ========================================
 
 elseif ($acao === 'avaliacao') {
-
-    // A avaliação pertence ao usuário
-    // autenticado e à sua academia.
 
     $usuario_id = filter_var(
         $_SESSION['usuario_id'] ?? null,
@@ -180,7 +253,9 @@ elseif ($acao === 'avaliacao') {
         $usuario_id <= 0 ||
         $company_id <= 0
     ) {
+
         http_response_code(403);
+
         exit('Sessão inválida. Faça login novamente.');
     }
 
@@ -191,9 +266,7 @@ elseif ($acao === 'avaliacao') {
 
     try {
 
-        // Confere se o usuário é um aluno da
-        // empresa e se sua filial pertence
-        // à mesma empresa.
+        // VALIDAR VÍNCULO DO ALUNO
 
         $stmtAluno = $pdo->prepare("
             SELECT
@@ -203,6 +276,7 @@ elseif ($acao === 'avaliacao') {
                 a.id AS aluno_id,
                 f.id AS filial_id,
                 f.nome AS nome_filial
+
             FROM users u
 
             INNER JOIN alunos a
@@ -231,13 +305,14 @@ elseif ($acao === 'avaliacao') {
             $stmtAluno->fetch(PDO::FETCH_ASSOC);
 
         if (!$dadosAlunoAvaliacao) {
+
             http_response_code(403);
+
             exit('Não foi possível validar seu vínculo ' .
                 'com esta academia.');
         }
 
-        // Busca a avaliação do próprio aluno,
-        // exclusivamente na empresa da sessão.
+        // BUSCAR AVALIAÇÃO DO ALUNO
 
         $stmtAvaliacao = $pdo->prepare("
             SELECT
@@ -247,6 +322,7 @@ elseif ($acao === 'avaliacao') {
                 mensagem,
                 criado_em,
                 ativo
+
             FROM portfolio_feedbacks
 
             WHERE user_id = :usuario_id
@@ -263,14 +339,18 @@ elseif ($acao === 'avaliacao') {
         $minhaAvaliacao =
             $stmtAvaliacao->fetch(PDO::FETCH_ASSOC) ?: null;
 
-        // Variáveis para a nova view.
         $tituloPagina = 'Minha Avaliação';
 
-        $nomeAluno = $dadosAlunoAvaliacao['nome_usuario'];
-        $nomeFilial = $dadosAlunoAvaliacao['nome_filial'];
+        $nomeAluno =
+            $dadosAlunoAvaliacao['nome_usuario'];
+
+        $nomeFilial =
+            $dadosAlunoAvaliacao['nome_filial'];
 
         require __DIR__ .
             '/../views/portal_aluno/avaliacao.php';
+
+        exit;
     } catch (Throwable $e) {
 
         error_log(
@@ -288,11 +368,15 @@ elseif ($acao === 'avaliacao') {
 }
 
 // ========================================
-// AÇÃO DESCONHECIDA
+// 7. AÇÃO DESCONHECIDA
 // ========================================
 
 else {
 
-    header("Location: $baseUrl?acao=aluno");
+    header(
+        'Location: ' . $baseUrl .
+            '?acao=aluno'
+    );
+
     exit;
 }

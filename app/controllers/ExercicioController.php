@@ -1,102 +1,192 @@
-
 <?php
-// ========================================
-// GYMFLOW - CONTROLLER DE EXERCÍCIOS
+// ==========================================
+// GYMFLOW — CONTROLLER DE EXERCÍCIOS
 // app/controllers/ExercicioController.php
-// ========================================
+// ==========================================
 
 require_once __DIR__ . '/../../config/sessao.php';
+
+verificarRole(['Admin', 'Professor']);
+
 require_once __DIR__ . '/../models/Exercicio.php';
 
-$tituloPagina = "Biblioteca de Exercícios";
+$tituloPagina = 'Biblioteca de Exercícios';
 
-// O header.php já adiciona a versão do CSS.
 $cssEspecifico = BASE_URL . '/assets/css/biblioteca.css';
 
-// ========================================
-// FUNÇÕES AUXILIARES
-// ========================================
+// ==========================================
+// 1. PROTEÇÃO CSRF
+// ==========================================
 
-function redirecionarExercicios(string $parametros = ''): void
+if (
+    !isset($_SESSION['exercicio_csrf']) ||
+    !is_string($_SESSION['exercicio_csrf']) ||
+    $_SESSION['exercicio_csrf'] === ''
+) {
+    $_SESSION['exercicio_csrf'] = bin2hex(random_bytes(32));
+}
+
+function validarCsrfExercicio(): void
 {
-    $url = BASE_URL . '/app/controllers/ExercicioController.php';
+    $token = $_POST['csrf_token'] ?? '';
+
+    if (
+        !is_string($token) ||
+        !hash_equals($_SESSION['exercicio_csrf'], $token)
+    ) {
+        http_response_code(403);
+
+        exit('Não foi possível validar a solicitação. ' .
+            'Recarregue o formulário e tente novamente.');
+    }
+}
+
+// ==========================================
+// 2. FUNÇÕES AUXILIARES
+// ==========================================
+
+function redirecionarExercicios(
+    string $parametros = ''
+): void {
+
+    $url = BASE_URL .
+        '/app/controllers/ExercicioController.php';
 
     if ($parametros !== '') {
         $url .= '?' . $parametros;
     }
 
-    header('Location: ' . $url);
+    header('Location: ' . $url, true, 303);
+
     exit;
+}
+
+function obterIdExercicio($valor): int
+{
+    $id = filter_var(
+        $valor,
+        FILTER_VALIDATE_INT,
+        [
+            'options' => [
+                'min_range' => 1
+            ]
+        ]
+    );
+
+    return $id === false ? 0 : (int) $id;
+}
+
+function obterTextoExercicio($valor): string
+{
+    return is_string($valor)
+        ? trim($valor)
+        : '';
 }
 
 function erroUploadExercicio(int $codigo): string
 {
-    switch ($codigo) {
-        case UPLOAD_ERR_INI_SIZE:
-        case UPLOAD_ERR_FORM_SIZE:
-            return 'O arquivo ultrapassa o limite permitido pelo servidor.';
+    return match ($codigo) {
 
-        case UPLOAD_ERR_PARTIAL:
-            return 'O envio do arquivo foi interrompido. Tente novamente.';
+        UPLOAD_ERR_INI_SIZE,
+        UPLOAD_ERR_FORM_SIZE =>
+        'O arquivo ultrapassa o limite permitido pelo servidor.',
 
-        case UPLOAD_ERR_NO_FILE:
-            return 'Nenhum arquivo foi selecionado.';
+        UPLOAD_ERR_PARTIAL =>
+        'O envio foi interrompido. Tente novamente.',
 
-        case UPLOAD_ERR_NO_TMP_DIR:
-            return 'A pasta temporária de uploads não está disponível.';
+        UPLOAD_ERR_NO_FILE =>
+        'Nenhum arquivo foi selecionado.',
 
-        case UPLOAD_ERR_CANT_WRITE:
-            return 'O servidor não conseguiu gravar o arquivo.';
+        UPLOAD_ERR_NO_TMP_DIR =>
+        'A pasta temporária de uploads não está disponível.',
 
-        case UPLOAD_ERR_EXTENSION:
-            return 'O envio foi bloqueado por uma extensão do PHP.';
+        UPLOAD_ERR_CANT_WRITE =>
+        'Não foi possível gravar o arquivo.',
 
-        default:
-            return 'Não foi possível enviar o arquivo.';
-    }
+        UPLOAD_ERR_EXTENSION =>
+        'O envio foi bloqueado por uma extensão do PHP.',
+
+        default =>
+        'Não foi possível enviar o arquivo.'
+    };
 }
 
-function validarTipoMidiaExercicio(string $tipo): void
+// ==========================================
+// 3. FORMATOS DE MÍDIA
+// ==========================================
+
+function formatosMidiaExercicio(): array
 {
-    if (!in_array($tipo, ['imagem', 'video'], true)) {
+    return [
+
+        'jpg' => [
+            'tipo' => 'imagem',
+            'mime' => 'image/jpeg',
+            'limite' => 5
+        ],
+
+        'jpeg' => [
+            'tipo' => 'imagem',
+            'mime' => 'image/jpeg',
+            'limite' => 5
+        ],
+
+        'png' => [
+            'tipo' => 'imagem',
+            'mime' => 'image/png',
+            'limite' => 5
+        ],
+
+        'webp' => [
+            'tipo' => 'imagem',
+            'mime' => 'image/webp',
+            'limite' => 5
+        ],
+
+        'gif' => [
+            'tipo' => 'imagem',
+            'mime' => 'image/gif',
+            'limite' => 15
+        ],
+
+        'mp4' => [
+            'tipo' => 'video',
+            'mime' => 'video/mp4',
+            'limite' => 50
+        ],
+
+        'webm' => [
+            'tipo' => 'video',
+            'mime' => 'video/webm',
+            'limite' => 50
+        ]
+
+    ];
+}
+
+// ==========================================
+// 4. PROCESSAMENTO SEGURO DO UPLOAD
+// ==========================================
+
+function processarUploadMidia(array $arquivo): array
+{
+    $erro = $arquivo['error'] ?? UPLOAD_ERR_NO_FILE;
+
+    if (!is_int($erro)) {
+
         throw new InvalidArgumentException(
-            'Selecione um tipo de mídia válido.'
+            'Estrutura de upload inválida.'
         );
     }
-}
-
-// ========================================
-// PROCESSAMENTO SEGURO DO UPLOAD
-// ========================================
-
-function processarUploadMidia(
-    array $arquivo,
-    string $tipo_midia
-): string {
-
-    validarTipoMidiaExercicio($tipo_midia);
-
-    $extensoesPermitidas = [
-        'imagem' => ['jpg', 'jpeg', 'png', 'webp'],
-        'video'  => ['mp4', 'webm']
-    ];
-
-    $mimesPorExtensao = [
-        'jpg'  => ['image/jpeg'],
-        'jpeg' => ['image/jpeg'],
-        'png'  => ['image/png'],
-        'webp' => ['image/webp'],
-        'mp4'  => ['video/mp4'],
-        'webm' => ['video/webm']
-    ];
-
-    $erro = (int) ($arquivo['error'] ?? UPLOAD_ERR_NO_FILE);
 
     if ($erro !== UPLOAD_ERR_OK) {
+
         throw new RuntimeException(
             erroUploadExercicio($erro)
         );
     }
+
+    // VALIDAR ARQUIVO RECEBIDO
 
     if (
         !isset($arquivo['name'], $arquivo['tmp_name']) ||
@@ -104,32 +194,13 @@ function processarUploadMidia(
         !is_string($arquivo['tmp_name']) ||
         !is_uploaded_file($arquivo['tmp_name'])
     ) {
-        throw new RuntimeException(
+
+        throw new InvalidArgumentException(
             'O arquivo enviado não é válido.'
         );
     }
 
-    $tamanho = (int) ($arquivo['size'] ?? 0);
-
-    if ($tamanho <= 0) {
-        throw new InvalidArgumentException(
-            'O arquivo está vazio.'
-        );
-    }
-
-    $limiteBytes = $tipo_midia === 'video'
-        ? 50 * 1024 * 1024
-        : 5 * 1024 * 1024;
-
-    if ($tamanho > $limiteBytes) {
-        $limite = $tipo_midia === 'video'
-            ? '50 MB'
-            : '5 MB';
-
-        throw new InvalidArgumentException(
-            "O arquivo excede o limite de {$limite}."
-        );
-    }
+    // IDENTIFICAR EXTENSÃO
 
     $extensao = strtolower(
         pathinfo(
@@ -138,458 +209,579 @@ function processarUploadMidia(
         )
     );
 
-    if (
-        !in_array(
-            $extensao,
-            $extensoesPermitidas[$tipo_midia],
-            true
-        )
-    ) {
+    $formatos = formatosMidiaExercicio();
+
+    if (!isset($formatos[$extensao])) {
+
         throw new InvalidArgumentException(
-            'A extensão do arquivo não é permitida para o tipo de mídia selecionado.'
+            'Formato de mídia não permitido.'
         );
     }
 
-    // Validação do conteúdo efetivo do arquivo.
+    $config = $formatos[$extensao];
+
+    // VALIDAR TAMANHO REAL
+
+    $tamanho = filesize($arquivo['tmp_name']);
+
+    if ($tamanho === false || $tamanho <= 0) {
+
+        throw new InvalidArgumentException(
+            'O arquivo está vazio ou inválido.'
+        );
+    }
+
+    $limiteBytes = $config['limite'] * 1024 * 1024;
+
+    if ($tamanho > $limiteBytes) {
+
+        throw new InvalidArgumentException(
+            'O limite para este formato é de ' .
+                $config['limite'] .
+                ' MB.'
+        );
+    }
+
+    // VALIDAR CONTEÚDO REAL
+
     $finfo = new finfo(FILEINFO_MIME_TYPE);
 
-    $mimeReal = $finfo->file($arquivo['tmp_name']);
+    $mimeReal = $finfo->file(
+        $arquivo['tmp_name']
+    );
 
-    if (
-        $mimeReal === false ||
-        !in_array(
-            $mimeReal,
-            $mimesPorExtensao[$extensao],
-            true
-        )
-    ) {
+    if ($mimeReal !== $config['mime']) {
+
         throw new InvalidArgumentException(
             'O conteúdo do arquivo não corresponde à extensão informada.'
         );
     }
 
-    $pastaUpload =
-        __DIR__ . '/../../assets/uploads/exercicios/';
+    // VALIDAR IMAGENS E GIFS
+
+    if ($config['tipo'] === 'imagem') {
+
+        $info = @getimagesize(
+            $arquivo['tmp_name']
+        );
+
+        if (
+            $info === false ||
+            ($info['mime'] ?? '') !== $mimeReal ||
+            $info[0] <= 0 ||
+            $info[1] <= 0 ||
+            $info[0] > 4096 ||
+            $info[1] > 4096
+        ) {
+
+            throw new InvalidArgumentException(
+                'A imagem é inválida ou ultrapassa a resolução máxima de 4096 pixels.'
+            );
+        }
+    }
+
+    // DIRETÓRIO DE UPLOAD
+
+    $pasta = dirname(__DIR__, 2) .
+        '/assets/uploads/exercicios/';
 
     if (
-        !is_dir($pastaUpload) &&
-        !mkdir($pastaUpload, 0755, true) &&
-        !is_dir($pastaUpload)
+        !is_dir($pasta) &&
+        !mkdir($pasta, 0755, true) &&
+        !is_dir($pasta)
     ) {
+
         throw new RuntimeException(
-            'Não foi possível criar a pasta de uploads.'
+            'Não foi possível criar a pasta de mídia.'
         );
     }
 
-    if (!is_writable($pastaUpload)) {
+    if (!is_writable($pasta)) {
+
         throw new RuntimeException(
-            'A pasta de uploads não possui permissão de escrita.'
+            'A pasta de mídia não possui permissão de escrita.'
         );
     }
 
-    // Nome imprevisível para evitar colisões.
+    // NOME ÚNICO
+
     $nomeArquivo =
         'exercicio_' .
         bin2hex(random_bytes(16)) .
         '.' .
         $extensao;
 
-    $caminhoCompleto =
-        $pastaUpload . $nomeArquivo;
+    if (!move_uploaded_file(
+        $arquivo['tmp_name'],
+        $pasta . $nomeArquivo
+    )) {
 
-    if (
-        !move_uploaded_file(
-            $arquivo['tmp_name'],
-            $caminhoCompleto
-        )
-    ) {
         throw new RuntimeException(
-            'Não foi possível salvar a mídia no servidor.'
+            'Não foi possível armazenar a demonstração.'
         );
     }
 
-    return BASE_URL .
-        '/assets/uploads/exercicios/' .
-        $nomeArquivo;
+    return [
+
+        'midia' => BASE_URL .
+            '/assets/uploads/exercicios/' .
+            $nomeArquivo,
+
+        'tipo_midia' => $config['tipo']
+
+    ];
 }
 
-// ========================================
-// LIMPEZA DE UPLOAD RECÉM-CRIADO
-// Utilizar somente ao desfazer uma operação
-// que falhou, nunca para remover mídia antiga.
-// ========================================
+// ==========================================
+// 5. LIMPEZA EM CASO DE FALHA
+// ==========================================
 
 function limparUploadNovoExercicio(string $url): void
 {
-    $prefixo =
-        BASE_URL . '/assets/uploads/exercicios/';
+    $prefixo = BASE_URL .
+        '/assets/uploads/exercicios/';
 
-    if (strpos($url, $prefixo) !== 0) {
+    if (!str_starts_with($url, $prefixo)) {
         return;
     }
 
-    $nome = substr($url, strlen($prefixo));
+    $nome = substr(
+        $url,
+        strlen($prefixo)
+    );
 
-    // Aceita somente o padrão de nomes criado
-    // pela função processarUploadMidia().
-    if (
-        !preg_match(
-            '/^exercicio_[a-f0-9]{32}\.(jpg|jpeg|png|webp|mp4|webm)$/',
-            $nome
-        )
-    ) {
+    if (!preg_match(
+        '/^exercicio_[a-f0-9]{32}\.(jpg|jpeg|png|webp|gif|mp4|webm)$/',
+        $nome
+    )) {
         return;
     }
 
-    $caminho =
-        __DIR__ .
-        '/../../assets/uploads/exercicios/' .
+    $caminho = dirname(__DIR__, 2) .
+        '/assets/uploads/exercicios/' .
         $nome;
 
     if (is_file($caminho)) {
-        unlink($caminho);
+
+        if (!@unlink($caminho)) {
+
+            error_log(
+                '[GymFlow][Exercicios] Falha ao limpar upload.'
+            );
+        }
     }
 }
 
-// ========================================
-// NOVO EXERCÍCIO - FORMULÁRIO
-// ========================================
+// ==========================================
+// 6. IDENTIFICAR REQUISIÇÃO
+// ==========================================
+
+$metodo = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+
+$acaoGet = obterTextoExercicio(
+    $_GET['acao'] ?? ''
+);
+
+$acaoPost = obterTextoExercicio(
+    $_POST['acao'] ?? ''
+);
+
+// Detectar requisição rejeitada pelo post_max_size.
 
 if (
-    $_SERVER['REQUEST_METHOD'] === 'GET' &&
-    ($_GET['acao'] ?? '') === 'novo'
+    $metodo === 'POST' &&
+    empty($_POST) &&
+    empty($_FILES) &&
+    (int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 0
 ) {
-    require __DIR__ . '/../views/exercicios/exercicios.php';
+
+    http_response_code(413);
+
+    exit('O formulário ultrapassa o limite de envio do PHP.');
+}
+
+if ($metodo === 'POST') {
+
+    validarCsrfExercicio();
+}
+
+// ==========================================
+// 7. NOVO EXERCÍCIO
+// ==========================================
+
+if (
+    $metodo === 'GET' &&
+    $acaoGet === 'novo'
+) {
+
+    require __DIR__ .
+        '/../views/exercicios/exercicios.php';
+
     exit;
 }
 
-// ========================================
-// EXCLUSÃO
-// Mantida por GET temporariamente para
-// preservar a compatibilidade com a view.
-// Migrar junto com biblioteca.php para
-// POST + proteção CSRF.
-// ========================================
+// ==========================================
+// 8. ABRIR EDIÇÃO
+// ==========================================
 
 if (
-    $_SERVER['REQUEST_METHOD'] === 'GET' &&
-    ($_GET['acao'] ?? '') === 'excluir'
+    $metodo === 'GET' &&
+    $acaoGet === 'editar'
 ) {
 
-    $id = (int) ($_GET['id'] ?? 0);
+    $id = obterIdExercicio(
+        $_GET['id'] ?? null
+    );
 
-    if ($id <= 0) {
-        redirecionarExercicios('erro=invalido');
+    if (!$id) {
+
+        redirecionarExercicios(
+            'erro=invalido'
+        );
+    }
+
+    // O Model restringe o acesso à própria empresa.
+
+    $exercicio = buscarExercicioPorId(
+        $pdo,
+        $id
+    );
+
+    if (!$exercicio) {
+
+        redirecionarExercicios(
+            'erro=nao_encontrado'
+        );
+    }
+
+    require __DIR__ .
+        '/../views/exercicios/editar.php';
+
+    exit;
+}
+
+// ==========================================
+// 9. DESATIVAR EXERCÍCIO
+// ==========================================
+
+// Mantido por compatibilidade com biblioteca.php.
+// Migrar posteriormente para POST + CSRF.
+
+if (
+    $metodo === 'GET' &&
+    $acaoGet === 'excluir'
+) {
+
+    $id = obterIdExercicio(
+        $_GET['id'] ?? null
+    );
+
+    if (!$id) {
+
+        redirecionarExercicios(
+            'erro=invalido'
+        );
     }
 
     try {
 
         excluirExercicio($pdo, $id);
 
-        redirecionarExercicios('sucesso=excluido');
+        redirecionarExercicios(
+            'sucesso=excluido'
+        );
     } catch (Throwable $e) {
 
         error_log(
-            '[GymFlow] Falha ao excluir exercício: ' .
+            '[GymFlow][Exercicios] ' .
                 $e->getMessage()
         );
 
-        redirecionarExercicios('erro=exclusao');
+        redirecionarExercicios(
+            'erro=exclusao'
+        );
     }
 }
 
-// ========================================
-// EDITAR EXERCÍCIO - FORMULÁRIO
-// ========================================
+// ==========================================
+// 10. CADASTRAR OU ATUALIZAR
+// ==========================================
 
 if (
-    $_SERVER['REQUEST_METHOD'] === 'GET' &&
-    ($_GET['acao'] ?? '') === 'editar'
+    $metodo === 'POST' &&
+    (
+        !isset($_POST['acao']) ||
+        $acaoPost === 'editar'
+    )
 ) {
 
-    $id = (int) ($_GET['id'] ?? 0);
+    $modoEdicao = $acaoPost === 'editar';
 
-    if ($id <= 0) {
-        redirecionarExercicios('erro=invalido');
-    }
+    $id = $modoEdicao
+        ? obterIdExercicio($_POST['id'] ?? null)
+        : 0;
 
-    $exercicio = buscarExercicioPorId($pdo, $id);
+    $exercicio = [];
 
-    if (!$exercicio) {
-        redirecionarExercicios('erro=nao_encontrado');
-    }
+    if ($modoEdicao) {
 
-    require __DIR__ . '/../views/exercicios/editar.php';
-    exit;
-}
+        if (!$id) {
 
-// ========================================
-// EDITAR EXERCÍCIO - SALVAR
-// ========================================
-
-if (
-    $_SERVER['REQUEST_METHOD'] === 'POST' &&
-    ($_POST['acao'] ?? '') === 'editar'
-) {
-
-    $id = (int) ($_POST['id'] ?? 0);
-
-    if ($id <= 0) {
-        redirecionarExercicios('erro=invalido');
-    }
-
-    $exercicio = buscarExercicioPorId($pdo, $id);
-
-    if (!$exercicio) {
-        redirecionarExercicios('erro=nao_encontrado');
-    }
-
-    $nome = trim((string) ($_POST['nome'] ?? ''));
-    $grupo = trim((string) ($_POST['grupo_muscular'] ?? ''));
-    $tipo_midia = trim((string) ($_POST['tipo_midia'] ?? ''));
-
-    $urlEdicao = 'acao=editar&id=' . $id;
-
-    if (
-        $nome === '' ||
-        $grupo === '' ||
-        $tipo_midia === ''
-    ) {
-        redirecionarExercicios(
-            $urlEdicao . '&erro=campos'
-        );
-    }
-
-    try {
-
-        validarTipoMidiaExercicio($tipo_midia);
-    } catch (InvalidArgumentException $e) {
-
-        redirecionarExercicios(
-            $urlEdicao . '&erro=' .
-                urlencode($e->getMessage())
-        );
-    }
-
-    $tipoAnterior =
-        (string) ($exercicio['tipo_midia'] ?? '');
-
-    $midiaAnterior =
-        (string) ($exercicio['midia'] ?? '');
-
-    $midia = $midiaAnterior;
-
-    $arquivo =
-        $_FILES['arquivo'] ?? null;
-
-    // Um input file vazio normalmente retorna
-    // UPLOAD_ERR_NO_FILE.
-    $codigoUpload = is_array($arquivo)
-        ? (int) ($arquivo['error'] ?? UPLOAD_ERR_NO_FILE)
-        : UPLOAD_ERR_NO_FILE;
-
-    $novoArquivoEnviado =
-        $codigoUpload !== UPLOAD_ERR_NO_FILE;
-
-    // Regra de segurança importante:
-    // não permite mudar o tipo de mídia
-    // mantendo um arquivo incompatível.
-    if (
-        $tipo_midia !== $tipoAnterior &&
-        !$novoArquivoEnviado
-    ) {
-        redirecionarExercicios(
-            $urlEdicao . '&erro=' .
-                urlencode(
-                    'Ao alterar o tipo de mídia, selecione um novo arquivo.'
-                )
-        );
-    }
-
-    // Se não existe mídia anterior, um arquivo
-    // passa a ser obrigatório.
-    if (
-        $midiaAnterior === '' &&
-        !$novoArquivoEnviado
-    ) {
-        redirecionarExercicios(
-            $urlEdicao . '&erro=arquivo'
-        );
-    }
-
-    $midiaNova = null;
-
-    try {
-
-        if ($novoArquivoEnviado) {
-
-            if (!is_array($arquivo)) {
-                throw new RuntimeException(
-                    'Arquivo inválido.'
-                );
-            }
-
-            $midiaNova =
-                processarUploadMidia(
-                    $arquivo,
-                    $tipo_midia
-                );
-
-            $midia = $midiaNova;
-        }
-
-        atualizarExercicio(
-            $pdo,
-            $id,
-            $nome,
-            $grupo,
-            $midia,
-            $tipo_midia
-        );
-    } catch (Throwable $e) {
-
-        // Se a atualização falhou depois do
-        // upload, descarta apenas o arquivo novo.
-        if ($midiaNova !== null) {
-            limparUploadNovoExercicio($midiaNova);
-        }
-
-        if (
-            $e instanceof InvalidArgumentException ||
-            $e instanceof RuntimeException
-        ) {
-            $mensagem = $e->getMessage();
-        } else {
-            error_log(
-                '[GymFlow] Erro ao editar exercício: ' .
-                    $e->getMessage()
+            redirecionarExercicios(
+                'erro=invalido'
             );
-
-            $mensagem =
-                'Não foi possível atualizar o exercício.';
         }
 
-        redirecionarExercicios(
-            $urlEdicao . '&erro=' .
-                urlencode($mensagem)
+        $exercicio = buscarExercicioPorId(
+            $pdo,
+            $id
         );
+
+        if (!$exercicio) {
+
+            redirecionarExercicios(
+                'erro=nao_encontrado'
+            );
+        }
     }
 
-    // A mídia antiga não é apagada aqui.
-    // Antes de removê-la, precisamos garantir
-    // que nenhum outro registro a utiliza.
+    $urlRetorno = $modoEdicao
+        ? 'acao=editar&id=' . $id
+        : 'acao=novo';
 
-    redirecionarExercicios('sucesso=atualizado');
-}
+    // ======================================
+    // 10.1. VALIDAR INFORMAÇÕES
+    // ======================================
 
-// ========================================
-// CADASTRAR EXERCÍCIO
-// ========================================
+    $nome = obterTextoExercicio(
+        $_POST['nome'] ?? ''
+    );
 
-if (
-    $_SERVER['REQUEST_METHOD'] === 'POST' &&
-    !isset($_POST['acao'])
-) {
-
-    $nome = trim((string) ($_POST['nome'] ?? ''));
-    $grupo = trim((string) ($_POST['grupo_muscular'] ?? ''));
-    $tipo_midia = trim((string) ($_POST['tipo_midia'] ?? ''));
+    $grupo = obterTextoExercicio(
+        $_POST['grupo_muscular'] ?? ''
+    );
 
     if (
         $nome === '' ||
         $grupo === '' ||
-        $tipo_midia === ''
+        mb_strlen($nome) > 100 ||
+        mb_strlen($grupo) > 30
     ) {
+
         redirecionarExercicios(
-            'acao=novo&erro=campos'
+            $urlRetorno . '&erro=campos'
         );
     }
 
-    try {
+    // ======================================
+    // 10.2. IDENTIFICAR MÍDIA EXISTENTE
+    // ======================================
 
-        validarTipoMidiaExercicio($tipo_midia);
-    } catch (InvalidArgumentException $e) {
+    $midiaAnterior = obterTextoExercicio(
+        $exercicio['midia'] ?? ''
+    );
+
+    $tipoAnterior = obterTextoExercicio(
+        $exercicio['tipo_midia'] ?? 'imagem'
+    );
+
+    $midia = $midiaAnterior !== ''
+        ? $midiaAnterior
+        : null;
+
+    $tipo_midia = (
+        $midia !== null &&
+        $tipoAnterior === 'video'
+    )
+        ? 'video'
+        : 'imagem';
+
+    // ======================================
+    // 10.3. VALIDAR AÇÃO DE REMOÇÃO
+    // ======================================
+
+    $remocao = $_POST['remover_midia'] ?? '0';
+
+    if (!in_array(
+        $remocao,
+        ['0', '1'],
+        true
+    )) {
 
         redirecionarExercicios(
-            'acao=novo&erro=' .
-                urlencode($e->getMessage())
+            $urlRetorno .
+                '&erro=' .
+                urlencode('Solicitação de remoção inválida.')
         );
     }
+
+    $removerMidia =
+        $modoEdicao &&
+        $remocao === '1';
+
+    // ======================================
+    // 10.4. IDENTIFICAR NOVO ARQUIVO
+    // ======================================
 
     $arquivo = $_FILES['arquivo'] ?? null;
 
-    if (!is_array($arquivo)) {
+    if (
+        $arquivo !== null &&
+        (
+            !is_array($arquivo) ||
+            !isset($arquivo['error']) ||
+            !is_int($arquivo['error'])
+        )
+    ) {
+
         redirecionarExercicios(
-            'acao=novo&erro=arquivo'
+            $urlRetorno . '&erro=arquivo'
         );
     }
 
+    $codigoUpload = $arquivo['error']
+        ?? UPLOAD_ERR_NO_FILE;
+
+    $novoArquivo =
+        $codigoUpload !== UPLOAD_ERR_NO_FILE;
+
     $midiaNova = null;
+
+    // ======================================
+    // 10.5. GERENCIAR A MÍDIA
+    // ======================================
 
     try {
 
-        $midiaNova =
-            processarUploadMidia(
-                $arquivo,
+        // Requisições contraditórias são rejeitadas.
+
+        if ($removerMidia && $novoArquivo) {
+
+            throw new InvalidArgumentException(
+                'Não é possível remover e substituir a mídia simultaneamente.'
+            );
+        }
+
+        // CENÁRIO A: NOVO ARQUIVO
+
+        if ($novoArquivo) {
+
+            $resultado = processarUploadMidia(
+                $arquivo
+            );
+
+            $midiaNova = $resultado['midia'];
+
+            $midia = $resultado['midia'];
+
+            $tipo_midia = $resultado['tipo_midia'];
+        }
+
+        // CENÁRIO B: REMOVER MÍDIA EXISTENTE
+
+        elseif ($removerMidia) {
+
+            $midia = null;
+
+            $tipo_midia = 'imagem';
+        }
+
+        // CENÁRIO C: PRESERVAR OU SALVAR SEM MÍDIA
+        //
+        // Sem upload e sem remoção, mantém o estado
+        // anterior. Em um cadastro, permanece NULL.
+
+        // ==================================
+        // 10.6. PERSISTIR NO BANCO
+        // ==================================
+
+        if ($modoEdicao) {
+
+            atualizarExercicio(
+                $pdo,
+                $id,
+                $nome,
+                $grupo,
+                $midia,
                 $tipo_midia
             );
+        } else {
 
-        cadastrarExercicio(
-            $pdo,
-            $nome,
-            $grupo,
-            $midiaNova,
-            $tipo_midia
-        );
+            cadastrarExercicio(
+                $pdo,
+                $nome,
+                $grupo,
+                $midia,
+                $tipo_midia
+            );
+        }
     } catch (Throwable $e) {
 
+        // Desfaz somente o novo upload se a
+        // operação no banco não for concluída.
+
         if ($midiaNova !== null) {
-            limparUploadNovoExercicio($midiaNova);
-        }
 
-        if (
-            $e instanceof InvalidArgumentException ||
-            $e instanceof RuntimeException
-        ) {
-            $mensagem = $e->getMessage();
-        } else {
-            error_log(
-                '[GymFlow] Erro ao cadastrar exercício: ' .
-                    $e->getMessage()
+            limparUploadNovoExercicio(
+                $midiaNova
             );
-
-            $mensagem =
-                'Não foi possível cadastrar o exercício.';
         }
+
+        error_log(
+            '[GymFlow][Exercicios] ' .
+                $e->getMessage()
+        );
+
+        $mensagem = (
+            $e instanceof InvalidArgumentException ||
+            (
+                $e instanceof RuntimeException &&
+                !($e instanceof PDOException)
+            )
+        )
+            ? $e->getMessage()
+            : 'Não foi possível salvar o exercício.';
 
         redirecionarExercicios(
-            'acao=novo&erro=' .
+            $urlRetorno .
+                '&erro=' .
                 urlencode($mensagem)
         );
     }
 
-    redirecionarExercicios('sucesso=cadastrado');
+    // ======================================
+    // 10.7. FINALIZAR
+    // ======================================
+
+    redirecionarExercicios(
+        $modoEdicao
+            ? 'sucesso=atualizado'
+            : 'sucesso=cadastrado'
+    );
 }
 
-// ========================================
-// REQUISIÇÕES POST DESCONHECIDAS
-// ========================================
+// ==========================================
+// 11. REQUISIÇÕES DESCONHECIDAS
+// ==========================================
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    http_response_code(400);
-    exit('Ação de exercício inválida.');
+if ($metodo !== 'GET') {
+
+    http_response_code(405);
+
+    exit('Método ou ação não permitida.');
 }
 
-// ========================================
-// PESQUISA E FILTRO
-// ========================================
+// ==========================================
+// 12. LISTAGEM E FILTROS
+// ==========================================
 
-$pesquisa = trim((string) ($_GET['pesquisa'] ?? ''));
-$grupo = trim((string) ($_GET['grupo'] ?? ''));
+$pesquisa = obterTextoExercicio(
+    $_GET['pesquisa'] ?? ''
+);
 
-// ========================================
-// CONSULTAR EXERCÍCIOS
-// ========================================
+$grupo = obterTextoExercicio(
+    $_GET['grupo'] ?? ''
+);
 
 if ($pesquisa !== '') {
 
@@ -608,8 +800,9 @@ if ($pesquisa !== '') {
     $exercicios = listarExercicios($pdo);
 }
 
-// ========================================
-// EXIBIR BIBLIOTECA
-// ========================================
+// ==========================================
+// 13. VIEW
+// ==========================================
 
-require __DIR__ . '/../views/treinos/biblioteca.php';
+require __DIR__ .
+    '/../views/treinos/biblioteca.php';

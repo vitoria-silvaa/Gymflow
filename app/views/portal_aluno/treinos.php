@@ -1,478 +1,1963 @@
 <?php
+// =============================================
+// GYMFLOW - PORTAL DO ALUNO
+// app/views/portal_aluno/treinos.php
+// =============================================
 
-if (!isset($fichas)) {
+$tituloPagina = 'Meus Treinos';
 
-    header("Location: " . BASE_URL . "/app/controllers/PortalAlunoController.php?acao=treinos");
+$cssEspecifico = BASE_URL .
+    '/assets/css/treino-guiado.css';
 
-    exit;
+$fichas = $fichas ?? [];
+$itens = $itens ?? [];
+$ficha_atual = $ficha_atual ?? null;
+
+$url = BASE_URL .
+    '/app/controllers/PortalAlunoController.php?acao=treinos';
+
+$esc = static fn($v) => htmlspecialchars(
+    (string) $v,
+    ENT_QUOTES | ENT_SUBSTITUTE,
+    'UTF-8'
+);
+
+// =============================================
+// PREPARAR EXERCÍCIOS
+// =============================================
+
+$exercicios = [];
+
+foreach ($itens as $i) {
+
+    $midia = trim((string) ($i['midia'] ?? ''));
+
+    if (str_starts_with($midia, 'assets/uploads/exercicios/')) {
+        $midia = BASE_URL . '/' . $midia;
+    }
+
+    if (str_starts_with($midia, '/assets/uploads/exercicios/')) {
+        $midia = BASE_URL . $midia;
+    }
+
+    $prefixo = BASE_URL . '/assets/uploads/exercicios/';
+
+    if (
+        !str_starts_with($midia, $prefixo) ||
+        !preg_match(
+            '/^[a-zA-Z0-9_-]+\.(jpg|jpeg|png|webp|gif|mp4|webm)$/i',
+            substr($midia, strlen($prefixo))
+        )
+    ) {
+        $midia = '';
+    }
+
+    $exercicios[] = [
+
+        'nome' => (string) (
+            $i['nome_exercicio'] ?? 'Exercício'
+        ),
+
+        'grupo' => (string) (
+            $i['grupo'] ??
+            $i['grupo_muscular'] ??
+            'Não informado'
+        ),
+
+        'series' => max(1, (int) ($i['series'] ?? 1)),
+
+        'reps' => (string) ($i['repeticoes'] ?? ''),
+
+        'carga' => (string) ($i['carga'] ?? ''),
+
+        'intervalo' => (string) ($i['intervalo'] ?? ''),
+
+        'midia' => $midia,
+
+        'video' => in_array(
+            strtolower(pathinfo($midia, PATHINFO_EXTENSION)),
+            ['mp4', 'webm'],
+            true
+        )
+
+    ];
 }
 
-/** @var array $fichas */
-/** @var array $itens */
-/** @var array|null $ficha_atual */
-/** @var mixed $ficha_id_selecionada */
+$idFicha = (int) ($ficha_atual['id'] ?? 0);
 
-$tituloPagina = "Treinos";
+$dataFicha = (
+    !empty($ficha_atual['criada_em']) &&
+    strtotime($ficha_atual['criada_em']) !== false
+)
+    ? date('d/m/Y', strtotime($ficha_atual['criada_em']))
+    : 'Não informada';
 
+$totalSeries = array_sum(
+    array_column($exercicios, 'series')
+);
+
+// =============================================
+// IDENTIFICAR SESSÃO TEMPORÁRIA
+// =============================================
+
+$chave = 'gymflow:guiado:v2:' . hash(
+    'sha256',
+    session_id() . '|' .
+        ($_SESSION['company_id'] ?? 0) . '|' .
+        ($_SESSION['aluno_id'] ?? 0) . '|' .
+        $idFicha . '|' .
+        serialize($exercicios)
+);
+
+$json = json_encode(
+    [
+        'exercicios' => $exercicios,
+        'chave' => $chave
+    ],
+    JSON_HEX_TAG |
+        JSON_HEX_AMP |
+        JSON_HEX_APOS |
+        JSON_HEX_QUOT |
+        JSON_INVALID_UTF8_SUBSTITUTE |
+        JSON_UNESCAPED_UNICODE
+);
+
+require __DIR__ . '/../shared/header.php';
+require __DIR__ . '/../shared/sidebar.php';
 ?>
 
-<?php 
-include __DIR__ . '/../shared/header.php'; 
-include __DIR__ . '/../shared/sidebar.php'; 
-?>
+<main class="tg-page" id="tgPage">
 
+    <p id="tgBoot" role="status">
+        Carregando controles do treino...
+    </p>
 
-<!-- CSS EXCLUSIVO DA PÁGINA DE TREINOS -->
-<link
-    rel="stylesheet"
-    href="<?= BASE_URL ?>/assets/css/treinos.css?v=<?= time() ?>">
+    <!-- =====================================
+         FICHA DE TREINO
+    ====================================== -->
 
+    <div id="tgOverview">
 
-<main class="treinos-page">
+        <header class="tg-page-header">
 
-
-    <!-- =========================================
-         CABEÇALHO
-         ========================================= -->
-
-    <header class="treinos-header">
-
-        <span class="portal-eyebrow">
-            PORTAL DO ALUNO
-        </span>
-
-        <h1>
-            Meus treinos
-        </h1>
-
-        <p>
-            Escolha sua ficha e acompanhe os exercícios do seu treino.
-        </p>
-
-    </header>
-
-
-
-    <?php if (empty($fichas)): ?>
-
-
-        <!-- =========================================
-             SEM FICHAS
-             ========================================= -->
-
-        <section class="treinos-empty">
-
-            <div class="empty-icon">
-                +
-            </div>
-
-            <h2>
-                Nenhuma ficha de treino
-            </h2>
+            <h1>Meus treinos</h1>
 
             <p>
-                Você ainda não possui nenhuma ficha de treino cadastrada.
+                Acompanhe e execute sua ficha de treino.
             </p>
 
-            <span>
-                Solicite ao seu professor para criar uma ficha personalizada
-                para você.
-            </span>
+        </header>
 
-        </section>
+        <?php if (!$fichas): ?>
 
+            <section class="tg-empty">
 
+                <h2>Nenhuma ficha disponível</h2>
 
-    <?php else: ?>
+                <p>
+                    Aguarde seu professor cadastrar sua ficha.
+                </p>
 
+            </section>
 
-        <!-- =========================================
-             SELEÇÃO DE FICHAS
-             ========================================= -->
+        <?php else: ?>
 
-        <section class="fichas-section">
+            <!-- FICHAS -->
 
-            <div class="section-title">
+            <section class="tg-fichas">
 
-                <span class="section-label">
-                    SUAS FICHAS
-                </span>
+                <h2>Suas fichas</h2>
 
-                <h2>
-                    Escolha seu treino
-                </h2>
+                <nav
+                    class="tg-ficha-tabs"
+                    aria-label="Fichas de treino">
 
-            </div>
+                    <?php foreach ($fichas as $f): ?>
 
-
-            <nav class="fichas-nav">
-
-                <?php foreach ($fichas as $ficha): ?>
-
-                    <a
-                        class="ficha-tab <?= (
-                                                $ficha_id_selecionada == $ficha['id']
-                                            ) ? 'ativo' : ''; ?>"
-                        href="<?= BASE_URL ?>/app/controllers/PortalAlunoController.php?acao=treinos&ficha=<?= (int)$ficha['id']; ?>">
-
-                        <span class="ficha-tab-titulo">
-
-                            <?= htmlspecialchars(
-                                $ficha['objetivo'] ?? 'Treino'
-                            ); ?>
-
-                        </span>
-
-                        <span class="ficha-tab-versao">
-
-                            v<?= htmlspecialchars(
-                                    $ficha['versao'] ?? '1'
-                                ); ?>
-
-                        </span>
-
-                    </a>
-
-                <?php endforeach; ?>
-
-            </nav>
-
-        </section>
-
-
-
-        <?php if ($ficha_atual): ?>
-
-
-            <!-- =========================================
-                 FICHA ATUAL
-                 ========================================= -->
-
-            <section class="ficha-container">
-
-
-                <!-- CABEÇALHO DA FICHA -->
-
-                <header class="ficha-header">
-
-                    <div class="ficha-header-info">
-
-                        <span class="section-label">
-                            FICHA ATUAL
-                        </span>
-
-                        <h2>
-
-                            <?= htmlspecialchars(
-                                $ficha_atual['objetivo'] ?? 'Treino'
-                            ); ?>
-
-                        </h2>
-
-
-                        <div class="ficha-meta">
+                        <a
+                            class="tg-ficha-tab <?= (int) $f['id'] === $idFicha ? 'is-active' : '' ?>"
+                            href="<?= $esc($url . '&ficha=' . (int) $f['id']) ?>">
 
                             <span>
 
-                                Versão
-                                <?= htmlspecialchars(
-                                    $ficha_atual['versao'] ?? '1'
-                                ); ?>
+                                <strong>
+                                    <?= $esc($f['objetivo'] ?? 'Treino') ?>
+                                </strong>
+
+                                <small>
+                                    Versão <?= $esc($f['versao'] ?? 1) ?>
+                                </small>
 
                             </span>
 
+                        </a>
 
-                            <span>
+                    <?php endforeach; ?>
 
-                                Prof.
-                                <?= htmlspecialchars(
-                                    $ficha_atual['nome_professor'] ?? 'Não informado'
-                                ); ?>
+                </nav>
 
-                            </span>
+            </section>
 
+            <?php if ($ficha_atual): ?>
 
-                            <span>
+                <!-- RESUMO DA FICHA -->
 
-                                Criada em
-                                <?= !empty($ficha_atual['criada_em'])
-                                    ? date(
-                                        'd/m/Y',
-                                        strtotime($ficha_atual['criada_em'])
-                                    )
-                                    : 'Não informado';
-                                ?>
+                <section class="tg-ficha-summary">
 
-                            </span>
+                    <div class="tg-summary-top">
+
+                        <div>
+
+                            <h2>
+                                <?= $esc($ficha_atual['objetivo'] ?? 'Treino') ?>
+                            </h2>
+
+                            <div class="tg-meta">
+
+                                <span>
+                                    Prof. <?= $esc($ficha_atual['nome_professor'] ?? 'Não informado') ?>
+                                </span>
+
+                                <span>
+                                    <?= $esc($dataFicha) ?>
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <button
+                            type="button"
+                            class="tg-btn tg-btn-secondary"
+                            data-tg-action="print">
+
+                            Imprimir / salvar PDF
+
+                        </button>
+
+                    </div>
+
+                    <div class="tg-summary-stats">
+
+                        <div>
+
+                            <span>Exercícios</span>
+
+                            <strong>
+                                <?= count($exercicios) ?>
+                            </strong>
+
+                        </div>
+
+                        <div>
+
+                            <span>Total de séries</span>
+
+                            <strong>
+                                <?= $totalSeries ?>
+                            </strong>
+
+                        </div>
+
+                        <div>
+
+                            <span>Versão</span>
+
+                            <strong>
+                                <?= $esc($ficha_atual['versao'] ?? 1) ?>
+                            </strong>
 
                         </div>
 
                     </div>
 
-                    <div class="ficha-header-acoes">
-                        <style>
-                            .btn-pdf {
-                                background-color: #ef4444;
-                                color: white;
-                                padding: 8px 16px;
-                                border: none;
-                                border-radius: 8px;
-                                font-weight: 600;
-                                cursor: pointer;
-                                transition: background-color 0.2s;
-                                display: flex;
-                                align-items: center;
-                                gap: 8px;
-                            }
-                            .btn-pdf:hover {
-                                background-color: #dc2626;
-                            }
-                            .ficha-header {
-                                display: flex;
-                                justify-content: space-between;
-                                align-items: flex-start;
-                            }
-                        </style>
-                        <button class="btn-pdf" onclick="baixarPdfTreinos()">
-                            📄 Baixar em PDF
-                        </button>
-                    </div>
+                    <?php if ($exercicios): ?>
 
-                </header>
+                        <div class="tg-summary-actions">
 
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-                <script>
-                    function baixarPdfTreinos() {
-                        const elemento = document.querySelector('.ficha-container');
-                        const btn = document.querySelector('.btn-pdf');
-                        btn.style.display = 'none'; // Oculta o botão no PDF
+                            <button
+                                type="button"
+                                id="tgStartAll"
+                                class="tg-btn tg-btn-primary"
+                                data-tg-action="all">
 
-                        const opt = {
-                            margin:       [10, 10, 10, 10], // top, left, bottom, right em mm
-                            filename:     'Meu_Treino_Gymflow.pdf',
-                            image:        { type: 'jpeg', quality: 0.98 },
-                            html2canvas:  { scale: 2, useCORS: true },
-                            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                        };
+                                Iniciar treino
 
-                        html2pdf().set(opt).from(elemento).save().then(() => {
-                            btn.style.display = 'inline-block'; // Mostra novamente
-                        });
-                    }
-                </script>
+                            </button>
 
+                            <button
+                                type="button"
+                                id="tgResume"
+                                class="tg-btn tg-btn-primary"
+                                data-tg-action="resume"
+                                hidden>
 
+                                Continuar treino
 
-                <!-- =========================================
-                     EXERCÍCIOS
-                     ========================================= -->
+                            </button>
 
-                <?php if (empty($itens)): ?>
+                            <p id="tgSessionNotice">
+                                Execute os exercícios na ordem prescrita.
+                            </p>
 
+                        </div>
 
-                    <div class="exercicios-empty">
+                    <?php endif; ?>
 
-                        <h3>
-                            Nenhum exercício cadastrado
-                        </h3>
+                </section>
 
-                        <p>
-                            Esta ficha ainda não possui exercícios cadastrados.
-                        </p>
+                <!-- EXERCÍCIOS -->
+
+                <section class="tg-exercise-section">
+
+                    <div class="tg-section-heading">
+
+                        <h2>Exercícios da ficha</h2>
+
+                        <span class="tg-count">
+
+                            <?= count($exercicios) ?> exercícios
+
+                        </span>
 
                     </div>
 
+                    <div class="tg-exercise-grid">
 
+                        <?php foreach ($exercicios as $n => $e): ?>
 
-                <?php else: ?>
+                            <article class="tg-exercise-card">
 
+                                <!-- MÍDIA -->
 
-                    <div class="exercicios-list">
+                                <div class="tg-media">
 
+                                    <?php if ($e['midia'] && $e['video']): ?>
 
-                        <?php foreach ($itens as $index => $item): ?>
+                                        <video
+                                            src="<?= $esc($e['midia']) ?>"
+                                            controls
+                                            playsinline
+                                            preload="metadata">
+                                        </video>
 
+                                    <?php elseif ($e['midia']): ?>
 
-                            <article class="exercicio-card">
-
-
-                                <!-- TOPO DO EXERCÍCIO -->
-
-                                <div class="exercicio-top">
-
-
-                                    <label class="exercicio-check">
-
-                                        <input
-                                            type="checkbox">
-
-                                        <span class="checkmark"></span>
-
-                                    </label>
-
-
-                                    <div class="exercicio-numero">
-
-                                        <?= str_pad(
-                                            $index + 1,
-                                            2,
-                                            '0',
-                                            STR_PAD_LEFT
-                                        ); ?>
-
-                                    </div>
-
-
-                                    <div class="exercicio-info">
-
-                                        <h3>
-
-                                            <?= htmlspecialchars(
-                                                $item['nome_exercicio'] ?? 'Exercício'
-                                            ); ?>
-
-                                        </h3>
-
-
-                                        <span class="grupo-muscular">
-
-                                            <?= htmlspecialchars(
-                                                $item['grupo'] ?? 'Grupo não informado'
-                                            ); ?>
-
-                                        </span>
-
-                                    </div>
-
-                                </div>
-
-
-
-                                <!-- DADOS DO EXERCÍCIO -->
-
-                                <div class="exercicio-dados">
-
-
-                                    <div class="dado">
-
-                                        <span>
-                                            Séries
-                                        </span>
-
-                                        <strong>
-
-                                            <?= htmlspecialchars(
-                                                $item['series'] ?? '0'
-                                            ); ?>
-
-                                        </strong>
-
-                                    </div>
-
-
-
-                                    <div class="dado">
-
-                                        <span>
-                                            Repetições
-                                        </span>
-
-                                        <strong>
-
-                                            <?= htmlspecialchars(
-                                                $item['repeticoes'] ?? '—'
-                                            ); ?>
-
-                                        </strong>
-
-                                    </div>
-
-
-
-                                    <?php if (!empty($item['intervalo'])): ?>
-
-                                        <div class="dado">
-
-                                            <span>
-                                                Descanso
-                                            </span>
-
-                                            <strong>
-
-                                                <?= htmlspecialchars(
-                                                    $item['intervalo']
-                                                ); ?>
-
-                                            </strong>
-
-                                        </div>
+                                        <img
+                                            src="<?= $esc($e['midia']) ?>"
+                                            alt="<?= $esc($e['nome']) ?>"
+                                            loading="lazy">
 
                                     <?php endif; ?>
 
+                                    <div
+                                        class="tg-media-empty"
+                                        <?= $e['midia'] ? 'hidden' : '' ?>>
 
-                                </div>
-
-
-
-                                <!-- =================================
-                                     CARGA + PAUSA
-                                     ================================= -->
-
-                                <div class="exercicio-acoes">
-
-
-                                    <div class="carga-container">
-
-                                        <label>
-                                            Carga
-                                        </label>
-
-
-                                        <input
-                                            type="text"
-                                            value="<?= htmlspecialchars(
-                                                        $item['carga'] ?? ''
-                                                    ); ?>"
-                                            placeholder="Ex.: 20 kg">
+                                        Sem mídia disponível
 
                                     </div>
 
+                                </div>
 
+                                <!-- INFORMAÇÕES -->
+
+                                <div class="tg-exercise-content">
+
+                                    <span class="tg-muscle">
+
+                                        <?= $esc($e['grupo']) ?>
+
+                                    </span>
+
+                                    <h3>
+                                        <?= $esc($e['nome']) ?>
+                                    </h3>
+
+                                    <div class="tg-exercise-data">
+
+                                        <?php foreach (
+                                            [
+                                                'Séries' => $e['series'],
+                                                'Repetições' => $e['reps'],
+                                                'Carga' => $e['carga'],
+                                                'Descanso' => $e['intervalo']
+                                            ] as $label => $valor
+                                        ): ?>
+
+                                            <div>
+
+                                                <span>
+                                                    <?= $label ?>
+                                                </span>
+
+                                                <strong>
+                                                    <?= $esc($valor === '' ? '—' : $valor) ?>
+                                                </strong>
+
+                                            </div>
+
+                                        <?php endforeach; ?>
+
+                                    </div>
 
                                     <button
                                         type="button"
-                                        class="btn-pausa">
+                                        class="tg-btn tg-btn-primary tg-start-exercise"
+                                        data-tg-action="one"
+                                        data-index="<?= $n ?>">
 
-                                        Iniciar pausa
+                                        Iniciar exercício
 
                                     </button>
 
-
                                 </div>
-
 
                             </article>
 
-
                         <?php endforeach; ?>
-
 
                     </div>
 
+                    <?php if (!$exercicios): ?>
 
-                <?php endif; ?>
+                        <div class="tg-empty">
+                            Ficha sem exercícios.
+                        </div>
 
+                    <?php endif; ?>
 
-            </section>
+                </section>
 
+            <?php endif; ?>
 
         <?php endif; ?>
 
+    </div>
+
+    <!-- =====================================
+         TREINO GUIADO
+    ====================================== -->
+
+    <section
+        class="tg-guide"
+        id="tgGuide"
+        hidden>
+
+        <header class="tg-guide-header">
+
+            <button
+                type="button"
+                class="tg-btn tg-btn-secondary"
+                data-tg-action="back">
+
+                Voltar à ficha
+
+            </button>
+
+            <button
+                type="button"
+                id="tgEndRequest"
+                class="tg-btn tg-btn-danger"
+                data-tg-action="askEnd">
+
+                Encerrar treino
+
+            </button>
+
+        </header>
+
+        <!-- CONFIRMAÇÃO -->
+
+        <div
+            class="tg-end-confirm"
+            id="tgEndConfirm"
+            hidden>
+
+            <strong>
+                Descartar a sessão atual?
+            </strong>
+
+            <p>
+                As séries registradas nesta sessão serão perdidas.
+            </p>
+
+            <div class="tg-button-row">
+
+                <button
+                    type="button"
+                    class="tg-btn tg-btn-secondary"
+                    data-tg-action="cancelEnd">
+
+                    Continuar
+
+                </button>
+
+                <button
+                    type="button"
+                    class="tg-btn tg-btn-danger"
+                    data-tg-action="end">
+
+                    Encerrar e descartar
+
+                </button>
+
+            </div>
+
+        </div>
+
+        <div id="tgRunning">
+
+            <!-- PROGRESSO -->
+
+            <section class="tg-progress-card">
+
+                <div class="tg-progress-heading">
+
+                    <h2>Treino em andamento</h2>
+
+                    <strong id="tgPercent">0%</strong>
+
+                </div>
+
+                <progress
+                    id="tgProgress"
+                    max="100"
+                    value="0">
+                </progress>
+
+                <div class="tg-progress-labels">
+
+                    <span id="tgPosition"></span>
+
+                    <span id="tgCount"></span>
+
+                </div>
+
+            </section>
+
+            <div class="tg-guide-grid">
+
+                <!-- EXERCÍCIO ATUAL -->
+
+                <section class="tg-guide-card">
+
+                    <div
+                        class="tg-media tg-guide-media"
+                        id="tgGuideMedia">
+                    </div>
+
+                    <div class="tg-guide-content">
+
+                        <span
+                            id="tgGroup"
+                            class="tg-muscle">
+                        </span>
+
+                        <h2 id="tgName"></h2>
+
+                        <div class="tg-prescription">
+
+                            <div>
+                                <span>Séries</span>
+                                <strong id="tgSets"></strong>
+                            </div>
+
+                            <div>
+                                <span>Repetições</span>
+                                <strong id="tgReps"></strong>
+                            </div>
+
+                            <div>
+                                <span>Carga prescrita</span>
+                                <strong id="tgLoad"></strong>
+                            </div>
+
+                            <div>
+                                <span>Descanso</span>
+                                <strong id="tgRest"></strong>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <!-- PAINEL DE EXECUÇÃO -->
+
+                <section class="tg-guide-card tg-execution">
+
+                    <div class="tg-execution-heading">
+
+                        <h2 id="tgPhase"></h2>
+
+                        <p id="tgHint"></p>
+
+                    </div>
+
+                    <div
+                        class="tg-set-indicators"
+                        id="tgIndicators">
+                    </div>
+
+                    <!-- CRONÔMETRO -->
+
+                    <div id="tgRestPanel">
+
+                        <div class="tg-timer">
+
+                            <svg
+                                viewBox="0 0 140 140"
+                                aria-hidden="true">
+
+                                <circle
+                                    class="tg-timer-track"
+                                    cx="70"
+                                    cy="70"
+                                    r="57">
+                                </circle>
+
+                                <circle
+                                    class="tg-timer-ring"
+                                    id="tgRing"
+                                    cx="70"
+                                    cy="70"
+                                    r="57"
+                                    transform="rotate(-90 70 70)">
+                                </circle>
+
+                            </svg>
+
+                            <div class="tg-timer-label">
+
+                                <strong id="tgTime">
+                                    00:00
+                                </strong>
+
+                                <span id="tgTimerStatus"></span>
+
+                            </div>
+
+                        </div>
+
+                        <div
+                            class="tg-timer-actions"
+                            id="tgControls"
+                            hidden>
+
+                            <button
+                                type="button"
+                                id="tgPause"
+                                class="tg-btn tg-btn-secondary"
+                                data-tg-action="pause">
+
+                                Pausar
+
+                            </button>
+
+                            <button
+                                type="button"
+                                id="tgAdd"
+                                class="tg-btn tg-btn-secondary"
+                                data-tg-action="add">
+
+                                +15 s
+
+                            </button>
+
+                            <button
+                                type="button"
+                                class="tg-btn tg-btn-secondary"
+                                data-tg-action="skip">
+
+                                Pular
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <!-- REGISTRO DA SÉRIE -->
+
+                    <div id="tgWorkPanel">
+
+                        <div class="tg-fields">
+
+                            <div>
+
+                                <label for="tgActualReps">
+                                    Repetições realizadas
+                                </label>
+
+                                <input
+                                    type="number"
+                                    id="tgActualReps"
+                                    min="1"
+                                    max="999"
+                                    step="1"
+                                    inputmode="numeric">
+
+                            </div>
+
+                            <div>
+
+                                <label for="tgActualLoad">
+                                    Carga utilizada
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="tgActualLoad"
+                                    maxlength="40">
+
+                            </div>
+
+                        </div>
+
+                        <p
+                            id="tgError"
+                            class="tg-error"
+                            role="alert"
+                            hidden>
+                        </p>
+
+                        <button
+                            type="button"
+                            class="tg-btn tg-btn-primary tg-full"
+                            data-tg-action="complete">
+
+                            Concluir série
+
+                        </button>
+
+                    </div>
+
+                    <!-- AVANÇAR -->
+
+                    <div id="tgNextPanel" hidden>
+
+                        <button
+                            type="button"
+                            class="tg-btn tg-btn-primary tg-full"
+                            id="tgNext"
+                            data-tg-action="next">
+
+                            Continuar
+
+                        </button>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+        </div>
+
+        <!-- RESUMO FINAL -->
+
+        <section
+            class="tg-finish"
+            id="tgFinishPanel"
+            hidden>
+
+            <h2>Execução concluída!</h2>
+
+            <p id="tgFinishStats"></p>
+
+            <div
+                class="tg-finish-details"
+                id="tgFinishDetails">
+            </div>
+
+            <p>
+                Resumo temporário, ainda sem histórico no banco.
+            </p>
+
+            <button
+                type="button"
+                class="tg-btn tg-btn-primary"
+                data-tg-action="end">
+
+                Voltar à ficha
+
+            </button>
+
+        </section>
+
+    </section>
+
+    <!-- =====================================
+         IMPRESSÃO DA FICHA
+    ====================================== -->
+
+    <?php if ($ficha_atual): ?>
+
+        <article class="tg-print">
+
+            <header>
+
+                <strong>
+                    <?= $esc($_SESSION['nome_painel'] ?? 'GymFlow') ?>
+                </strong>
+
+                <h1>Ficha de treinamento</h1>
+
+            </header>
+
+            <dl>
+
+                <?php foreach (
+                    [
+                        'Aluno' => $ficha_atual['nome_aluno'] ?? $_SESSION['usuario_nome'] ?? 'Aluno',
+                        'Professor' => $ficha_atual['nome_professor'] ?? 'Não informado',
+                        'Unidade' => $ficha_atual['nome_filial'] ?? 'Não informada',
+                        'Objetivo' => $ficha_atual['objetivo'] ?? 'Treino',
+                        'Versão' => $ficha_atual['versao'] ?? 1,
+                        'Data' => $dataFicha
+                    ] as $k => $v
+                ): ?>
+
+                    <dt><?= $esc($k) ?></dt>
+
+                    <dd><?= $esc($v) ?></dd>
+
+                <?php endforeach; ?>
+
+            </dl>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Exercício</th>
+                        <th>Grupo</th>
+                        <th>Séries</th>
+                        <th>Repetições</th>
+                        <th>Carga</th>
+                        <th>Descanso</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <?php foreach ($exercicios as $e): ?>
+
+                        <tr>
+
+                            <?php foreach (
+                                [
+                                    'nome',
+                                    'grupo',
+                                    'series',
+                                    'reps',
+                                    'carga',
+                                    'intervalo'
+                                ] as $k
+                            ): ?>
+
+                                <td>
+
+                                    <?= $esc($e[$k] === '' ? '—' : $e[$k]) ?>
+
+                                </td>
+
+                            <?php endforeach; ?>
+
+                        </tr>
+
+                    <?php endforeach; ?>
+
+                </tbody>
+
+            </table>
+
+        </article>
 
     <?php endif; ?>
 
-
 </main>
 
+<!-- =========================================
+     JAVASCRIPT INTEGRADO
+========================================== -->
 
-<?php include __DIR__ . '/../shared/footer.php'; ?>
+<script>
+    (() => {
+
+        'use strict';
+
+        const dados = <?= $json ?: '{"exercicios":[],"chave":""}' ?>;
+
+        const lista = dados.exercicios;
+
+        const $ = id => document.getElementById(id);
+
+        const show = (id, visivel) => {
+
+            const elemento = $(id);
+
+            if (elemento) {
+                elemento.hidden = !visivel;
+            }
+        };
+
+        const text = (id, valor) => {
+
+            const elemento = $(id);
+
+            if (elemento) {
+                elemento.textContent = valor;
+            }
+        };
+
+        const page = $('tgPage');
+
+        let s = null;
+        let mediaIndex = -1;
+        let storageOk = true;
+
+        const limite = 3600000;
+
+        const circulo = 2 * Math.PI * 57;
+
+        const atual = () => lista[s.fila[s.pos]];
+
+        const feitas = () => s.registros[s.pos].length;
+
+        const total = () => s.fila.reduce(
+            (a, i) => a + lista[i].series,
+            0
+        );
+
+        const realizadas = () => s.registros.reduce(
+            (a, r) => a + r.length,
+            0
+        );
+
+        // =====================================
+        // ARMAZENAMENTO TEMPORÁRIO
+        // =====================================
+
+        function salvar() {
+
+            try {
+
+                if (s) {
+
+                    sessionStorage.setItem(
+                        dados.chave,
+                        JSON.stringify({
+                            s,
+                            atualizado: Date.now()
+                        })
+                    );
+
+                } else {
+
+                    sessionStorage.removeItem(dados.chave);
+                }
+
+            } catch {
+
+                storageOk = false;
+            }
+        }
+
+        function restaurar() {
+
+            try {
+
+                const r = JSON.parse(
+                    sessionStorage.getItem(dados.chave)
+                );
+
+                if (
+                    !r ||
+                    Date.now() - r.atualizado > 43200000
+                ) {
+                    return;
+                }
+
+                const x = r.s;
+
+                if (
+                    !x ||
+                    !Array.isArray(x.fila) ||
+                    !x.fila.length ||
+
+                    !x.fila.every(i =>
+                        Number.isInteger(i) &&
+                        lista[i]
+                    ) ||
+
+                    !Number.isInteger(x.pos) ||
+                    !lista[x.fila[x.pos]] ||
+
+                    !Array.isArray(x.registros) ||
+
+                    x.registros.length !== x.fila.length ||
+
+                    !x.registros.every((a, i) =>
+                        Array.isArray(a) &&
+                        a.length <= lista[x.fila[i]].series &&
+                        a.every(v =>
+                            Number.isInteger(v.reps) &&
+                            v.reps > 0 &&
+                            v.reps <= 999 &&
+                            typeof v.carga === 'string'
+                        )
+                    ) ||
+
+                    ![
+                        'work',
+                        'rest',
+                        'nextSet',
+                        'nextExercise',
+                        'done'
+                    ].includes(x.fase) ||
+
+                    !Number.isFinite(x.inicio)
+                ) {
+                    return;
+                }
+
+                if (
+                    x.fase === 'rest' &&
+                    (
+                        !x.timer ||
+                        !Number.isFinite(x.timer.duracao) ||
+                        x.timer.duracao <= 0 ||
+                        x.timer.duracao > limite ||
+                        !Number.isFinite(x.timer.restante) ||
+                        (
+                            x.timer.fim !== null &&
+                            !Number.isFinite(x.timer.fim)
+                        )
+                    )
+                ) {
+                    return;
+                }
+
+                s = x;
+
+            } catch {
+
+                // Continua funcionando sem rascunho.
+            }
+        }
+
+        // =====================================
+        // INTERPRETAR INTERVALO DO PROFESSOR
+        // =====================================
+
+        function intervalo(v) {
+
+            v = String(v ?? '')
+                .trim()
+                .toLowerCase()
+                .replace(',', '.');
+
+            let m;
+            let n;
+
+            // Exemplo: 01:30
+
+            if ((m = v.match(/^(\d+):([0-5]\d)$/))) {
+
+                n = +m[1] * 60 + +m[2];
+
+                // Exemplo: 1 min 30 s
+
+            } else if (
+                (m = v.match(
+                    /^(\d+)\s*(?:m|min|minuto|minutos)\s*(\d+)\s*(?:s|seg|segundo|segundos)$/
+                ))
+            ) {
+
+                n = +m[1] * 60 + +m[2];
+
+                // Exemplo: 1.5 min
+
+            } else if (
+                (m = v.match(
+                    /^(\d+(?:\.\d+)?)\s*(?:m|min|minuto|minutos)$/
+                ))
+            ) {
+
+                n = +m[1] * 60;
+
+                // Exemplos: 60, 60s, 60 segundos
+
+            } else if (
+                (m = v.match(
+                    /^(\d+(?:\.\d+)?)\s*(?:s|seg|segs|segundo|segundos)?$/
+                ))
+            ) {
+
+                n = +m[1];
+            }
+
+            return (
+                    Number.isFinite(n) &&
+                    n >= 0 &&
+                    n <= 3600
+                ) ?
+                Math.ceil(n) :
+                null;
+        }
+
+        function tempo(ms) {
+
+            const t = Math.max(
+                0,
+                Math.ceil(ms / 1000)
+            );
+
+            return (
+                String(Math.floor(t / 60)).padStart(2, '0') +
+                ':' +
+                String(t % 60).padStart(2, '0')
+            );
+        }
+
+        // =====================================
+        // MÍDIAS
+        // =====================================
+
+        function pausaVideos() {
+
+            page.querySelectorAll('video')
+                .forEach(v => v.pause());
+        }
+
+        function fallback(el, vazio) {
+
+            const falha = () => {
+
+                el.hidden = true;
+                vazio.hidden = false;
+            };
+
+            el.addEventListener('error', falha);
+
+            if (
+                (
+                    el.tagName === 'IMG' &&
+                    el.complete &&
+                    !el.naturalWidth
+                ) ||
+                el.error
+            ) {
+
+                falha();
+            }
+        }
+
+        page.querySelectorAll('#tgOverview .tg-media')
+            .forEach(c => {
+
+                const el = c.querySelector('img,video');
+
+                if (el) {
+
+                    fallback(
+                        el,
+                        c.querySelector('.tg-media-empty')
+                    );
+                }
+            });
+
+        function midia() {
+
+            const indice = s.fila[s.pos];
+
+            if (mediaIndex === indice) return;
+
+            mediaIndex = indice;
+
+            const c = $('tgGuideMedia');
+
+            const e = atual();
+
+            c.querySelectorAll('video')
+                .forEach(v => v.pause());
+
+            c.replaceChildren();
+
+            const vazio = document.createElement('div');
+
+            vazio.className = 'tg-media-empty';
+
+            vazio.textContent = 'Sem mídia disponível';
+
+            c.append(vazio);
+
+            if (!e.midia) return;
+
+            const el = document.createElement(
+                e.video ? 'video' : 'img'
+            );
+
+            if (e.video) {
+
+                el.controls = true;
+                el.playsInline = true;
+                el.preload = 'metadata';
+
+            } else {
+
+                el.alt = e.nome;
+            }
+
+            vazio.hidden = true;
+
+            el.addEventListener('error', () => {
+
+                el.hidden = true;
+                vazio.hidden = false;
+            });
+
+            c.prepend(el);
+
+            el.src = e.midia;
+        }
+
+        // =====================================
+        // TELA PRINCIPAL
+        // =====================================
+
+        function overview() {
+
+            show('tgStartAll', !s);
+
+            show('tgResume', !!s);
+
+            text(
+                'tgResume',
+                s?.fase === 'done' ?
+                'Ver resumo' :
+                'Continuar treino'
+            );
+
+            text(
+                'tgSessionNotice',
+                s ?
+                `${realizadas()}/${total()} séries realizadas.${storageOk ? '' : ' Progresso apenas nesta página.'}` :
+                'Execute os exercícios na ordem prescrita.'
+            );
+
+            page.querySelectorAll('.tg-start-exercise')
+                .forEach(b => {
+
+                    b.disabled = !!s;
+                });
+        }
+
+        // =====================================
+        // INICIAR TREINO
+        // =====================================
+
+        function abrir() {
+
+            pausaVideos();
+
+            show('tgOverview', false);
+            show('tgGuide', true);
+            show('tgEndConfirm', false);
+
+            render();
+            tick();
+
+            window.scrollTo(0, 0);
+        }
+
+        function iniciar(fila) {
+
+            if (s || !fila.length) return;
+
+            s = {
+
+                fila,
+
+                pos: 0,
+
+                registros: fila.map(() => []),
+
+                fase: 'work',
+
+                inicio: Date.now(),
+
+                timer: null
+            };
+
+            mediaIndex = -1;
+
+            salvar();
+
+            abrir();
+        }
+
+        function voltar() {
+
+            pausaVideos();
+
+            show('tgGuide', false);
+            show('tgOverview', true);
+            show('tgEndConfirm', false);
+
+            salvar();
+            overview();
+
+            window.scrollTo(0, 0);
+        }
+
+        function encerrar() {
+
+            pausaVideos();
+
+            s = null;
+
+            mediaIndex = -1;
+
+            $('tgGuideMedia').replaceChildren();
+
+            salvar();
+
+            voltar();
+        }
+
+        // =====================================
+        // CRONÔMETRO
+        // =====================================
+
+        function restante() {
+
+            return Math.max(
+                0,
+                s.timer.fim === null ?
+                s.timer.restante :
+                s.timer.fim - Date.now()
+            );
+        }
+
+        function desenhar(ms, max, status) {
+
+            text('tgTime', tempo(ms));
+
+            text('tgTimerStatus', status);
+
+            $('tgRing').style.strokeDasharray =
+                String(circulo);
+
+            $('tgRing').style.strokeDashoffset =
+                String(
+                    circulo * (
+                        1 - (
+                            max > 0 ?
+                            Math.min(1, Math.max(0, ms / max)) :
+                            0
+                        )
+                    )
+                );
+        }
+
+        function fimDescanso() {
+
+            if (s?.fase !== 'rest') return;
+
+            s.timer = null;
+
+            s.fase = 'nextSet';
+
+            salvar();
+
+            render();
+        }
+
+        function tick() {
+
+            if (s?.fase !== 'rest') return;
+
+            const ms = restante();
+
+            if (ms <= 0) {
+
+                fimDescanso();
+
+                return;
+            }
+
+            if (!$('tgGuide').hidden) {
+
+                desenhar(
+                    ms,
+                    s.timer.duracao,
+                    s.timer.fim === null ?
+                    'Pausado' :
+                    'Descansando'
+                );
+
+                text(
+                    'tgPause',
+                    s.timer.fim === null ?
+                    'Retomar' :
+                    'Pausar'
+                );
+
+                $('tgAdd').disabled =
+                    s.timer.duracao >= limite;
+            }
+        }
+
+        // =====================================
+        // RESUMO FINAL
+        // =====================================
+
+        function resumo() {
+
+            const c = $('tgFinishDetails');
+
+            c.replaceChildren();
+
+            text(
+                'tgFinishStats',
+                `${realizadas()}/${total()} séries · Duração ${tempo((s.fim || Date.now()) - s.inicio)}`
+            );
+
+            s.fila.forEach((i, p) => {
+
+                const card = document.createElement('article');
+
+                card.className = 'tg-result-card';
+
+                const h = document.createElement('h3');
+
+                h.textContent = lista[i].nome;
+
+                card.append(h);
+
+                s.registros[p].forEach((r, n) => {
+
+                    const row = document.createElement('div');
+
+                    row.className = 'tg-result-row';
+
+                    [
+                        `Série ${n + 1}`,
+                        `${r.reps} repetições`,
+                        r.carga || 'Sem carga informada'
+                    ].forEach(v => {
+
+                        const span =
+                            document.createElement('span');
+
+                        span.textContent = v;
+
+                        row.append(span);
+                    });
+
+                    card.append(row);
+                });
+
+                c.append(card);
+            });
+        }
+
+        // =====================================
+        // RENDERIZAÇÃO DA INTERFACE
+        // =====================================
+
+        function render() {
+
+            overview();
+
+            if (!s || $('tgGuide').hidden) return;
+
+            const done = s.fase === 'done';
+
+            show('tgRunning', !done);
+            show('tgFinishPanel', done);
+            show('tgEndRequest', !done);
+
+            if (done) {
+
+                pausaVideos();
+
+                show('tgEndConfirm', false);
+
+                resumo();
+
+                return;
+            }
+
+            const e = atual();
+
+            const n = feitas();
+
+            const pct = Math.round(
+                realizadas() / total() * 100
+            );
+
+            midia();
+
+            text('tgPercent', pct + '%');
+
+            $('tgProgress').value = pct;
+
+            text(
+                'tgPosition',
+                `Exercício ${s.pos + 1} de ${s.fila.length}`
+            );
+
+            text(
+                'tgCount',
+                `${realizadas()}/${total()} séries`
+            );
+
+            text('tgName', e.nome);
+            text('tgGroup', e.grupo);
+            text('tgSets', e.series);
+            text('tgReps', e.reps || '—');
+            text('tgLoad', e.carga || '—');
+            text('tgRest', e.intervalo || '—');
+
+            // Indicadores das séries.
+
+            const indicadores = $('tgIndicators');
+
+            indicadores.replaceChildren();
+
+            for (let j = 0; j < e.series; j++) {
+
+                const span = document.createElement('span');
+
+                span.className =
+                    'tg-set-indicator' +
+                    (
+                        j < n ?
+                        ' is-complete' :
+                        j === n ?
+                        ' is-current' :
+                        ''
+                    );
+
+                span.textContent =
+                    j < n ? '✓' : j + 1;
+
+                indicadores.append(span);
+            }
+
+            show('tgError', false);
+
+            show(
+                'tgWorkPanel',
+                s.fase === 'work'
+            );
+
+            show(
+                'tgRestPanel',
+                s.fase === 'work' ||
+                s.fase === 'rest'
+            );
+
+            show(
+                'tgControls',
+                s.fase === 'rest'
+            );
+
+            show(
+                'tgNextPanel',
+                s.fase === 'nextSet' ||
+                s.fase === 'nextExercise'
+            );
+
+            // EXECUÇÃO
+
+            if (s.fase === 'work') {
+
+                text(
+                    'tgPhase',
+                    `Série ${n + 1} de ${e.series}`
+                );
+
+                text(
+                    'tgHint',
+                    'Realize a série e registre sua execução.'
+                );
+
+                const sec = intervalo(e.intervalo);
+
+                desenhar(
+                    n + 1 === e.series ?
+                    0 :
+                    (sec ?? 0) * 1000,
+
+                    (sec ?? 0) * 1000,
+
+                    n + 1 === e.series ?
+                    'Última série' :
+                    sec === null ?
+                    'Intervalo não definido' :
+                    'Aguardando conclusão'
+                );
+
+                const ant = s.registros[s.pos][n - 1];
+
+                $('tgActualReps').value =
+                    ant?.reps ??
+                    (
+                        /^\d+$/.test(e.reps) ?
+                        e.reps :
+                        ''
+                    );
+
+                $('tgActualLoad').value =
+                    ant?.carga ?? e.carga;
+
+                // DESCANSO
+
+            } else if (s.fase === 'rest') {
+
+                text(
+                    'tgPhase',
+                    'Tempo de descanso'
+                );
+
+                text(
+                    'tgHint',
+                    `Série ${n} concluída.`
+                );
+
+                desenhar(
+                    restante(),
+                    s.timer.duracao,
+                    s.timer.fim === null ?
+                    'Pausado' :
+                    'Descansando'
+                );
+
+                text(
+                    'tgPause',
+                    s.timer.fim === null ?
+                    'Retomar' :
+                    'Pausar'
+                );
+
+                $('tgAdd').disabled =
+                    s.timer.duracao >= limite;
+
+                // AVANÇAR
+
+            } else {
+
+                const prox =
+                    s.fase === 'nextExercise';
+
+                text(
+                    'tgPhase',
+                    prox ?
+                    'Exercício concluído' :
+                    'Próxima série'
+                );
+
+                text(
+                    'tgHint',
+                    prox ?
+                    'Todas as séries foram realizadas.' :
+                    'Continue quando estiver pronto.'
+                );
+
+                text(
+                    'tgNext',
+                    prox ?
+                    'Próximo exercício' :
+                    `Iniciar série ${n + 1}`
+                );
+            }
+        }
+
+        // =====================================
+        // CONCLUIR SÉRIE
+        // =====================================
+
+        function concluir() {
+
+            if (s?.fase !== 'work') return;
+
+            const e = atual();
+
+            const reps = Number(
+                $('tgActualReps').value
+            );
+
+            if (
+                !Number.isInteger(reps) ||
+                reps < 1 ||
+                reps > 999
+            ) {
+
+                text(
+                    'tgError',
+                    'Informe as repetições realizadas (1 a 999).'
+                );
+
+                show('tgError', true);
+
+                return;
+            }
+
+            s.registros[s.pos].push({
+
+                reps,
+
+                carga: $('tgActualLoad')
+                    .value
+                    .trim()
+                    .slice(0, 40)
+            });
+
+            // Ainda existem séries.
+
+            if (feitas() < e.series) {
+
+                const sec = intervalo(e.intervalo);
+
+                if (sec > 0) {
+
+                    const ms = sec * 1000;
+
+                    s.timer = {
+
+                        duracao: ms,
+
+                        restante: ms,
+
+                        fim: Date.now() + ms
+
+                    };
+
+                    s.fase = 'rest';
+
+                } else {
+
+                    s.fase = 'nextSet';
+                }
+
+                // Existem outros exercícios.
+
+            } else if (s.pos + 1 < s.fila.length) {
+
+                s.fase = 'nextExercise';
+
+                // Finalizar sessão.
+
+            } else {
+
+                s.fase = 'done';
+
+                s.fim = Date.now();
+            }
+
+            salvar();
+
+            render();
+        }
+
+        // =====================================
+        // AÇÕES DOS BOTÕES
+        // =====================================
+
+        const acoes = {
+
+            all: () => {
+
+                iniciar(lista.map((_, i) => i));
+            },
+
+            one: b => {
+
+                const i = Number(b.dataset.index);
+
+                if (
+                    Number.isInteger(i) &&
+                    lista[i]
+                ) {
+
+                    iniciar([i]);
+                }
+            },
+
+            resume: () => {
+
+                if (s) abrir();
+            },
+
+            back: voltar,
+
+            askEnd: () => {
+
+                show('tgEndConfirm', true);
+            },
+
+            cancelEnd: () => {
+
+                show('tgEndConfirm', false);
+            },
+
+            end: encerrar,
+
+            complete: concluir,
+
+            skip: fimDescanso,
+
+            next: () => {
+
+                if (
+                    !s ||
+                    !['nextSet', 'nextExercise'].includes(s.fase)
+                ) {
+                    return;
+                }
+
+                if (s.fase === 'nextExercise') {
+
+                    s.pos++;
+                }
+
+                s.fase = 'work';
+
+                salvar();
+
+                render();
+            },
+
+            pause: () => {
+
+                if (s?.fase !== 'rest') return;
+
+                const ms = restante();
+
+                if (ms <= 0) {
+
+                    return fimDescanso();
+                }
+
+                if (s.timer.fim === null) {
+
+                    s.timer.fim = Date.now() + ms;
+
+                } else {
+
+                    s.timer.restante = ms;
+
+                    s.timer.fim = null;
+                }
+
+                salvar();
+
+                tick();
+            },
+
+            add: () => {
+
+                if (s?.fase !== 'rest') return;
+
+                const ms = restante();
+
+                if (ms <= 0) {
+
+                    return fimDescanso();
+                }
+
+                const extra = Math.min(
+                    15000,
+                    limite - s.timer.duracao
+                );
+
+                s.timer.duracao += extra;
+
+                s.timer.restante = ms + extra;
+
+                if (s.timer.fim !== null) {
+
+                    s.timer.fim =
+                        Date.now() + s.timer.restante;
+                }
+
+                salvar();
+
+                tick();
+            },
+
+            print: () => {
+
+                pausaVideos();
+
+                window.print();
+            }
+
+        };
+
+        // =====================================
+        // GERENCIADOR CENTRAL DE CLIQUES
+        // =====================================
+
+        page.addEventListener('click', ev => {
+
+            const b = ev.target.closest(
+                'button[data-tg-action]'
+            );
+
+            if (!b || b.disabled) return;
+
+            try {
+
+                acoes[b.dataset.tgAction]?.(b);
+
+            } catch (err) {
+
+                text(
+                    'tgBoot',
+                    'Não foi possível executar esta ação: ' +
+                    err.message
+                );
+
+                show('tgBoot', true);
+            }
+        });
+
+        // =====================================
+        // INICIALIZAÇÃO
+        // =====================================
+
+        restaurar();
+
+        overview();
+
+        tick();
+
+        setInterval(tick, 250);
+
+        window.addEventListener(
+            'pagehide',
+            salvar
+        );
+
+        document.addEventListener(
+            'visibilitychange',
+            tick
+        );
+
+        show('tgBoot', false);
+
+    })();
+</script>
+
+<?php require __DIR__ . '/../shared/footer.php'; ?>
