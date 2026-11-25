@@ -1388,6 +1388,62 @@
     }
 }
 
+/* =============================================
+   NAVEGAÇÃO - MINHA FREQUÊNCIA
+============================================= */
+
+.tg-frequency-navigation {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+}
+
+.tg-frequency-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 1px solid var(--ui-borda);
+    border-radius: 9px;
+    background: var(--ui-fundo-card);
+    color: var(--ui-texto);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+.tg-frequency-link:hover {
+    border-color: var(--cor-primaria);
+    color: var(--cor-primaria);
+}
+
+.tg-frequency-link svg {
+    width: 17px;
+    height: 17px;
+}
+
+/* Ocultar indicador antigo de frequência */
+
+#tgFrequencyCard {
+    display: none !important;
+}
+
+/* Responsividade */
+
+@media (max-width: 600px) {
+
+    .tg-frequency-navigation {
+        justify-content: stretch;
+    }
+
+    .tg-frequency-link {
+        width: 100%;
+    }
+
+}
+
 @media (prefers-reduced-motion: reduce) {
     .tg-page * {
         transition: none !important;

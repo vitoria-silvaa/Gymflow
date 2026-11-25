@@ -1,0 +1,529 @@
+@import url("./treino-guiado.css");
+
+/* =============================================
+   GYMFLOW - FREQUÊNCIA DE TREINOS
+============================================= */
+
+.gf-page {
+    --gf-card: var(--ui-fundo-card, #222);
+    --gf-background: var(--ui-fundo-pagina, #181818);
+    --gf-text: var(--ui-texto, #fff);
+    --gf-muted: var(--ui-texto-suave, #aaa);
+    --gf-border: var(--ui-borda, #444);
+    --gf-primary: var(--cor-primaria, #c9a227);
+
+    --gf-green: #166534;
+    --gf-yellow: #a16207;
+    --gf-success-text: var(--tg-success, #16a34a);
+}
+
+/* =============================================
+   CABEÇALHO
+============================================= */
+
+.gf-page-header {
+    margin-bottom: 24px;
+}
+
+.gf-page-header h1 {
+    margin: 20px 0 6px;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--gf-text);
+}
+
+.gf-page-header p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--gf-muted);
+}
+
+.gf-back-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    padding: 10px 14px;
+
+    border: 1px solid var(--gf-border);
+    border-radius: 9px;
+
+    background: var(--gf-card);
+    color: var(--gf-text);
+
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+
+    transition: 0.2s ease;
+}
+
+.gf-back-link:hover {
+    border-color: var(--gf-primary);
+    color: var(--gf-primary);
+}
+
+.gf-back-link svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* =============================================
+   COMPONENTE PRINCIPAL
+============================================= */
+
+#gf-frequencia {
+    width: 100%;
+    color: var(--gf-text);
+}
+
+#gf-frequencia * {
+    box-sizing: border-box;
+}
+
+#gf-frequencia h2,
+#gf-frequencia h3,
+#gf-frequencia p {
+    margin: 0;
+}
+
+#gf-frequencia h2 {
+    font-size: 17px;
+    font-weight: 600;
+}
+
+#gf-frequencia h3 {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+#gf-frequencia .gf-muted {
+    color: var(--gf-muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+#gf-frequencia [hidden] {
+    display: none !important;
+}
+
+/* =============================================
+   INDICADORES MENSAIS
+============================================= */
+
+.gf-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+
+    margin-bottom: 20px;
+}
+
+.gf-stat {
+    position: relative;
+
+    min-width: 0;
+    padding: 18px;
+
+    border: 1px solid var(--gf-border);
+    border-radius: 12px;
+
+    background: var(--gf-card);
+}
+
+.gf-stat strong {
+    display: block;
+    margin-top: 6px;
+
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.gf-stat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 36px;
+    height: 36px;
+    margin-bottom: 12px;
+
+    border-radius: 9px;
+
+    background: var(--gf-background);
+    color: var(--gf-primary);
+}
+
+.gf-stat-icon svg {
+    width: 19px;
+    height: 19px;
+}
+
+.gf-stat-completo .gf-stat-icon {
+    background: rgba(34, 197, 94, 0.12);
+    color: var(--gf-success-text);
+}
+
+.gf-stat-parcial .gf-stat-icon {
+    background: rgba(234, 179, 8, 0.15);
+    color: #d97706;
+}
+
+/* =============================================
+   ORGANIZAÇÃO DO CALENDÁRIO
+============================================= */
+
+.gf-body {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1.15fr) minmax(0, 1fr);
+
+    gap: 16px;
+    align-items: start;
+}
+
+.gf-calendar,
+.gf-detail {
+    min-width: 0;
+    padding: 18px;
+
+    border: 1px solid var(--gf-border);
+    border-radius: 12px;
+
+    background: var(--gf-card);
+}
+
+.gf-section-heading {
+    display: grid;
+    gap: 5px;
+    margin-bottom: 18px;
+}
+
+/* =============================================
+   BOTÕES
+============================================= */
+
+#gf-frequencia button {
+    cursor: pointer;
+    font: inherit;
+
+    color: var(--gf-text);
+    background: var(--gf-background);
+
+    border: 1px solid var(--gf-border);
+    border-radius: 8px;
+
+    transition: 0.2s ease;
+}
+
+#gf-frequencia button:not(:disabled):hover {
+    border-color: var(--gf-primary);
+}
+
+#gf-frequencia button:disabled {
+    cursor: default;
+    opacity: 0.35;
+}
+
+#gf-frequencia button:focus-visible,
+.gf-back-link:focus-visible {
+    outline: 2px solid var(--gf-primary);
+    outline-offset: 2px;
+}
+
+/* =============================================
+   NAVEGAÇÃO MENSAL
+============================================= */
+
+.gf-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.gf-nav strong {
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    text-transform: capitalize;
+}
+
+.gf-nav button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 34px;
+    height: 34px;
+}
+
+.gf-nav button svg {
+    width: 17px;
+    height: 17px;
+}
+
+/* =============================================
+   CALENDÁRIO
+============================================= */
+
+.gf-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(7, minmax(0, 1fr));
+
+    gap: 5px;
+}
+
+.gf-week {
+    padding: 5px 0;
+
+    text-align: center;
+    font-size: 11px;
+    color: var(--gf-muted);
+}
+
+#gf-frequencia .gf-day {
+    min-width: 0;
+    height: 44px;
+    padding: 0;
+
+    font-size: 13px;
+    font-weight: 500;
+}
+
+#gf-frequencia .gf-day.gf-completo,
+.gf-dot.gf-completo {
+    background: var(--gf-green);
+    border-color: var(--gf-green);
+    color: #fff;
+}
+
+#gf-frequencia .gf-day.gf-parcial,
+.gf-dot.gf-parcial {
+    background: var(--gf-yellow);
+    border-color: var(--gf-yellow);
+    color: #fff;
+}
+
+#gf-frequencia .gf-day[aria-pressed="true"] {
+    outline: 2px solid var(--gf-primary);
+    outline-offset: 1px;
+    font-weight: 700;
+}
+
+#gf-frequencia .gf-day.gf-hoje {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+/* =============================================
+   LEGENDA
+============================================= */
+
+.gf-legend {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 12px;
+    margin-top: 16px;
+
+    font-size: 11px;
+    color: var(--gf-muted);
+}
+
+.gf-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.gf-dot {
+    display: inline-block;
+
+    width: 10px;
+    height: 10px;
+
+    border: 1px solid var(--gf-border);
+    border-radius: 3px;
+
+    background: var(--gf-background);
+}
+
+/* =============================================
+   RESUMO DO DIA
+============================================= */
+
+.gf-daily-summary {
+    display: grid;
+    gap: 10px;
+
+    padding: 16px;
+
+    border: 1px solid var(--gf-border);
+    border-radius: 10px;
+
+    background: var(--gf-background);
+}
+
+.gf-status {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.gf-status.gf-completo {
+    color: var(--gf-success-text);
+}
+
+.gf-status.gf-parcial {
+    color: #d97706;
+}
+
+.gf-status.gf-vazio {
+    color: var(--gf-muted);
+}
+
+.gf-daily-count {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.gf-progress {
+    width: 100%;
+    height: 8px;
+
+    accent-color: #d97706;
+}
+
+.gf-progress.gf-completo {
+    accent-color: #16a34a;
+}
+
+/* =============================================
+   EXERCÍCIOS REALIZADOS
+============================================= */
+
+.gf-exercise-section {
+    margin-top: 20px;
+}
+
+.gf-exercise-section h3 {
+    margin-bottom: 10px !important;
+}
+
+.gf-list {
+    display: grid;
+    gap: 8px;
+
+    padding: 0;
+    margin: 0;
+
+    list-style: none;
+}
+
+.gf-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+
+    padding: 12px;
+
+    border: 1px solid var(--gf-border);
+    border-radius: 8px;
+
+    background: var(--gf-background);
+    font-size: 13px;
+
+    overflow-wrap: anywhere;
+}
+
+.gf-exercise-executions {
+    flex-shrink: 0;
+
+    font-size: 11px;
+    color: var(--gf-muted);
+}
+
+/* =============================================
+   AVISOS E ERROS
+============================================= */
+
+.gf-notice:not(:empty) {
+    margin-top: 12px !important;
+}
+
+.gf-retry {
+    padding: 8px 12px;
+    margin-top: 10px;
+}
+
+/* =============================================
+   RESPONSIVIDADE
+============================================= */
+
+@media (max-width: 800px) {
+
+    .gf-body {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .gf-page-header h1 {
+        font-size: 22px;
+    }
+
+    .gf-stats {
+        gap: 7px;
+    }
+
+    .gf-stat {
+        padding: 10px;
+    }
+
+    .gf-stat strong {
+        font-size: 22px;
+    }
+
+    .gf-stat-icon {
+        width: 30px;
+        height: 30px;
+    }
+
+    #gf-frequencia .gf-stat .gf-muted {
+        font-size: 11px;
+    }
+
+    .gf-calendar,
+    .gf-detail {
+        padding: 13px;
+    }
+
+    .gf-grid {
+        gap: 4px;
+    }
+
+    #gf-frequencia .gf-day {
+        height: 36px;
+        font-size: 12px;
+    }
+
+    .gf-week {
+        font-size: 10px;
+    }
+
+    .gf-legend {
+        gap: 8px;
+    }
+
+}

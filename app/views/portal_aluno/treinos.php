@@ -148,6 +148,15 @@ $json = json_encode(
         JSON_UNESCAPED_UNICODE
 );
 
+// NAVEGAÇÃO INTERNA DO MÓDULO DE TREINOS
+
+if (
+    ($_GET['visualizacao'] ?? '') === 'frequencia'
+) {
+    require __DIR__ . '/frequencia-pagina.php';
+    return;
+}
+
 require __DIR__ . '/../shared/header.php';
 require __DIR__ . '/../shared/sidebar.php';
 ?>
@@ -224,6 +233,24 @@ require __DIR__ . '/../shared/sidebar.php';
             </p>
 
         </header>
+
+        <div class="tg-frequency-navigation">
+
+            <a
+                class="tg-frequency-link"
+                href="<?= BASE_URL ?>/app/controllers/PortalAlunoController.php?acao=treinos&amp;visualizacao=frequencia<?=
+                                                                                                                        !empty($idFicha)
+                                                                                                                            ? '&amp;ficha=' . (int) $idFicha
+                                                                                                                            : ''
+                                                                                                                        ?>">
+
+                <i data-lucide="calendar-days"></i>
+
+                Minha frequência
+
+            </a>
+
+        </div>
 
         <?php if (!$fichas): ?>
 
