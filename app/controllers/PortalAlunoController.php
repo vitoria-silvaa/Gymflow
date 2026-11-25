@@ -25,6 +25,7 @@ $aluno_id = filter_var(
 if (!$aluno_id || $aluno_id <= 0) {
 
     $_SESSION = [];
+
     session_destroy();
 
     header(
@@ -91,6 +92,7 @@ elseif ($acao === 'faturas') {
         ['vencer', 'atraso', 'pagas'],
         true
     )) {
+
         $aba = 'vencer';
     }
 
@@ -112,8 +114,6 @@ elseif ($acao === 'treinos') {
     $itens = [];
     $ficha_atual = null;
     $ficha_id_selecionada = null;
-
-    // Seleciona a ficha solicitada ou a mais recente.
 
     if (isset($_GET['ficha'])) {
 
@@ -143,8 +143,6 @@ elseif ($acao === 'treinos') {
         );
     }
 
-    // Confirma que a ficha pertence ao aluno.
-
     foreach ($fichas as $f) {
 
         if ((int) $f['id'] === $fichaSolicitada) {
@@ -156,8 +154,6 @@ elseif ($acao === 'treinos') {
             break;
         }
     }
-
-    // Uma ficha desconhecida não pode ser consultada.
 
     if (
         isset($_GET['ficha']) &&
@@ -171,8 +167,6 @@ elseif ($acao === 'treinos') {
 
         exit;
     }
-
-    // Consulta exclusivamente a ficha validada.
 
     if ($ficha_atual !== null) {
 
@@ -192,47 +186,194 @@ elseif ($acao === 'treinos') {
 // 4. CONTRATOS
 // ========================================
 
-elseif ($acao === 'contratos') {
+elseif (
+    in_array(
+        $acao,
+        [
+            'contratos',
+            'baixar_contrato',
+            'imprimir_contrato'
+        ],
+        true
+    )
+) {
 
-    $operacao = 'listar_contratos';
+    $respostaJson = $acao === 'baixar_contrato';
 
-    require __DIR__ . '/../models/Aluno.php';
+    header('Cache-Control: no-store, private');
 
-    require __DIR__ . '/../views/portal_aluno/contratos.php';
+    if ($respostaJson) {
 
-    exit;
-}
-
-// ========================================
-// 5. IMPRIMIR CONTRATO
-// ========================================
-
-elseif ($acao === 'imprimir_contrato') {
-
-    $contrato_id = (int) ($_GET['id'] ?? 0);
-
-    $operacao = 'buscar_contrato_impressao';
-
-    require __DIR__ . '/../models/Aluno.php';
-
-    if (!$contrato) {
-
-        header(
-            'Location: ' . $baseUrl .
-                '?acao=contratos'
-        );
-
-        exit;
+        header('Content-Type: application/json; charset=utf-8');
     }
 
-    require __DIR__ .
-        '/../views/portal_aluno/imprimir_contrato.php';
+    // Função para tratar erros deste módulo.
 
-    exit;
+    $erroContrato = static function (
+        int $status,
+        string $mensagem
+    ) use ($respostaJson): void {
+
+        http_response_code($status);
+
+        if ($respostaJson) {
+
+            echo json_encode(
+                [
+                    'sucesso' => false,
+                    'mensagem' => $mensagem
+                ],
+                JSON_UNESCAPED_UNICODE
+            );
+        } else {
+
+            echo htmlspecialchars(
+                $mensagem,
+                ENT_QUOTES,
+                'UTF-8'
+            );
+        }
+
+        exit;
+    };
+
+    $usuarioId = filter_var(
+        $_SESSION['usuario_id'] ?? null,
+        FILTER_VALIDATE_INT
+    );
+
+    $empresaId = filter_var(
+        $_SESSION['company_id'] ?? null,
+        FILTER_VALIDATE_INT
+    );
+
+    if (
+        !$usuarioId ||
+        !$empresaId ||
+        $usuarioId <= 0 ||
+        $empresaId <= 0
+    ) {
+
+        $erroContrato(403, 'Sessão inválida.');
+    }
+
+    require_once __DIR__ . '/../models/Database.php';
+
+    require_once __DIR__ . '/../models/ContratoAluno.php';
+
+    try {
+
+        // LISTAR CONTRATOS
+
+        if ($acao === 'contratos') {
+
+            $contratos = consultarContratosPortal(
+                $pdo,
+                (int) $usuarioId,
+                $aluno_id,
+                (int) $empresaId
+            );
+
+            require __DIR__ .
+                '/../views/portal_aluno/contratos.php';
+
+            exit;
+        }
+
+        // VALIDAR ID DO CONTRATO
+
+        $contratoId = filter_var(
+            $_GET['id'] ?? null,
+            FILTER_VALIDATE_INT,
+            [
+                'options' => [
+                    'min_range' => 1
+                ]
+            ]
+        );
+
+        if (!$contratoId) {
+
+            $erroContrato(400, 'Contrato inválido.');
+        }
+
+        // BUSCAR CONTRATO AUTORIZADO
+
+        $resultado = consultarContratosPortal(
+            $pdo,
+            (int) $usuarioId,
+            $aluno_id,
+            (int) $empresaId,
+            (int) $contratoId
+        );
+
+        $contrato = $resultado[0] ?? null;
+
+        if (!$contrato) {
+
+            $erroContrato(
+                404,
+                'Contrato não encontrado ou indisponível.'
+            );
+        }
+
+        // ====================================
+        // DOWNLOAD DIRETO - DADOS PARA O PDF
+        // ====================================
+
+        if ($acao === 'baixar_contrato') {
+
+            $dataGeracao = new DateTimeImmutable(
+                'now',
+                new DateTimeZone('America/Sao_Paulo')
+            );
+
+            $contrato['gerado_em'] = $dataGeracao->format(
+                'd/m/Y H:i:s'
+            );
+
+            echo json_encode(
+
+                [
+                    'sucesso' => true,
+
+                    'contrato' => $contrato,
+
+                    'clausulas' => obterClausulasContratoAluno()
+                ],
+
+                JSON_UNESCAPED_UNICODE |
+                    JSON_INVALID_UTF8_SUBSTITUTE
+
+            );
+
+            exit;
+        }
+
+        // ====================================
+        // IMPRESSÃO LEGADA
+        // ====================================
+
+        require __DIR__ .
+            '/../views/portal_aluno/imprimir_contrato.php';
+
+        exit;
+    } catch (Throwable $e) {
+
+        error_log(
+            '[GymFlow][Contratos] ' .
+                $e->getMessage()
+        );
+
+        $erroContrato(
+            500,
+            'Não foi possível carregar o contrato.'
+        );
+    }
 }
 
 // ========================================
-// 6. MINHA AVALIAÇÃO
+// 5. MINHA AVALIAÇÃO
 // ========================================
 
 elseif ($acao === 'avaliacao') {
@@ -260,13 +401,12 @@ elseif ($acao === 'avaliacao') {
     }
 
     $usuario_id = (int) $usuario_id;
+
     $company_id = (int) $company_id;
 
     require_once __DIR__ . '/../models/Database.php';
 
     try {
-
-        // VALIDAR VÍNCULO DO ALUNO
 
         $stmtAluno = $pdo->prepare("
             SELECT
@@ -295,9 +435,13 @@ elseif ($acao === 'avaliacao') {
         ");
 
         $stmtAluno->execute([
+
             ':usuario_id' => $usuario_id,
+
             ':aluno_id' => $aluno_id,
+
             ':company_id' => $company_id,
+
             ':company_id_filial' => $company_id
         ]);
 
@@ -311,8 +455,6 @@ elseif ($acao === 'avaliacao') {
             exit('Não foi possível validar seu vínculo ' .
                 'com esta academia.');
         }
-
-        // BUSCAR AVALIAÇÃO DO ALUNO
 
         $stmtAvaliacao = $pdo->prepare("
             SELECT
@@ -332,7 +474,9 @@ elseif ($acao === 'avaliacao') {
         ");
 
         $stmtAvaliacao->execute([
+
             ':usuario_id' => $usuario_id,
+
             ':company_id' => $company_id
         ]);
 
@@ -368,7 +512,7 @@ elseif ($acao === 'avaliacao') {
 }
 
 // ========================================
-// 7. AÇÃO DESCONHECIDA
+// 6. AÇÃO DESCONHECIDA
 // ========================================
 
 else {

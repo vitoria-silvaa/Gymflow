@@ -1,57 +1,104 @@
 <?php
+// ============================================
+// GYMFLOW - PORTAL DO ALUNO
+// app/views/portal_aluno/faturas.php
+// ============================================
 
 if (!isset($todas_contas)) {
-
-    header("Location: " . BASE_URL . "/app/controllers/PortalAlunoController.php?acao=faturas");
-
-    exit;
+    http_response_code(403);
+    exit('Acesso negado.');
 }
 
+$tituloPagina = 'Minhas Faturas';
 
-/** @var array $todas_contas */
-/** @var array $a_vencer */
-/** @var array $em_atraso */
-/** @var array $pagas */
-/** @var string $aba */
-/** @var string $hoje */
+$hoje = $hoje ?? date('Y-m-d');
 
-$tituloPagina = "Faturas";
+$cssEspecifico = BASE_URL . '/assets/css/faturas.css';
 
-?>
+$url = BASE_URL . '/app/controllers/PortalAlunoController.php?acao=faturas';
 
-<?php 
-include __DIR__ . '/../shared/header.php'; 
-include __DIR__ . '/../shared/sidebar.php'; 
-?>
+// ============================================
+// FUNÇÕES AUXILIARES
+// ============================================
 
-
-<!-- CSS EXCLUSIVO DA PÁGINA DE FATURAS -->
-
-<link
-    rel="stylesheet"
-    href="<?= BASE_URL ?>/assets/css/faturas.css?v=<?= time() ?>">
-
-
-<?php
-
-$lista = match ($aba) {
-
-    'atraso' => $em_atraso,
-
-    'pagas' => $pagas,
-
-    default => $a_vencer
+$esc = function ($valor) {
+    return htmlspecialchars(
+        (string) ($valor ?? ''),
+        ENT_QUOTES,
+        'UTF-8'
+    );
 };
 
-?>
+$data = function ($valor) {
 
+    if (empty($valor)) {
+        return 'Não informado';
+    }
+
+    $ts = strtotime($valor);
+
+    return $ts === false
+        ? 'Não informado'
+        : date('d/m/Y', $ts);
+};
+
+// ============================================
+// ORGANIZAÇÃO DAS ABAS
+// ============================================
+
+$abas = [
+
+    'vencer' => [
+        'titulo' => 'A vencer',
+        'icone' => 'wallet',
+        'classe' => 'aberto',
+        'lista' => $a_vencer ?? []
+    ],
+
+    'atraso' => [
+        'titulo' => 'Em atraso',
+        'icone' => 'circle-alert',
+        'classe' => 'atraso',
+        'lista' => $em_atraso ?? []
+    ],
+
+    'pagas' => [
+        'titulo' => 'Pagas',
+        'icone' => 'circle-check',
+        'classe' => 'pago',
+        'lista' => $pagas ?? []
+    ]
+];
+
+$aba = $aba ?? 'vencer';
+
+if (!isset($abas[$aba])) {
+    $aba = 'vencer';
+}
+
+$lista = $abas[$aba]['lista'];
+
+$mensagens = [
+
+    'vencer' =>
+    'Você não possui faturas a vencer.',
+
+    'atraso' =>
+    'Você não possui faturas em atraso.',
+
+    'pagas' =>
+    'Você ainda não possui pagamentos registrados.'
+];
+
+require __DIR__ . '/../shared/header.php';
+
+require __DIR__ . '/../shared/sidebar.php';
+
+?>
 
 <main class="faturas-page">
 
-
-    <!-- =========================================
-         CABEÇALHO
-         ========================================= -->
+    <!-- CABEÇALHO -->
 
     <header class="faturas-header">
 
@@ -59,244 +106,156 @@ $lista = match ($aba) {
             PORTAL DO ALUNO
         </span>
 
-        <h1>
-            Minhas faturas
-        </h1>
+        <h1>Minhas Faturas</h1>
 
         <p>
-            Acompanhe suas mensalidades e o histórico de pagamentos.
+            Acompanhe suas mensalidades,
+            pagamentos e recibos.
         </p>
 
     </header>
 
-
-
-    <!-- =========================================
-         RESUMO FINANCEIRO
-         ========================================= -->
+    <!-- RESUMO FINANCEIRO -->
 
     <section class="faturas-resumo">
 
+        <?php foreach ($abas as $item): ?>
 
-        <div class="resumo-card">
+            <article class="resumo-card">
 
-            <div class="resumo-icone resumo-icone-aberto">
-                $
-            </div>
+                <div class="resumo-icone resumo-icone-<?= $esc($item['classe']) ?>">
 
-            <div>
+                    <i data-lucide="<?= $esc($item['icone']) ?>"></i>
 
-                <span>
-                    A vencer
-                </span>
+                </div>
 
-                <strong>
-                    <?= count($a_vencer) ?>
-                </strong>
+                <div>
 
-            </div>
+                    <span>
+                        <?= $esc($item['titulo']) ?>
+                    </span>
 
-        </div>
+                    <strong>
+                        <?= count($item['lista']) ?>
+                    </strong>
 
+                </div>
 
+            </article>
 
-        <div class="resumo-card">
-
-            <div class="resumo-icone resumo-icone-atraso">
-                !
-            </div>
-
-            <div>
-
-                <span>
-                    Em atraso
-                </span>
-
-                <strong>
-                    <?= count($em_atraso) ?>
-                </strong>
-
-            </div>
-
-        </div>
-
-
-
-        <div class="resumo-card">
-
-            <div class="resumo-icone resumo-icone-pago">
-                ✓
-            </div>
-
-            <div>
-
-                <span>
-                    Pagas
-                </span>
-
-                <strong>
-                    <?= count($pagas) ?>
-                </strong>
-
-            </div>
-
-        </div>
-
+        <?php endforeach; ?>
 
     </section>
 
-
-
-    <!-- =========================================
-         ABAS
-         ========================================= -->
+    <!-- LISTAGEM -->
 
     <section class="faturas-lista">
 
+        <!-- ABAS -->
 
-        <nav class="faturas-tabs">
+        <nav
+            class="faturas-tabs"
+            aria-label="Situação das faturas">
 
+            <?php foreach ($abas as $chave => $item): ?>
 
-            <a
-                href="<?= BASE_URL ?>/app/controllers/PortalAlunoController.php?acao=faturas&aba=vencer"
-                class="<?= $aba === 'vencer' ? 'ativo' : '' ?>">
+                <a
+                    href="<?= $esc($url . '&aba=' . $chave) ?>"
+                    class="<?= $aba === $chave ? 'ativo' : '' ?>">
 
-                <span>
-                    A vencer
-                </span>
+                    <span>
+                        <?= $esc($item['titulo']) ?>
+                    </span>
 
-                <strong>
-                    <?= count($a_vencer) ?>
-                </strong>
+                    <strong>
+                        <?= count($item['lista']) ?>
+                    </strong>
 
-            </a>
+                </a>
 
-
-
-            <a
-                href="<?= BASE_URL ?>/app/controllers/PortalAlunoController.php?acao=faturas&aba=atraso"
-                class="<?= $aba === 'atraso' ? 'ativo' : '' ?>">
-
-                <span>
-                    Em atraso
-                </span>
-
-                <strong>
-                    <?= count($em_atraso) ?>
-                </strong>
-
-            </a>
-
-
-
-            <a
-                href="<?= BASE_URL ?>/app/controllers/PortalAlunoController.php?acao=faturas&aba=pagas"
-                class="<?= $aba === 'pagas' ? 'ativo' : '' ?>">
-
-                <span>
-                    Pagas
-                </span>
-
-                <strong>
-                    <?= count($pagas) ?>
-                </strong>
-
-            </a>
-
+            <?php endforeach; ?>
 
         </nav>
 
+        <!-- MENSAGEM DO DOWNLOAD -->
 
+        <div
+            id="reciboMensagem"
+            class="recibo-mensagem"
+            role="status"
+            aria-live="polite"
+            hidden>
+        </div>
 
-        <!-- =========================================
-             LISTAGEM
-             ========================================= -->
+        <!-- ESTADO VAZIO -->
 
         <?php if (empty($lista)): ?>
-
 
             <div class="faturas-vazio">
 
                 <div class="vazio-icone">
 
-                    <?php if ($aba === 'pagas'): ?>
-
-                        ✓
-
-                    <?php elseif ($aba === 'atraso'): ?>
-
-                        !
-
-                    <?php else: ?>
-
-                        $
-
-                    <?php endif; ?>
+                    <i data-lucide="<?= $esc($abas[$aba]['icone']) ?>"></i>
 
                 </div>
 
-
-                <h2>
-                    Nenhuma fatura encontrada
-                </h2>
-
+                <h2>Nenhuma fatura encontrada</h2>
 
                 <p>
-
-                    <?php if ($aba === 'atraso'): ?>
-
-                        Você não possui faturas em atraso.
-
-                    <?php elseif ($aba === 'pagas'): ?>
-
-                        Você ainda não possui pagamentos registrados.
-
-                    <?php else: ?>
-
-                        Você não possui faturas próximas do vencimento.
-
-                    <?php endif; ?>
-
+                    <?= $esc($mensagens[$aba]) ?>
                 </p>
 
             </div>
 
-
-
         <?php else: ?>
-
 
             <div class="faturas-grid">
 
-
                 <?php foreach ($lista as $conta): ?>
-
 
                     <?php
 
-                    $statusPago = $conta['status'] === 'Pago';
+                    $paga = ($conta['status'] ?? '') === 'Pago';
 
-                    $estaAtrasada =
-                        !$statusPago &&
-                        $conta['vencimento'] < $hoje;
+                    $atrasada =
+                        !$paga &&
+                        ($conta['vencimento'] ?? '') < $hoje;
+
+                    $classe = 'aberta';
+
+                    $status = 'Aberto';
+
+                    $classeStatus = 'aberto';
+
+                    if ($paga) {
+
+                        $classe = 'paga';
+
+                        $status = 'Pago';
+
+                        $classeStatus = 'pago';
+                    } elseif ($atrasada) {
+
+                        $classe = 'atrasada';
+
+                        $status = 'Em atraso';
+
+                        $classeStatus = 'atrasado';
+                    }
+
+                    $id = (int) ($conta['id'] ?? 0);
+
+                    $urlRecibo = BASE_URL .
+                        '/app/controllers/ReciboAlunoController.php?id=' .
+                        $id;
 
                     ?>
 
-
-                    <article
-                        class="fatura-card
-                        <?= $statusPago
-                            ? 'fatura-paga'
-                            : ($estaAtrasada
-                                ? 'fatura-atrasada'
-                                : 'fatura-aberta')
-                        ?>">
-
+                    <article class="fatura-card fatura-<?= $classe ?>">
 
                         <!-- CABEÇALHO -->
 
                         <div class="fatura-card-header">
-
 
                             <div>
 
@@ -304,260 +263,204 @@ $lista = match ($aba) {
                                     MENSALIDADE
                                 </span>
 
+                                <h3 class="fatura-plano">
+
+                                    <?= $esc(
+                                        $conta['nome_plano']
+                                            ?? 'Plano contratado'
+                                    ) ?>
+
+                                </h3>
+
                                 <span class="fatura-data">
 
-                                    Vencimento
-                                    <?= date(
-                                        'd/m/Y',
-                                        strtotime($conta['vencimento'])
-                                    ); ?>
+                                    Fatura nº <?= $id ?>
 
                                 </span>
 
                             </div>
 
+                            <span class="status status-<?= $classeStatus ?>">
 
+                                <?= $status ?>
 
-                            <?php if ($statusPago): ?>
-
-                                <span class="status status-pago">
-                                    Pago
-                                </span>
-
-
-                            <?php elseif ($estaAtrasada): ?>
-
-                                <span class="status status-atrasado">
-                                    Em atraso
-                                </span>
-
-
-                            <?php else: ?>
-
-                                <span class="status status-aberto">
-                                    Aberto
-                                </span>
-
-                            <?php endif; ?>
-
+                            </span>
 
                         </div>
-
-
 
                         <!-- VALOR -->
 
                         <div class="fatura-valor">
 
                             <span>
-                                Valor
+
+                                <?= $paga
+                                    ? 'Valor registrado como pago'
+                                    : 'Valor da fatura' ?>
+
                             </span>
 
                             <strong>
 
-                                R$
-
-                                <?= number_format(
-                                    $conta['valor'],
-                                    2,
-                                    ',',
-                                    '.'
-                                ); ?>
+                                R$ <?= number_format(
+                                        (float) ($conta['valor'] ?? 0),
+                                        2,
+                                        ',',
+                                        '.'
+                                    ) ?>
 
                             </strong>
 
                         </div>
 
-
-
                         <!-- INFORMAÇÕES -->
 
                         <div class="fatura-info">
 
+                            <div class="info-item">
 
-                            <?php if ($statusPago): ?>
+                                <span>Vencimento</span>
 
+                                <strong>
+
+                                    <?= $data(
+                                        $conta['vencimento'] ?? null
+                                    ) ?>
+
+                                </strong>
+
+                            </div>
+
+                            <div class="info-item">
+
+                                <span>Unidade</span>
+
+                                <strong>
+
+                                    <?= $esc(
+                                        $conta['nome_filial']
+                                            ?? 'Não informado'
+                                    ) ?>
+
+                                </strong>
+
+                            </div>
+
+                            <?php if ($paga): ?>
 
                                 <div class="info-item">
 
-                                    <span>
-                                        Pago em
-                                    </span>
+                                    <span>Pago em</span>
 
                                     <strong>
 
-                                        <?php
-
-                                        if (!empty($conta['pago_em'])) {
-
-                                            echo date(
-                                                'd/m/Y',
-                                                strtotime($conta['pago_em'])
-                                            );
-                                        } else {
-
-                                            echo '—';
-                                        }
-
-                                        ?>
+                                        <?= $data(
+                                            $conta['pago_em'] ?? null
+                                        ) ?>
 
                                     </strong>
 
                                 </div>
 
-
-
                                 <div class="info-item">
 
-                                    <span>
-                                        Forma de pagamento
-                                    </span>
+                                    <span>Forma de pagamento</span>
 
                                     <strong>
 
-                                        <?= htmlspecialchars(
-                                            $conta['forma_pagamento'] ?? '—'
-                                        ); ?>
+                                        <?= $esc(
+                                            $conta['forma_pagamento']
+                                                ?? 'Não informado'
+                                        ) ?>
 
                                     </strong>
 
                                 </div>
-
-
-                            <?php elseif ($estaAtrasada): ?>
-
-
-                                <div class="info-item">
-
-                                    <span>
-                                        Situação
-                                    </span>
-
-                                    <strong class="texto-atrasado">
-                                        Pagamento pendente
-                                    </strong>
-
-                                </div>
-
-
-                                <div class="info-item">
-
-                                    <span>
-                                        Vencimento
-                                    </span>
-
-                                    <strong>
-
-                                        <?= date(
-                                            'd/m/Y',
-                                            strtotime($conta['vencimento'])
-                                        ); ?>
-
-                                    </strong>
-
-                                </div>
-
 
                             <?php else: ?>
 
-
                                 <div class="info-item">
 
-                                    <span>
-                                        Situação
-                                    </span>
+                                    <span>Situação</span>
 
-                                    <strong>
-                                        Pagamento em aberto
-                                    </strong>
+                                    <strong class="<?= $atrasada
+                                                        ? 'texto-atrasado'
+                                                        : '' ?>">
 
-                                </div>
-
-
-                                <div class="info-item">
-
-                                    <span>
-                                        Vencimento
-                                    </span>
-
-                                    <strong>
-
-                                        <?= date(
-                                            'd/m/Y',
-                                            strtotime($conta['vencimento'])
-                                        ); ?>
+                                        Pagamento pendente
 
                                     </strong>
 
                                 </div>
-
 
                             <?php endif; ?>
 
-
                         </div>
-
-
 
                         <!-- AÇÕES -->
 
                         <div class="fatura-acoes">
 
-
-                            <?php if ($statusPago): ?>
-
+                            <?php if ($paga && $id > 0): ?>
 
                                 <button
                                     type="button"
-                                    class="btn-recibo">
+                                    class="btn-recibo"
+                                    data-recibo-url="<?= $esc($urlRecibo) ?>">
 
-                                    Baixar recibo
+                                    <i data-lucide="download"></i>
+
+                                    <span data-recibo-label>
+                                        Baixar recibo em PDF
+                                    </span>
 
                                 </button>
 
-
-                            <?php elseif ($estaAtrasada): ?>
-
+                            <?php elseif (!$paga): ?>
 
                                 <span class="aviso-pagamento">
 
-                                    Entre em contato com a recepção.
+                                    <i data-lucide="info"></i>
+
+                                    <?= $atrasada
+                                        ? 'Entre em contato com a recepção.'
+                                        : 'Pagamento disponível na recepção.' ?>
 
                                 </span>
-
-
-                            <?php else: ?>
-
-
-                                <span class="aviso-pagamento">
-
-                                    Pagamento disponível na recepção.
-
-                                </span>
-
 
                             <?php endif; ?>
 
-
                         </div>
-
 
                     </article>
 
-
                 <?php endforeach; ?>
-
 
             </div>
 
-
         <?php endif; ?>
-
 
     </section>
 
-
 </main>
 
+<!-- BIBLIOTECAS PDF -->
 
-<?php include __DIR__ . '/../shared/footer.php'; ?>
+<script
+    src="<?= BASE_URL ?>/vendor/jspdf/jspdf.umd.min.js"
+    defer>
+</script>
+
+<script
+    src="<?= BASE_URL ?>/vendor/jspdf/jspdf.plugin.autotable.min.js"
+    defer>
+</script>
+
+<!-- GERADOR DE RECIBO -->
+
+<script
+    src="<?= BASE_URL ?>/assets/js/recibo-pdf.js"
+    defer>
+</script>
+
+<?php require __DIR__ . '/../shared/footer.php'; ?>

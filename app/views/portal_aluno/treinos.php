@@ -335,10 +335,15 @@ require __DIR__ . '/../shared/sidebar.php';
                             class="tg-btn tg-btn-secondary"
                             data-tg-action="print">
 
-                            Imprimir / salvar PDF
+                            Baixar PDF
 
                         </button>
-
+                        <p
+                            id="tgPdfError"
+                            class="tg-pdf-error"
+                            role="alert"
+                            hidden>
+                        </p>
                     </div>
 
                     <div class="tg-summary-stats">
@@ -2371,7 +2376,7 @@ require __DIR__ . '/../shared/sidebar.php';
 
                 pausaVideos();
 
-                window.print();
+                window.GymFlowFichaPdf.baixar()
             }
 
         };
@@ -2454,5 +2459,85 @@ require __DIR__ . '/../shared/sidebar.php';
 
     })();
 </script>
+
+<?php
+
+// =============================================
+// DADOS PARA EXPORTAÇÃO DA FICHA EM PDF
+// =============================================
+
+$dadosPdf = [
+
+    'id' => (int) $idFicha,
+
+    'aluno' => $ficha_atual['nome_aluno'] ?? '',
+
+    'professor' => $ficha_atual['nome_professor'] ?? '',
+
+    'unidade' => $ficha_atual['nome_filial'] ?? '',
+
+    'objetivo' => $ficha_atual['objetivo'] ?? '',
+
+    'versao' => (int) (
+        $ficha_atual['versao'] ?? 1
+    ),
+
+    'data' => !empty($ficha_atual['criada_em'])
+
+        ? date(
+            'd/m/Y',
+            strtotime($ficha_atual['criada_em'])
+        )
+
+        : '',
+
+    'exercicios' => array_map(
+
+        static function (array $item): array {
+
+            return [
+
+                'nome' => $item['nome_exercicio'] ?? '',
+
+                'grupo' => $item['grupo'] ?? '',
+
+                'series' => (int) ($item['series'] ?? 0),
+
+                'repeticoes' => $item['repeticoes'] ?? '',
+
+                'carga' => $item['carga'] ?? '',
+
+                'intervalo' => $item['intervalo'] ?? ''
+
+            ];
+        },
+
+        $itens ?? []
+    )
+];
+
+?>
+
+<script type="application/json" id="tgPdfData">
+    <?= json_encode(
+        $dadosPdf,
+        JSON_HEX_TAG |
+            JSON_HEX_AMP |
+            JSON_HEX_APOS |
+            JSON_HEX_QUOT |
+            JSON_INVALID_UTF8_SUBSTITUTE |
+            JSON_UNESCAPED_UNICODE
+    ) ?>
+</script>
+
+<!-- BIBLIOTECAS DO PDF -->
+
+<script src="<?= BASE_URL ?>/vendor/jspdf/jspdf.umd.min.js"></script>
+
+<script src="<?= BASE_URL ?>/vendor/jspdf/jspdf.plugin.autotable.min.js"></script>
+
+<!-- GERADOR DA FICHA -->
+
+<script src="<?= BASE_URL ?>/assets/js/ficha-treino-pdf.js"></script>
 
 <?php require __DIR__ . '/../shared/footer.php'; ?>

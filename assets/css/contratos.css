@@ -1,0 +1,609 @@
+/* ============================================
+   GYMFLOW - PORTAL DO ALUNO / CONTRATOS
+   assets/css/contratos.css
+============================================ */
+
+.contratos-page {
+
+    --ct-card: var(--portal-card, var(--ui-fundo-card, #fff));
+    --ct-texto: var(--portal-texto, var(--ui-texto, #222));
+    --ct-suave: var(--portal-texto-suave, var(--ui-texto-suave, #64748b));
+    --ct-borda: var(--portal-borda, var(--ui-borda, #e2e8f0));
+    --ct-superficie: var(--portal-superficie, var(--ui-fundo-pagina, #f8fafc));
+
+    --ct-destaque: var(--portal-destaque, var(--cor-primaria, #c9a227));
+    --ct-legivel: var(--portal-destaque-legivel, var(--cor-primaria, #c9a227));
+    --ct-sobre-destaque: var(--portal-destaque-texto, var(--cor-sobre-primaria, #171717));
+    --ct-destaque-suave: var(--portal-destaque-suave, var(--cor-primaria-suave, #c9a22720));
+
+    width: 100%;
+    min-width: 0;
+    max-width: 1400px;
+
+    margin: 0 auto;
+    padding: 28px;
+
+    color: var(--ct-texto);
+}
+
+/* ============================================
+   CABEÇALHO
+============================================ */
+
+.contratos-page .contratos-header {
+    margin-bottom: 25px;
+}
+
+.contratos-page .contratos-eyebrow {
+
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: var(--ct-legivel);
+
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.6px;
+}
+
+.contratos-page .contratos-header h1 {
+
+    margin: 0 0 7px;
+
+    color: var(--ct-texto);
+
+    font-size: clamp(25px, 3vw, 32px);
+    font-weight: 750;
+}
+
+.contratos-page .contratos-header p {
+
+    margin: 0;
+
+    color: var(--ct-suave);
+
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* ============================================
+   CARDS DE RESUMO
+============================================ */
+
+.contratos-page .contratos-resumo {
+
+    display: grid;
+
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    gap: 14px;
+
+    margin-bottom: 30px;
+}
+
+.contratos-page .contratos-resumo-card {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    padding: 18px;
+
+    background: var(--ct-card);
+
+    border: 1px solid var(--ct-borda);
+
+    border-radius: 12px;
+}
+
+.contratos-page .contratos-resumo-icone {
+
+    display: grid;
+
+    place-items: center;
+
+    flex-shrink: 0;
+
+    width: 44px;
+    height: 44px;
+
+    border-radius: 10px;
+
+    background: var(--ct-destaque-suave);
+
+    color: var(--ct-legivel);
+}
+
+.contratos-page .contratos-resumo-icone.icone-ativo {
+
+    background: rgba(22, 163, 74, .12);
+
+    color: #16a34a;
+}
+
+.contratos-page .contratos-resumo-card span {
+
+    display: block;
+
+    margin-bottom: 4px;
+
+    font-size: 12px;
+
+    color: var(--ct-suave);
+}
+
+.contratos-page .contratos-resumo-card strong {
+
+    display: block;
+
+    font-size: 23px;
+
+    line-height: 1.2;
+
+    color: var(--ct-texto);
+}
+
+/* ============================================
+   LISTAGEM
+============================================ */
+
+.contratos-page .contratos-lista-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-bottom: 15px;
+}
+
+.contratos-page .contratos-lista-header h2 {
+
+    margin: 0;
+
+    font-size: 19px;
+
+    color: var(--ct-texto);
+}
+
+.contratos-page .contratos-lista-header>span {
+
+    color: var(--ct-suave);
+
+    font-size: 12px;
+}
+
+.contratos-page .contratos-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+
+    gap: 16px;
+
+    align-items: stretch;
+}
+
+/* ============================================
+   CARD DO CONTRATO
+============================================ */
+
+.contratos-page .contrato-card {
+
+    display: flex;
+
+    flex-direction: column;
+
+    min-width: 0;
+
+    padding: 20px;
+
+    background: var(--ct-card);
+
+    border: 1px solid var(--ct-borda);
+
+    border-radius: 14px;
+
+    transition: border-color .2s ease;
+}
+
+.contratos-page .contrato-card:hover {
+
+    border-color: var(--ct-destaque);
+}
+
+.contratos-page .contrato-card-topo {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-bottom: 18px;
+}
+
+.contratos-page .contrato-card-icone {
+
+    display: grid;
+
+    place-items: center;
+
+    width: 45px;
+    height: 45px;
+
+    border-radius: 10px;
+
+    background: var(--ct-destaque-suave);
+
+    color: var(--ct-legivel);
+}
+
+.contratos-page .contrato-status {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    padding: 5px 9px;
+
+    border-radius: 6px;
+
+    font-size: 11px;
+
+    font-weight: 650;
+}
+
+.contratos-page .contrato-status svg {
+
+    width: 14px;
+    height: 14px;
+}
+
+.contratos-page .contrato-status.status-ativo {
+
+    color: #15803d;
+
+    background: rgba(22, 163, 74, .12);
+}
+
+.contratos-page .contrato-status.status-inativo {
+
+    color: var(--ct-suave);
+
+    background: var(--ct-superficie);
+}
+
+.contratos-page .contrato-title {
+
+    margin: 0 0 7px;
+
+    font-size: 18px;
+
+    font-weight: 700;
+
+    color: var(--ct-texto);
+
+    overflow-wrap: anywhere;
+}
+
+.contratos-page .contrato-category {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    margin-bottom: 20px;
+
+    font-size: 13px;
+
+    color: var(--ct-suave);
+}
+
+.contratos-page .contrato-category svg {
+
+    width: 16px;
+    height: 16px;
+
+    flex-shrink: 0;
+}
+
+.contratos-page .contrato-price {
+
+    margin-bottom: 18px;
+
+    color: var(--ct-legivel);
+
+    font-size: 25px;
+
+    font-weight: 750;
+}
+
+.contratos-page .contrato-price span {
+
+    color: var(--ct-suave);
+
+    font-size: 12px;
+
+    font-weight: 500;
+}
+
+/* ============================================
+   INFORMAÇÕES DO CONTRATO
+============================================ */
+
+.contratos-page .contrato-details {
+
+    display: flex;
+
+    flex-direction: column;
+
+    flex: 1;
+
+    gap: 13px;
+
+    padding-top: 17px;
+
+    margin-bottom: 22px;
+
+    border-top: 1px solid var(--ct-borda);
+}
+
+.contratos-page .contrato-detail-row {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    justify-content: space-between;
+
+    gap: 14px;
+
+    font-size: 13px;
+}
+
+.contratos-page .contrato-detail-row>span {
+
+    color: var(--ct-suave);
+}
+
+.contratos-page .contrato-detail-row strong {
+
+    color: var(--ct-texto);
+
+    font-weight: 600;
+
+    text-align: right;
+
+    overflow-wrap: anywhere;
+
+    min-width: 0;
+}
+
+.contratos-page .contrato-detail-row .contrato-desconto {
+
+    color: #16a34a;
+}
+
+/* ============================================
+   BOTÃO DO PDF
+============================================ */
+
+.contratos-page .btn-contrato {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    width: 100%;
+
+    min-height: 44px;
+
+    padding: 12px;
+
+    background: var(--ct-destaque);
+
+    color: var(--ct-sobre-destaque);
+
+    border: 1px solid transparent;
+
+    border-radius: 9px;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    font-weight: 650;
+
+    cursor: pointer;
+
+    transition: filter .2s ease;
+}
+
+.contratos-page .btn-contrato svg {
+
+    width: 17px;
+    height: 17px;
+
+    flex-shrink: 0;
+}
+
+.contratos-page .btn-contrato:hover {
+
+    filter: brightness(.92);
+}
+
+.contratos-page .btn-contrato:focus-visible {
+
+    outline: 2px solid var(--ct-legivel);
+
+    outline-offset: 3px;
+}
+
+.contratos-page .btn-contrato:disabled {
+
+    opacity: .65;
+
+    cursor: wait;
+}
+
+/* ============================================
+   MENSAGENS
+============================================ */
+
+.contratos-page .contrato-pdf-mensagem {
+
+    padding: 13px 15px;
+
+    margin-bottom: 15px;
+
+    border: 1px solid var(--ct-borda);
+
+    border-radius: 8px;
+
+    font-size: 13px;
+}
+
+.contratos-page .contrato-pdf-mensagem[data-tipo="erro"] {
+
+    color: #dc2626;
+
+    background: rgba(220, 38, 38, .08);
+}
+
+.contratos-page .contrato-pdf-mensagem[data-tipo="sucesso"] {
+
+    color: #16a34a;
+
+    background: rgba(22, 163, 74, .08);
+}
+
+.contratos-page [hidden] {
+
+    display: none !important;
+}
+
+/* ============================================
+   ESTADO VAZIO
+============================================ */
+
+.contratos-page .contratos-empty {
+
+    padding: 50px 20px;
+
+    text-align: center;
+
+    background: var(--ct-card);
+
+    border: 1px dashed var(--ct-borda);
+
+    border-radius: 14px;
+}
+
+.contratos-page .contratos-empty>svg {
+
+    width: 42px;
+    height: 42px;
+
+    margin-bottom: 12px;
+
+    color: var(--ct-suave);
+}
+
+.contratos-page .contratos-empty h2 {
+
+    margin: 0 0 8px;
+
+    font-size: 17px;
+
+    color: var(--ct-texto);
+}
+
+.contratos-page .contratos-empty p {
+
+    margin: 0;
+
+    font-size: 13px;
+
+    color: var(--ct-suave);
+}
+
+/* ============================================
+   MODO ESCURO
+============================================ */
+
+[data-theme="dark"] .contratos-page .contrato-status.status-ativo {
+
+    color: #86efac;
+}
+
+[data-theme="dark"] .contratos-page .contrato-desconto,
+
+[data-theme="dark"] .contratos-page .contrato-pdf-mensagem[data-tipo="sucesso"] {
+
+    color: #86efac;
+}
+
+[data-theme="dark"] .contratos-page .contrato-pdf-mensagem[data-tipo="erro"] {
+
+    color: #fca5a5;
+}
+
+/* ============================================
+   RESPONSIVIDADE
+============================================ */
+
+@media (max-width: 768px) {
+
+    .contratos-page {
+
+        padding: 18px;
+    }
+
+    .contratos-page .contratos-resumo {
+
+        grid-template-columns: 1fr;
+
+        gap: 9px;
+    }
+
+    .contratos-page .contratos-resumo-card {
+
+        padding: 13px;
+    }
+
+    .contratos-page .contratos-grid {
+
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 420px) {
+
+    .contratos-page {
+
+        padding: 12px;
+    }
+
+    .contratos-page .contrato-card {
+
+        padding: 15px;
+    }
+}

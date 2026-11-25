@@ -1430,6 +1430,21 @@
     display: none !important;
 }
 
+/* =============================================
+   EXPORTAÇÃO DA FICHA EM PDF
+============================================= */
+
+.tg-pdf-error {
+    color: var(--tg-danger, #dc2626);
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 8px 0;
+}
+
+.tg-pdf-error[hidden] {
+    display: none !important;
+}
+
 /* Responsividade */
 
 @media (max-width: 600px) {
