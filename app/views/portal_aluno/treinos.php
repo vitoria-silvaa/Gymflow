@@ -54,6 +54,10 @@ foreach ($itens as $i) {
 
     $exercicios[] = [
 
+        'item_id' => (int) (
+            $i['item_id'] ?? 0
+        ),
+
         'nome' => (string) (
             $i['nome_exercicio'] ?? 'Exercício'
         ),
@@ -109,10 +113,32 @@ $chave = 'gymflow:guiado:v2:' . hash(
         serialize($exercicios)
 );
 
+if (
+    empty($_SESSION['historico_treino_csrf']) ||
+    !is_string($_SESSION['historico_treino_csrf'])
+) {
+
+    $_SESSION['historico_treino_csrf'] =
+        bin2hex(random_bytes(32));
+}
+
 $json = json_encode(
     [
         'exercicios' => $exercicios,
-        'chave' => $chave
+
+        'chave' => $chave,
+
+        'ficha_id' => $idFicha,
+
+        'versao' => (int) (
+            $ficha_atual['versao'] ?? 1
+        ),
+
+        'csrf' =>
+        $_SESSION['historico_treino_csrf'],
+
+        'url_historico' => BASE_URL .
+            '/app/controllers/HistoricoTreinoController.php'
     ],
     JSON_HEX_TAG |
         JSON_HEX_AMP |
@@ -127,6 +153,57 @@ require __DIR__ . '/../shared/sidebar.php';
 ?>
 
 <main class="tg-page" id="tgPage">
+    <section
+        class="tg-ficha-summary"
+        id="tgFrequencyCard"
+        hidden>
+
+        <div class="tg-summary-top">
+
+            <div>
+
+                <span class="tg-eyebrow">
+                    MINHA FREQUÊNCIA
+                </span>
+
+                <h2 id="tgFrequencyTitle">
+                    Meta diária
+                </h2>
+
+                <p id="tgFrequencyText">
+                    Carregando frequência...
+                </p>
+
+            </div>
+
+            <strong
+                id="tgFrequencyCount"
+                style="font-size: 24px;">
+
+                0/4
+
+            </strong>
+
+        </div>
+
+        <progress
+            id="tgFrequencyProgress"
+            value="0"
+            max="4"
+            aria-label="Meta diária de exercícios"
+            style="
+            width: 100%;
+            height: 8px;
+            accent-color: #d97706;
+        ">
+        </progress>
+
+        <p
+            id="tgFrequencyMessage"
+            style="font-size: 12px; margin-bottom: 0;">
+        </p>
+
+    </section>
 
     <p id="tgBoot" role="status">
         Carregando controles do treino...
@@ -479,7 +556,9 @@ require __DIR__ . '/../shared/sidebar.php';
             </strong>
 
             <p>
-                As séries registradas nesta sessão serão perdidas.
+                Os exercícios concluídos continuarão no histórico.
+                Apenas o progresso dos exercícios não concluídos
+                será descartado.
             </p>
 
             <div class="tg-button-row">
@@ -773,7 +852,8 @@ require __DIR__ . '/../shared/sidebar.php';
             </div>
 
             <p>
-                Resumo temporário, ainda sem histórico no banco.
+                Os exercícios concluídos foram registrados
+                no seu histórico de treinos.
             </p>
 
             <button
@@ -922,6 +1002,8 @@ require __DIR__ . '/../shared/sidebar.php';
         let s = null;
         let mediaIndex = -1;
         let storageOk = true;
+        let salvandoHistorico = false;
+        let revisaoFrequencia = 0;
 
         const limite = 3600000;
 
@@ -1278,13 +1360,15 @@ require __DIR__ . '/../shared/sidebar.php';
             window.scrollTo(0, 0);
         }
 
-        function iniciar(fila) {
+        function iniciar(fila, tipo = 'individual') {
 
             if (s || !fila.length) return;
 
             s = {
 
                 fila,
+
+                tipo,
 
                 pos: 0,
 
@@ -1683,19 +1767,300 @@ require __DIR__ . '/../shared/sidebar.php';
             }
         }
 
+        // =============================================
+        // HISTÓRICO E FREQUÊNCIA
+        // =============================================
+
+        function gerarTokenHistorico() {
+
+            const bytes = new Uint8Array(16);
+
+            window.crypto.getRandomValues(bytes);
+
+            return Array.from(
+                bytes,
+                b => b.toString(16).padStart(2, '0')
+            ).join('');
+        }
+
+        // =============================================
+        // ATUALIZAR INDICADOR DIÁRIO
+        // =============================================
+
+        function mostrarFrequencia(frequencia) {
+
+            if (!frequencia) return;
+
+            revisaoFrequencia++;
+
+            const quantidade = Math.max(
+                0,
+                Number(frequencia.exercicios) || 0
+            );
+
+            const meta = 4;
+
+            const concluido = quantidade >= meta;
+
+            const cor = concluido ?
+                'var(--tg-success)' :
+                quantidade > 0 ?
+                '#d97706' :
+                'var(--tg-muted)';
+
+            text(
+                'tgFrequencyTitle',
+                'Meta diária'
+            );
+
+            text(
+                'tgFrequencyCount',
+                `${quantidade}/${meta}`
+            );
+
+            text(
+                'tgFrequencyText',
+
+                concluido ?
+                'Treino concluído' :
+                quantidade > 0 ?
+                'Treino parcialmente concluído' :
+                'Sem treino registrado'
+            );
+
+            text(
+                'tgFrequencyMessage',
+
+                concluido ?
+                'Você atingiu sua meta diária!' :
+                `Faltam ${meta - quantidade} exercícios distintos para atingir sua meta.`
+            );
+
+            const titulo = $('tgFrequencyText');
+
+            if (titulo) {
+
+                titulo.style.color = cor;
+            }
+
+            const contador = $('tgFrequencyCount');
+
+            if (contador) {
+
+                contador.style.color = cor;
+            }
+
+            const barra = $('tgFrequencyProgress');
+
+            if (barra) {
+
+                barra.value = Math.min(
+                    quantidade,
+                    meta
+                );
+
+                barra.style.accentColor = cor;
+            }
+
+            show('tgFrequencyCard', true);
+        }
+
+        // =============================================
+        // CONSULTAR A FREQUÊNCIA ATUAL
+        // =============================================
+
+        async function carregarFrequencia() {
+
+            const revisao = revisaoFrequencia;
+
+            try {
+
+                const resposta = await fetch(
+
+                    dados.url_historico,
+
+                    {
+                        method: 'GET',
+
+                        credentials: 'same-origin',
+
+                        cache: 'no-store',
+
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    }
+                );
+
+                const resultado = await resposta.json();
+
+                if (
+                    !resposta.ok ||
+                    !resultado.sucesso
+                ) {
+
+                    throw new Error(
+                        resultado.mensagem ||
+                        'Frequência indisponível.'
+                    );
+                }
+
+                if (revisao === revisaoFrequencia) {
+
+                    mostrarFrequencia(
+                        resultado.frequencia
+                    );
+                }
+
+            } catch {
+
+                if (revisao !== revisaoFrequencia) {
+                    return;
+                }
+
+                text(
+                    'tgFrequencyText',
+                    'Frequência temporariamente indisponível.'
+                );
+
+                text(
+                    'tgFrequencyCount',
+                    '—'
+                );
+
+                text(
+                    'tgFrequencyMessage',
+                    'Não foi possível consultar os registros.'
+                );
+
+                show('tgFrequencyProgress', false);
+
+                show('tgFrequencyCard', true);
+            }
+        }
+
+        // =============================================
+        // SALVAR EXERCÍCIO NO BANCO
+        // =============================================
+
+        async function salvarExercicioConcluido(
+            exercicio,
+            registros
+        ) {
+
+            if (!exercicio.item_id) {
+
+                throw new Error(
+                    'Não foi possível identificar o exercício da ficha.'
+                );
+            }
+
+            if (!s.token) {
+
+                s.token = gerarTokenHistorico();
+
+                salvar();
+            }
+
+            const payload = {
+
+                ficha_id: Number(dados.ficha_id),
+
+                item_id: Number(exercicio.item_id),
+
+                versao: Number(dados.versao),
+
+                token: s.token,
+
+                tipo: s.tipo || 'individual',
+
+                inicio: s.inicio,
+
+                series: registros
+            };
+
+            const resposta = await fetch(
+
+                dados.url_historico,
+
+                {
+                    method: 'POST',
+
+                    credentials: 'same-origin',
+
+                    headers: {
+
+                        'Content-Type': 'application/json',
+
+                        'Accept': 'application/json',
+
+                        'X-CSRF-Token': dados.csrf
+                    },
+
+                    body: JSON.stringify(payload)
+                }
+            );
+
+            let resultado;
+
+            try {
+
+                resultado = await resposta.json();
+
+            } catch {
+
+                throw new Error(
+                    'Resposta inválida do servidor. Verifique se sua sessão está ativa e tente novamente.'
+                );
+            }
+
+            if (
+                !resposta.ok ||
+                !resultado.sucesso ||
+                !Array.isArray(
+                    resultado.registro?.series
+                )
+            ) {
+
+                throw new Error(
+                    resultado.mensagem ||
+                    'Não foi possível salvar o exercício.'
+                );
+            }
+
+            show('tgFrequencyProgress', true);
+
+            mostrarFrequencia(
+                resultado.frequencia
+            );
+
+            return resultado.registro.series;
+        }
+
         // =====================================
         // CONCLUIR SÉRIE
         // =====================================
 
-        function concluir() {
+        async function concluir() {
 
-            if (s?.fase !== 'work') return;
+            if (
+                s?.fase !== 'work' ||
+                salvandoHistorico
+            ) {
+
+                return;
+            }
 
             const e = atual();
 
             const reps = Number(
                 $('tgActualReps').value
             );
+
+            const carga = $('tgActualLoad')
+                .value
+                .trim()
+                .slice(0, 40);
 
             if (
                 !Number.isInteger(reps) ||
@@ -1713,17 +2078,93 @@ require __DIR__ . '/../shared/sidebar.php';
                 return;
             }
 
-            s.registros[s.pos].push({
+            show('tgError', false);
 
-                reps,
+            const novosRegistros = [
 
-                carga: $('tgActualLoad')
-                    .value
-                    .trim()
-                    .slice(0, 40)
-            });
+                ...s.registros[s.pos],
 
-            // Ainda existem séries.
+                {
+                    reps,
+                    carga
+                }
+            ];
+
+            const ultimaSerie =
+                novosRegistros.length === e.series;
+
+            // =====================================
+            // SALVAR NO BANCO APÓS A ÚLTIMA SÉRIE
+            // =====================================
+
+            if (ultimaSerie) {
+
+                const botao = page.querySelector(
+                    '[data-tg-action="complete"]'
+                );
+
+                salvandoHistorico = true;
+
+                if (botao) {
+
+                    botao.disabled = true;
+
+                    botao.textContent =
+                        'Salvando exercício...';
+                }
+
+                try {
+
+                    const registrosSalvos =
+                        await salvarExercicioConcluido(
+                            e,
+                            novosRegistros
+                        );
+
+                    s.registros[s.pos] =
+                        registrosSalvos;
+
+                } catch (erro) {
+
+                    text(
+                        'tgError',
+
+                        erro.message ||
+                        'Erro ao salvar exercício. Tente novamente.'
+                    );
+
+                    show('tgError', true);
+
+                    // Permanece na série atual.
+                    // Não perde as séries anteriores.
+
+                    return;
+
+                } finally {
+
+                    salvandoHistorico = false;
+
+                    if (botao) {
+
+                        botao.disabled = false;
+
+                        botao.textContent =
+                            'Concluir série';
+                    }
+                }
+
+            } else {
+
+                // As séries intermediárias continuam
+                // sendo armazenadas temporariamente.
+
+                s.registros[s.pos] =
+                    novosRegistros;
+            }
+
+            // =====================================
+            // PRESERVAR A LÓGICA DO CRONÔMETRO
+            // =====================================
 
             if (feitas() < e.series) {
 
@@ -1750,13 +2191,13 @@ require __DIR__ . '/../shared/sidebar.php';
                     s.fase = 'nextSet';
                 }
 
-                // Existem outros exercícios.
+            } else if (
 
-            } else if (s.pos + 1 < s.fila.length) {
+                s.pos + 1 < s.fila.length
+
+            ) {
 
                 s.fase = 'nextExercise';
-
-                // Finalizar sessão.
 
             } else {
 
@@ -1778,7 +2219,10 @@ require __DIR__ . '/../shared/sidebar.php';
 
             all: () => {
 
-                iniciar(lista.map((_, i) => i));
+                iniciar(
+                    lista.map((_, i) => i),
+                    'completo'
+                );
             },
 
             one: b => {
@@ -1915,7 +2359,13 @@ require __DIR__ . '/../shared/sidebar.php';
                 'button[data-tg-action]'
             );
 
-            if (!b || b.disabled) return;
+            if (
+                !b ||
+                b.disabled ||
+                salvandoHistorico
+            ) {
+                return;
+            }
 
             try {
 
@@ -1937,11 +2387,29 @@ require __DIR__ . '/../shared/sidebar.php';
         // INICIALIZAÇÃO
         // =====================================
 
+        // Mantém o indicador de frequência na listagem,
+        // sem ocupar espaço durante o treino guiado.
+
+        const frequencyCard = $('tgFrequencyCard');
+
+        const overviewHeader = $('tgOverview')
+            .querySelector('.tg-page-header');
+
+        if (frequencyCard && overviewHeader) {
+
+            overviewHeader.insertAdjacentElement(
+                'afterend',
+                frequencyCard
+            );
+        }
+
         restaurar();
 
         overview();
 
         tick();
+
+        carregarFrequencia();
 
         setInterval(tick, 250);
 

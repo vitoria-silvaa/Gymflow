@@ -243,6 +243,83 @@ CREATE TABLE ficha_itens (
     FOREIGN KEY (exercicio_id) REFERENCES exercicios (id) ON DELETE RESTRICT
 );
 
+-- ---------- 10.1. HISTÓRICO E FREQUÊNCIA DE TREINOS -------------------
+
+CREATE TABLE IF NOT EXISTS treino_sessoes (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    company_id INT NOT NULL,
+    aluno_id INT NOT NULL,
+    ficha_id INT DEFAULT NULL,
+    token_sessao CHAR(36) NOT NULL,
+    objetivo_ficha VARCHAR(50) NOT NULL,
+    versao_ficha INT NOT NULL DEFAULT 1,
+    tipo ENUM('completo', 'individual') NOT NULL,
+    iniciado_em DATETIME NOT NULL,
+    concluido_em DATETIME DEFAULT NULL,
+    duracao_segundos INT UNSIGNED NOT NULL DEFAULT 0,
+    total_exercicios INT UNSIGNED NOT NULL DEFAULT 0,
+    total_series INT UNSIGNED NOT NULL DEFAULT 0,
+    registrado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ts_company FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE,
+    CONSTRAINT fk_ts_aluno FOREIGN KEY (aluno_id) REFERENCES alunos (id) ON DELETE CASCADE,
+    CONSTRAINT fk_ts_ficha FOREIGN KEY (ficha_id) REFERENCES fichas_treino (id) ON DELETE SET NULL,
+    CONSTRAINT uq_ts_token UNIQUE (
+        company_id,
+        aluno_id,
+        token_sessao
+    ),
+    INDEX idx_ts_historico (
+        company_id,
+        aluno_id,
+        concluido_em
+    ),
+    CONSTRAINT chk_ts_datas CHECK (
+        concluido_em IS NULL
+        OR concluido_em >= iniciado_em
+    )
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE IF NOT EXISTS treino_sessao_exercicios (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    sessao_id BIGINT UNSIGNED NOT NULL,
+    ficha_item_id INT DEFAULT NULL,
+    exercicio_id INT DEFAULT NULL,
+    exercicio_origem_id INT DEFAULT NULL,
+    ordem INT UNSIGNED NOT NULL,
+    nome_exercicio VARCHAR(100) NOT NULL,
+    grupo_muscular VARCHAR(30) DEFAULT NULL,
+    series_prescritas INT UNSIGNED NOT NULL,
+    repeticoes_prescritas VARCHAR(30) NOT NULL,
+    carga_prescrita VARCHAR(20) DEFAULT NULL,
+    intervalo_prescrito VARCHAR(20) DEFAULT NULL,
+    concluido_em DATETIME DEFAULT NULL,
+    CONSTRAINT fk_tse_sessao FOREIGN KEY (sessao_id) REFERENCES treino_sessoes (id) ON DELETE CASCADE,
+    CONSTRAINT fk_tse_ficha_item FOREIGN KEY (ficha_item_id) REFERENCES ficha_itens (id) ON DELETE SET NULL,
+    CONSTRAINT fk_tse_exercicio FOREIGN KEY (exercicio_id) REFERENCES exercicios (id) ON DELETE SET NULL,
+    CONSTRAINT uq_tse_ordem UNIQUE (sessao_id, ordem),
+    INDEX idx_tse_frequencia (
+        concluido_em,
+        exercicio_origem_id
+    ),
+    CONSTRAINT chk_tse_series CHECK (series_prescritas > 0)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE IF NOT EXISTS treino_sessao_series (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    sessao_exercicio_id BIGINT UNSIGNED NOT NULL,
+    numero_serie INT UNSIGNED NOT NULL,
+    repeticoes_realizadas SMALLINT UNSIGNED NOT NULL,
+    carga_utilizada VARCHAR(40) DEFAULT NULL,
+    CONSTRAINT fk_tss_exercicio FOREIGN KEY (sessao_exercicio_id) REFERENCES treino_sessao_exercicios (id) ON DELETE CASCADE,
+    CONSTRAINT uq_tss_numero UNIQUE (
+        sessao_exercicio_id,
+        numero_serie
+    ),
+    CONSTRAINT chk_tss_numero CHECK (numero_serie > 0),
+    CONSTRAINT chk_tss_repeticoes CHECK (
+        repeticoes_realizadas BETWEEN 1 AND 999
+    )
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 -- ---------- 11. AVALIAÇÕES FÍSICAS ----------------------------------
 
 CREATE TABLE avaliacoes (
