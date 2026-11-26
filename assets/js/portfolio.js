@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const btnMaps = document.createElement('a');
         btnMaps.href = 'https://www.google.com/maps/search/?api=1&query=' + latitude + ',' + longitude;
         btnMaps.target = '_blank';
-        btnMaps.textContent = '📍 Abrir no Google Maps';
+        btnMaps.textContent = ' Abrir no Google Maps';
         btnMaps.style.display = 'inline-block';
         btnMaps.style.marginTop = '10px';
         btnMaps.style.padding = '4px 8px';
@@ -270,7 +270,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const btnMaps = document.createElement('a');
             btnMaps.href = 'https://www.google.com/maps/search/?api=1&query=' + latitude + ',' + longitude;
             btnMaps.target = '_blank';
-            btnMaps.textContent = '📍 Abrir no Google Maps';
+            btnMaps.textContent = ' Abrir no Google Maps';
             btnMaps.style.display = 'inline-block';
             btnMaps.style.marginTop = '10px';
             btnMaps.style.padding = '4px 8px';
