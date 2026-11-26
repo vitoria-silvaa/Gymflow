@@ -6,15 +6,13 @@
 
 require_once __DIR__ . '/../../config/sessao.php';
 
-// Exclusivo para alunos.
-
 verificarRole(['Aluno']);
 
 // =============================================
-// 1. ACEITAR SOMENTE POST
+// 1. VALIDAR MÉTODO
 // =============================================
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
 
     http_response_code(405);
     header('Allow: POST');
@@ -37,10 +35,7 @@ if (
     !is_string($tokenFormulario) ||
     $tokenSessao === '' ||
     $tokenFormulario === '' ||
-    !hash_equals(
-        $tokenSessao,
-        $tokenFormulario
-    )
+    !hash_equals($tokenSessao, $tokenFormulario)
 ) {
 
     http_response_code(403);
@@ -66,7 +61,7 @@ if (!in_array(
 }
 
 // =============================================
-// 4. DEFINIR PÁGINA DE RETORNO
+// 4. VALIDAR PÁGINA DE RETORNO
 // =============================================
 
 $acoesPermitidas = [
@@ -79,13 +74,15 @@ $acoesPermitidas = [
     'minhas_medidas'
 ];
 
-$acaoRetorno = $_POST['acao_retorno'] ?? 'aluno';
+$acaoRetorno =
+    $_POST['acao_retorno'] ?? 'aluno';
 
 if (!in_array(
     $acaoRetorno,
     $acoesPermitidas,
     true
 )) {
+
     $acaoRetorno = 'aluno';
 }
 
@@ -93,40 +90,65 @@ $parametros = [
     'acao' => $acaoRetorno
 ];
 
-// Preserva a aba das faturas.
+// =============================================
+// 5. PRESERVAR ABA DAS FATURAS
+// =============================================
 
 if ($acaoRetorno === 'faturas') {
 
     $aba = $_POST['aba'] ?? '';
 
-    if (
-        is_string($aba) &&
-        preg_match('/^[a-z_-]{1,30}$/', $aba)
-    ) {
+    if (in_array(
+        $aba,
+        ['vencer', 'atraso', 'pagas'],
+        true
+    )) {
+
         $parametros['aba'] = $aba;
     }
 }
 
-// Preserva a ficha selecionada.
+// =============================================
+// 6. PRESERVAR TREINOS E FREQUÊNCIA
+// =============================================
 
 if ($acaoRetorno === 'treinos') {
 
+    if (
+        ($_POST['visualizacao'] ?? '')
+        === 'frequencia'
+    ) {
+
+        $parametros['visualizacao'] =
+            'frequencia';
+    }
+
     $ficha = filter_var(
         $_POST['ficha'] ?? null,
-        FILTER_VALIDATE_INT
+        FILTER_VALIDATE_INT,
+        [
+            'options' => [
+                'min_range' => 1
+            ]
+        ]
     );
 
-    if ($ficha && $ficha > 0) {
+    if ($ficha) {
+
         $parametros['ficha'] = $ficha;
     }
 }
+
+// =============================================
+// 7. MONTAR URL DE RETORNO
+// =============================================
 
 $urlRetorno = BASE_URL .
     '/app/controllers/PortalAlunoController.php?' .
     http_build_query($parametros);
 
 // =============================================
-// 5. SALVAR PREFERÊNCIA
+// 8. SALVAR PREFERÊNCIA
 // =============================================
 
 try {
@@ -150,12 +172,11 @@ try {
 
     http_response_code(500);
 
-    exit('Não foi possível alterar o tema. ' .
-        'Tente novamente.');
+    exit('Não foi possível alterar o tema. Tente novamente.');
 }
 
 // =============================================
-// 6. RETORNAR AO PORTAL
+// 9. RETORNAR À PÁGINA ORIGINAL
 // =============================================
 
 header(

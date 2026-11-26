@@ -19,7 +19,6 @@ if ($usuario_role === 'Aluno') {
     $acessoPermitido =
         $acessoPermitido &&
         (int) ($_SESSION['aluno_id'] ?? 0) === $aluno_id;
-
 } elseif (!in_array(
     $usuario_role,
     ['Admin', 'Professor'],
@@ -276,7 +275,7 @@ elseif (in_array(
             if ((int) $stmtUso->fetchColumn() === 1) {
                 throw new RuntimeException(
                     'Esta ficha possui registros de frequência '
-                    . 'e não pode ser excluída permanentemente.'
+                        . 'e não pode ser excluída permanentemente.'
                 );
             }
 
@@ -316,7 +315,7 @@ elseif (in_array(
         ) {
             throw new RuntimeException(
                 'Preencha os campos obrigatórios '
-                . 'e adicione pelo menos um exercício.'
+                    . 'e adicione pelo menos um exercício.'
             );
         }
 
@@ -492,13 +491,14 @@ elseif (in_array(
             $ficha_id = $ficha_origem_id;
 
             $stmt = $pdo->prepare("
-                UPDATE fichas_treino
-                SET nome = :nome,
-                    objetivo = :objetivo,
-                    professor_id = :professor_id
-                WHERE id = :ficha_id
-                  AND aluno_id = :aluno_id
-            ");
+    UPDATE fichas_treino
+    SET nome = :nome,
+        objetivo = :objetivo,
+        professor_id = :professor_id,
+        versao = versao + 1
+    WHERE id = :ficha_id
+      AND aluno_id = :aluno_id
+");
 
             $stmt->execute([
                 ':nome' => $nome_ficha,
@@ -507,7 +507,6 @@ elseif (in_array(
                 ':ficha_id' => $ficha_id,
                 ':aluno_id' => $aluno_id
             ]);
-
         } else {
 
             // CADASTRAR NOVA FICHA
@@ -650,7 +649,6 @@ elseif (in_array(
                 ));
 
                 $mantidos[$item_id] = true;
-
             } else {
 
                 // Exercício novo ou substituído
@@ -684,7 +682,6 @@ elseif (in_array(
         $pdo->commit();
 
         return $ficha_id;
-
     } catch (Throwable $e) {
 
         if ($pdo->inTransaction()) {

@@ -88,6 +88,7 @@
                     ['Aluno', texto(dados.aluno)],
                     ['Professor', texto(dados.professor)],
                     ['Unidade', texto(dados.unidade)],
+                    ['Ficha', texto(dados.nome_ficha || dados.objetivo)],
                     ['Objetivo', texto(dados.objetivo)],
                     ['Data da ficha', texto(dados.data)],
                     ['Versão', texto(dados.versao)]

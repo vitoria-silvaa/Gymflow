@@ -177,6 +177,36 @@ elseif ($acao === 'faturas') {
 
 elseif ($acao === 'treinos') {
 
+    header('Cache-Control: no-store, private');
+
+    require_once __DIR__ . '/../models/Database.php';
+    require_once __DIR__ . '/../models/HistoricoTreino.php';
+
+    try {
+
+        if (!historicoAutorizar(
+            $pdo,
+            (int) ($_SESSION['company_id'] ?? 0),
+            $aluno_id,
+            (int) ($_SESSION['usuario_id'] ?? 0)
+        )) {
+
+            http_response_code(403);
+
+            exit('Não foi possível validar seu vínculo com esta academia.');
+        }
+    } catch (Throwable $e) {
+
+        error_log(
+            '[GymFlow][PortalTreinos] ' .
+                $e->getMessage()
+        );
+
+        http_response_code(500);
+
+        exit('Não foi possível carregar os treinos.');
+    }
+
     $operacao = 'listar_fichas_aluno';
 
     require __DIR__ . '/../models/Treino.php';

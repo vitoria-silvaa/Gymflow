@@ -63,20 +63,45 @@ include __DIR__ . '/../shared/sidebar.php';
                     <input type="text" name="telefone" class="fin-input" value="<?= htmlspecialchars($_POST['telefone'] ?? '') ?>">
                 </div>
                 <div class="fin-form-group">
-                    <label>Senha *</label>
-                    <input type="password" name="senha" class="fin-input" required>
+                    <label for="senha">Senha *</label>
+
+                    <input
+                        type="password"
+                        id="senha"
+                        name="senha"
+                        class="fin-input"
+                        placeholder="Mínimo de 8 caracteres"
+                        minlength="8"
+                        maxlength="72"
+                        autocomplete="new-password"
+                        required>
+                </div>
+
+                <div class="fin-form-group">
+                    <label for="confirmar_senha">Confirmar senha *</label>
+
+                    <input
+                        type="password"
+                        id="confirmar_senha"
+                        name="confirmar_senha"
+                        class="fin-input"
+                        placeholder="Repita a senha"
+                        minlength="8"
+                        maxlength="72"
+                        autocomplete="new-password"
+                        required>
                 </div>
             </div>
 
             <h3 style="margin-bottom: 16px; font-size: 16px; color: #1e293b; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">Endereço</h3>
-            
+
             <div class="fin-form-grid" style="display: grid; grid-template-columns: 150px 1fr; gap: 16px; margin-bottom: 24px;">
                 <div class="fin-form-group">
                     <label>CEP</label>
                     <div style="display: flex; gap: 8px;">
                         <input type="text" id="cep" class="fin-input" maxlength="9" placeholder="00000-000">
-                                     <button type="button" class="fin-btn fin-btn-secondary" onclick="buscarCep()" style="padding: 8px 12px; color: #ffffff;">Buscar</button>
-  </div>
+                        <button type="button" class="fin-btn fin-btn-secondary" onclick="buscarCep()" style="padding: 8px 12px; color: #ffffff;">Buscar</button>
+                    </div>
                 </div>
                 <div class="fin-form-group">
                     <label>Endereço Completo (Rua, Número, Bairro, Cidade - UF)</label>
@@ -109,31 +134,31 @@ include __DIR__ . '/../shared/sidebar.php';
 </main>
 
 <script>
-function buscarCep() {
-    var cep = document.getElementById('cep').value.replace(/\D/g, '');
-    if (cep !== "") {
-        var validacep = /^[0-9]{8}$/;
-        if(validacep.test(cep)) {
-            document.getElementById('endereco').value = "...";
-            fetch('https://viacep.com.br/ws/'+ cep +'/json/')
-            .then(response => response.json())
-            .then(data => {
-                if (!("erro" in data)) {
-                    document.getElementById('endereco').value = data.logradouro + ',  - ' + data.bairro + ', ' + data.localidade + ' - ' + data.uf;
-                } else {
-                    alert("CEP não encontrado.");
-                    document.getElementById('endereco').value = "";
-                }
-            })
-            .catch(error => {
-                alert("Erro ao buscar CEP.");
-                document.getElementById('endereco').value = "";
-            });
-        } else {
-            alert("Formato de CEP inválido.");
+    function buscarCep() {
+        var cep = document.getElementById('cep').value.replace(/\D/g, '');
+        if (cep !== "") {
+            var validacep = /^[0-9]{8}$/;
+            if (validacep.test(cep)) {
+                document.getElementById('endereco').value = "...";
+                fetch('https://viacep.com.br/ws/' + cep + '/json/')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!("erro" in data)) {
+                            document.getElementById('endereco').value = data.logradouro + ',  - ' + data.bairro + ', ' + data.localidade + ' - ' + data.uf;
+                        } else {
+                            alert("CEP não encontrado.");
+                            document.getElementById('endereco').value = "";
+                        }
+                    })
+                    .catch(error => {
+                        alert("Erro ao buscar CEP.");
+                        document.getElementById('endereco').value = "";
+                    });
+            } else {
+                alert("Formato de CEP inválido.");
+            }
         }
     }
-}
 </script>
 
 <?php include __DIR__ . '/../shared/footer.php'; ?>
