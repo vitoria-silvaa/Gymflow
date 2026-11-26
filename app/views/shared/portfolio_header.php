@@ -354,6 +354,17 @@ if (
     </style>
 <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/portfolio-mobile.css?v=1">
 <script src="<?= BASE_URL ?>/assets/js/portfolio-mobile.js?v=1" defer></script>
+    <!-- Tratamento de imagens -->
+
+    <link
+        rel="stylesheet"
+        href="<?= BASE_URL ?>/assets/css/image-placeholder.css">
+
+    <script
+        src="<?= BASE_URL ?>/assets/js/image-placeholder.js"
+        defer>
+    </script>
+
 </head>
 
 <body>

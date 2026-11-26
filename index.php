@@ -36,9 +36,17 @@ include __DIR__ . '/app/views/shared/portfolio_header.php';
 
                     <div class="hero-slide <?= $index === 0 ? 'ativo' : '' ?>">
 
-                        <img
-                            src="<?= htmlspecialchars($slide['image_url'] ?? '') ?>"
-                            alt="Imagem do portfólio">
+                        <?php if (!empty($slide['image_url'])): ?>
+
+                            <img
+                                src="<?= htmlspecialchars(
+                                            $slide['image_url'],
+                                            ENT_QUOTES,
+                                            'UTF-8'
+                                        ) ?>"
+                                alt="Imagem do portfólio">
+
+                        <?php endif; ?>
 
                     </div>
 
@@ -161,17 +169,25 @@ include __DIR__ . '/app/views/shared/portfolio_header.php';
 
                     <article class="modalidade-card">
 
-                        <?php if (!empty($mod['image_url'])): ?>
+                        <div class="modalidade-imagem">
 
-                            <div class="modalidade-imagem">
+                            <?php if (!empty($mod['image_url'])): ?>
 
                                 <img
-                                    src="<?= htmlspecialchars($mod['image_url']) ?>"
-                                    alt="<?= htmlspecialchars($mod['name'] ?? '') ?>">
+                                    src="<?= htmlspecialchars(
+                                                $mod['image_url'],
+                                                ENT_QUOTES,
+                                                'UTF-8'
+                                            ) ?>"
+                                    alt="<?= htmlspecialchars(
+                                                $mod['name'] ?? '',
+                                                ENT_QUOTES,
+                                                'UTF-8'
+                                            ) ?>">
 
-                            </div>
+                            <?php endif; ?>
 
-                        <?php endif; ?>
+                        </div>
 
                         <div class="modalidade-conteudo">
 
@@ -608,8 +624,8 @@ include __DIR__ . '/app/views/shared/portfolio_header.php';
                                 class="unidade-btn"
                                 href="https://www.google.com/maps/search/?api=1&query=<?= urlencode(($filial['latitude'] ?? '') . ',' . ($filial['longitude'] ?? '')) ?>"
                                 target="_blank"
+                                rel="noopener noreferrer"
                                 style="display: inline-flex; align-items: center; gap: 6px;">
-
                                 <svg
                                     class="unidade-icone"
                                     xmlns="http://www.w3.org/2000/svg"
@@ -1372,7 +1388,7 @@ include __DIR__ . '/app/views/shared/portfolio_header.php';
 
                         const url = `https://wa.me/55${telefoneZap}?text=${encodeURIComponent(textoZap)}`;
 
-                        window.open(url, '_blank');
+                        window.open(url, '_blank', 'noopener,noreferrer');
 
                     }
                 </script>
@@ -1771,159 +1787,159 @@ include __DIR__ . '/app/views/shared/portfolio_header.php';
 
                 <div class="feedback-carousel" data-feedback-carousel>
 
-    <button
-        type="button"
-        class="feedback-carousel-seta feedback-carousel-anterior"
-        aria-label="Feedbacks anteriores">
+                    <button
+                        type="button"
+                        class="feedback-carousel-seta feedback-carousel-anterior"
+                        aria-label="Feedbacks anteriores">
 
-        &#10094;
+                        &#10094;
 
-    </button>
+                    </button>
 
-    <div
-        class="feedback-carousel-viewport"
-        aria-label="Avaliações dos alunos">
+                    <div
+                        class="feedback-carousel-viewport"
+                        aria-label="Avaliações dos alunos">
 
-        <div class="feedback-lista feedback-carousel-track">
+                        <div class="feedback-lista feedback-carousel-track">
 
-                    <?php foreach ($feedbacks as $feedback): ?>
+                            <?php foreach ($feedbacks as $feedback): ?>
 
-                        <?php
+                                <?php
 
-                        $nomeFeedback = trim(
-                            (string) ($feedback['nome'] ?? 'Aluno')
-                        );
+                                $nomeFeedback = trim(
+                                    (string) ($feedback['nome'] ?? 'Aluno')
+                                );
 
-                        $notaFeedback = max(
-                            1,
-                            min(
-                                5,
-                                (int) ($feedback['nota'] ?? 0)
-                            )
-                        );
-
-                        $dataFeedback = !empty($feedback['criado_em'])
-
-                            ? date(
-                                'd/m/Y',
-                                strtotime($feedback['criado_em'])
-                            )
-
-                            : '';
-
-                        $inicialFeedback = function_exists('mb_substr')
-
-                            ? mb_strtoupper(
-                                mb_substr(
-                                    $nomeFeedback,
-                                    0,
+                                $notaFeedback = max(
                                     1,
-                                    'UTF-8'
-                                ),
-                                'UTF-8'
-                            )
+                                    min(
+                                        5,
+                                        (int) ($feedback['nota'] ?? 0)
+                                    )
+                                );
 
-                            : strtoupper(
-                                substr($nomeFeedback, 0, 1)
-                            );
+                                $dataFeedback = !empty($feedback['criado_em'])
 
-                        ?>
+                                    ? date(
+                                        'd/m/Y',
+                                        strtotime($feedback['criado_em'])
+                                    )
 
-                        <article class="feedback-card">
+                                    : '';
 
-                            <div class="feedback-autor">
+                                $inicialFeedback = function_exists('mb_substr')
 
-                                <div class="feedback-avatar">
-
-                                    <?= htmlspecialchars(
-                                        $inicialFeedback,
-                                        ENT_QUOTES,
-                                        'UTF-8'
-                                    ) ?>
-
-                                </div>
-
-                                <div class="feedback-autor-info">
-
-                                    <strong>
-
-                                        <?= htmlspecialchars(
+                                    ? mb_strtoupper(
+                                        mb_substr(
                                             $nomeFeedback,
-                                            ENT_QUOTES,
+                                            0,
+                                            1,
                                             'UTF-8'
-                                        ) ?>
+                                        ),
+                                        'UTF-8'
+                                    )
 
-                                    </strong>
+                                    : strtoupper(
+                                        substr($nomeFeedback, 0, 1)
+                                    );
 
-                                    <?php if ($dataFeedback !== ''): ?>
+                                ?>
 
-                                        <span>
+                                <article class="feedback-card">
+
+                                    <div class="feedback-autor">
+
+                                        <div class="feedback-avatar">
 
                                             <?= htmlspecialchars(
-                                                $dataFeedback,
+                                                $inicialFeedback,
                                                 ENT_QUOTES,
                                                 'UTF-8'
                                             ) ?>
 
-                                        </span>
+                                        </div>
 
-                                    <?php endif; ?>
+                                        <div class="feedback-autor-info">
 
-                                </div>
+                                            <strong>
 
-                            </div>
+                                                <?= htmlspecialchars(
+                                                    $nomeFeedback,
+                                                    ENT_QUOTES,
+                                                    'UTF-8'
+                                                ) ?>
 
-                            <div
-                                class="feedback-card-estrelas"
-                                aria-label="<?= $notaFeedback ?> de 5 estrelas">
+                                            </strong>
 
-                                <?php for ($estrela = 1; $estrela <= 5; $estrela++): ?>
+                                            <?php if ($dataFeedback !== ''): ?>
 
-                                    <span
-                                        class="<?= $estrela <= $notaFeedback
-                                                    ? 'ativa'
-                                                    : '' ?>">
+                                                <span>
 
-                                        ★
+                                                    <?= htmlspecialchars(
+                                                        $dataFeedback,
+                                                        ENT_QUOTES,
+                                                        'UTF-8'
+                                                    ) ?>
 
-                                    </span>
+                                                </span>
 
-                                <?php endfor; ?>
+                                            <?php endif; ?>
 
-                            </div>
+                                        </div>
 
-                            <p>
+                                    </div>
 
-                                <?= nl2br(htmlspecialchars(
-                                    $feedback['mensagem'] ?? '',
-                                    ENT_QUOTES,
-                                    'UTF-8'
-                                )) ?>
+                                    <div
+                                        class="feedback-card-estrelas"
+                                        aria-label="<?= $notaFeedback ?> de 5 estrelas">
 
-                            </p>
+                                        <?php for ($estrela = 1; $estrela <= 5; $estrela++): ?>
 
-                        </article>
+                                            <span
+                                                class="<?= $estrela <= $notaFeedback
+                                                            ? 'ativa'
+                                                            : '' ?>">
 
-                    <?php endforeach; ?>
+                                                ★
 
-                </div>
+                                            </span>
+
+                                        <?php endfor; ?>
+
+                                    </div>
+
+                                    <p>
+
+                                        <?= nl2br(htmlspecialchars(
+                                            $feedback['mensagem'] ?? '',
+                                            ENT_QUOTES,
+                                            'UTF-8'
+                                        )) ?>
+
+                                    </p>
+
+                                </article>
+
+                            <?php endforeach; ?>
+
+                        </div>
                     </div>
 
-    <button
-        type="button"
-        class="feedback-carousel-seta feedback-carousel-proxima"
-        aria-label="Próximos feedbacks">
+                    <button
+                        type="button"
+                        class="feedback-carousel-seta feedback-carousel-proxima"
+                        aria-label="Próximos feedbacks">
 
-        &#10095;
+                        &#10095;
 
-    </button>
+                    </button>
 
-</div>
+                </div>
 
-<div
-    class="feedback-carousel-indicadores"
-    aria-label="Navegação dos feedbacks">
-</div>
+                <div
+                    class="feedback-carousel-indicadores"
+                    aria-label="Navegação dos feedbacks">
+                </div>
 
             <?php endif; ?>
 

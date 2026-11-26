@@ -66,6 +66,45 @@ if ($role === 'Aluno') {
 }
 
 // =============================================
+// IDENTIDADE INSTITUCIONAL DOS FUNCIONARIOS
+// =============================================
+
+if (in_array(
+    $role,
+    ['Professor', 'Recepcao'],
+    true
+)) {
+
+    require_once __DIR__ .
+        '/../../models/IdentidadeInstitucional.php';
+
+    $identidadeInterna =
+        identidadePadraoPortalAluno();
+
+    try {
+
+        require_once __DIR__ .
+            '/../../models/Database.php';
+
+        $identidadeInterna =
+            carregarIdentidadePainelInterno($pdo);
+    } catch (Throwable $e) {
+
+        error_log(
+            '[GymFlow][IdentidadeInstitucional] ' .
+                $e->getMessage()
+        );
+    }
+
+    foreach (
+        $identidadeInterna as $chave => $valor
+    ) {
+
+        $_SESSION[$chave] = $valor;
+    }
+}
+
+// =============================================
 // 3. IDENTIDADE VISUAL DO PAINEL
 // =============================================
 
@@ -442,6 +481,29 @@ if (!empty($cssEspecifico)) {
             color: var(--cor-sobre-secundaria);
         }
     </style>
+
+    <!-- Tratamento de imagens -->
+
+    <link
+        rel="stylesheet"
+        href="<?= BASE_URL ?>/assets/css/image-placeholder.css">
+
+    <script
+        src="<?= BASE_URL ?>/assets/js/image-placeholder.js"
+        defer>
+    </script>
+
+    <!-- PADRONIZAÇÃO VISUAL DOS PAINÉIS -->
+
+    <?php if ($role !== 'Aluno'): ?>
+
+        <link
+            rel="stylesheet"
+            href="<?= $escapar(
+                        $carregarCss('painel-identidade.css')
+                    ) ?>">
+
+    <?php endif; ?>
 
 </head>
 

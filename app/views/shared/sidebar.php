@@ -8,7 +8,11 @@ $logoPainel = $_SESSION['logo_url'] ?? '';
 $usuarioId = (int) ($_SESSION['usuario_id'] ?? 0);
 $companyId = (int) ($_SESSION['company_id'] ?? 0);
 
-if ($role === 'Aluno') {
+if (in_array(
+    $role,
+    ['Aluno', 'Professor', 'Recepcao'],
+    true
+)) {
 
     require_once __DIR__ .
         '/../../models/IdentidadePortalAluno.php';

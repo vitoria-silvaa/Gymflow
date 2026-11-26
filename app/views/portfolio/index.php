@@ -54,7 +54,12 @@
                </div>
                <div>
                    <div class="portfolio-admin-header-actions">
-                       <a class="portfolio-admin-preview-link" href="<?= BASE_URL ?>/index.php" target="_blank" rel="noopener noreferrer">Visualizar site </a>
+                       <a class="portfolio-admin-preview-link"
+                           href="<?= BASE_URL ?>/index.php?id=<?= (int) $_SESSION['company_id'] ?>"
+                           target="_blank"
+                           rel="noopener noreferrer">
+                           Visualizar site
+                       </a>
                        <button type="submit" class="portfolio-admin-save">Salvar alterações</button>
                    </div>
                </div>

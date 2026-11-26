@@ -141,6 +141,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const btnMaps = document.createElement('a');
         btnMaps.href = 'https://www.google.com/maps/search/?api=1&query=' + latitude + ',' + longitude;
         btnMaps.target = '_blank';
+        btnMaps.rel = 'noopener noreferrer';
+        btnMaps.rel = 'noopener noreferrer';
         btnMaps.textContent = ' Abrir no Google Maps';
         btnMaps.style.display = 'inline-block';
         btnMaps.style.marginTop = '10px';
@@ -270,6 +272,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const btnMaps = document.createElement('a');
             btnMaps.href = 'https://www.google.com/maps/search/?api=1&query=' + latitude + ',' + longitude;
             btnMaps.target = '_blank';
+            btnMaps.rel = 'noopener noreferrer';
             btnMaps.textContent = ' Abrir no Google Maps';
             btnMaps.style.display = 'inline-block';
             btnMaps.style.marginTop = '10px';
@@ -313,7 +316,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 maxZoom: 13
             });
         }
-        
+
         window._limitesMapaCompleto = limitesModal;
     }
 
@@ -327,7 +330,7 @@ document.addEventListener('DOMContentLoaded', function () {
         window.setTimeout(function () {
             if (mapaCompleto) {
                 mapaCompleto.invalidateSize();
-                
+
                 if (window._limitesMapaCompleto) {
                     if (window._limitesMapaCompleto.length === 1) {
                         mapaCompleto.setView(window._limitesMapaCompleto[0], 14);
@@ -529,14 +532,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
             entradas.forEach(function (entrada) {
 
-              if (entrada.isIntersecting) {
-             entrada.target.classList.add('reveal-visivel');
-              } else {
-              entrada.target.classList.remove('reveal-visivel');
-}
+                if (entrada.isIntersecting) {
+                    entrada.target.classList.add('reveal-visivel');
+                } else {
+                    entrada.target.classList.remove('reveal-visivel');
+                }
             });
 
-        },       
+        },
         {
             threshold: 0.12,
             rootMargin: '0px 0px -40px 0px'
@@ -544,23 +547,23 @@ document.addEventListener('DOMContentLoaded', function () {
     );
 
     elementosAnimados.forEach(function (elemento) {
-    elemento.classList.add('portfolio-reveal');
-    observador.observe(elemento);
-});
-
-/* Cards aparecem em sequência */
-const gruposDeCards = [
-    '.modalidade-card',
-    '.plano-card',
-    '.unidade-card',
-    '.sobre-card'
-];
-
-gruposDeCards.forEach(function (seletor) {
-    document.querySelectorAll(seletor).forEach(function (card, indice) {
-        card.style.transitionDelay = (indice * 180) + 'ms';
+        elemento.classList.add('portfolio-reveal');
+        observador.observe(elemento);
     });
-});
+
+    /* Cards aparecem em sequência */
+    const gruposDeCards = [
+        '.modalidade-card',
+        '.plano-card',
+        '.unidade-card',
+        '.sobre-card'
+    ];
+
+    gruposDeCards.forEach(function (seletor) {
+        document.querySelectorAll(seletor).forEach(function (card, indice) {
+            card.style.transitionDelay = (indice * 180) + 'ms';
+        });
+    });
 
 });
 
