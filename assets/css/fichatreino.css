@@ -1,181 +1,144 @@
-/* ========================================
-   GYMFLOW - FICHAS DE TREINO
-   ADMINISTRADOR E PROFESSOR
-======================================== */
-
-/* 1. ESTRUTURA DA PÁGINA */
+/* FICHAS DE TREINO */
 
 .fichatreino-page {
     width: 100%;
     max-width: 1500px;
     min-width: 0;
     margin: 0 auto;
-    padding: 30px 32px 45px;
+    padding: 28px 32px 40px;
     color: var(--ui-texto);
-    font-size: 15px;
+    font-size: 14px;
 }
 
-/* 2. CABEÇALHO */
+.fichatreino-page *,
+.fichatreino-page *::before,
+.fichatreino-page *::after {
+    box-sizing: border-box;
+}
 
-.fichatreino-page .fichatreino-header {
+/* CABEÇALHO */
+
+.fichatreino-page .ft-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 20px;
-    margin-bottom: 28px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--ui-borda);
+    margin-bottom: 26px;
 }
 
-.fichatreino-page .fichatreino-etiqueta {
-    display: block;
-    margin-bottom: 7px;
-    color: var(--cor-primaria);
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-}
-
-.fichatreino-page .fichatreino-header h1 {
-    margin: 0 0 7px;
-    color: var(--ui-texto);
-    font-size: 28px;
-    font-weight: 700;
-    line-height: 1.2;
-}
-
-.fichatreino-page .fichatreino-header p,
-.fichatreino-page .ficha-card-header p {
-    margin: 0;
-    color: var(--ui-texto-suave);
-    font-size: 14px;
-    line-height: 1.5;
-}
-
-/* 3. ALERTAS */
-
-.fichatreino-page .ficha-alerta {
-    margin-bottom: 20px;
-    padding: 13px 16px;
-    border-radius: var(--ui-raio-sm);
-    font-size: 14px;
-    line-height: 1.5;
-}
-
-.fichatreino-page .ficha-alerta-sucesso {
-    background-color: var(--cor-sucesso-fundo);
-    color: #047857;
-    border: 1px solid #a7f3d0;
-}
-
-.fichatreino-page .ficha-alerta-erro,
-.fichatreino-page .ficha-historico-erro {
-    background-color: var(--cor-perigo-fundo);
-    color: #b91c1c;
-    border: 1px solid #fecaca;
-}
-
-/* 4. CARDS */
-
-.fichatreino-page .ficha-card,
-.fichatreino-page .ficha-acoes {
-    background-color: var(--ui-fundo-card);
-    border: 1px solid var(--ui-borda);
-    border-radius: var(--ui-raio-md);
-    box-shadow: var(--ui-sombra-card);
-}
-
-.fichatreino-page .ficha-card {
-    margin-bottom: 24px;
-    padding: 24px;
-}
-
-.fichatreino-page .ficha-card-header {
+.fichatreino-page .ft-header-title {
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 16px;
-    margin-bottom: 24px;
-    padding-bottom: 18px;
-    border-bottom: 1px solid var(--ui-borda);
+    align-items: center;
+    gap: 14px;
 }
 
-.fichatreino-page .ficha-card-header h2 {
-    margin: 0 0 6px;
+.fichatreino-page h1 {
+    margin: 0;
     color: var(--ui-texto);
-    font-size: 20px;
-    font-weight: 700;
+    font-size: 26px;
+    font-weight: 600;
+    line-height: 1.3;
 }
 
-/* 5. FORMULÁRIO */
+.fichatreino-page h2 {
+    margin: 0;
+    color: var(--ui-texto);
+    font-size: 18px;
+    font-weight: 600;
+}
 
-.fichatreino-page .ficha-form-grid {
+.fichatreino-page .ft-header p {
+    margin: 5px 0 0;
+    font-size: 14px;
+    color: var(--ui-texto-suave);
+}
+
+.fichatreino-page .ft-muted {
+    color: var(--ui-texto-suave);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+/* PAINÉIS */
+
+.fichatreino-page .ft-panel {
+    background: var(--ui-fundo-card);
+    border: 1px solid var(--ui-borda);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.fichatreino-page .ft-editor-info,
+.fichatreino-page .ft-editor-exercises {
+    padding: 22px;
+}
+
+.fichatreino-page .ft-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+/* FILTRO DE ALUNO */
+
+.fichatreino-page .ft-filter {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    margin-bottom: 22px;
+}
+
+.fichatreino-page .ft-filter .ft-field {
+    flex: 1;
+    max-width: 420px;
+}
+
+/* FORMULÁRIO */
+
+.fichatreino-page .ft-form-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 20px;
 }
 
-.fichatreino-page .ficha-campo {
+.fichatreino-page .ft-field {
     display: flex;
     flex-direction: column;
+    gap: 8px;
     min-width: 0;
-    gap: 7px;
 }
 
-.fichatreino-page .ficha-campo-largo {
+.fichatreino-page .ft-field-full {
     grid-column: 1 / -1;
 }
 
-.fichatreino-page .ficha-campo label {
-    margin: 0;
+.fichatreino-page .ft-field label {
     color: var(--ui-texto);
     font-size: 13px;
-    font-weight: 600;
-    line-height: 1.4;
+    font-weight: 500;
 }
 
-.fichatreino-page .ficha-obrigatorio {
-    color: var(--cor-perigo);
-}
-
-/* 6. INPUTS E SELECTS */
-
-.fichatreino-page .ficha-campo select,
-.fichatreino-page .ficha-campo input,
-.fichatreino-page .ficha-tabela input:not([type="hidden"]) {
+.fichatreino-page input:not([type="hidden"]),
+.fichatreino-page select {
     width: 100%;
-    background-color: var(--ui-input-fundo);
+    min-width: 0;
+    min-height: 42px;
+    padding: 10px 12px;
+    background: var(--ui-input-fundo);
     color: var(--ui-input-texto);
     border: 1px solid var(--ui-input-borda);
-    border-radius: var(--ui-raio-sm);
+    border-radius: 4px;
+    outline: none;
     font-family: inherit;
-    transition: border-color var(--ui-transicao);
-}
-
-.fichatreino-page .ficha-campo select,
-.fichatreino-page .ficha-campo input {
-    min-height: 43px;
-    padding: 10px 12px;
     font-size: 14px;
+    transition: border-color .15s ease;
 }
 
-.fichatreino-page .ficha-tabela input:not([type="hidden"]) {
-    min-width: 75px;
-    padding: 9px 10px;
-    font-size: 13px;
-}
-
-.fichatreino-page .ficha-campo select:hover,
-.fichatreino-page .ficha-campo input:hover,
-.fichatreino-page .ficha-tabela input:not([type="hidden"]):hover {
-    border-color: var(--cor-borda-forte);
-}
-
-.fichatreino-page .ficha-campo select:focus,
-.fichatreino-page .ficha-campo input:focus,
-.fichatreino-page .ficha-tabela input:not([type="hidden"]):focus {
+.fichatreino-page input:focus,
+.fichatreino-page select:focus {
     border-color: var(--ui-input-foco);
     outline: 2px solid var(--ui-input-foco);
     outline-offset: 1px;
@@ -186,361 +149,403 @@
 }
 
 .fichatreino-page select option {
-    background-color: var(--ui-input-fundo);
+    background: var(--ui-input-fundo);
     color: var(--ui-input-texto);
 }
 
-/* 7. ADICIONAR EXERCÍCIO */
+.fichatreino-page .ft-field-error {
+    margin: 0 0 15px;
+    font-size: 13px;
+    color: var(--cor-perigo);
+}
 
-.fichatreino-page .ficha-adicionar {
+/* ADICIONAR EXERCÍCIO */
+
+.fichatreino-page .ft-add {
     display: flex;
     align-items: flex-end;
     gap: 12px;
-    margin-bottom: 18px;
+    margin-bottom: 20px;
 }
 
-.fichatreino-page .ficha-adicionar .ficha-campo {
+.fichatreino-page .ft-add .ft-field {
     flex: 1;
 }
 
-/* 8. BOTÕES */
+/* BOTÕES */
 
-.fichatreino-page .ficha-btn {
+.fichatreino-page .ft-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    min-height: 43px;
-    padding: 10px 18px;
+    min-height: 42px;
+    padding: 9px 16px;
     border: 1px solid transparent;
-    border-radius: var(--ui-raio-sm);
+    border-radius: 4px;
     font-family: inherit;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
     line-height: 1.4;
     text-decoration: none;
     white-space: nowrap;
     cursor: pointer;
     transition:
-        background-color var(--ui-transicao),
-        border-color var(--ui-transicao),
-        color var(--ui-transicao);
+        background-color .15s ease,
+        border-color .15s ease,
+        color .15s ease;
 }
 
-.fichatreino-page .ficha-btn-primario,
-.fichatreino-page .ficha-btn-secundario {
-    background-color: var(--ui-botao-fundo);
+.fichatreino-page .ft-btn svg {
+    flex-shrink: 0;
+}
+
+.fichatreino-page .ft-btn-primary {
+    background: var(--ui-botao-fundo);
     color: var(--ui-botao-texto);
 }
 
-.fichatreino-page .ficha-btn-primario:hover:not(:disabled),
-.fichatreino-page .ficha-btn-secundario:hover:not(:disabled) {
-    background-color: var(--ui-botao-fundo-hover);
+.fichatreino-page .ft-btn-primary:hover:not(:disabled) {
+    background: var(--ui-botao-fundo-hover);
     color: var(--ui-botao-texto);
 }
 
-/* Botão salvar desabilitado */
-
-.fichatreino-page #btnSalvarFicha:disabled {
-    background-color: var(--cor-superficie-secundaria);
-    color: var(--ui-texto-suave);
+.fichatreino-page .ft-btn-secondary {
+    background: transparent;
+    color: var(--ui-texto);
     border-color: var(--ui-borda);
+}
+
+.fichatreino-page .ft-btn-secondary:hover {
+    background: var(--ui-fundo-pagina);
+    border-color: var(--cor-borda-forte);
+}
+
+.fichatreino-page .ft-btn-danger {
+    background: #b91c1c;
+    color: #fff;
+}
+
+.fichatreino-page .ft-btn-danger:hover {
+    background: #991b1b;
+}
+
+.fichatreino-page .ft-btn:disabled {
+    opacity: .45;
     cursor: not-allowed;
-    opacity: 0.65;
-    box-shadow: none;
-    transform: none;
 }
 
-.fichatreino-page .ficha-mensagem-campo {
-    margin: -4px 0 16px;
-    color: var(--cor-perigo);
-    font-size: 13px;
-    font-weight: 600;
-}
+/* BOTÕES COM ÍCONES SVG */
 
-/* 9. CONTADOR DE EXERCÍCIOS */
-
-.fichatreino-page .ficha-contador {
+.fichatreino-page .ft-icon-btn {
     display: inline-flex;
     align-items: center;
-    padding: 7px 12px;
-    background-color: var(--ui-fundo-pagina);
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    padding: 0;
+    background: transparent;
     color: var(--ui-texto-suave);
-    border: 1px solid var(--ui-borda);
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 600;
-    white-space: nowrap;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+        color .15s ease,
+        background-color .15s ease;
 }
 
-/* 10. TABELAS */
+.fichatreino-page .ft-icon-btn:hover {
+    background: var(--ui-fundo-pagina);
+    color: var(--ui-texto);
+}
 
-.fichatreino-page .ficha-tabela-container {
+.fichatreino-page .ft-icon-danger {
+    color: var(--cor-perigo, #dc2626);
+}
+
+.fichatreino-page .ft-icon-danger:hover {
+    background: var(--cor-perigo-fundo, #fee2e2);
+    color: #b91c1c;
+}
+
+.fichatreino-page .ft-icon-btn:focus-visible,
+.fichatreino-page .ft-btn:focus-visible,
+.fichatreino-page .ft-grip:focus-visible {
+    outline: 2px solid var(--ui-input-foco);
+    outline-offset: 2px;
+}
+
+/* TABELAS */
+
+.fichatreino-page .ft-table-wrap {
     width: 100%;
     overflow-x: auto;
-    border: 1px solid var(--ui-borda);
-    border-radius: 8px;
 }
 
-.fichatreino-page .ficha-tabela {
+.fichatreino-page .ft-table {
     width: 100%;
-    min-width: 680px;
+    min-width: 760px;
     margin: 0;
-    background-color: var(--ui-fundo-card);
-    color: var(--ui-texto);
     border-collapse: collapse;
+    color: var(--ui-texto);
     font-size: 14px;
 }
 
-.fichatreino-page .ficha-tabela thead,
-.fichatreino-page .ficha-tabela th {
-    background-color: var(--ui-fundo-pagina);
+.fichatreino-page .ft-table thead {
+    background: var(--ui-fundo-pagina);
 }
 
-.fichatreino-page .ficha-tabela th {
-    padding: 14px 15px;
+.fichatreino-page .ft-table th {
+    padding: 15px 16px;
     color: var(--ui-texto-suave);
     border-bottom: 1px solid var(--ui-borda);
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.03em;
+    font-size: 13px;
+    font-weight: 500;
     text-align: left;
     white-space: nowrap;
 }
 
-.fichatreino-page .ficha-tabela td {
-    padding: 12px 15px;
-    background-color: transparent;
-    color: var(--ui-texto);
+.fichatreino-page .ft-table td {
+    padding: 15px 16px;
+    background: transparent;
     border-bottom: 1px solid var(--ui-borda);
     vertical-align: middle;
 }
 
-.fichatreino-page .ficha-tabela tbody tr {
-    background-color: var(--ui-fundo-card);
-    transition: background-color var(--ui-transicao);
-}
-
-.fichatreino-page .ficha-tabela tbody tr:hover {
-    background-color: var(--ui-fundo-pagina);
-}
-
-.fichatreino-page .ficha-tabela tbody tr:last-child td {
+.fichatreino-page .ft-table tbody tr:last-child td {
     border-bottom: none;
 }
 
-.fichatreino-page .ficha-nome-exercicio {
-    min-width: 165px;
-    font-weight: 600;
+.fichatreino-page .ft-table tbody tr:hover {
+    background: var(--ui-fundo-pagina);
 }
 
-/* 11. REMOVER EXERCÍCIO */
+.fichatreino-page .ft-name {
+    min-width: 180px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
 
-.fichatreino-page .ficha-btn-remover {
+.fichatreino-page .ft-actions-column {
+    width: 110px;
+}
+
+.fichatreino-page .ft-row-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* TABELA DO EDITOR */
+
+.fichatreino-page .ft-edit-table {
+    min-width: 880px;
+}
+
+.fichatreino-page .ft-edit-table th,
+.fichatreino-page .ft-edit-table td {
+    padding: 10px 9px;
+}
+
+.fichatreino-page .ft-edit-table input:not([type="hidden"]),
+.fichatreino-page .ft-edit-table select {
+    min-height: 38px;
+    padding: 7px 9px;
+    font-size: 13px;
+}
+
+.fichatreino-page .ft-edit-table input[data-field="series"] {
+    min-width: 65px;
+}
+
+.fichatreino-page .ft-edit-table input[data-field="intervalo"] {
+    min-width: 85px;
+}
+
+.fichatreino-page .ft-edit-table input[data-field="repeticoes"],
+.fichatreino-page .ft-edit-table input[data-field="carga"] {
+    min-width: 95px;
+}
+
+.fichatreino-page .ft-exercise-name {
+    width: 30%;
+    min-width: 200px;
+}
+
+/* ORDENAÇÃO DE EXERCÍCIOS */
+
+.fichatreino-page .ft-grip-column {
+    width: 38px;
+}
+
+.fichatreino-page .ft-grip {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 8px 12px;
-    background-color: var(--cor-perigo-fundo);
-    color: #b91c1c;
-    border: 1px solid #fecaca;
-    border-radius: var(--ui-raio-sm);
-    font-family: inherit;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition:
-        background-color var(--ui-transicao),
-        border-color var(--ui-transicao),
-        color var(--ui-transicao);
-}
-
-.fichatreino-page .ficha-btn-remover:hover {
-    background-color: #fee2e2;
-    color: #991b1b;
-    border-color: #fca5a5;
-}
-
-/* 12. ESTADO VAZIO */
-
-.fichatreino-page .ficha-estado-vazio {
-    padding: 38px 20px;
-    background-color: var(--ui-fundo-card);
-    text-align: center;
-}
-
-.fichatreino-page .ficha-estado-vazio strong {
-    display: block;
-    margin-bottom: 7px;
-    color: var(--ui-texto);
-    font-size: 15px;
-    font-weight: 700;
-}
-
-.fichatreino-page .ficha-estado-vazio p {
-    margin: 0;
+    width: 28px;
+    height: 36px;
+    background: transparent;
     color: var(--ui-texto-suave);
-    font-size: 13px;
-    line-height: 1.5;
+    border: none;
+    border-radius: 4px;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
 }
 
-/* 13. ÁREA DE SALVAR */
-
-.fichatreino-page .ficha-acoes {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    margin-bottom: 26px;
-    padding: 20px 24px;
-}
-
-.fichatreino-page .ficha-acoes-info strong {
-    display: block;
-    margin-bottom: 5px;
+.fichatreino-page .ft-grip:hover {
     color: var(--ui-texto);
-    font-size: 14px;
-    font-weight: 700;
 }
 
-.fichatreino-page .ficha-acoes-info p {
-    margin: 0;
-    color: var(--ui-texto-suave);
-    font-size: 13px;
-    line-height: 1.5;
+.fichatreino-page .ft-grip:active {
+    cursor: grabbing;
 }
 
-/* 14. HISTÓRICO DE TREINOS */
-
-.fichatreino-page .ficha-historico-secao {
-    margin-top: 28px;
+.fichatreino-page .ft-dragging {
+    opacity: .65;
+    background: var(--ui-fundo-pagina);
 }
 
-.fichatreino-page .ficha-historico-item {
-    margin-bottom: 18px;
-    padding: 20px;
-    background-color: var(--ui-fundo-card);
-    border: 1px solid var(--ui-borda);
-    border-radius: 8px;
-}
+/* AÇÕES DO FORMULÁRIO */
 
-.fichatreino-page .ficha-historico-item:last-child {
-    margin-bottom: 0;
-}
-
-.fichatreino-page .ficha-historico-topo {
+.fichatreino-page .ft-form-actions {
     display: flex;
+    justify-content: flex-end;
     align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
     gap: 12px;
-    margin-bottom: 12px;
+    margin-top: 24px;
 }
 
-.fichatreino-page .ficha-historico-topo strong {
-    color: var(--ui-texto);
-    font-size: 15px;
-    font-weight: 700;
-}
+/* ESTADO VAZIO */
 
-.fichatreino-page .ficha-versao {
-    display: inline-flex;
-    padding: 5px 10px;
-    background-color: var(--cor-primaria-suave);
-    color: var(--ui-texto);
-    border-radius: var(--ui-raio-sm);
-    font-size: 12px;
-    font-weight: 700;
-}
-
-.fichatreino-page .ficha-historico-meta {
+.fichatreino-page .ft-empty {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 8px 20px;
-    margin-bottom: 18px;
+    justify-content: center;
+    gap: 16px;
+    min-height: 120px;
+    padding: 30px 20px;
     color: var(--ui-texto-suave);
-    font-size: 13px;
+    font-size: 14px;
+    text-align: center;
+}
+
+/* MENSAGENS */
+
+.fichatreino-page .ft-alert {
+    padding: 13px 16px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    font-size: 14px;
     line-height: 1.5;
 }
 
-.fichatreino-page .ficha-historico-vazio {
-    padding: 26px 20px;
-    background-color: var(--ui-fundo-pagina);
-    color: var(--ui-texto-suave);
+.fichatreino-page .ft-alert-success {
+    background: #ecfdf5;
+    color: #047857;
+    border-color: #a7f3d0;
+}
+
+.fichatreino-page .ft-alert-error {
+    background: #fef2f2;
+    color: #b91c1c;
+    border-color: #fecaca;
+}
+
+/* MODAL DE EXCLUSÃO */
+
+.fichatreino-page .ft-dialog {
+    width: min(460px, calc(100% - 32px));
+    max-height: calc(100vh - 40px);
+    padding: 24px;
+    margin: auto;
+    background: var(--ui-fundo-card);
+    color: var(--ui-texto);
     border: 1px solid var(--ui-borda);
     border-radius: 8px;
-    text-align: center;
-    font-size: 14px;
 }
 
-.fichatreino-page .ficha-historico-mensagem {
-    color: var(--ui-texto-suave);
-    font-size: 14px;
+.fichatreino-page .ft-dialog::backdrop {
+    background: rgba(0, 0, 0, .60);
 }
 
-.fichatreino-page .ficha-historico-erro {
-    padding: 13px 16px;
-    border-radius: 8px;
-    font-size: 14px;
+.fichatreino-page .ft-dialog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
 }
 
-/* 15. ESTADOS NO TEMA ESCURO */
+.fichatreino-page .ft-dialog p {
+    margin: 0 0 15px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.fichatreino-page .ft-dialog-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 24px;
+}
+
+/* TEMA ESCURO */
 
 :root[data-theme="dark"]
-.fichatreino-page .ficha-alerta-sucesso {
-    background-color: #15372a;
+.fichatreino-page .ft-alert-success {
+    background: #15372a;
     color: #86efac;
     border-color: #286344;
 }
 
 :root[data-theme="dark"]
-.fichatreino-page .ficha-alerta-erro,
-
-:root[data-theme="dark"]
-.fichatreino-page .ficha-historico-erro,
-
-:root[data-theme="dark"]
-.fichatreino-page .ficha-btn-remover {
-    background-color: #3f2027;
+.fichatreino-page .ft-alert-error {
+    background: #3f2027;
     color: #fca5a5;
     border-color: #7f3540;
 }
 
 :root[data-theme="dark"]
-.fichatreino-page .ficha-btn-remover:hover {
-    background-color: #57272f;
-    color: #fecaca;
-    border-color: #fca5a5;
-}
-
-:root[data-theme="dark"]
-.fichatreino-page .ficha-mensagem-campo,
-
-:root[data-theme="dark"]
-.fichatreino-page .ficha-obrigatorio {
+.fichatreino-page .ft-icon-danger {
     color: #f87171;
 }
 
-/* 16. ELEMENTOS OCULTOS */
+:root[data-theme="dark"]
+.fichatreino-page .ft-icon-danger:hover {
+    background: #3f2027;
+    color: #fca5a5;
+}
+
+:root[data-theme="dark"]
+.fichatreino-page .ft-field-error {
+    color: #f87171;
+}
+
+/* ELEMENTOS OCULTOS */
 
 .fichatreino-page [hidden] {
     display: none !important;
 }
 
-/* 17. RESPONSIVIDADE */
+/* RESPONSIVIDADE */
 
 @media (max-width: 900px) {
 
     .fichatreino-page {
-        padding: 24px 20px 40px;
+        padding: 24px 20px;
     }
 
-    .fichatreino-page .ficha-form-grid {
+    .fichatreino-page .ft-form-grid {
         grid-template-columns: 1fr;
     }
 
-    .fichatreino-page .ficha-campo-largo {
+    .fichatreino-page .ft-field-full {
         grid-column: auto;
     }
 }
@@ -548,38 +553,39 @@
 @media (max-width: 600px) {
 
     .fichatreino-page {
-        padding: 20px 16px 35px;
+        padding: 18px 14px;
     }
 
-    .fichatreino-page .fichatreino-header h1 {
-        font-size: 26px;
+    .fichatreino-page h1 {
+        font-size: 23px;
     }
 
-    .fichatreino-page .ficha-card {
-        padding: 18px;
+    .fichatreino-page .ft-header {
+        align-items: flex-start;
+        flex-wrap: wrap;
     }
 
-    .fichatreino-page .ficha-card-header h2 {
-        font-size: 18px;
+    .fichatreino-page .ft-editor-info,
+    .fichatreino-page .ft-editor-exercises {
+        padding: 16px;
     }
 
-    .fichatreino-page .ficha-adicionar {
+    .fichatreino-page .ft-filter,
+    .fichatreino-page .ft-add {
         flex-direction: column;
         align-items: stretch;
     }
 
-    .fichatreino-page .ficha-acoes {
-        flex-direction: column;
+    .fichatreino-page .ft-filter .ft-field {
+        max-width: none;
+    }
+
+    .fichatreino-page .ft-form-actions {
+        flex-direction: column-reverse;
         align-items: stretch;
-        padding: 18px;
     }
 
-    .fichatreino-page #btnAdicionar,
-    .fichatreino-page #btnSalvarFicha {
-        width: 100%;
-    }
-
-    .fichatreino-page .ficha-historico-item {
-        padding: 15px;
+    .fichatreino-page .ft-dialog-actions {
+        flex-wrap: wrap;
     }
 }

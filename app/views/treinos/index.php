@@ -1,711 +1,1234 @@
 <?php
-// app/views/treinos/index.php
 
 if (!isset($tituloPagina)) {
-    header(
-        "Location: " . BASE_URL .
-            "/app/controllers/TreinoController.php"
-    );
+
+    header('../../controllers/TreinoController.php' !== ''
+        ? 'Location: ../../controllers/TreinoController.php'
+        : 'Location: /');
+
     exit;
 }
 
-/** @var array $alunos */
-/** @var array $professores */
-/** @var array $exercicios */
+$tituloPagina = 'Fichas de Treino';
 
-$tituloPagina = "Fichas de Treino";
-
-// O header já acrescenta a versão do CSS.
 $cssEspecifico = BASE_URL . '/assets/css/fichatreino.css';
+
+$esc = static function ($valor) {
+    return htmlspecialchars(
+        is_scalar($valor) ? (string) $valor : '',
+        ENT_QUOTES,
+        'UTF-8'
+    );
+};
+
+$objetivos = [
+    'Emagrecimento',
+    'Definição',
+    'Hipertrofia',
+    'Ganho de Massa Muscular',
+    'Condicionamento',
+    'Resistência Muscular',
+    'Força',
+    'Mobilidade e Flexibilidade',
+    'Reabilitação',
+    'Saúde e Qualidade de Vida'
+];
+
+$objetivoAtual = $fichaForm['objetivo'] ?? '';
+
+if (
+    $objetivoAtual !== '' &&
+    !in_array($objetivoAtual, $objetivos, true)
+) {
+    $objetivos[] = $objetivoAtual;
+}
+
+// Ícones SVG no padrão Lucide
+
+$icone = static function ($nome) {
+
+    $paths = [
+        'plus' => '<path d="M12 5v14M5 12h14"/>',
+
+        'edit' => '
+            <path d="m16 3 5 5"/>
+            <path d="M4 20h4L21 7l-4-4L4 16z"/>
+        ',
+
+        'trash' => '
+            <path d="M3 6h18"/>
+            <path d="M19 6v14H5V6"/>
+            <path d="M8 6V3h8v3"/>
+            <path d="M10 10v7M14 10v7"/>
+        ',
+
+        'back' => '
+            <path d="m12 19-7-7 7-7"/>
+            <path d="M5 12h14"/>
+        ',
+
+        'grip' => '
+            <circle cx="9" cy="5" r="1"/>
+            <circle cx="9" cy="12" r="1"/>
+            <circle cx="9" cy="19" r="1"/>
+            <circle cx="15" cy="5" r="1"/>
+            <circle cx="15" cy="12" r="1"/>
+            <circle cx="15" cy="19" r="1"/>
+        ',
+
+        'close' => '
+            <path d="m18 6-12 12M6 6l12 12"/>
+        '
+    ];
+
+    return '<svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+        focusable="false">'
+        . ($paths[$nome] ?? '') .
+        '</svg>';
+};
+
+$urlLista = $urlFicha .
+    '?aluno_id=' . $alunoSelecionado;
+
+$editando = $modoEditor &&
+    (int) ($fichaForm['id'] ?? 0) > 0;
 
 include __DIR__ . '/../shared/header.php';
 include __DIR__ . '/../shared/sidebar.php';
+
 ?>
 
 <main class="conteudo fichatreino-page">
 
-    <!-- CABEÇALHO -->
-
-    <header class="fichatreino-header">
-        <div>
-            <span class="fichatreino-etiqueta">
-                GESTÃO DE TREINOS
-            </span>
-
-            <h1>Fichas de Treino</h1>
-
-            <p>
-                Monte e versione os treinos dos alunos,
-                de forma organizada.
-            </p>
-        </div>
-    </header>
-
-    <!-- MENSAGENS -->
-
     <?php if (!empty($mensagemSucesso)): ?>
-        <div class="ficha-alerta ficha-alerta-sucesso"
-            role="status">
-            <?= htmlspecialchars(
-                $mensagemSucesso,
-                ENT_QUOTES,
-                'UTF-8'
-            ) ?>
+
+        <div class="ft-alert ft-alert-success" role="status">
+
+            <?= $esc($mensagemSucesso) ?>
+
         </div>
+
     <?php endif; ?>
 
     <?php if (!empty($mensagemErro)): ?>
-        <div class="ficha-alerta ficha-alerta-erro"
-            role="alert">
-            <?= htmlspecialchars(
-                $mensagemErro,
-                ENT_QUOTES,
-                'UTF-8'
-            ) ?>
+
+        <div class="ft-alert ft-alert-error" role="alert">
+
+            <?= $esc($mensagemErro) ?>
+
         </div>
+
     <?php endif; ?>
 
-    <!-- FORMULÁRIO -->
+    <?php if (!$modoEditor): ?>
 
-    <form method="POST" id="formFicha">
+        <!-- LISTAGEM DE FICHAS -->
 
-        <!-- CONFIGURAÇÃO DA FICHA -->
+        <header class="ft-header">
 
-        <section class="ficha-card">
+            <h1>Fichas de Treino</h1>
 
-            <div class="ficha-card-header">
-                <div>
-                    <h2>Informações da ficha</h2>
-                    <p>
-                        Defina o responsável, o aluno
-                        e o objetivo do treinamento.
-                    </p>
-                </div>
+            <?php if ($alunoSelecionado > 0): ?>
+
+                <a
+                    href="<?= $esc($urlLista . '&novo=1') ?>"
+                    class="ft-btn ft-btn-primary">
+
+                    <?= $icone('plus') ?>
+
+                    Nova ficha
+
+                </a>
+
+            <?php endif; ?>
+
+        </header>
+
+        <form
+            method="GET"
+            action="<?= $esc($urlFicha) ?>"
+            class="ft-filter">
+
+            <div class="ft-field">
+
+                <label for="filtroAluno">Aluno</label>
+
+                <select id="filtroAluno" name="aluno_id">
+
+                    <option value="">
+                        Selecione um aluno
+                    </option>
+
+                    <?php foreach ($alunos as $aluno): ?>
+
+                        <option
+                            value="<?= (int) $aluno['id'] ?>"
+                            <?= $alunoSelecionado ===
+                                (int) $aluno['id']
+                                ? 'selected'
+                                : '' ?>>
+
+                            <?= $esc($aluno['nome']) ?>
+
+                        </option>
+
+                    <?php endforeach; ?>
+
+                </select>
+
             </div>
 
-            <div class="ficha-form-grid">
+            <button type="submit" class="ft-btn ft-btn-secondary">
 
-                <div class="ficha-campo">
-                    <label for="professor">
-                        Professor responsável
-                        <span class="ficha-obrigatorio">*</span>
-                    </label>
+                Consultar
 
-                    <select
-                        id="professor"
-                        name="professor_id"
-                        required>
-                        <option value="">
-                            Selecione um professor
-                        </option>
+            </button>
 
-                        <?php foreach ($professores as $professor): ?>
-                            <option value="<?= (int) $professor['id'] ?>">
-                                <?= htmlspecialchars(
-                                    $professor['name'],
-                                    ENT_QUOTES,
-                                    'UTF-8'
-                                ) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+        </form>
+
+        <section class="ft-panel">
+
+            <?php if ($alunoSelecionado <= 0): ?>
+
+                <div class="ft-empty">
+
+                    Selecione um aluno para consultar suas fichas.
+
                 </div>
 
-                <div class="ficha-campo">
-                    <label for="aluno">
-                        Aluno
-                        <span class="ficha-obrigatorio">*</span>
-                    </label>
+            <?php elseif (empty($fichas)): ?>
 
-                    <select
-                        id="aluno"
-                        name="aluno"
-                        required>
-                        <option value="">
-                            Selecione um aluno
-                        </option>
+                <div class="ft-empty">
 
-                        <?php foreach ($alunos as $aluno): ?>
-                            <option value="<?= (int) $aluno['id'] ?>">
-                                <?= htmlspecialchars(
-                                    $aluno['nome'],
-                                    ENT_QUOTES,
-                                    'UTF-8'
-                                ) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+                    Nenhuma ficha cadastrada para este aluno.
+
+                    <a
+                        href="<?= $esc($urlLista . '&novo=1') ?>"
+                        class="ft-btn ft-btn-primary">
+
+                        <?= $icone('plus') ?>
+
+                        Criar ficha
+
+                    </a>
+
                 </div>
 
-                <div class="ficha-campo ficha-campo-largo">
-                    <label for="objetivo">
-                        Objetivo do treinamento
-                        <span class="ficha-obrigatorio">*</span>
-                    </label>
+            <?php else: ?>
 
-                    <select
-                        id="objetivo"
-                        name="objetivo"
-                        required>
-                        <option value="">
-                            Selecione um objetivo
-                        </option>
+                <div class="ft-table-wrap">
 
-                        <?php
-                        $objetivos = [
-                            'Emagrecimento',
-                            'Definição',
-                            'Hipertrofia',
-                            'Ganho de Massa Muscular',
-                            'Condicionamento',
-                            'Resistência Muscular',
-                            'Força',
-                            'Mobilidade e Flexibilidade',
-                            'Reabilitação',
-                            'Saúde e Qualidade de Vida'
-                        ];
-                        ?>
+                    <table class="ft-table">
 
-                        <?php foreach ($objetivos as $objetivo): ?>
-                            <option value="<?= htmlspecialchars(
-                                                $objetivo,
-                                                ENT_QUOTES,
-                                                'UTF-8'
-                                            ) ?>">
-                                <?= htmlspecialchars(
-                                    $objetivo,
-                                    ENT_QUOTES,
-                                    'UTF-8'
-                                ) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+                        <thead>
+                            <tr>
+                                <th>Nome da ficha</th>
+                                <th>Objetivo</th>
+                                <th>Professor</th>
+                                <th>Exercícios</th>
+                                <th>Criação</th>
+                                <th class="ft-actions-column">Ações</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            <?php foreach ($fichas as $ficha): ?>
+
+                                <?php
+                                $dataFicha = strtotime(
+                                    $ficha['criada_em'] ?? ''
+                                );
+                                ?>
+
+                                <tr>
+
+                                    <td class="ft-name">
+
+                                        <?= $esc($ficha['nome_ficha']) ?>
+
+                                    </td>
+
+                                    <td>
+
+                                        <?= $esc($ficha['objetivo']) ?>
+
+                                    </td>
+
+                                    <td>
+
+                                        <?= $esc($ficha['nome_professor']) ?>
+
+                                    </td>
+
+                                    <td>
+
+                                        <?= (int) $ficha['total_exercicios'] ?>
+
+                                    </td>
+
+                                    <td>
+
+                                        <?= $dataFicha
+                                            ? date('d/m/Y', $dataFicha)
+                                            : '—' ?>
+
+                                    </td>
+
+                                    <td>
+
+                                        <div class="ft-row-actions">
+
+                                            <a
+                                                href="<?= $esc(
+                                                    $urlLista .
+                                                    '&editar=' .
+                                                    (int) $ficha['id']
+                                                ) ?>"
+                                                class="ft-icon-btn"
+                                                title="Editar ficha"
+                                                aria-label="Editar ficha">
+
+                                                <?= $icone('edit') ?>
+
+                                            </a>
+
+                                            <button
+                                                type="button"
+                                                class="ft-icon-btn ft-icon-danger"
+                                                data-excluir-id="<?= (int) $ficha['id'] ?>"
+                                                data-excluir-nome="<?= $esc($ficha['nome_ficha']) ?>"
+                                                title="Excluir ficha"
+                                                aria-label="Excluir ficha">
+
+                                                <?= $icone('trash') ?>
+
+                                            </button>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            <?php endforeach; ?>
+
+                        </tbody>
+
+                    </table>
+
                 </div>
 
-            </div>
+            <?php endif; ?>
+
         </section>
 
-        <!-- EXERCÍCIOS -->
+        <!-- CONFIRMAÇÃO DE EXCLUSÃO -->
 
-        <section class="ficha-card">
+        <dialog id="dialogExcluir" class="ft-dialog">
 
-            <div class="ficha-card-header">
-                <div>
-                    <h2>Exercícios da ficha</h2>
-                    <p>
-                        Escolha os exercícios e defina
-                        séries, repetições e carga.
-                    </p>
+            <form method="POST" action="<?= $esc($urlFicha) ?>">
+
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="<?= $esc($csrfTreino) ?>">
+
+                <input type="hidden" name="acao" value="excluir">
+
+                <input
+                    type="hidden"
+                    name="aluno"
+                    value="<?= (int) $alunoSelecionado ?>">
+
+                <input
+                    type="hidden"
+                    name="ficha_origem_id"
+                    id="fichaExcluir">
+
+                <div class="ft-dialog-header">
+
+                    <h2>Excluir ficha</h2>
+
+                    <button
+                        type="button"
+                        id="fecharDialog"
+                        class="ft-icon-btn"
+                        aria-label="Fechar">
+
+                        <?= $icone('close') ?>
+
+                    </button>
+
                 </div>
 
-                <span id="contadorExercicios"
-                    class="ficha-contador">
-                    0 exercícios
-                </span>
+                <p>
+                    Deseja excluir a ficha
+                    <strong id="nomeFichaExcluir"></strong>?
+                </p>
+
+                <p class="ft-muted">
+
+                    Os exercícios continuarão disponíveis na biblioteca.
+
+                    Fichas vinculadas a registros de frequência
+                    não poderão ser excluídas permanentemente.
+
+                </p>
+
+                <div class="ft-dialog-actions">
+
+                    <button
+                        type="button"
+                        id="cancelarExclusao"
+                        class="ft-btn ft-btn-secondary">
+
+                        Cancelar
+
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="ft-btn ft-btn-danger">
+
+                        <?= $icone('trash') ?>
+
+                        Excluir ficha
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </dialog>
+
+    <?php else: ?>
+
+        <!-- EDITOR DE FICHAS -->
+
+        <header class="ft-header">
+
+            <div class="ft-header-title">
+
+                <a
+                    href="<?= $esc($urlLista) ?>"
+                    class="ft-icon-btn"
+                    title="Voltar"
+                    aria-label="Voltar para fichas">
+
+                    <?= $icone('back') ?>
+
+                </a>
+
+                <div>
+
+                    <h1>
+                        <?= $editando ? 'Editar ficha' : 'Nova ficha' ?>
+                    </h1>
+
+                    <p><?= $esc($nomeAlunoSelecionado) ?></p>
+
+                </div>
+
             </div>
 
-            <div class="ficha-adicionar">
+        </header>
 
-                <div class="ficha-campo">
-                    <label for="exercicio">
-                        Adicionar exercício
-                    </label>
+        <form
+            method="POST"
+            action="<?= $esc($urlFicha) ?>"
+            id="formFicha">
 
-                    <select id="exercicio" name="exercicio">
-                        <option value="">
-                            Selecione um exercício
-                        </option>
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="<?= $esc($csrfTreino) ?>">
 
-                        <?php foreach ($exercicios as $exercicio): ?>
-                            <option value="<?= (int) $exercicio['id'] ?>">
-                                <?= htmlspecialchars(
-                                    $exercicio['nome'],
-                                    ENT_QUOTES,
-                                    'UTF-8'
-                                ) ?>
+            <input type="hidden" name="acao" value="salvar">
+
+            <input
+                type="hidden"
+                name="aluno"
+                value="<?= (int) $alunoSelecionado ?>">
+
+            <input
+                type="hidden"
+                name="ficha_origem_id"
+                value="<?= (int) ($fichaForm['id'] ?? 0) ?>">
+
+            <section class="ft-panel ft-editor-info">
+
+                <div class="ft-form-grid">
+
+                    <div class="ft-field ft-field-full">
+
+                        <label for="nomeFicha">
+                            Nome da ficha
+                        </label>
+
+                        <input
+                            type="text"
+                            id="nomeFicha"
+                            name="nome_ficha"
+                            maxlength="100"
+                            placeholder="Ex.: Treino A - Peito e tríceps"
+                            value="<?= $esc($fichaForm['nome_ficha'] ?? '') ?>"
+                            required>
+
+                    </div>
+
+                    <div class="ft-field">
+
+                        <label for="professor">
+                            Professor responsável
+                        </label>
+
+                        <select
+                            id="professor"
+                            name="professor_id"
+                            required>
+
+                            <option value="">
+                                Selecione
                             </option>
-                        <?php endforeach; ?>
-                    </select>
+
+                            <?php foreach ($professores as $professor): ?>
+
+                                <option
+                                    value="<?= (int) $professor['id'] ?>"
+                                    <?= (int) ($fichaForm['professor_id'] ?? 0)
+                                        === (int) $professor['id']
+                                        ? 'selected'
+                                        : '' ?>>
+
+                                    <?= $esc($professor['name']) ?>
+
+                                </option>
+
+                            <?php endforeach; ?>
+
+                        </select>
+
+                    </div>
+
+                    <div class="ft-field">
+
+                        <label for="objetivo">Objetivo</label>
+
+                        <select
+                            id="objetivo"
+                            name="objetivo"
+                            required>
+
+                            <option value="">
+                                Selecione
+                            </option>
+
+                            <?php foreach ($objetivos as $obj): ?>
+
+                                <option
+                                    value="<?= $esc($obj) ?>"
+                                    <?= $objetivoAtual === $obj
+                                        ? 'selected'
+                                        : '' ?>>
+
+                                    <?= $esc($obj) ?>
+
+                                </option>
+
+                            <?php endforeach; ?>
+
+                        </select>
+
+                    </div>
+
                 </div>
 
+            </section>
+
+            <section class="ft-panel ft-editor-exercises">
+
+                <div class="ft-section-header">
+
+                    <h2>Exercícios</h2>
+
+                    <span id="contadorExercicios" class="ft-muted">
+
+                        0 exercícios
+
+                    </span>
+
+                </div>
+
+                <div class="ft-add">
+
+                    <div class="ft-field">
+
+                        <label for="exercicio">
+                            Adicionar exercício
+                        </label>
+
+                        <select id="exercicio">
+
+                            <option value="">
+                                Selecione um exercício
+                            </option>
+
+                            <?php foreach ($exercicios as $exercicio): ?>
+
+                                <option value="<?= (int) $exercicio['id'] ?>">
+
+                                    <?= $esc($exercicio['nome']) ?>
+
+                                </option>
+
+                            <?php endforeach; ?>
+
+                        </select>
+
+                    </div>
+
+                    <button
+                        type="button"
+                        id="btnAdicionar"
+                        class="ft-btn ft-btn-secondary">
+
+                        <?= $icone('plus') ?>
+
+                        Adicionar
+
+                    </button>
+
+                </div>
+
+                <p
+                    id="mensagemExercicio"
+                    class="ft-field-error"
+                    role="alert"
+                    hidden>
+                </p>
+
+                <div class="ft-table-wrap">
+
+                    <table class="ft-table ft-edit-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th class="ft-grip-column"></th>
+                                <th>Exercício</th>
+                                <th>Séries</th>
+                                <th>Repetições</th>
+                                <th>Carga (kg)</th>
+                                <th>Intervalo (s)</th>
+                                <th>Ação</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="corpoExercicios"></tbody>
+
+                    </table>
+
+                    <div id="fichaEstadoVazio" class="ft-empty">
+
+                        Nenhum exercício adicionado.
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <div class="ft-form-actions">
+
+                <a
+                    href="<?= $esc($urlLista) ?>"
+                    class="ft-btn ft-btn-secondary">
+
+                    Cancelar
+
+                </a>
+
                 <button
-                    type="button"
-                    id="btnAdicionar"
-                    class="ficha-btn ficha-btn-secundario">
-                    + Adicionar
+                    type="submit"
+                    id="btnSalvarFicha"
+                    class="ft-btn ft-btn-primary">
+
+                    <?= $editando
+                        ? 'Salvar alterações'
+                        : 'Salvar ficha' ?>
+
                 </button>
 
             </div>
 
-            <p
-                id="mensagemExercicio"
-                class="ficha-mensagem-campo"
-                role="alert"
-                hidden></p>
+        </form>
 
-            <div class="ficha-tabela-container">
+        <!-- MODELO DE LINHA DOS EXERCÍCIOS -->
 
-                <table class="ficha-tabela"
-                    id="tabelaExercicios">
+        <template id="templateExercicio">
 
-                    <thead>
-                        <tr>
-                            <th>Exercício</th>
-                            <th>Séries</th>
-                            <th>Repetições</th>
-                            <th>Carga (kg)</th>
-                            <th>Intervalo</th>
-                            <th>Ação</th>
-                        </tr>
-                    </thead>
+            <tr>
 
-                    <tbody id="corpoExercicios">
-                        <!-- Inserção dinâmica via JavaScript -->
-                    </tbody>
-                </table>
+                <td class="ft-grip-column">
 
-                <div
-                    id="fichaEstadoVazio"
-                    class="ficha-estado-vazio">
-                    <strong>Nenhum exercício adicionado</strong>
-                    <p>
-                        Selecione um exercício acima
-                        e clique em Adicionar.
-                    </p>
-                </div>
+                    <button
+                        type="button"
+                        class="ft-grip"
+                        title="Arraste para ordenar ou use as setas do teclado"
+                        aria-label="Reordenar exercício">
 
-            </div>
+                        <?= $icone('grip') ?>
 
-        </section>
+                    </button>
 
-        <!-- SALVAR -->
+                </td>
 
-        <section class="ficha-acoes">
+                <td class="ft-exercise-name">
 
-            <div class="ficha-acoes-info">
-                <strong>Pronto para salvar?</strong>
+                    <input type="hidden" data-field="item_id">
 
-                <p id="mensagemSalvar">
-                    Preencha os campos obrigatórios
-                    e adicione pelo menos um exercício.
-                </p>
-            </div>
+                    <select
+                        data-field="exercicio_id"
+                        aria-label="Exercício"
+                        required>
 
-            <button
-                type="submit"
-                id="btnSalvarFicha"
-                class="ficha-btn ficha-btn-primario"
-                disabled>
-                Salvar ficha
-            </button>
+                        <option value="">Selecione</option>
 
-        </section>
+                        <?php foreach ($exercicios as $exercicio): ?>
 
-    </form>
+                            <option value="<?= (int) $exercicio['id'] ?>">
 
-    <!-- HISTÓRICO -->
+                                <?= $esc($exercicio['nome']) ?>
 
-    <section
-        id="historicoTreinos"
-        class="ficha-card ficha-historico-secao"
-        hidden>
-        <div class="ficha-card-header">
-            <div>
-                <h2>Histórico de Treinos</h2>
-                <p>
-                    Consulte as versões anteriores
-                    das fichas do aluno selecionado.
-                </p>
-            </div>
-        </div>
+                            </option>
 
-        <div id="listaHistorico"></div>
-    </section>
+                        <?php endforeach; ?>
+
+                    </select>
+
+                </td>
+
+                <td>
+
+                    <input
+                        type="number"
+                        data-field="series"
+                        min="1"
+                        max="2147483647"
+                        step="1"
+                        aria-label="Séries"
+                        required>
+
+                </td>
+
+                <td>
+
+                    <input
+                        type="text"
+                        data-field="repeticoes"
+                        maxlength="30"
+                        aria-label="Repetições"
+                        required>
+
+                </td>
+
+                <td>
+
+                    <input
+                        type="text"
+                        data-field="carga"
+                        maxlength="20"
+                        placeholder="Opcional"
+                        aria-label="Carga">
+
+                </td>
+
+                <td>
+
+                    <input
+                        type="number"
+                        data-field="intervalo"
+                        min="0"
+                        max="1000"
+                        step="1"
+                        aria-label="Intervalo em segundos">
+
+                </td>
+
+                <td>
+
+                    <button
+                        type="button"
+                        class="ft-icon-btn ft-icon-danger ft-remove"
+                        title="Remover exercício"
+                        aria-label="Remover exercício">
+
+                        <?= $icone('trash') ?>
+
+                    </button>
+
+                </td>
+
+            </tr>
+
+        </template>
+
+    <?php endif; ?>
 
 </main>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
 
-        const form = document.getElementById('formFicha');
-        const professor = document.getElementById('professor');
-        const aluno = document.getElementById('aluno');
-        const objetivo = document.getElementById('objetivo');
-        const exercicio = document.getElementById('exercicio');
+document.addEventListener('DOMContentLoaded', function () {
 
-        const btnAdicionar = document.getElementById('btnAdicionar');
-        const btnSalvar = document.getElementById('btnSalvarFicha');
+    // CONFIRMAÇÃO DE EXCLUSÃO
 
-        const corpoExercicios =
-            document.getElementById('corpoExercicios');
+    const dialog = document.getElementById('dialogExcluir');
 
-        const contador =
-            document.getElementById('contadorExercicios');
+    if (dialog) {
 
-        const estadoVazio =
-            document.getElementById('fichaEstadoVazio');
+        const campoId = document.getElementById('fichaExcluir');
 
-        const mensagemSalvar =
-            document.getElementById('mensagemSalvar');
+        const nome = document.getElementById('nomeFichaExcluir');
 
-        const mensagemExercicio =
-            document.getElementById('mensagemExercicio');
+        document.querySelectorAll('[data-excluir-id]')
+            .forEach(botao => {
 
-        const historico =
-            document.getElementById('historicoTreinos');
+                botao.addEventListener('click', function () {
 
-        const listaHistorico =
-            document.getElementById('listaHistorico');
+                    campoId.value = this.dataset.excluirId;
 
-        let proximoIndice = 0;
-        let requisicaoHistorico = null;
+                    nome.textContent = this.dataset.excluirNome;
 
-        // Evita inserir texto retornado pelo banco
-        // como HTML sem tratamento.
-        function escaparHTML(valor) {
-            return String(valor ?? '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
+                    dialog.showModal();
+                });
+            });
+
+        document.getElementById('fecharDialog')
+            .addEventListener('click', () => dialog.close());
+
+        document.getElementById('cancelarExclusao')
+            .addEventListener('click', () => dialog.close());
+
+        return;
+    }
+
+    // EDITOR DE FICHAS
+
+    const form = document.getElementById('formFicha');
+
+    if (!form) {
+        return;
+    }
+
+    const corpo = document.getElementById('corpoExercicios');
+
+    const template = document.getElementById('templateExercicio');
+
+    const exercicio = document.getElementById('exercicio');
+
+    const contador = document.getElementById('contadorExercicios');
+
+    const vazio = document.getElementById('fichaEstadoVazio');
+
+    const mensagem = document.getElementById('mensagemExercicio');
+
+    const btnSalvar = document.getElementById('btnSalvarFicha');
+
+    const itensIniciais = <?= json_encode(
+        array_values(
+            is_array($fichaForm['itens'] ?? null)
+                ? $fichaForm['itens']
+                : []
+        ),
+        JSON_HEX_TAG |
+        JSON_HEX_AMP |
+        JSON_HEX_APOS |
+        JSON_HEX_QUOT |
+        JSON_INVALID_UTF8_SUBSTITUTE
+    ) ?>;
+
+    function mostrarMensagem(texto = '') {
+
+        mensagem.textContent = texto;
+
+        mensagem.hidden = !texto;
+    }
+
+    function atualizarLinhas() {
+
+        const linhas = Array.from(corpo.rows);
+
+        linhas.forEach((linha, indice) => {
+
+            linha.querySelectorAll('[data-field]')
+                .forEach(campo => {
+
+                    campo.name =
+                        `itens[${indice}][${campo.dataset.field}]`;
+                });
+        });
+
+        contador.textContent =
+            linhas.length +
+            (linhas.length === 1 ? ' exercício' : ' exercícios');
+
+        vazio.hidden = linhas.length > 0;
+
+        btnSalvar.disabled = linhas.length === 0;
+    }
+
+    // Converter 60s, 90s e outros valores antigos
+
+    function converterIntervalo(valor) {
+
+        const texto = String(valor ?? '').trim();
+
+        if (!texto) {
+            return '';
         }
 
-        function atualizarBotaoSalvar() {
+        const resultado = texto.match(/^(\d+)\s*s?$/i);
 
-            const quantidade =
-                corpoExercicios.querySelectorAll('tr').length;
+        return resultado ? resultado[1] : null;
+    }
 
-            const fichaValida =
-                professor.value !== '' &&
-                aluno.value !== '' &&
-                objetivo.value !== '' &&
-                quantidade > 0;
+    // Ordenação pelo ícone de arrastar
 
-            btnSalvar.disabled = !fichaValida;
+    function configurarOrdenacao(linha, grip) {
 
-            contador.textContent =
-                quantidade + (
-                    quantidade === 1 ?
-                    ' exercício' :
-                    ' exercícios'
-                );
+        let arrastando = false;
 
-            estadoVazio.hidden = quantidade > 0;
+        grip.addEventListener('pointerdown', evento => {
 
-            mensagemSalvar.textContent = fichaValida ?
-                'Confira os dados antes de salvar a ficha.' :
-                'Preencha os campos obrigatórios e adicione pelo menos um exercício.';
-        }
-
-        function mostrarMensagemExercicio(texto) {
-            mensagemExercicio.textContent = texto;
-            mensagemExercicio.hidden = !texto;
-        }
-
-        function adicionarExercicio() {
-
-            if (exercicio.value === '') {
-                mostrarMensagemExercicio(
-                    'Selecione um exercício para adicionar.'
-                );
-                exercicio.focus();
+            if (evento.button !== 0) {
                 return;
             }
 
-            mostrarMensagemExercicio('');
+            evento.preventDefault();
 
-            const option =
-                exercicio.options[exercicio.selectedIndex];
+            grip.focus();
 
-            const idExercicio = exercicio.value;
-            const nomeExercicio = option.textContent.trim();
+            arrastando = true;
 
-            const indice = proximoIndice++;
+            grip.setPointerCapture(evento.pointerId);
 
-            const linha = document.createElement('tr');
+            linha.classList.add('ft-dragging');
+        });
 
-            linha.innerHTML = `
-            <td class="ficha-nome-exercicio">
-                <span class="nome-exercicio"></span>
+        grip.addEventListener('pointermove', evento => {
 
-                <input
-                    type="hidden"
-                    name="itens[${indice}][exercicio_id]"
-                    value="${escaparHTML(idExercicio)}"
-                >
-            </td>
+            if (!arrastando) {
+                return;
+            }
 
-            <td>
-                <input
-                    type="number"
-                    name="itens[${indice}][series]"
-                    min="1"
-                    required
-                    placeholder="3"
-                    aria-label="Séries"
-                >
-            </td>
+            const elemento = document.elementFromPoint(
+                evento.clientX,
+                evento.clientY
+            );
 
-            <td>
-                <input
-                    type="number"
-                    name="itens[${indice}][repeticoes]"
-                    min="1"
-                    required
-                    placeholder="12"
-                    aria-label="Repetições"
-                >
-            </td>
+            const alvo = elemento?.closest('tr');
 
-            <td>
-                <input
-                    type="number"
-                    name="itens[${indice}][carga]"
-                    min="0"
-                    step="0.5"
-                    placeholder="Opcional"
-                    aria-label="Carga em quilogramas"
-                >
-            </td>
+            if (
+                !alvo ||
+                alvo === linha ||
+                alvo.parentElement !== corpo
+            ) {
+                return;
+            }
 
-            <td>
-                <input
-                    type="text"
-                    name="itens[${indice}][intervalo]"
-                    placeholder="Ex.: 60s"
-                    aria-label="Intervalo"
-                >
-            </td>
+            const posicao = alvo.getBoundingClientRect();
 
-            <td>
-                <button
-                    type="button"
-                    class="ficha-btn-remover"
-                    aria-label="Remover exercício"
-                    title="Remover exercício"
-                >
-                    Remover
-                </button>
-            </td>
-        `;
+            const depois =
+                evento.clientY >
+                posicao.top + posicao.height / 2;
 
-            linha.querySelector('.nome-exercicio').textContent =
-                nomeExercicio;
+            corpo.insertBefore(
+                linha,
+                depois ? alvo.nextElementSibling : alvo
+            );
 
-            linha.querySelector('.ficha-btn-remover')
-                .addEventListener('click', function() {
+            atualizarLinhas();
+        });
 
-                    linha.remove();
-                    atualizarBotaoSalvar();
-                });
+        function finalizar() {
 
-            corpoExercicios.appendChild(linha);
+            arrastando = false;
+
+            linha.classList.remove('ft-dragging');
+
+            atualizarLinhas();
+        }
+
+        grip.addEventListener('pointerup', finalizar);
+        grip.addEventListener('pointercancel', finalizar);
+        grip.addEventListener('lostpointercapture', finalizar);
+
+        // Alternativa de ordenação pelo teclado
+
+        grip.addEventListener('keydown', evento => {
+
+            if (evento.key === 'ArrowUp') {
+
+                evento.preventDefault();
+
+                const anterior = linha.previousElementSibling;
+
+                if (anterior) {
+
+                    corpo.insertBefore(linha, anterior);
+                }
+
+            } else if (evento.key === 'ArrowDown') {
+
+                evento.preventDefault();
+
+                const proxima = linha.nextElementSibling;
+
+                if (proxima) {
+
+                    corpo.insertBefore(proxima, linha);
+                }
+
+            } else {
+
+                return;
+            }
+
+            atualizarLinhas();
+
+            grip.focus();
+        });
+    }
+
+    // Adicionar ou preencher exercício
+
+    function adicionarLinha(item) {
+
+        if (!item || typeof item !== 'object') {
+            return;
+        }
+
+        const linha =
+            template.content.firstElementChild.cloneNode(true);
+
+        const campo = nome =>
+            linha.querySelector(`[data-field="${nome}"]`);
+
+        campo('item_id').value = item.item_id ?? 0;
+
+        const selectExercicio = campo('exercicio_id');
+
+        const idExercicio = String(item.exercicio_id ?? '');
+
+        const disponivel = Array.from(selectExercicio.options)
+            .some(option =>
+                option.value !== '' &&
+                option.value === idExercicio
+            );
+
+        if (!disponivel && idExercicio !== '') {
+
+            const option = document.createElement('option');
+
+            option.value = idExercicio;
+
+            option.textContent =
+                (item.nome_exercicio || 'Exercício') +
+                ' (indisponível)';
+
+            selectExercicio.appendChild(option);
+        }
+
+        selectExercicio.value = idExercicio;
+
+        if (!disponivel) {
+
+            selectExercicio.setCustomValidity(
+                'Selecione um exercício disponível.'
+            );
+        }
+
+        selectExercicio.addEventListener('change', function () {
+
+            const valido = Array.from(exercicio.options)
+                .some(option =>
+                    option.value !== '' &&
+                    option.value === this.value
+                );
+
+            this.setCustomValidity(
+                valido ? '' : 'Selecione um exercício disponível.'
+            );
+        });
+
+        campo('series').value = item.series ?? 3;
+
+        campo('repeticoes').value = item.repeticoes ?? 12;
+
+        campo('carga').value = item.carga ?? '';
+
+        const intervalo = converterIntervalo(item.intervalo);
+
+        campo('intervalo').value = intervalo ?? '';
+
+        if (intervalo === null) {
+
+            campo('intervalo').setCustomValidity(
+                'Revise o intervalo em segundos.'
+            );
+
+            campo('intervalo').placeholder = 'Revisar';
+        }
+
+        campo('intervalo').addEventListener('input', function () {
+
+            const valor = Number(this.value);
+
+            this.setCustomValidity(
+                this.value !== '' &&
+                (
+                    !Number.isInteger(valor) ||
+                    valor < 0 ||
+                    valor > 1000
+                )
+                    ? 'Informe um intervalo de 0 a 1000 segundos.'
+                    : ''
+            );
+        });
+
+        const repeticoes = campo('repeticoes');
+
+        function validarRepeticoes() {
+
+            const valor = repeticoes.value.trim();
+
+            const valido =
+                /^[1-9]\d*(?:\s*(?:a|-)\s*[1-9]\d*)?$/i
+                    .test(valor);
+
+            repeticoes.setCustomValidity(
+                valor === '' || valido
+                    ? ''
+                    : 'Informe repetições válidas.'
+            );
+        }
+
+        repeticoes.addEventListener('input', validarRepeticoes);
+
+        validarRepeticoes();
+
+        linha.querySelector('.ft-remove')
+            .addEventListener('click', function () {
+
+                linha.remove();
+
+                atualizarLinhas();
+            });
+
+        configurarOrdenacao(
+            linha,
+            linha.querySelector('.ft-grip')
+        );
+
+        corpo.appendChild(linha);
+
+        atualizarLinhas();
+    }
+
+    document.getElementById('btnAdicionar')
+        .addEventListener('click', function () {
+
+            if (!exercicio.value) {
+
+                mostrarMensagem('Selecione um exercício.');
+
+                exercicio.focus();
+
+                return;
+            }
+
+            mostrarMensagem();
+
+            adicionarLinha({
+                item_id: 0,
+                exercicio_id: exercicio.value,
+                series: 3,
+                repeticoes: '12',
+                carga: '',
+                intervalo: '60'
+            });
 
             exercicio.value = '';
+        });
 
-            atualizarBotaoSalvar();
+    exercicio.addEventListener('change', () => mostrarMensagem());
+
+    // Carregar dados existentes
+
+    if (Array.isArray(itensIniciais)) {
+
+        itensIniciais.forEach(adicionarLinha);
+    }
+
+    atualizarLinhas();
+
+    // Salvar formulário
+
+    form.addEventListener('submit', evento => {
+
+        atualizarLinhas();
+
+        if (corpo.rows.length === 0) {
+
+            evento.preventDefault();
+
+            mostrarMensagem(
+                'Adicione pelo menos um exercício.'
+            );
+
+            return;
         }
 
-        btnAdicionar.addEventListener(
-            'click',
-            adicionarExercicio
-        );
+        if (!form.checkValidity()) {
 
-        exercicio.addEventListener('change', function() {
-            mostrarMensagemExercicio('');
-        });
+            evento.preventDefault();
 
-        professor.addEventListener(
-            'change',
-            atualizarBotaoSalvar
-        );
+            form.reportValidity();
 
-        aluno.addEventListener(
-            'change',
-            atualizarBotaoSalvar
-        );
+            return;
+        }
 
-        objetivo.addEventListener(
-            'change',
-            atualizarBotaoSalvar
-        );
+        corpo.querySelectorAll('[data-field="intervalo"]')
+            .forEach(input => {
 
-        form.addEventListener('submit', function(event) {
-            atualizarBotaoSalvar();
-
-            if (btnSalvar.disabled) {
-                event.preventDefault();
-            }
-        });
-
-        // ======================================
-        // HISTÓRICO DE TREINOS
-        // ======================================
-
-        aluno.addEventListener('change', async function() {
-
-            const alunoId = this.value;
-
-            if (requisicaoHistorico) {
-                requisicaoHistorico.abort();
-            }
-
-            listaHistorico.innerHTML = '';
-
-            if (alunoId === '') {
-                historico.hidden = true;
-                return;
-            }
-
-            historico.hidden = false;
-            listaHistorico.innerHTML =
-                '<p class="ficha-historico-mensagem">Carregando histórico...</p>';
-
-            requisicaoHistorico = new AbortController();
-
-            try {
-                const url =
-                    <?= json_encode(
-                        BASE_URL . '/app/controllers/TreinoController.php',
-                        JSON_HEX_TAG |
-                            JSON_HEX_AMP |
-                            JSON_HEX_APOS |
-                            JSON_HEX_QUOT
-                    ) ?> +
-                    '?acao=historico&aluno_id=' +
-                    encodeURIComponent(alunoId);
-
-                const resposta = await fetch(url, {
-                    signal: requisicaoHistorico.signal
-                });
-
-                if (!resposta.ok) {
-                    throw new Error(
-                        'Falha ao consultar histórico.'
-                    );
+                if (input.value !== '') {
+                    input.value = String(Number(input.value));
                 }
+            });
 
-                const fichas = await resposta.json();
+        btnSalvar.disabled = true;
 
-                if (!Array.isArray(fichas)) {
-                    throw new Error(
-                        'Resposta inesperada do servidor.'
-                    );
-                }
-
-                if (fichas.length === 0) {
-                    listaHistorico.innerHTML = `
-                    <div class="ficha-historico-vazio">
-                        Este aluno ainda não possui fichas de treino.
-                    </div>
-                `;
-                    return;
-                }
-
-                listaHistorico.innerHTML = '';
-
-                fichas.forEach(function(ficha) {
-
-                    const itens = Array.isArray(ficha.itens) ?
-                        ficha.itens :
-                        [];
-
-                    const linhas = itens.map(function(item) {
-
-                        const carga =
-                            item.carga !== null &&
-                            item.carga !== '' ?
-                            item.carga + ' kg' :
-                            '—';
-
-                        const intervalo =
-                            item.intervalo !== null &&
-                            item.intervalo !== '' ?
-                            item.intervalo :
-                            '—';
-
-                        return `
-                        <tr>
-                            <td>${escaparHTML(item.nome_exercicio)}</td>
-                            <td>${escaparHTML(item.series)}</td>
-                            <td>${escaparHTML(item.repeticoes)}</td>
-                            <td>${escaparHTML(carga)}</td>
-                            <td>${escaparHTML(intervalo)}</td>
-                        </tr>
-                    `;
-                    }).join('');
-
-                    const card = document.createElement('article');
-
-                    card.className = 'ficha-historico-item';
-
-                    card.innerHTML = `
-                    <div class="ficha-historico-topo">
-                        <span class="ficha-versao">
-                            Versão ${escaparHTML(ficha.versao)}
-                        </span>
-
-                        <strong>
-                            ${escaparHTML(ficha.objetivo)}
-                        </strong>
-                    </div>
-
-                    <div class="ficha-historico-meta">
-                        <span>
-                            Professor:
-                            ${escaparHTML(ficha.nome_professor)}
-                        </span>
-
-                        <span>
-                            Criada em:
-                            ${escaparHTML(ficha.criada_em)}
-                        </span>
-                    </div>
-
-                    <div class="ficha-tabela-container">
-                        <table class="ficha-tabela">
-                            <thead>
-                                <tr>
-                                    <th>Exercício</th>
-                                    <th>Séries</th>
-                                    <th>Reps</th>
-                                    <th>Carga</th>
-                                    <th>Intervalo</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                ${linhas}
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-
-                    listaHistorico.appendChild(card);
-                });
-
-            } catch (erro) {
-
-                if (erro.name === 'AbortError') {
-                    return;
-                }
-
-                console.error(erro);
-
-                listaHistorico.innerHTML = `
-                <p class="ficha-historico-erro">
-                    Não foi possível carregar o histórico de treinos.
-                </p>
-            `;
-            }
-        });
-
-        // Sincroniza o estado inicial dos elementos.
-        atualizarBotaoSalvar();
+        btnSalvar.textContent = 'Salvando...';
     });
+
+});
+
 </script>
 
-<?php
-include __DIR__ . '/../shared/footer.php';
-?>
+<?php include __DIR__ . '/../shared/footer.php'; ?>

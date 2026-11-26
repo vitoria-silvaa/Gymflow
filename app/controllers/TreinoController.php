@@ -1,13 +1,10 @@
-
 <?php
-// ================================================
-// GYMFLOW - CONTROLLER DE TREINOS
-// app/controllers/TreinoController.php
-// ================================================
 
 require_once __DIR__ . '/../../config/sessao.php';
 
 verificarRole(['Admin', 'Professor']);
+
+require_once __DIR__ . '/../models/Database.php';
 
 $company_id = (int) ($_SESSION['company_id'] ?? 0);
 $usuario_id = (int) ($_SESSION['usuario_id'] ?? 0);
@@ -18,69 +15,87 @@ if ($company_id <= 0 || $usuario_id <= 0) {
     exit('Acesso não autorizado.');
 }
 
-$tituloPagina = "Treinos";
+$tituloPagina = 'Fichas de Treino';
 
-$cssEspecifico = BASE_URL
-    . '/assets/css/fichatreino.css?v='
-    . time();
+$cssEspecifico = BASE_URL . '/assets/css/fichatreino.css';
 
-// ================================================
-// LISTAGEM DE ALUNOS
-// ================================================
+$urlFicha = BASE_URL . '/app/controllers/TreinoController.php';
 
-$operacao = 'listar';
+$perfilProfessor = $usuario_role === 'Professor';
 
-require __DIR__ . '/../models/Aluno.php';
+$mensagemSucesso = $_SESSION['treino_sucesso'] ?? '';
+$mensagemErro = '';
 
-// ================================================
-// HISTÓRICO DE TREINOS - AJAX
-// ================================================
+unset($_SESSION['treino_sucesso']);
 
-if (
-    isset($_GET['acao']) &&
-    $_GET['acao'] === 'historico'
-) {
+if (empty($_SESSION['csrf_treino'])) {
+    $_SESSION['csrf_treino'] = bin2hex(random_bytes(32));
+}
+
+$csrfTreino = $_SESSION['csrf_treino'];
+
+$texto = static function ($valor) {
+    return is_scalar($valor)
+        ? trim((string) $valor)
+        : '';
+};
+
+// ALUNOS
+
+$sqlAlunos = "
+    SELECT a.id, a.nome
+    FROM alunos a
+    INNER JOIN filiais f
+        ON f.id = a.filial_id
+    WHERE f.company_id = :company_id
+";
+
+$paramsAlunos = [
+    ':company_id' => $company_id
+];
+
+if ($perfilProfessor) {
+
+    $sqlAlunos .= "
+        AND EXISTS (
+            SELECT 1
+            FROM user_filiais uf
+            WHERE uf.user_id = :usuario_id
+              AND uf.filial_id = a.filial_id
+        )
+    ";
+
+    $paramsAlunos[':usuario_id'] = $usuario_id;
+}
+
+$sqlAlunos .= " ORDER BY a.nome ASC";
+
+$stmtAlunos = $pdo->prepare($sqlAlunos);
+$stmtAlunos->execute($paramsAlunos);
+
+$alunos = $stmtAlunos->fetchAll(PDO::FETCH_ASSOC);
+
+$idsAlunos = array_map(
+    'intval',
+    array_column($alunos, 'id')
+);
+
+// ALUNO SELECIONADO
+
+$aluno_id = (int) ($_GET['aluno_id'] ?? 0);
+
+if (!in_array($aluno_id, $idsAlunos, true)) {
+    $aluno_id = 0;
+}
+
+// HISTÓRICO - COMPATIBILIDADE COM AJAX
+
+if (($_GET['acao'] ?? '') === 'historico') {
 
     header('Content-Type: application/json; charset=utf-8');
     header('Cache-Control: no-store');
 
-    $aluno_id = filter_var(
-        $_GET['aluno_id'] ?? null,
-        FILTER_VALIDATE_INT,
-        [
-            'options' => [
-                'min_range' => 1
-            ]
-        ]
-    );
-
-    if ($aluno_id === false) {
-        http_response_code(400);
-
-        echo json_encode([
-            'erro' => 'Aluno inválido.'
-        ]);
-
-        exit;
-    }
-
-    // Verifica se o aluno pertence à empresa.
-    $stmtAluno = $pdo->prepare("
-        SELECT a.id
-        FROM alunos a
-        INNER JOIN filiais f
-            ON f.id = a.filial_id
-        WHERE a.id = :aluno_id
-          AND f.company_id = :company_id
-        LIMIT 1
-    ");
-
-    $stmtAluno->execute([
-        ':aluno_id' => $aluno_id,
-        ':company_id' => $company_id
-    ]);
-
-    if (!$stmtAluno->fetch(PDO::FETCH_ASSOC)) {
+    if ($aluno_id <= 0) {
 
         http_response_code(404);
 
@@ -91,266 +106,285 @@ if (
         exit;
     }
 
-    // Recupera o histórico somente de alunos
-    // e professores vinculados à empresa atual.
+    try {
 
-    $stmt = $pdo->prepare("
-        SELECT
-            ft.id AS ficha_id,
-            ft.objetivo,
-            ft.versao,
-            ft.criada_em,
-            u.name AS nome_professor,
-            fi.ordem,
-            fi.series,
-            fi.repeticoes,
-            fi.carga,
-            fi.intervalo,
-            e.nome AS nome_exercicio
+        $operacao = 'listar_fichas_aluno';
 
-        FROM fichas_treino ft
+        require __DIR__ . '/../models/Treino.php';
 
-        INNER JOIN alunos a
-            ON a.id = ft.aluno_id
+        $historico = [];
 
-        INNER JOIN filiais f
-            ON f.id = a.filial_id
+        foreach ($fichas as $ficha) {
 
-        INNER JOIN users u
-            ON u.id = ft.professor_id
-           AND u.company_id = f.company_id
+            $ficha_id = (int) $ficha['id'];
 
-        LEFT JOIN ficha_itens fi
-            ON fi.ficha_id = ft.id
+            $operacao = 'buscar_itens_ficha';
 
-        LEFT JOIN exercicios e
-            ON e.id = fi.exercicio_id
+            require __DIR__ . '/../models/Treino.php';
 
-        WHERE ft.aluno_id = :aluno_id
-          AND f.company_id = :company_id
+            $ficha['ficha_id'] = $ficha_id;
+            $ficha['itens'] = $itens;
 
-        ORDER BY ft.versao DESC, fi.ordem ASC
-    ");
-
-    $stmt->execute([
-        ':aluno_id' => $aluno_id,
-        ':company_id' => $company_id
-    ]);
-
-    $resultado = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    $historico = [];
-
-    foreach ($resultado as $item) {
-
-        $ficha_id = (int) $item['ficha_id'];
-
-        if (!isset($historico[$ficha_id])) {
-
-            $historico[$ficha_id] = [
-                'ficha_id' => $ficha_id,
-                'objetivo' => $item['objetivo'],
-                'versao' => $item['versao'],
-                'criada_em' => $item['criada_em'],
-                'nome_professor' => $item['nome_professor'],
-                'itens' => []
-            ];
+            $historico[] = $ficha;
         }
 
-        if ($item['nome_exercicio'] !== null) {
+        echo json_encode(
+            $historico,
+            JSON_UNESCAPED_UNICODE |
+            JSON_INVALID_UTF8_SUBSTITUTE
+        );
 
-            $historico[$ficha_id]['itens'][] = [
-                'nome_exercicio' => $item['nome_exercicio'],
-                'series' => $item['series'],
-                'repeticoes' => $item['repeticoes'],
-                'carga' => $item['carga'],
-                'intervalo' => $item['intervalo']
-            ];
-        }
+    } catch (Throwable $e) {
+
+        error_log('[GymFlow][Treinos] ' . $e->getMessage());
+
+        http_response_code(500);
+
+        echo json_encode([
+            'erro' => 'Não foi possível carregar as fichas.'
+        ]);
     }
-
-    echo json_encode(
-        array_values($historico),
-        JSON_UNESCAPED_UNICODE
-    );
 
     exit;
 }
 
-// ================================================
-// MENSAGENS DA TELA
-// ================================================
+// ESTADO DO EDITOR
 
-$mensagemSucesso = '';
-$mensagemErro = '';
+$modoEditor = false;
+$fichaForm = null;
 
-// ================================================
-// SALVAR FICHA DE TREINO
-// ================================================
+// PROCESSAR FORMULÁRIO
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 
-    $professor_id = (int) (
-        $_POST['professor_id'] ?? 0
-    );
+    $acao = $texto($_POST['acao'] ?? '');
 
-    $aluno_id = (int) (
-        $_POST['aluno'] ?? 0
-    );
+    $aluno_id = (int) ($_POST['aluno'] ?? 0);
+    $ficha_origem_id = (int) ($_POST['ficha_origem_id'] ?? 0);
 
-    $objetivo = trim(
-        $_POST['objetivo'] ?? ''
-    );
+    $professor_id = (int) ($_POST['professor_id'] ?? 0);
+
+    $nome_ficha = $texto($_POST['nome_ficha'] ?? '');
+    $objetivo = $texto($_POST['objetivo'] ?? '');
 
     $itens = $_POST['itens'] ?? [];
 
     if (
-        $professor_id <= 0 ||
-        $aluno_id <= 0 ||
-        $objetivo === '' ||
-        !is_array($itens) ||
-        empty($itens)
+        $acao === 'salvar' &&
+        in_array($aluno_id, $idsAlunos, true)
     ) {
 
-        $mensagemErro =
-            'Preencha todos os campos obrigatórios '
-            . 'e adicione pelo menos um exercício.';
-    } else {
+        $modoEditor = true;
 
-        // O professor logado não pode atribuir
-        // a ficha a outro professor.
+        $fichaForm = [
+            'id' => $ficha_origem_id,
+            'professor_id' => $professor_id,
+            'nome_ficha' => $nome_ficha,
+            'objetivo' => $objetivo,
+            'itens' => is_array($itens)
+                ? array_values($itens)
+                : []
+        ];
+    }
+
+    try {
+
+        $token = $_POST['csrf_token'] ?? '';
 
         if (
-            $usuario_role === 'Professor' &&
-            $professor_id !== $usuario_id
+            !is_string($token) ||
+            !hash_equals($csrfTreino, $token)
         ) {
+            throw new RuntimeException(
+                'Formulário inválido. Atualize a página.'
+            );
+        }
 
-            $mensagemErro =
-                'Você não pode cadastrar uma ficha '
-                . 'em nome de outro professor.';
+        if (!in_array($aluno_id, $idsAlunos, true)) {
+            throw new RuntimeException('Aluno inválido.');
+        }
+
+        if (!in_array($acao, ['salvar', 'excluir'], true)) {
+            throw new RuntimeException('Operação inválida.');
+        }
+
+        $operacao = $acao === 'excluir'
+            ? 'excluir_ficha'
+            : 'salvar_ficha';
+
+        require __DIR__ . '/../models/Treino.php';
+
+        if ($acao === 'excluir') {
+
+            $_SESSION['treino_sucesso'] =
+                'Ficha excluída com sucesso.';
+
+        } elseif ($ficha_origem_id > 0) {
+
+            $_SESSION['treino_sucesso'] =
+                'Ficha atualizada com sucesso.';
+
         } else {
 
-            // Confirma professor pertencente à empresa.
-
-            $stmtProfessor = $pdo->prepare("
-                SELECT id
-                FROM users
-                WHERE id = :professor_id
-                  AND company_id = :company_id
-                  AND role = 'Professor'
-                LIMIT 1
-            ");
-
-            $stmtProfessor->execute([
-                ':professor_id' => $professor_id,
-                ':company_id' => $company_id
-            ]);
-
-            $professorValido = (bool) $stmtProfessor->fetch(
-                PDO::FETCH_ASSOC
-            );
-
-            // Confirma aluno pertencente à empresa.
-
-            $stmtAluno = $pdo->prepare("
-                SELECT a.id
-                FROM alunos a
-                INNER JOIN filiais f
-                    ON f.id = a.filial_id
-                WHERE a.id = :aluno_id
-                  AND f.company_id = :company_id
-                LIMIT 1
-            ");
-
-            $stmtAluno->execute([
-                ':aluno_id' => $aluno_id,
-                ':company_id' => $company_id
-            ]);
-
-            $alunoValido = (bool) $stmtAluno->fetch(
-                PDO::FETCH_ASSOC
-            );
-
-            if (!$professorValido || !$alunoValido) {
-
-                $mensagemErro =
-                    'Professor ou aluno inválido '
-                    . 'para esta academia.';
-            } else {
-
-                $operacao = 'salvar_ficha';
-
-                try {
-
-                    $ficha_id = require __DIR__
-                        . '/../models/Treino.php';
-
-                    $mensagemSucesso =
-                        'Ficha de treino salva com sucesso!';
-                } catch (Throwable $e) {
-
-                    error_log(
-                        '[GymFlow][TreinoController] ' .
-                            $e->getMessage()
-                    );
-
-                    $mensagemErro =
-                        'Não foi possível salvar a ficha. '
-                        . 'Tente novamente.';
-                }
-            }
+            $_SESSION['treino_sucesso'] =
+                'Ficha cadastrada com sucesso.';
         }
+
+        header(
+            'Location: ' . $urlFicha .
+            '?aluno_id=' . $aluno_id
+        );
+
+        exit;
+
+    } catch (PDOException $e) {
+
+        error_log('[GymFlow][Treinos] ' . $e->getMessage());
+
+        $mensagemErro =
+            'Não foi possível concluir a operação.';
+
+    } catch (RuntimeException $e) {
+
+        $mensagemErro = $e->getMessage();
+
+    } catch (Throwable $e) {
+
+        error_log('[GymFlow][Treinos] ' . $e->getMessage());
+
+        $mensagemErro = 'Ocorreu um erro inesperado.';
     }
 }
 
-// ================================================
-// LISTAR EXERCÍCIOS
-// ================================================
+// GARANTIR ALUNO AUTORIZADO
 
-require __DIR__ . '/../models/Exercicio.php';
+if (!in_array($aluno_id, $idsAlunos, true)) {
 
-$exercicios = listarExercicios($pdo);
-
-// ================================================
-// LISTAR PROFESSORES
-// ================================================
-
-if ($usuario_role === 'Professor') {
-
-    $stmt_professores = $pdo->prepare("
-        SELECT id, name
-        FROM users
-        WHERE id = :usuario_id
-          AND company_id = :company_id
-          AND role = 'Professor'
-        LIMIT 1
-    ");
-
-    $stmt_professores->execute([
-        ':usuario_id' => $usuario_id,
-        ':company_id' => $company_id
-    ]);
-} else {
-
-    $stmt_professores = $pdo->prepare("
-        SELECT id, name
-        FROM users
-        WHERE role = 'Professor'
-          AND company_id = :company_id
-        ORDER BY name ASC
-    ");
-
-    $stmt_professores->execute([
-        ':company_id' => $company_id
-    ]);
+    $aluno_id = 0;
+    $modoEditor = false;
+    $fichaForm = null;
 }
 
-$professores = $stmt_professores->fetchAll(
-    PDO::FETCH_ASSOC
-);
+$alunoSelecionado = $aluno_id;
+$nomeAlunoSelecionado = '';
 
-// ================================================
+foreach ($alunos as $registroAluno) {
+
+    if ((int) $registroAluno['id'] === $alunoSelecionado) {
+
+        $nomeAlunoSelecionado = $registroAluno['nome'];
+        break;
+    }
+}
+
+// LISTAR FICHAS
+
+$operacao = 'listar_fichas_aluno';
+
+require __DIR__ . '/../models/Treino.php';
+
+// ABRIR NOVA FICHA OU EDITAR EXISTENTE
+
+if (
+    ($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST' &&
+    $alunoSelecionado > 0
+) {
+
+    $editarId = (int) ($_GET['editar'] ?? 0);
+
+    if ($editarId > 0) {
+
+        foreach ($fichas as $registroFicha) {
+
+            if ((int) $registroFicha['id'] !== $editarId) {
+                continue;
+            }
+
+            $ficha_id = $editarId;
+
+            $operacao = 'buscar_itens_ficha';
+
+            require __DIR__ . '/../models/Treino.php';
+
+            $fichaForm = $registroFicha;
+            $fichaForm['itens'] = $itens;
+
+            if ($perfilProfessor) {
+
+                $fichaForm['professor_id'] = $usuario_id;
+            }
+
+            $modoEditor = true;
+
+            break;
+        }
+
+        if (!$modoEditor) {
+
+            $mensagemErro = 'Ficha não encontrada.';
+        }
+
+    } elseif (($_GET['novo'] ?? '') === '1') {
+
+        $modoEditor = true;
+
+        $fichaForm = [
+            'id' => 0,
+            'professor_id' => $perfilProfessor
+                ? $usuario_id
+                : 0,
+            'nome_ficha' => '',
+            'objetivo' => '',
+            'itens' => []
+        ];
+    }
+}
+
+// PROFESSORES
+
+$sqlProfessores = "
+    SELECT id, name
+    FROM users
+    WHERE company_id = :company_id
+      AND role = 'Professor'
+";
+
+$paramsProfessores = [
+    ':company_id' => $company_id
+];
+
+if ($perfilProfessor) {
+
+    $sqlProfessores .= " AND id = :usuario_id";
+
+    $paramsProfessores[':usuario_id'] = $usuario_id;
+}
+
+$sqlProfessores .= " ORDER BY name ASC";
+
+$stmtProfessores = $pdo->prepare($sqlProfessores);
+
+$stmtProfessores->execute($paramsProfessores);
+
+$professores = $stmtProfessores->fetchAll(PDO::FETCH_ASSOC);
+
+// BIBLIOTECA DE EXERCÍCIOS
+// Somente consulta. Nenhuma alteração na biblioteca.
+
+$stmtExercicios = $pdo->prepare("
+    SELECT id, nome
+    FROM exercicios
+    WHERE company_id = :company_id
+      AND ativo = 1
+    ORDER BY nome ASC
+");
+
+$stmtExercicios->execute([
+    ':company_id' => $company_id
+]);
+
+$exercicios = $stmtExercicios->fetchAll(PDO::FETCH_ASSOC);
+
 // VIEW
-// ================================================
 
 require __DIR__ . '/../views/treinos/index.php';
