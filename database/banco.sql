@@ -51,6 +51,7 @@ CREATE TABLE users (
     reset_token_expires_at DATETIME DEFAULT NULL,
     FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE
 );
+
 CREATE TABLE user_filiais (
     user_id INT NOT NULL,
     filial_id INT NOT NULL,
@@ -83,8 +84,7 @@ CREATE TABLE configuracoes_email (
     atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT uq_configuracoes_email_empresa UNIQUE (company_id),
     CONSTRAINT fk_configuracoes_email_empresa FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE,
-    CONSTRAINT fk_configuracoes_email_usuario FOREIGN KEY (atualizado_por) REFERENCES users (id) ON DELETE
-    SET NULL
+    CONSTRAINT fk_configuracoes_email_usuario FOREIGN KEY (atualizado_por) REFERENCES users (id) ON DELETE SET NULL
 );
 -- ---------- 4. PLANOS DA ACADEMIA ------------------------------------
 CREATE TABLE planos (
@@ -112,13 +112,11 @@ CREATE TABLE alunos (
     status VARCHAR(20) NOT NULL DEFAULT 'Ativo',
     criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (filial_id) REFERENCES filiais (id) ON DELETE RESTRICT,
-    FOREIGN KEY (professor_id) REFERENCES users (id) ON DELETE
-    SET NULL
+    FOREIGN KEY (professor_id) REFERENCES users (id) ON DELETE SET NULL
 );
 -- Vinculando a chave estrangeira de usuários/alunos de forma segura para o MySQL
 ALTER TABLE users
-ADD CONSTRAINT fk_users_aluno FOREIGN KEY (aluno_id) REFERENCES alunos (id) ON DELETE
-SET NULL;
+ADD CONSTRAINT fk_users_aluno FOREIGN KEY (aluno_id) REFERENCES alunos (id) ON DELETE SET NULL;
 -- ---------- 6. MATRÍCULAS ----------------------------------------------
 CREATE TABLE matriculas (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -193,18 +191,19 @@ CREATE TABLE exercicios (
     ativo BOOLEAN NOT NULL DEFAULT TRUE,
     FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE
 );
+
 CREATE TABLE fichas_treino (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(100) DEFAULT NULL,
     aluno_id INT NOT NULL,
     professor_id INT NOT NULL,
-    nome VARCHAR(100) NULL,
+    nome VARCHAR(100) DEFAULT NULL,
     objetivo VARCHAR(50) NOT NULL,
     criada_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     versao INT NOT NULL DEFAULT 1,
     FOREIGN KEY (aluno_id) REFERENCES alunos (id) ON DELETE CASCADE,
     FOREIGN KEY (professor_id) REFERENCES users (id) ON DELETE RESTRICT
 );
+
 CREATE TABLE ficha_itens (
     id INT AUTO_INCREMENT PRIMARY KEY,
     ficha_id INT NOT NULL,
@@ -235,23 +234,23 @@ CREATE TABLE IF NOT EXISTS treino_sessoes (
     registrado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_ts_company FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE,
     CONSTRAINT fk_ts_aluno FOREIGN KEY (aluno_id) REFERENCES alunos (id) ON DELETE CASCADE,
-    CONSTRAINT fk_ts_ficha FOREIGN KEY (ficha_id) REFERENCES fichas_treino (id) ON DELETE
-    SET NULL,
-        CONSTRAINT uq_ts_token UNIQUE (
-            company_id,
-            aluno_id,
-            token_sessao
-        ),
-        INDEX idx_ts_historico (
-            company_id,
-            aluno_id,
-            concluido_em
-        ),
-        CONSTRAINT chk_ts_datas CHECK (
-            concluido_em IS NULL
-            OR concluido_em >= iniciado_em
-        )
+    CONSTRAINT fk_ts_ficha FOREIGN KEY (ficha_id) REFERENCES fichas_treino (id) ON DELETE SET NULL,
+    CONSTRAINT uq_ts_token UNIQUE (
+        company_id,
+        aluno_id,
+        token_sessao
+    ),
+    INDEX idx_ts_historico (
+        company_id,
+        aluno_id,
+        concluido_em
+    ),
+    CONSTRAINT chk_ts_datas CHECK (
+        concluido_em IS NULL
+        OR concluido_em >= iniciado_em
+    )
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
 CREATE TABLE IF NOT EXISTS treino_sessao_exercicios (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     sessao_id BIGINT UNSIGNED NOT NULL,
@@ -267,17 +266,16 @@ CREATE TABLE IF NOT EXISTS treino_sessao_exercicios (
     intervalo_prescrito VARCHAR(20) DEFAULT NULL,
     concluido_em DATETIME DEFAULT NULL,
     CONSTRAINT fk_tse_sessao FOREIGN KEY (sessao_id) REFERENCES treino_sessoes (id) ON DELETE CASCADE,
-    CONSTRAINT fk_tse_ficha_item FOREIGN KEY (ficha_item_id) REFERENCES ficha_itens (id) ON DELETE
-    SET NULL,
-        CONSTRAINT fk_tse_exercicio FOREIGN KEY (exercicio_id) REFERENCES exercicios (id) ON DELETE
-    SET NULL,
-        CONSTRAINT uq_tse_ordem UNIQUE (sessao_id, ordem),
-        INDEX idx_tse_frequencia (
-            concluido_em,
-            exercicio_origem_id
-        ),
-        CONSTRAINT chk_tse_series CHECK (series_prescritas > 0)
+    CONSTRAINT fk_tse_ficha_item FOREIGN KEY (ficha_item_id) REFERENCES ficha_itens (id) ON DELETE SET NULL,
+    CONSTRAINT fk_tse_exercicio FOREIGN KEY (exercicio_id) REFERENCES exercicios (id) ON DELETE SET NULL,
+    CONSTRAINT uq_tse_ordem UNIQUE (sessao_id, ordem),
+    INDEX idx_tse_frequencia (
+        concluido_em,
+        exercicio_origem_id
+    ),
+    CONSTRAINT chk_tse_series CHECK (series_prescritas > 0)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
 CREATE TABLE IF NOT EXISTS treino_sessao_series (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     sessao_exercicio_id BIGINT UNSIGNED NOT NULL,
@@ -319,9 +317,9 @@ CREATE TABLE checkins (
     data TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     ficha_id INT DEFAULT NULL,
     FOREIGN KEY (aluno_id) REFERENCES alunos (id) ON DELETE CASCADE,
-    FOREIGN KEY (ficha_id) REFERENCES fichas_treino (id) ON DELETE
-    SET NULL
+    FOREIGN KEY (ficha_id) REFERENCES fichas_treino (id) ON DELETE SET NULL
 );
+
 CREATE TABLE trancamentos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     aluno_id INT NOT NULL,
@@ -384,6 +382,7 @@ CREATE TABLE portfolio_config (
     CONSTRAINT uq_portfolio_company UNIQUE (company_id),
     FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE
 );
+
 CREATE TABLE portfolio_modalities (
     id INT AUTO_INCREMENT PRIMARY KEY,
     filial_id INT NOT NULL,
@@ -392,6 +391,7 @@ CREATE TABLE portfolio_modalities (
     image_url TEXT,
     FOREIGN KEY (filial_id) REFERENCES filiais (id) ON DELETE CASCADE
 );
+
 CREATE TABLE portfolio_filial_images (
     id INT AUTO_INCREMENT PRIMARY KEY,
     company_id INT NOT NULL,
@@ -401,6 +401,7 @@ CREATE TABLE portfolio_filial_images (
     FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE,
     FOREIGN KEY (filial_id) REFERENCES filiais (id) ON DELETE CASCADE
 );
+
 CREATE TABLE portfolio_slides (
     id INT AUTO_INCREMENT PRIMARY KEY,
     company_id INT NOT NULL,
@@ -410,6 +411,7 @@ CREATE TABLE portfolio_slides (
     CONSTRAINT uq_portfolio_slides_company_ordem UNIQUE (company_id, ordem),
     FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE
 );
+
 CREATE TABLE portfolio_feedbacks (
     id INT AUTO_INCREMENT PRIMARY KEY,
     company_id INT NOT NULL,
@@ -419,30 +421,36 @@ CREATE TABLE portfolio_feedbacks (
     mensagem TEXT NOT NULL,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     ativo BOOLEAN NOT NULL DEFAULT FALSE,
-    CHECK (
-        nota BETWEEN 1 AND 5
-    ),
+    CHECK (nota BETWEEN 1 AND 5),
     CONSTRAINT uq_feedback_company_user UNIQUE (company_id, user_id),
     CONSTRAINT fk_feedback_usuario FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     FOREIGN KEY (company_id) REFERENCES companies (id) ON DELETE CASCADE
 );
 -- ---------- ÍNDICES DE PERFORMANCE -----------------------------------
 CREATE INDEX idx_alunos_filial_status ON alunos (filial_id, status);
+
 CREATE INDEX idx_contas_vencimento ON contas (status, vencimento);
+
 CREATE INDEX idx_pagamentos_matricula ON pagamentos (matricula_id);
+
 CREATE INDEX idx_pagamentos_status ON pagamentos (status);
+
 CREATE INDEX idx_ficha_itens_vinculo ON ficha_itens (ficha_id);
+
 CREATE INDEX idx_custos_data ON custos (data);
+
 CREATE INDEX idx_leads_status ON leads (status);
 -- =====================================================================
 -- PARTE 2: CARGA DE DADOS INICIAIS (SEED / MOCK DATA)
 -- =====================================================================
 -- 1. COMPANIES
-INSERT INTO companies (id, nome)
+INSERT INTO
+    companies (id, nome)
 VALUES (1, 'GymFlow Corporation'),
     (2, 'FitLife Group');
 -- 2. FILIAIS
-INSERT INTO filiais (
+INSERT INTO
+    filiais (
         id,
         company_id,
         nome,
@@ -487,7 +495,8 @@ VALUES (
         -46.47000000
     );
 -- 3. ALUNOS
-INSERT INTO alunos (
+INSERT INTO
+    alunos (
         id,
         filial_id,
         nome,
@@ -580,7 +589,8 @@ VALUES (
     );
 -- 4. USERS
 -- Senha padrão para todos: 'admin' | Hash bcrypt: $2y$10$nmdtL/W7IDi8gbKjf3sYOO1CWKPfsuMZYtNWGaBJ3hFMCTS00NW5.
-INSERT INTO users (
+INSERT INTO
+    users (
         id,
         company_id,
         name,
@@ -644,7 +654,8 @@ VALUES (
         NULL
     );
 -- 5. USER_FILIAIS
-INSERT INTO user_filiais (user_id, filial_id)
+INSERT INTO
+    user_filiais (user_id, filial_id)
 VALUES (1, 1),
     (1, 2),
     (1, 3),
@@ -652,7 +663,8 @@ VALUES (1, 1),
     (3, 3),
     (6, 1);
 -- 6. PLANOS
-INSERT INTO planos (
+INSERT INTO
+    planos (
         id,
         company_id,
         nome,
@@ -693,7 +705,8 @@ VALUES (
         '1 Mês'
     );
 -- 7. MATRÍCULAS
-INSERT INTO matriculas (
+INSERT INTO
+    matriculas (
         id,
         aluno_id,
         plano_id,
@@ -754,7 +767,8 @@ VALUES (
         TRUE
     );
 -- 7.1 PAGAMENTOS
-INSERT INTO pagamentos (
+INSERT INTO
+    pagamentos (
         id,
         matricula_id,
         mercado_pago_id,
@@ -795,7 +809,8 @@ VALUES (
         'pendente'
     );
 -- 8. CONTAS A RECEBER (MÓDULO FINANCEIRO - JORGE)
-INSERT INTO contas (
+INSERT INTO
+    contas (
         id,
         aluno_id,
         matricula_id,
@@ -866,7 +881,8 @@ VALUES (
         NULL
     );
 -- 9. LEADS (MÓDULO CRM - JORGE) - Distribuídos em todas as etapas do Kanban
-INSERT INTO leads (
+INSERT INTO
+    leads (
         id,
         filial_id,
         nome,
@@ -937,7 +953,8 @@ VALUES (
         '2026-09-21 14:00:00'
     );
 -- 10. CUSTOS (MÓDULO FLUXO DE CAIXA - JORGE)
-INSERT INTO custos (
+INSERT INTO
+    custos (
         id,
         filial_id,
         descricao,
@@ -994,7 +1011,8 @@ VALUES (
         '2026-09-15'
     );
 -- 11. EXERCÍCIOS
-INSERT INTO exercicios (
+INSERT INTO
+    exercicios (
         id,
         company_id,
         nome,
@@ -1059,7 +1077,8 @@ VALUES (
         'imagem'
     );
 -- 12. FICHAS_TREINO
-INSERT INTO fichas_treino (
+INSERT INTO
+    fichas_treino (
         id,
         aluno_id,
         professor_id,
@@ -1084,7 +1103,8 @@ VALUES (
         1
     );
 -- 13. FICHA_ITENS
-INSERT INTO ficha_itens (
+INSERT INTO
+    ficha_itens (
         id,
         ficha_id,
         exercicio_id,
@@ -1145,7 +1165,8 @@ VALUES (
         '60s'
     );
 -- 14. AVALIAÇÕES FÍSICAS
-INSERT INTO avaliacoes (
+INSERT INTO
+    avaliacoes (
         id,
         aluno_id,
         data,
@@ -1194,7 +1215,8 @@ VALUES (
         38.0
     );
 -- 15. CHECK-INS
-INSERT INTO checkins (id, aluno_id, data, ficha_id)
+INSERT INTO
+    checkins (id, aluno_id, data, ficha_id)
 VALUES (
         1,
         1,
@@ -1220,7 +1242,8 @@ VALUES (
         NULL
     );
 -- 16. TRANCAMENTOS
-INSERT INTO trancamentos (
+INSERT INTO
+    trancamentos (
         id,
         aluno_id,
         inicio,
@@ -1237,7 +1260,8 @@ VALUES (
         30.00
     );
 -- 17. PREFERÊNCIAS DO USUÁRIO
-INSERT INTO preferencias_usuario (
+INSERT INTO
+    preferencias_usuario (
         user_id,
         notificacoes_email,
         notificacoes_push,
@@ -1246,7 +1270,8 @@ INSERT INTO preferencias_usuario (
 VALUES (1, TRUE, TRUE, 'light'),
     (4, TRUE, FALSE, 'dark');
 -- 18. PORTFOLIO_CONFIG
-INSERT INTO portfolio_config (
+INSERT INTO
+    portfolio_config (
         company_id,
         app_name,
         theme_mode,
@@ -1313,7 +1338,8 @@ VALUES (
         'totalpass'
     );
 -- 19. PORTFOLIO_MODALITIES
-INSERT INTO portfolio_modalities (
+INSERT INTO
+    portfolio_modalities (
         id,
         filial_id,
         name,
@@ -1349,7 +1375,8 @@ VALUES (
         'https://example.com/spinning.jpg'
     );
 -- 20. PORTFOLIO_FEEDBACKS
-INSERT INTO portfolio_feedbacks (
+INSERT INTO
+    portfolio_feedbacks (
         company_id,
         nome,
         nota,

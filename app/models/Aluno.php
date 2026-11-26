@@ -18,7 +18,7 @@ if ($operacao === 'listar') {
     // LÓGICA DE MULTI-TENANT (RESTRIÇÃO DE FILIAL)
     $role_logado = $_SESSION['usuario_role'] ?? '';
     $id_logado = $_SESSION['usuario_id'] ?? 0;
-    
+
     if ($role_logado === 'Professor') {
         $sql .= " AND a.professor_id = :user_id";
         $parametros[':user_id'] = $id_logado;
@@ -46,29 +46,124 @@ if ($operacao === 'listar') {
     $alunos = $stmt->fetchAll();
 }
 
-/* 2. LISTAR FILIAIS ATIVAS */
-elseif ($operacao === 'listar_filiais') {
-    $company_id = $_SESSION['company_id'] ?? 0;
-    $stmt = $pdo->prepare("SELECT id, nome FROM filiais WHERE ativo = TRUE AND company_id = ? ORDER BY nome");
-    $stmt->execute([$company_id]);
+/* 2. LISTAR FILIAIS ATIVAS */ elseif ($operacao === 'listar_filiais') {
+
+    $company_id = (int) (
+        $_SESSION['company_id'] ?? 0
+    );
+
+    $role_logado =
+        $_SESSION['usuario_role'] ?? '';
+
+    $sql = "
+        SELECT f.id, f.nome
+
+        FROM filiais f
+
+        WHERE f.ativo = TRUE
+          AND f.company_id = :empresa
+    ";
+
+    $parametros = [
+        ':empresa' => $company_id
+    ];
+
+    if ($role_logado === 'Recepcao') {
+
+        $sql .= "
+            AND EXISTS (
+                SELECT 1
+                FROM user_filiais uf
+                WHERE uf.filial_id = f.id
+                  AND uf.user_id = :usuario
+            )
+        ";
+
+        $parametros[':usuario'] =
+            (int) ($_SESSION['usuario_id'] ?? 0);
+    }
+
+    $sql .= " ORDER BY f.nome";
+
+    $stmt = $pdo->prepare($sql);
+
+    $stmt->execute($parametros);
+
     $filiais = $stmt->fetchAll();
 }
 
-/* 3. BUSCAR ALUNO POR ID */
-elseif ($operacao === 'buscar') {
-    $company_id = $_SESSION['company_id'] ?? 0;
+/* 3. BUSCAR ALUNO POR ID */ elseif ($operacao === 'buscar') {
+
+    $company_id = (int) (
+        $_SESSION['company_id'] ?? 0
+    );
+
     $id = (int) ($id ?? 0);
-    $stmt = $pdo->prepare("SELECT a.*, f.nome AS nome_filial FROM alunos a INNER JOIN filiais f ON f.id = a.filial_id WHERE a.id = :id AND f.company_id = :company_id");
-    $stmt->execute([':id' => $id, ':company_id' => $company_id]);
+
+    $role_logado =
+        $_SESSION['usuario_role'] ?? '';
+
+    $sql = "
+        SELECT a.*, f.nome AS nome_filial
+
+        FROM alunos a
+
+        INNER JOIN filiais f
+            ON f.id = a.filial_id
+
+        WHERE a.id = :id
+          AND f.company_id = :company_id
+    ";
+
+    $parametros = [
+        ':id' => $id,
+        ':company_id' => $company_id
+    ];
+
+    if ($role_logado === 'Recepcao') {
+
+        $sql .= "
+            AND EXISTS (
+                SELECT 1
+                FROM user_filiais uf
+                WHERE uf.filial_id = a.filial_id
+                  AND uf.user_id = :usuario
+            )
+        ";
+
+        $parametros[':usuario'] =
+            (int) ($_SESSION['usuario_id'] ?? 0);
+    }
+
+    $stmt = $pdo->prepare($sql);
+
+    $stmt->execute($parametros);
+
     $aluno = $stmt->fetch() ?: null;
 }
 
-/* 4. CADASTRAR ALUNO */
-elseif ($operacao === 'cadastrar') {
+/* 4. CADASTRAR ALUNO */ elseif ($operacao === 'cadastrar') {
     try {
         // Valida CPF duplicado
-        $stmt = $pdo->prepare("SELECT id FROM alunos WHERE cpf = :cpf");
-        $stmt->execute([':cpf' => $dados['cpf']]);
+        $stmt = $pdo->prepare("
+    SELECT id
+
+    FROM alunos
+
+    WHERE REPLACE(
+        REPLACE(cpf, '.', ''),
+        '-',
+        ''
+    ) = :cpf
+");
+
+        $stmt->execute([
+            ':cpf' => preg_replace(
+                '/[^0-9]/',
+                '',
+                $dados['cpf']
+            )
+        ]);
         if ($stmt->fetch()) {
             throw new Exception('Este CPF já está cadastrado.');
         }
@@ -108,7 +203,7 @@ elseif ($operacao === 'cadastrar') {
             VALUES (:company_id, :nome, :email, :senha, 'Aluno', :aluno_id)
         ");
         $stmt->execute([
-            ':company_id'=> $_SESSION['company_id'],
+            ':company_id' => $_SESSION['company_id'],
             ':nome'     => $dados['nome'],
             ':email'    => $dados['email'],
             ':senha'    => password_hash($dados['senha'], PASSWORD_DEFAULT),
@@ -124,14 +219,35 @@ elseif ($operacao === 'cadastrar') {
     }
 }
 
-/* 5. ATUALIZAR ALUNO */
-elseif ($operacao === 'atualizar') {
+/* 5. ATUALIZAR ALUNO */ elseif ($operacao === 'atualizar') {
     $id = (int) ($id ?? 0);
 
     try {
         // Valida CPF duplicado ignorando o próprio aluno
-        $stmt = $pdo->prepare("SELECT id FROM alunos WHERE cpf = :cpf AND id != :id");
-        $stmt->execute([':cpf' => $dados['cpf'], ':id' => $id]);
+        $stmt = $pdo->prepare("
+    SELECT id
+
+    FROM alunos
+
+    WHERE REPLACE(
+        REPLACE(cpf, '.', ''),
+        '-',
+        ''
+    ) = :cpf
+
+      AND id != :id
+");
+
+        $stmt->execute([
+
+            ':cpf' => preg_replace(
+                '/[^0-9]/',
+                '',
+                $dados['cpf']
+            ),
+
+            ':id' => $id
+        ]);
         if ($stmt->fetch()) {
             throw new Exception('Este CPF pertence a outro aluno.');
         }
@@ -195,8 +311,7 @@ elseif ($operacao === 'atualizar') {
     }
 }
 
-/* 6. DADOS COMPLETOS DA VISUALIZAÇÃO DO ALUNO */
-elseif ($operacao === 'visualizar') {
+/* 6. DADOS COMPLETOS DA VISUALIZAÇÃO DO ALUNO */ elseif ($operacao === 'visualizar') {
     $id = (int) ($id ?? 0);
 
     // Dados do aluno
@@ -234,8 +349,7 @@ elseif ($operacao === 'visualizar') {
     $planos = $stmt->fetchAll();
 }
 
-/* 7. MATRICULAR ALUNO */
-elseif ($operacao === 'matricular') {
+/* 7. MATRICULAR ALUNO */ elseif ($operacao === 'matricular') {
     $alunoId = (int) ($alunoId ?? 0);
     $planoId = (int) ($planoId ?? 0);
     $dataInicio = $dataInicio ?? '';
@@ -321,8 +435,7 @@ elseif ($operacao === 'matricular') {
     }
 }
 
-/* 8. REGISTRAR PAGAMENTO */
-elseif ($operacao === 'pagar') {
+/* 8. REGISTRAR PAGAMENTO */ elseif ($operacao === 'pagar') {
     $contaId = (int) ($contaId ?? 0);
     $alunoId = (int) ($alunoId ?? 0);
 
@@ -335,8 +448,7 @@ elseif ($operacao === 'pagar') {
     $pagamentoRealizado = $stmt->rowCount() > 0;
 }
 
-/* 9. DADOS DO PORTAL DO ALUNO */
-elseif ($operacao === 'dados_portal_aluno') {
+/* 9. DADOS DO PORTAL DO ALUNO */ elseif ($operacao === 'dados_portal_aluno') {
     $alunoId = (int) ($alunoId ?? 0);
 
     // Nome do aluno
@@ -372,8 +484,7 @@ elseif ($operacao === 'dados_portal_aluno') {
     $faturas_abertas = (int) $stmt->fetchColumn();
 }
 
-/* 10. LISTAR CONTRATOS/MATRÍCULAS DO ALUNO */
-elseif ($operacao === 'listar_contratos') {
+/* 10. LISTAR CONTRATOS/MATRÍCULAS DO ALUNO */ elseif ($operacao === 'listar_contratos') {
     $alunoId = (int) ($aluno_id ?? 0);
 
     $stmt = $pdo->prepare("
@@ -387,8 +498,7 @@ elseif ($operacao === 'listar_contratos') {
     $contratos = $stmt->fetchAll();
 }
 
-/* 11. BUSCAR DETALHES DO CONTRATO PARA IMPRESSÃO */
-elseif ($operacao === 'buscar_contrato_impressao') {
+/* 11. BUSCAR DETALHES DO CONTRATO PARA IMPRESSÃO */ elseif ($operacao === 'buscar_contrato_impressao') {
     $alunoId = (int) ($aluno_id ?? 0);
     $contratoId = (int) ($contrato_id ?? 0);
 

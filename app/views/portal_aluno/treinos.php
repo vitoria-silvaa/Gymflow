@@ -110,6 +110,7 @@ $chave = 'gymflow:guiado:v2:' . hash(
         ($_SESSION['company_id'] ?? 0) . '|' .
         ($_SESSION['aluno_id'] ?? 0) . '|' .
         $idFicha . '|' .
+        (int) ($ficha_atual['versao'] ?? 1) . '|' .
         serialize($exercicios)
 );
 
@@ -285,7 +286,7 @@ require __DIR__ . '/../shared/sidebar.php';
                             <span>
 
                                 <strong>
-                                    <?= $esc($f['objetivo'] ?? 'Treino') ?>
+                                    <?= $esc($f['nome_ficha'] ?? $f['objetivo'] ?? 'Treino') ?>
                                 </strong>
 
                                 <small>
@@ -313,10 +314,14 @@ require __DIR__ . '/../shared/sidebar.php';
                         <div>
 
                             <h2>
-                                <?= $esc($ficha_atual['objetivo'] ?? 'Treino') ?>
+                                <?= $esc($ficha_atual['nome_ficha'] ?? $ficha_atual['objetivo'] ?? 'Treino') ?>
                             </h2>
 
                             <div class="tg-meta">
+
+                                <span>
+                                    <?= $esc($ficha_atual['objetivo'] ?? 'Treino') ?>
+                                </span>
 
                                 <span>
                                     Prof. <?= $esc($ficha_atual['nome_professor'] ?? 'Não informado') ?>
@@ -926,6 +931,7 @@ require __DIR__ . '/../shared/sidebar.php';
                         'Aluno' => $ficha_atual['nome_aluno'] ?? $_SESSION['usuario_nome'] ?? 'Aluno',
                         'Professor' => $ficha_atual['nome_professor'] ?? 'Não informado',
                         'Unidade' => $ficha_atual['nome_filial'] ?? 'Não informada',
+                        'Ficha' => $ficha_atual['nome_ficha'] ?? $ficha_atual['objetivo'] ?? 'Treino',
                         'Objetivo' => $ficha_atual['objetivo'] ?? 'Treino',
                         'Versão' => $ficha_atual['versao'] ?? 1,
                         'Data' => $dataFicha
@@ -2475,6 +2481,8 @@ $dadosPdf = [
     'professor' => $ficha_atual['nome_professor'] ?? '',
 
     'unidade' => $ficha_atual['nome_filial'] ?? '',
+
+    'nome_ficha' => $ficha_atual['nome_ficha'] ?? $ficha_atual['objetivo'] ?? 'Treino',
 
     'objetivo' => $ficha_atual['objetivo'] ?? '',
 

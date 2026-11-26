@@ -1,25 +1,64 @@
 <?php
-$tituloPagina = "Editar Aluno";
-include __DIR__ . '/../shared/header.php';
-include __DIR__ . '/../shared/sidebar.php';
+// app/views/alunos/editar.php
 
-// $dados tem as informações atuais do aluno (vindas do controller).
-// Aqui garantimos que todos os campos existem (vazios) para não dar aviso do PHP.
-if (!isset($dados)) {
-    $dados = [];
+if (!defined('BASE_URL')) {
+    http_response_code(403);
+    exit('Acesso negado.');
 }
 
-$campos = ['nome', 'cpf', 'rg', 'sexo', 'nascimento', 'status', 'email', 'telefone', 'endereco', 'filial_id', 'professor_id'];
+// Inicializar variáveis recebidas do Controller.
+
+$baseUrl = BASE_URL . '/app/controllers/AlunoController.php';
+
+$erro = $erro ?? '';
+
+$filiais = $filiais ?? [];
+
+$professores = $professores ?? [];
+
+$id = filter_var(
+    $id ?? null,
+    FILTER_VALIDATE_INT,
+    [
+        'options' => [
+            'min_range' => 1
+        ]
+    ]
+);
+
+$dados = $dados ?? null;
+
+// Impedir a edição sem um aluno identificado.
+
+if ($id === false || !is_array($dados)) {
+    header('Location: ' . $baseUrl . '?acao=listar');
+    exit;
+}
+
+// Inicializar os campos do formulário.
+
+$campos = [
+    'nome',
+    'cpf',
+    'rg',
+    'sexo',
+    'nascimento',
+    'status',
+    'email',
+    'telefone',
+    'endereco',
+    'filial_id',
+    'professor_id'
+];
 
 foreach ($campos as $campo) {
-    if (!isset($dados[$campo])) {
-        $dados[$campo] = '';
-    }
+    $dados[$campo] = $dados[$campo] ?? '';
 }
 
-if (!isset($professores)) {
-    $professores = [];
-}
+$tituloPagina = "Editar Aluno";
+
+include __DIR__ . '/../shared/header.php';
+include __DIR__ . '/../shared/sidebar.php';
 ?>
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/jorge-financeiro.css">
@@ -147,64 +186,132 @@ if (!isset($professores)) {
                 <div class="grade">
                     <div class="fin-form-group">
                         <label>Nome Completo *</label>
-                        <input type="text" name="nome" class="fin-input" value="<?= htmlspecialchars($dados['nome']) ?>" required>
+                        <input type="text" name="nome" class="fin-input" maxlength="100" value="<?= htmlspecialchars($dados['nome']) ?>" required>
                     </div>
 
                     <div class="fin-form-group">
                         <label>CPF *</label>
-                        <input type="text" name="cpf" class="fin-input" value="<?= htmlspecialchars($dados['cpf']) ?>" required>
+                        <input type="text" name="cpf" class="fin-input" maxlength="14" inputmode="numeric" value="<?= htmlspecialchars($dados['cpf']) ?>" required>
                     </div>
 
                     <div class="fin-form-group">
                         <label>RG</label>
-                        <input type="text" name="rg" class="fin-input" value="<?= htmlspecialchars($dados['rg']) ?>">
+                        <input type="text" name="rg" class="fin-input" maxlength="20" value="<?= htmlspecialchars($dados['rg']) ?>">
                     </div>
 
                     <div class="fin-form-group">
                         <label>Sexo *</label>
                         <select name="sexo" class="fin-select" required>
-                            <option value="Masculino" <?php if ($dados['sexo'] == 'Masculino') { echo 'selected'; } ?>>Masculino</option>
-                            <option value="Feminino" <?php if ($dados['sexo'] == 'Feminino') { echo 'selected'; } ?>>Feminino</option>
-                            <option value="Outro" <?php if ($dados['sexo'] == 'Outro') { echo 'selected'; } ?>>Outro</option>
+                            <option value="Masculino" <?php if ($dados['sexo'] == 'Masculino') {
+                                                            echo 'selected';
+                                                        } ?>>Masculino</option>
+                            <option value="Feminino" <?php if ($dados['sexo'] == 'Feminino') {
+                                                            echo 'selected';
+                                                        } ?>>Feminino</option>
+                            <option value="Outro" <?php if ($dados['sexo'] == 'Outro') {
+                                                        echo 'selected';
+                                                    } ?>>Outro</option>
                         </select>
                     </div>
 
                     <div class="fin-form-group">
                         <label>Data de Nascimento *</label>
-                        <input type="date" name="nascimento" class="fin-input" value="<?= htmlspecialchars($dados['nascimento']) ?>" required>
+                        <input type="date" name="nascimento" class="fin-input" max="<?= date('Y-m-d') ?>" value="<?= htmlspecialchars($dados['nascimento']) ?>" required>
                     </div>
 
                     <div class="fin-form-group">
                         <label>Status da Conta *</label>
                         <select name="status" class="fin-select" required>
-                            <option value="Ativo" <?php if ($dados['status'] == 'Ativo') { echo 'selected'; } ?>>Ativo</option>
-                            <option value="Inativo" <?php if ($dados['status'] == 'Inativo') { echo 'selected'; } ?>>Inativo</option>
+                            <option value="Ativo" <?php if ($dados['status'] == 'Ativo') {
+                                                        echo 'selected';
+                                                    } ?>>Ativo</option>
+                            <option value="Inativo" <?php if ($dados['status'] == 'Inativo') {
+                                                        echo 'selected';
+                                                    } ?>>Inativo</option>
                         </select>
                     </div>
                 </div>
             </div>
 
             <!-- PARTE 2: CONTATO E ACESSO -->
+            <!-- PARTE 2: CONTATO E ACESSO -->
+
             <div class="secao">
-                <h3 class="titulo-secao">Contato &amp; Acesso ao Portal</h3>
+
+                <h3 class="titulo-secao">
+                    Contato &amp; Acesso ao Portal
+                </h3>
 
                 <div class="grade">
+
                     <div class="fin-form-group">
-                        <label>E-mail *</label>
-                        <input type="email" name="email" class="fin-input" value="<?= htmlspecialchars($dados['email']) ?>" required>
+
+                        <label for="email">E-mail *</label>
+
+                        <input
+                            type="email"
+                            id="email"
+                            name="email" maxlength="100"
+                            class="fin-input"
+                            value="<?= htmlspecialchars($dados['email']) ?>"
+                            autocomplete="email"
+                            required>
+
                     </div>
 
                     <div class="fin-form-group">
-                        <label>Telefone / WhatsApp *</label>
-                        <input type="text" name="telefone" class="fin-input" value="<?= htmlspecialchars($dados['telefone']) ?>" required>
+
+                        <label for="telefone">
+                            Telefone / WhatsApp *
+                        </label>
+
+                        <input
+                            type="tel"
+                            id="telefone"
+                            name="telefone" maxlength="15"
+                            class="fin-input"
+                            value="<?= htmlspecialchars($dados['telefone']) ?>"
+                            autocomplete="tel"
+                            required>
+
                     </div>
 
                     <div class="fin-form-group">
-                        <!-- Se deixar vazio, a senha antiga continua valendo -->
-                        <label>Nova Senha (deixe em branco para não alterar)</label>
-                        <input type="password" name="senha" class="fin-input" placeholder="Mínimo 6 caracteres se alterar" minlength="6">
+
+                        <label for="senha">Nova senha</label>
+
+                        <input
+                            type="password"
+                            id="senha"
+                            name="senha"
+                            class="fin-input"
+                            placeholder="Deixe vazio para manter a atual"
+                            minlength="8"
+                            maxlength="72"
+                            autocomplete="new-password">
+
                     </div>
+
+                    <div class="fin-form-group">
+
+                        <label for="confirmar_senha">
+                            Confirmar nova senha
+                        </label>
+
+                        <input
+                            type="password"
+                            id="confirmar_senha"
+                            name="confirmar_senha"
+                            class="fin-input"
+                            placeholder="Repita a nova senha"
+                            minlength="8"
+                            maxlength="72"
+                            autocomplete="new-password">
+
+                    </div>
+
                 </div>
+
             </div>
 
             <!-- PARTE 3: ENDEREÇO -->
@@ -222,24 +329,24 @@ if (!isset($professores)) {
 
                     <div class="fin-form-group">
                         <label>Logradouro / Rua</label>
-                        <input type="text" id="rua" class="fin-input" placeholder="Rua, Avenida..." oninput="atualizarEndereco()">
+                        <input type="text" id="rua" class="fin-input" maxlength="150" placeholder="Rua, Avenida..." oninput="atualizarEndereco()">
                     </div>
                 </div>
 
                 <div class="linha-numero">
                     <div class="fin-form-group">
                         <label>Número</label>
-                        <input type="text" id="numero" class="fin-input" placeholder="123" oninput="atualizarEndereco()">
+                        <input type="text" id="numero" class="fin-input" maxlength="20" placeholder="123" oninput="atualizarEndereco()">
                     </div>
 
                     <div class="fin-form-group">
                         <label>Bairro</label>
-                        <input type="text" id="bairro" class="fin-input" placeholder="Bairro" oninput="atualizarEndereco()">
+                        <input type="text" id="bairro" class="fin-input" maxlength="100" placeholder="Bairro" oninput="atualizarEndereco()">
                     </div>
 
                     <div class="fin-form-group">
                         <label>Cidade / UF</label>
-                        <input type="text" id="cidade_uf" class="fin-input" placeholder="São Paulo/SP" oninput="atualizarEndereco()">
+                        <input type="text" id="cidade_uf" class="fin-input" maxlength="100" placeholder="São Paulo/SP" oninput="atualizarEndereco()">
                     </div>
                 </div>
 
@@ -251,17 +358,17 @@ if (!isset($professores)) {
                 <div id="div_condominio" style="display: none;">
                     <div class="fin-form-group">
                         <label>Bloco / Torre</label>
-                        <input type="text" id="bloco" class="fin-input" placeholder="Bloco A" oninput="atualizarEndereco()">
+                        <input type="text" id="bloco" class="fin-input" maxlength="50" placeholder="Bloco A" oninput="atualizarEndereco()">
                     </div>
                     <div class="fin-form-group">
                         <label>Apto / Sala</label>
-                        <input type="text" id="apto" class="fin-input" placeholder="Apto 42" oninput="atualizarEndereco()">
+                        <input type="text" id="apto" class="fin-input" maxlength="50" placeholder="Apto 42" oninput="atualizarEndereco()">
                     </div>
                 </div>
 
                 <div class="fin-form-group">
                     <label>Endereço Completo (Salvo no Sistema)</label>
-                    <input type="text" id="endereco" name="endereco" class="fin-input campo-endereco" value="<?= htmlspecialchars($dados['endereco']) ?>">
+                    <input type="text" id="endereco" name="endereco" maxlength="500" class="fin-input campo-endereco" value="<?= htmlspecialchars($dados['endereco']) ?>">
                 </div>
             </div>
 
@@ -275,7 +382,9 @@ if (!isset($professores)) {
                         <select name="filial_id" class="fin-select" required>
                             <option value="">Selecione uma filial...</option>
                             <?php foreach ($filiais as $filial): ?>
-                                <option value="<?= $filial['id'] ?>" <?php if ($dados['filial_id'] == $filial['id']) { echo 'selected'; } ?>>
+                                <option value="<?= $filial['id'] ?>" <?php if ($dados['filial_id'] == $filial['id']) {
+                                                                            echo 'selected';
+                                                                        } ?>>
                                     <?= htmlspecialchars($filial['nome']) ?>
                                 </option>
                             <?php endforeach; ?>
@@ -287,7 +396,9 @@ if (!isset($professores)) {
                         <select name="professor_id" class="fin-select">
                             <option value="">Nenhum (Sem instrutor fixo)</option>
                             <?php foreach ($professores as $professor): ?>
-                                <option value="<?= $professor['id'] ?>" <?php if ($dados['professor_id'] == $professor['id']) { echo 'selected'; } ?>>
+                                <option value="<?= $professor['id'] ?>" <?php if ($dados['professor_id'] == $professor['id']) {
+                                                                            echo 'selected';
+                                                                        } ?>>
                                     <?= htmlspecialchars($professor['name']) ?>
                                 </option>
                             <?php endforeach; ?>
@@ -381,10 +492,10 @@ if (!isset($professores)) {
         campoEndereco.value = 'Buscando CEP...';
 
         fetch('https://viacep.com.br/ws/' + cep + '/json/')
-            .then(function (resposta) {
+            .then(function(resposta) {
                 return resposta.json();
             })
-            .then(function (resultado) {
+            .then(function(resultado) {
                 if (resultado.erro) {
                     alert('CEP não encontrado!');
                     campoEndereco.value = '';
@@ -398,7 +509,7 @@ if (!isset($professores)) {
 
                 atualizarEndereco();
             })
-            .catch(function () {
+            .catch(function() {
                 alert('Erro ao buscar o CEP.');
                 campoEndereco.value = '';
             });

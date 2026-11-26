@@ -260,7 +260,8 @@ function registrarExercicioHistorico(
         if ((int) $ficha['versao'] !== $versao) {
 
             throw new DomainException(
-                'A ficha foi atualizada pelo professor.'
+                'A ficha foi atualizada pelo professor. ' .
+                    'Atualize a página para iniciar o treino com a nova versão.'
             );
         }
 

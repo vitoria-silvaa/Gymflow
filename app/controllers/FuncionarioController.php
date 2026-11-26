@@ -3,6 +3,7 @@
 
 
 require_once __DIR__ . '/../../config/sessao.php';
+require_once __DIR__ . '/../helpers/validacao.php';
 verificarRole(['Admin']);
 
 $baseUrl = BASE_URL . '/app/controllers/FuncionarioController.php';
@@ -19,8 +20,7 @@ if ($acao === 'listar') {
     require __DIR__ . '/../views/funcionarios/index.php';
 }
 
-/* 2. CADASTRAR FUNCIONÁRIO */
-elseif ($acao === 'cadastrar') {
+/* 2. CADASTRAR FUNCIONÁRIO */ elseif ($acao === 'cadastrar') {
     $erro = '';
     $dados = [];
 
@@ -37,8 +37,23 @@ elseif ($acao === 'cadastrar') {
 
         if (empty($dados['nome']) || empty($dados['email']) || empty($dados['senha']) || empty($dados['role']) || $dados['id_filial'] <= 0) {
             $erro = "Por favor, preencha todos os campos obrigatórios (*).";
+        } elseif (
+            ($erroSenha = gymflowErroNovaSenha(
+                $dados['senha'],
+                $_POST['confirmar_senha'] ?? ''
+            )) !== null
+        ) {
+            $erro = $erroSenha;
+        } elseif (
+            ($erroSenha = gymflowErroNovaSenha(
+                $dados['senha'],
+                $_POST['confirmar_senha'] ?? '',
+                true
+            )) !== null
+        ) {
+            $erro = $erroSenha;
         } else {
-            $operacao = 'cadastrar';
+            $operacao = 'atualizar';
             require __DIR__ . '/../models/Funcionario.php';
 
             if (empty($erroModel)) {
@@ -57,8 +72,7 @@ elseif ($acao === 'cadastrar') {
     require __DIR__ . '/../views/funcionarios/cadastrar.php';
 }
 
-/* 3. EDITAR FUNCIONÁRIO */
-elseif ($acao === 'editar') {
+/* 3. EDITAR FUNCIONÁRIO */ elseif ($acao === 'editar') {
     $id = (int) ($_GET['id'] ?? $_POST['id'] ?? 0);
 
     if ($id <= 0) {
@@ -113,8 +127,7 @@ elseif ($acao === 'editar') {
     require __DIR__ . '/../views/funcionarios/editar.php';
 }
 
-/* 4. VISUALIZAR FUNCIONÁRIO */
-elseif ($acao === 'visualizar') {
+/* 4. VISUALIZAR FUNCIONÁRIO */ elseif ($acao === 'visualizar') {
     $id = (int) ($_GET['id'] ?? 0);
 
     if ($id <= 0) {
@@ -131,9 +144,7 @@ elseif ($acao === 'visualizar') {
     }
 
     require __DIR__ . '/../views/funcionarios/visualizar.php';
-}
-
-else {
+} else {
     header("Location: $baseUrl?acao=listar");
     exit;
 }

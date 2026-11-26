@@ -551,7 +551,17 @@ if (!empty($cssEspecifico)) {
                             value="<?= (int) $_GET['ficha'] ?>">
 
                     <?php endif; ?>
+                    <?php if (
+                        $acaoAtual === 'treinos' &&
+                        ($_GET['visualizacao'] ?? '') === 'frequencia'
+                    ): ?>
 
+                        <input
+                            type="hidden"
+                            name="visualizacao"
+                            value="frequencia">
+
+                    <?php endif; ?>
                     <button
                         type="submit"
                         class="portal-tema-toggle"
