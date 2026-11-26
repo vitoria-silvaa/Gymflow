@@ -1,53 +1,33 @@
 <?php
-// =============================================
-// GYMFLOW - SIDEBAR GLOBAL
 // app/views/shared/sidebar.php
-// =============================================
 
-$nomePainel =
-    $_SESSION['nome_painel'] ?? 'Gymflow';
+$nomePainel = $_SESSION['nome_painel'] ?? 'Gymflow';
+$role = $_SESSION['usuario_role'] ?? '';
+$logoPainel = $_SESSION['logo_url'] ?? '';
 
-$role =
-    $_SESSION['usuario_role'] ?? '';
-
-$logoPainel =
-    $_SESSION['logo_url'] ?? '';
-
-$usuarioId =
-    (int) ($_SESSION['usuario_id'] ?? 0);
-
-$companyId =
-    (int) ($_SESSION['company_id'] ?? 0);
-
-// =============================================
-// 1. VALIDAR LOGOTIPO
-// =============================================
+$usuarioId = (int) ($_SESSION['usuario_id'] ?? 0);
+$companyId = (int) ($_SESSION['company_id'] ?? 0);
 
 if ($role === 'Aluno') {
-
-    // Logotipo institucional do Portfólio.
 
     require_once __DIR__ .
         '/../../models/IdentidadePortalAluno.php';
 
-    $logoPainel =
-        validarLogoPortalAluno($logoPainel);
-} else {
+    $logoPainel = validarLogoPortalAluno($logoPainel);
 
-    // Logotipo pessoal do Minha Marca.
+} else {
 
     $prefixoLogo = BASE_URL .
         '/assets/uploads/minha-marca/' .
-        $usuarioId .
-        '/';
+        $usuarioId . '/';
 
     if (
         !is_string($logoPainel) ||
         $usuarioId <= 0 ||
         !preg_match(
             '~^' .
-                preg_quote($prefixoLogo, '~') .
-                '[a-f0-9]{32}\.(png|jpg|webp)$~',
+            preg_quote($prefixoLogo, '~') .
+            '[a-f0-9]{32}\.(png|jpg|webp)$~',
             $logoPainel
         )
     ) {
@@ -55,218 +35,149 @@ if ($role === 'Aluno') {
     }
 }
 
-// =============================================
-// 2. FUNÇÕES AUXILIARES
-// =============================================
-
-$escSidebar = static function ($valor) {
-
-    return htmlspecialchars(
-        (string) $valor,
-        ENT_QUOTES,
+$escSidebar = static fn($v) =>
+    htmlspecialchars(
+        (string) $v,
+        ENT_QUOTES | ENT_SUBSTITUTE,
         'UTF-8'
     );
-};
 
-$controllerUrl = BASE_URL .
-    '/app/controllers/';
-
-// =============================================
-// 3. ITENS DO MENU
-// =============================================
+$controllerUrl = BASE_URL . '/app/controllers/';
 
 $menu = [];
 
-// PORTAL DO ALUNO
+$adicionarMenu = static function (
+    string $titulo,
+    string $icone,
+    string $rota
+) use (&$menu): void {
+
+    $menu[] = [
+        'titulo' => $titulo,
+        'icone' => $icone,
+        'rota' => $rota
+    ];
+};
 
 if ($role === 'Aluno') {
 
     $portal = 'PortalAlunoController.php';
 
-    $menu = [
+    $adicionarMenu('Início', 'house', $portal . '?acao=aluno');
+    $adicionarMenu('Treinos', 'dumbbell', $portal . '?acao=treinos');
+    $adicionarMenu('Minhas Medidas', 'ruler', $portal . '?acao=minhas_medidas');
+    $adicionarMenu('Faturas', 'credit-card', $portal . '?acao=faturas');
+    $adicionarMenu('Contratos', 'file-text', $portal . '?acao=contratos');
+    $adicionarMenu('Meus Dados', 'user-round', $portal . '?acao=meus_dados');
+    $adicionarMenu('Avaliar Academia', 'star', $portal . '?acao=avaliacao');
 
-        [
-            'titulo' => 'Início',
-            'icone' => 'house',
-            'rota' => $portal . '?acao=aluno'
-        ],
+} elseif (in_array(
+    $role,
+    ['Admin', 'Recepcao', 'Professor'],
+    true
+)) {
 
-        [
-            'titulo' => 'Treinos',
-            'icone' => 'dumbbell',
-            'rota' => $portal . '?acao=treinos'
-        ],
-
-        [
-            'titulo' => 'Minhas Medidas',
-            'icone' => 'ruler',
-            'rota' => $portal . '?acao=minhas_medidas'
-        ],
-        [
-            'titulo' => 'Faturas',
-            'icone' => 'credit-card',
-            'rota' => $portal . '?acao=faturas'
-        ],
-
-        [
-            'titulo' => 'Contratos',
-            'icone' => 'file-text',
-            'rota' => $portal . '?acao=contratos'
-        ],
-
-        [
-            'titulo' => 'Meus Dados',
-            'icone' => 'user-round',
-            'rota' => $portal . '?acao=meus_dados'
-        ],
-
-
-        [
-            'titulo' => 'Avaliar Academia',
-            'icone' => 'star',
-            'rota' => $portal . '?acao=avaliacao'
-        ]
-    ];
-}
-
-// PAINEL INTERNO
-
-elseif (
-    in_array(
-        $role,
-        ['Admin', 'Recepcao', 'Professor'],
-        true
-    )
-) {
-
-    $menu[] = [
-        'titulo' => 'Dashboard',
-        'icone' => 'layout-dashboard',
-        'rota' => 'DashboardController.php'
-    ];
-
-    // ADMIN
+    $adicionarMenu(
+        'Dashboard',
+        'layout-dashboard',
+        'DashboardController.php'
+    );
 
     if ($role === 'Admin') {
 
-        $menu[] = [
-            'titulo' => 'Filiais',
-            'icone' => 'map-pin',
-            'rota' => 'FilialController.php?acao=listar'
-        ];
+        $adicionarMenu('Filiais', 'map-pin', 'FilialController.php?acao=listar');
 
-        $menu[] = [
-            'titulo' => 'Funcionários',
-            'icone' => 'users',
-            'rota' => 'FuncionarioController.php?acao=listar'
-        ];
+        $adicionarMenu(
+            'Funcionários',
+            'users',
+            'FuncionarioController.php?acao=listar'
+        );
     }
 
-    // ADMIN E RECEPÇÃO
+    if (in_array($role, ['Admin', 'Recepcao'], true)) {
 
-    if (in_array(
-        $role,
-        ['Admin', 'Recepcao'],
-        true
-    )) {
+        $adicionarMenu('Alunos', 'graduation-cap', 'AlunoController.php?acao=listar');
 
-        $menu[] = [
-            'titulo' => 'Alunos',
-            'icone' => 'graduation-cap',
-            'rota' => 'AlunoController.php?acao=listar'
-        ];
-
-        $menu[] = [
-            'titulo' => 'Planos',
-            'icone' => 'layers',
-            'rota' => 'PlanoController.php?acao=listar'
-        ];
+        $adicionarMenu('Planos', 'layers', 'PlanoController.php?acao=listar');
     }
 
-    // FINANCEIRO E PERSONALIZAÇÃO
+    if ($role === 'Recepcao') {
+
+        $adicionarMenu(
+            'Recebimentos',
+            'credit-card',
+            'RecebimentoController.php'
+        );
+
+        $adicionarMenu(
+            'Caixa físico',
+            'banknote',
+            'CaixaFisicoController.php'
+        );
+
+        $adicionarMenu('CRM Leads', 'target', 'CrmController.php');
+    }
 
     if ($role === 'Admin') {
 
-        $menu[] = [
-            'titulo' => 'Financeiro',
-            'icone' => 'credit-card',
-            'rota' => 'FinanceiroController.php'
-        ];
+        $adicionarMenu('Financeiro', 'credit-card', 'FinanceiroController.php');
 
-        $menu[] = [
-            'titulo' => 'CRM Leads',
-            'icone' => 'target',
-            'rota' => 'CrmController.php'
-        ];
+        $adicionarMenu('CRM Leads', 'target', 'CrmController.php');
 
-        $menu[] = [
-            'titulo' => 'Fluxo de caixa',
-            'icone' => 'chart-no-axes-column-increasing',
-            'rota' => 'FluxoCaixaController.php'
-        ];
+        $adicionarMenu(
+            'Fluxo de caixa',
+            'chart-no-axes-column-increasing',
+            'FluxoCaixaController.php'
+        );
 
-        $menu[] = [
-            'titulo' => 'Minha marca',
-            'icone' => 'tag',
-            'rota' => 'MinhaMarcaController.php'
-        ];
+        $adicionarMenu('Minha marca', 'tag', 'MinhaMarcaController.php');
     }
 
-    // ADMIN E PROFESSOR
+    if (in_array($role, ['Admin', 'Professor'], true)) {
 
-    if (in_array(
-        $role,
-        ['Admin', 'Professor'],
-        true
-    )) {
+        $adicionarMenu(
+            'Biblioteca de exercícios',
+            'dumbbell',
+            'ExercicioController.php'
+        );
 
-        $menu[] = [
-            'titulo' => 'Biblioteca de exercícios',
-            'icone' => 'dumbbell',
-            'rota' => 'ExercicioController.php'
-        ];
-
-        $menu[] = [
-            'titulo' => 'Ficha de treino',
-            'icone' => 'clipboard-list',
-            'rota' => 'TreinoController.php'
-        ];
+        $adicionarMenu(
+            'Ficha de treino',
+            'clipboard-list',
+            'TreinoController.php'
+        );
     }
-
-    // CONFIGURAÇÕES ADMINISTRATIVAS
 
     if ($role === 'Admin') {
 
-        $menu[] = [
-            'titulo' => 'Site / Portfólio',
-            'icone' => 'globe',
-            'rota' => 'PortfolioController.php'
-        ];
+        $adicionarMenu('Site / Portfólio', 'globe', 'PortfolioController.php');
 
-        $menu[] = [
-            'titulo' => 'Configurações de e-mail',
-            'icone' => 'mail',
-            'rota' => 'ConfiguracaoEmailController.php'
-        ];
+        $adicionarMenu(
+            'Configurações de e-mail',
+            'mail',
+            'ConfiguracaoEmailController.php'
+        );
+    }
+
+    if ($role === 'Professor') {
+
+        $adicionarMenu(
+            'Avaliações físicas',
+            'clipboard-check',
+            'AvaliacaoFisicaController.php'
+        );
     }
 }
-
-// =============================================
-// 4. ENDEREÇO DO SITE INSTITUCIONAL
-// =============================================
 
 $siteUrl = BASE_URL . '/index.php';
 
 if ($companyId > 0) {
-
     $siteUrl .= '?id=' . $companyId;
 }
 
 ?>
 
 <aside class="sidebar" id="appSidebar">
-
-    <!-- IDENTIDADE -->
 
     <div class="sidebar-header">
 
@@ -284,26 +195,21 @@ if ($companyId > 0) {
 
             <?php endif; ?>
 
-            <span>
-                <?= $escSidebar($nomePainel) ?>
-            </span>
+            <span><?= $escSidebar($nomePainel) ?></span>
 
         </h1>
 
-        <button
-            type="button"
-            class="sidebar-toggle"
-            id="sidebarToggle"
-            aria-label="Recolher menu"
-            title="Recolher menu">
+        <button type="button"
+                class="sidebar-toggle"
+                id="sidebarToggle"
+                aria-label="Recolher menu"
+                title="Recolher menu">
 
             <i data-lucide="menu"></i>
 
         </button>
 
     </div>
-
-    <!-- MENU PRINCIPAL -->
 
     <nav class="sidebar-nav">
 
@@ -313,29 +219,21 @@ if ($companyId > 0) {
 
                 <li>
 
-                    <a
-                        href="<?= $escSidebar(
-                                    $controllerUrl .
-                                        $item['rota']
-                                ) ?>"
-                        title="<?= $escSidebar(
-                                    $item['titulo']
-                                ) ?>">
+                    <a href="<?= $escSidebar(
+                        $controllerUrl . $item['rota']
+                    ) ?>"
+                       title="<?= $escSidebar($item['titulo']) ?>">
 
                         <span class="menu-icon">
 
                             <i data-lucide="<?= $escSidebar(
-                                                $item['icone']
-                                            ) ?>"></i>
+                                $item['icone']
+                            ) ?>"></i>
 
                         </span>
 
                         <span class="menu-text">
-
-                            <?= $escSidebar(
-                                $item['titulo']
-                            ) ?>
-
+                            <?= $escSidebar($item['titulo']) ?>
                         </span>
 
                     </a>
@@ -343,64 +241,34 @@ if ($companyId > 0) {
                 </li>
 
             <?php endforeach; ?>
-            <?php if ($role === 'Professor'): ?>
 
-                <li>
-                    <a
-                        href="<?= BASE_URL ?>/app/controllers/AvaliacaoFisicaController.php"
-                        title="Avaliações físicas">
-
-                        <span class="menu-icon">
-                            <i data-lucide="clipboard-check"></i>
-                        </span>
-
-                        <span class="menu-text">
-                            Avaliações físicas
-                        </span>
-
-                    </a>
-                </li>
-
-            <?php endif; ?>
         </ul>
 
     </nav>
 
-    <!-- RODAPÉ -->
-
     <div class="sidebar-footer">
 
-        <a
-            class="sidebar-action voltar-site"
-            href="<?= $escSidebar($siteUrl) ?>"
-            title="Voltar ao Site">
+        <a class="sidebar-action voltar-site"
+           href="<?= $escSidebar($siteUrl) ?>"
+           title="Voltar ao Site">
 
             <span class="menu-icon">
-
                 <i data-lucide="arrow-left"></i>
-
             </span>
 
-            <span class="menu-text">
-                Voltar ao Site
-            </span>
+            <span class="menu-text">Voltar ao Site</span>
 
         </a>
 
-        <a
-            class="sidebar-action sair"
-            href="<?= BASE_URL ?>/app/controllers/LoginController.php?acao=logout"
-            title="Sair">
+        <a class="sidebar-action sair"
+           href="<?= BASE_URL ?>/app/controllers/LoginController.php?acao=logout"
+           title="Sair">
 
             <span class="menu-icon">
-
                 <i data-lucide="log-out"></i>
-
             </span>
 
-            <span class="menu-text">
-                Sair
-            </span>
+            <span class="menu-text">Sair</span>
 
         </a>
 
@@ -408,30 +276,22 @@ if ($companyId > 0) {
 
 </aside>
 
-<!-- LUCIDE ICONS -->
-
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
 <script>
-    document.addEventListener(
-        'DOMContentLoaded',
-        function() {
+document.addEventListener('DOMContentLoaded', function () {
 
-            if (window.lucide) {
+    if (window.lucide) {
 
-                lucide.createIcons({
-
-                    attrs: {
-                        width: 20,
-                        height: 20,
-                        'stroke-width': 1.8
-                    }
-
-                });
+        lucide.createIcons({
+            attrs: {
+                width: 20,
+                height: 20,
+                'stroke-width': 1.8
             }
-
-        }
-    );
+        });
+    }
+});
 </script>
 
 <script src="<?= BASE_URL ?>/assets/js/sidebar.js"></script>

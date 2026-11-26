@@ -195,7 +195,6 @@ CREATE TABLE exercicios (
 );
 CREATE TABLE fichas_treino (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(100) DEFAULT NULL,
     aluno_id INT NOT NULL,
     professor_id INT NOT NULL,
     nome VARCHAR(100) NULL,

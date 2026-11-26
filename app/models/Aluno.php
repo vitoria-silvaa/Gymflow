@@ -4,404 +4,914 @@
 require_once __DIR__ . '/Database.php';
 
 $operacao = $operacao ?? '';
+
 $erroModel = '';
-$dados = $dados ?? [];
 
-/* 1. LISTAR ALUNOS */
-if ($operacao === 'listar') {
-    $cpf = trim($cpf ?? '');
-    $status = trim($status ?? '');
+$company_id = (int) ($_SESSION['company_id'] ?? 0);
 
-    $sql = "SELECT a.*, f.nome AS nome_filial FROM alunos a INNER JOIN filiais f ON f.id = a.filial_id WHERE f.company_id = :company_id";
-    $parametros = [':company_id' => $_SESSION['company_id'] ?? 0];
+$usuario_id = (int) ($_SESSION['usuario_id'] ?? 0);
 
-    // LÓGICA DE MULTI-TENANT (RESTRIÇÃO DE FILIAL)
-    $role_logado = $_SESSION['usuario_role'] ?? '';
-    $id_logado = $_SESSION['usuario_id'] ?? 0;
-    
-    if ($role_logado === 'Professor') {
-        $sql .= " AND a.professor_id = :user_id";
-        $parametros[':user_id'] = $id_logado;
-    } elseif ($role_logado === 'Recepcao') {
-        $sql .= " AND a.filial_id IN (SELECT filial_id FROM user_filiais WHERE user_id = :user_id)";
-        $parametros[':user_id'] = $id_logado;
-    }
+$role_logado = $_SESSION['usuario_role'] ?? '';
 
-    if ($cpf !== '') {
-        $sql .= " AND a.cpf LIKE :cpf";
-        $parametros[':cpf'] = "%$cpf%";
-    }
-    if ($status !== '') {
-        $sql .= " AND a.status = :status";
-        $parametros[':status'] = $status;
-    }
-    if (!empty($filial_id_filter)) {
-        $sql .= " AND a.filial_id = :filial_id_filter";
-        $parametros[':filial_id_filter'] = $filial_id_filter;
-    }
+$executarAluno = static function (
+    string $sql,
+    array $params = []
+) use ($pdo): PDOStatement {
 
-    $sql .= " ORDER BY a.nome";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute($parametros);
-    $alunos = $stmt->fetchAll();
-}
+    $stmt->execute($params);
 
-/* 2. LISTAR FILIAIS ATIVAS */
-elseif ($operacao === 'listar_filiais') {
-    $company_id = $_SESSION['company_id'] ?? 0;
-    $stmt = $pdo->prepare("SELECT id, nome FROM filiais WHERE ativo = TRUE AND company_id = ? ORDER BY nome");
-    $stmt->execute([$company_id]);
-    $filiais = $stmt->fetchAll();
-}
+    return $stmt;
+};
 
-/* 3. BUSCAR ALUNO POR ID */
-elseif ($operacao === 'buscar') {
-    $company_id = $_SESSION['company_id'] ?? 0;
-    $id = (int) ($id ?? 0);
-    $stmt = $pdo->prepare("SELECT a.*, f.nome AS nome_filial FROM alunos a INNER JOIN filiais f ON f.id = a.filial_id WHERE a.id = :id AND f.company_id = :company_id");
-    $stmt->execute([':id' => $id, ':company_id' => $company_id]);
-    $aluno = $stmt->fetch() ?: null;
-}
+$mensagemSeguraAluno = '';
 
-/* 4. CADASTRAR ALUNO */
-elseif ($operacao === 'cadastrar') {
-    try {
-        // Valida CPF duplicado
-        $stmt = $pdo->prepare("SELECT id FROM alunos WHERE cpf = :cpf");
-        $stmt->execute([':cpf' => $dados['cpf']]);
-        if ($stmt->fetch()) {
-            throw new Exception('Este CPF já está cadastrado.');
-        }
+$transacaoAluno = false;
 
-        // Valida E-mail duplicado em usuários
-        $stmt = $pdo->prepare("SELECT id FROM users WHERE email = :email");
-        $stmt->execute([':email' => $dados['email']]);
-        if ($stmt->fetch()) {
-            throw new Exception('Este e-mail já está sendo utilizado.');
-        }
+$impedirAluno = static function (
+    string $mensagem
+) use (&$mensagemSeguraAluno): void {
 
-        $pdo->beginTransaction();
+    $mensagemSeguraAluno = $mensagem;
 
-        // Insere aluno
-        $stmt = $pdo->prepare("
-            INSERT INTO alunos (filial_id, professor_id, nome, cpf, rg, sexo, nascimento, email, telefone, endereco, status)
-            VALUES (:filial_id, :professor_id, :nome, :cpf, :rg, :sexo, :nascimento, :email, :telefone, :endereco, 'Ativo')
-        ");
-        $stmt->execute([
-            ':filial_id'    => $dados['filial_id'],
-            ':professor_id' => !empty($dados['professor_id']) ? $dados['professor_id'] : null,
-            ':nome'         => $dados['nome'],
-            ':cpf'          => $dados['cpf'],
-            ':rg'           => !empty($dados['rg']) ? $dados['rg'] : null,
-            ':sexo'         => $dados['sexo'],
-            ':nascimento'   => $dados['nascimento'],
-            ':email'        => $dados['email'],
-            ':telefone'     => $dados['telefone'],
-            ':endereco'     => !empty($dados['endereco']) ? $dados['endereco'] : null
-        ]);
+    throw new DomainException(
+        'Operação cadastral não autorizada.'
+    );
+};
 
-        $novoAlunoId = (int) $pdo->lastInsertId();
+try {
 
-        // Cria usuário de acesso para o aluno
-        $stmt = $pdo->prepare("
-            INSERT INTO users (company_id, name, email, password, role, aluno_id)
-            VALUES (:company_id, :nome, :email, :senha, 'Aluno', :aluno_id)
-        ");
-        $stmt->execute([
-            ':company_id'=> $_SESSION['company_id'],
-            ':nome'     => $dados['nome'],
-            ':email'    => $dados['email'],
-            ':senha'    => password_hash($dados['senha'], PASSWORD_DEFAULT),
-            ':aluno_id' => $novoAlunoId
-        ]);
+    // Validar identidade e perfil.
 
-        $pdo->commit();
-    } catch (Throwable $e) {
-        if ($pdo->inTransaction()) {
-            $pdo->rollBack();
-        }
-        $erroModel = $e->getMessage();
-    }
-}
-
-/* 5. ATUALIZAR ALUNO */
-elseif ($operacao === 'atualizar') {
-    $id = (int) ($id ?? 0);
-
-    try {
-        // Valida CPF duplicado ignorando o próprio aluno
-        $stmt = $pdo->prepare("SELECT id FROM alunos WHERE cpf = :cpf AND id != :id");
-        $stmt->execute([':cpf' => $dados['cpf'], ':id' => $id]);
-        if ($stmt->fetch()) {
-            throw new Exception('Este CPF pertence a outro aluno.');
-        }
-
-        // Valida E-mail duplicado ignorando o próprio usuário do aluno
-        $stmt = $pdo->prepare("SELECT id FROM users WHERE email = :email AND (aluno_id IS NULL OR aluno_id != :aluno_id)");
-        $stmt->execute([':email' => $dados['email'], ':aluno_id' => $id]);
-        if ($stmt->fetch()) {
-            throw new Exception('Este e-mail pertence a outro usuário.');
-        }
-
-        $pdo->beginTransaction();
-
-        // Atualiza aluno
-        $stmt = $pdo->prepare("
-            UPDATE alunos
-            SET filial_id = :filial_id, professor_id = :professor_id, nome = :nome, cpf = :cpf, rg = :rg, sexo = :sexo,
-                nascimento = :nascimento, email = :email, telefone = :telefone,
-                endereco = :endereco, status = :status
-            WHERE id = :id
-        ");
-        $stmt->execute([
-            ':filial_id'    => $dados['filial_id'],
-            ':professor_id' => !empty($dados['professor_id']) ? $dados['professor_id'] : null,
-            ':nome'         => $dados['nome'],
-            ':cpf'          => $dados['cpf'],
-            ':rg'           => !empty($dados['rg']) ? $dados['rg'] : null,
-            ':sexo'         => $dados['sexo'],
-            ':nascimento'   => $dados['nascimento'],
-            ':email'        => $dados['email'],
-            ':telefone'     => $dados['telefone'],
-            ':endereco'     => !empty($dados['endereco']) ? $dados['endereco'] : null,
-            ':status'       => $dados['status'],
-            ':id'           => $id
-        ]);
-
-        // Atualiza usuário
-        if (!empty($dados['senha'])) {
-            $stmt = $pdo->prepare("UPDATE users SET name = :nome, email = :email, password = :senha WHERE aluno_id = :aluno_id");
-            $stmt->execute([
-                ':nome'     => $dados['nome'],
-                ':email'    => $dados['email'],
-                ':senha'    => password_hash($dados['senha'], PASSWORD_DEFAULT),
-                ':aluno_id' => $id
-            ]);
-        } else {
-            $stmt = $pdo->prepare("UPDATE users SET name = :nome, email = :email WHERE aluno_id = :aluno_id");
-            $stmt->execute([
-                ':nome'     => $dados['nome'],
-                ':email'    => $dados['email'],
-                ':aluno_id' => $id
-            ]);
-        }
-
-        $pdo->commit();
-    } catch (Throwable $e) {
-        if ($pdo->inTransaction()) {
-            $pdo->rollBack();
-        }
-        $erroModel = $e->getMessage();
-    }
-}
-
-/* 6. DADOS COMPLETOS DA VISUALIZAÇÃO DO ALUNO */
-elseif ($operacao === 'visualizar') {
-    $id = (int) ($id ?? 0);
-
-    // Dados do aluno
-    $stmt = $pdo->prepare("SELECT a.*, f.nome AS nome_filial FROM alunos a INNER JOIN filiais f ON f.id = a.filial_id WHERE a.id = :id");
-    $stmt->execute([':id' => $id]);
-    $aluno = $stmt->fetch() ?: null;
-
-    // Matrícula ativa
-    $stmt = $pdo->prepare("
-        SELECT m.*, p.nome AS nome_plano, p.duracao
-        FROM matriculas m
-        INNER JOIN planos p ON p.id = m.plano_id
-        WHERE m.aluno_id = :id AND m.ativa = TRUE
-        ORDER BY m.id DESC
-        LIMIT 1
-    ");
-    $stmt->execute([':id' => $id]);
-    $matricula = $stmt->fetch() ?: false;
-
-    // Histórico de contas/mensalidades
-    $stmt = $pdo->prepare("SELECT * FROM contas WHERE aluno_id = :id ORDER BY vencimento DESC");
-    $stmt->execute([':id' => $id]);
-    $contas = $stmt->fetchAll();
-
-    // Planos disponíveis na rede do aluno
-    $stmt = $pdo->prepare("
-        SELECT id, nome, valor, duracao
-        FROM planos
-        WHERE company_id = (
-            SELECT f.company_id FROM alunos a INNER JOIN filiais f ON f.id = a.filial_id WHERE a.id = :id
+    if (
+        $company_id <= 0 ||
+        $usuario_id <= 0 ||
+        !in_array(
+            $role_logado,
+            ['Admin', 'Recepcao', 'Professor', 'Aluno'],
+            true
         )
-        ORDER BY nome
-    ");
-    $stmt->execute([':id' => $id]);
-    $planos = $stmt->fetchAll();
-}
+    ) {
+        $impedirAluno('Acesso não autorizado.');
+    }
 
-/* 7. MATRICULAR ALUNO */
-elseif ($operacao === 'matricular') {
-    $alunoId = (int) ($alunoId ?? 0);
-    $planoId = (int) ($planoId ?? 0);
-    $dataInicio = $dataInicio ?? '';
-    $desconto = (float) ($desconto ?? 0.0);
+    $usuarioLogado = $executarAluno(
+        "SELECT id, aluno_id
+         FROM users
+         WHERE id = ?
+           AND company_id = ?
+           AND role = ?
+         LIMIT 1",
+        [
+            $usuario_id,
+            $company_id,
+            $role_logado
+        ]
+    )->fetch(PDO::FETCH_ASSOC);
 
-    try {
+    if (!$usuarioLogado) {
+        $impedirAluno('Sua sessão não está autorizada.');
+    }
+
+    // Operações exclusivas do Portal do Aluno.
+
+    if (in_array(
+        $operacao,
+        [
+            'dados_portal_aluno',
+            'listar_contratos',
+            'buscar_contrato_impressao'
+        ],
+        true
+    )) {
+
+        $aluno = null;
+        $matricula = false;
+        $frequencia = 0;
+        $faturas_abertas = 0;
+        $contratos = [];
+        $contrato = false;
+
+        $alunoPortalId = (int) (
+            $_SESSION['aluno_id'] ?? 0
+        );
+
+        if (
+            $role_logado !== 'Aluno' ||
+            $alunoPortalId <= 0 ||
+            $alunoPortalId !==
+                (int) $usuarioLogado['aluno_id']
+        ) {
+            return;
+        }
+
+        $aluno = $executarAluno(
+            "SELECT a.nome
+             FROM alunos a
+             INNER JOIN filiais f
+                ON f.id = a.filial_id
+             WHERE a.id = ?
+               AND f.company_id = ?",
+            [
+                $alunoPortalId,
+                $company_id
+            ]
+        )->fetch(PDO::FETCH_ASSOC) ?: null;
+
+        if (!$aluno) {
+            return;
+        }
+
+        if ($operacao === 'dados_portal_aluno') {
+
+            $matricula = $executarAluno(
+                "SELECT
+                    m.fim,
+                    p.nome AS nome_plano
+
+                 FROM matriculas m
+
+                 INNER JOIN planos p
+                    ON p.id = m.plano_id
+
+                 WHERE m.aluno_id = ?
+                   AND p.company_id = ?
+                   AND m.ativa = 1
+                   AND m.inicio <= CURRENT_DATE()
+                   AND m.fim >= CURRENT_DATE()
+                   AND (
+                       m.status_matricula IS NULL
+                       OR m.status_matricula = 'ativa'
+                   )
+
+                 ORDER BY m.id DESC
+                 LIMIT 1",
+                [
+                    $alunoPortalId,
+                    $company_id
+                ]
+            )->fetch(PDO::FETCH_ASSOC) ?: false;
+
+            $frequencia = (int) $executarAluno(
+                "SELECT COUNT(*)
+                 FROM checkins
+                 WHERE aluno_id = ?
+                   AND MONTH(data) = MONTH(CURDATE())
+                   AND YEAR(data) = YEAR(CURDATE())",
+                [$alunoPortalId]
+            )->fetchColumn();
+
+            $faturas_abertas = (int) $executarAluno(
+                "SELECT COUNT(*)
+                 FROM contas c
+                 INNER JOIN matriculas m
+                    ON m.id = c.matricula_id
+                    AND m.aluno_id = c.aluno_id
+                 INNER JOIN planos p
+                    ON p.id = m.plano_id
+                 WHERE c.aluno_id = ?
+                   AND p.company_id = ?
+                   AND c.status IN (
+                       'Aberto',
+                       'Vencido',
+                       'Atrasado'
+                   )",
+                [
+                    $alunoPortalId,
+                    $company_id
+                ]
+            )->fetchColumn();
+
+        } elseif ($operacao === 'listar_contratos') {
+
+            $contratos = $executarAluno(
+                "SELECT
+                    m.id,
+                    m.inicio,
+                    m.fim,
+                    m.valor,
+                    m.desconto,
+                    m.ativa,
+                    m.status_matricula,
+
+                    p.nome AS nome_plano,
+                    p.categoria,
+                    p.duracao
+
+                 FROM matriculas m
+
+                 INNER JOIN planos p
+                    ON p.id = m.plano_id
+
+                 WHERE m.aluno_id = ?
+                   AND p.company_id = ?
+
+                 ORDER BY m.inicio DESC, m.id DESC",
+                [
+                    $alunoPortalId,
+                    $company_id
+                ]
+            )->fetchAll(PDO::FETCH_ASSOC);
+
+        } else {
+
+            $contratoId = (int) ($contrato_id ?? 0);
+
+            $contrato = $executarAluno(
+                "SELECT
+                    m.*,
+
+                    p.nome AS nome_plano,
+                    p.categoria,
+                    p.duracao,
+
+                    a.nome AS nome_aluno,
+                    a.cpf AS cpf_aluno,
+                    a.telefone AS tel_aluno,
+
+                    f.nome AS nome_filial
+
+                 FROM matriculas m
+
+                 INNER JOIN planos p
+                    ON p.id = m.plano_id
+
+                 INNER JOIN alunos a
+                    ON a.id = m.aluno_id
+
+                 INNER JOIN filiais f
+                    ON f.id = COALESCE(
+                        m.filial_id,
+                        a.filial_id
+                    )
+
+                 WHERE m.aluno_id = ?
+                   AND m.id = ?
+                   AND p.company_id = ?
+                   AND f.company_id = ?
+
+                 LIMIT 1",
+                [
+                    $alunoPortalId,
+                    $contratoId,
+                    $company_id,
+                    $company_id
+                ]
+            )->fetch(PDO::FETCH_ASSOC);
+        }
+
+        return;
+    }
+
+    // Operações internas.
+
+    if (!in_array(
+        $role_logado,
+        ['Admin', 'Recepcao', 'Professor'],
+        true
+    )) {
+        $impedirAluno('Acesso não autorizado.');
+    }
+
+    // Restringir alunos por empresa e funcionário.
+
+    $escopoAluno = "
+        FROM alunos a
+
+        INNER JOIN filiais f
+            ON f.id = a.filial_id
+
+        WHERE f.company_id = ?
+    ";
+
+    $paramsAluno = [$company_id];
+
+    if ($role_logado === 'Recepcao') {
+
+        $escopoAluno .= "
+            AND EXISTS (
+                SELECT 1
+
+                FROM user_filiais uf
+
+                WHERE uf.filial_id = a.filial_id
+                  AND uf.user_id = ?
+            )
+        ";
+
+        $paramsAluno[] = $usuario_id;
+
+    } elseif ($role_logado === 'Professor') {
+
+        $escopoAluno .= ' AND a.professor_id = ?';
+
+        $paramsAluno[] = $usuario_id;
+    }
+
+    // Restringir contratos e cobranças à unidade autorizada.
+
+    $escopoMatricula = "
+        FROM matriculas m
+
+        INNER JOIN alunos a
+            ON a.id = m.aluno_id
+
+        INNER JOIN filiais fa
+            ON fa.id = a.filial_id
+
+        INNER JOIN filiais fm
+            ON fm.id = COALESCE(
+                m.filial_id,
+                a.filial_id
+            )
+            AND fm.company_id = fa.company_id
+
+        INNER JOIN planos p
+            ON p.id = m.plano_id
+            AND p.company_id = fa.company_id
+
+        WHERE fa.company_id = ?
+    ";
+
+    $paramsMatricula = [$company_id];
+
+    if ($role_logado === 'Recepcao') {
+
+        $escopoMatricula .= "
+            AND EXISTS (
+                SELECT 1
+                FROM user_filiais uf
+                WHERE uf.filial_id = fa.id
+                  AND uf.user_id = ?
+            )
+
+            AND EXISTS (
+                SELECT 1
+                FROM user_filiais uf
+                WHERE uf.filial_id = fm.id
+                  AND uf.user_id = ?
+            )
+        ";
+
+        $paramsMatricula[] = $usuario_id;
+        $paramsMatricula[] = $usuario_id;
+
+    } elseif ($role_logado === 'Professor') {
+
+        $escopoMatricula .= ' AND a.professor_id = ?';
+
+        $paramsMatricula[] = $usuario_id;
+    }
+
+    // Listar apenas filiais autorizadas.
+
+    if ($operacao === 'listar_filiais') {
+
+        $sql = "
+            SELECT f.id, f.nome, f.ativo
+
+            FROM filiais f
+
+            WHERE f.company_id = ?
+        ";
+
+        $params = [$company_id];
+
+        if (in_array(
+            $role_logado,
+            ['Recepcao', 'Professor'],
+            true
+        )) {
+
+            $sql .= "
+                AND EXISTS (
+                    SELECT 1
+                    FROM user_filiais uf
+                    WHERE uf.filial_id = f.id
+                      AND uf.user_id = ?
+                )
+            ";
+
+            $params[] = $usuario_id;
+        }
+
+        $filiais = $executarAluno(
+            $sql . ' ORDER BY f.nome',
+            $params
+        )->fetchAll(PDO::FETCH_ASSOC);
+
+        return;
+    }
+
+    // Listagem de alunos.
+
+    if ($operacao === 'listar') {
+
+        $alunos = [];
+
+        $cpf = is_string($cpf ?? null)
+            ? trim($cpf)
+            : '';
+
+        $status = is_string($status ?? null)
+            ? $status
+            : '';
+
+        $filial_id_filter = (int) (
+            $filial_id_filter ?? 0
+        );
+
+        $pendente = "
+            EXISTS (
+                SELECT 1
+
+                FROM matriculas mp
+
+                INNER JOIN planos pp
+                    ON pp.id = mp.plano_id
+                    AND pp.company_id = f.company_id
+
+                WHERE mp.aluno_id = a.id
+                  AND mp.status_matricula = 'pendente'
+                  AND mp.ativa = 0
+                  AND COALESCE(
+                      mp.filial_id,
+                      a.filial_id
+                  ) = a.filial_id
+            )
+        ";
+
+        $sql = "
+            SELECT
+                a.*,
+                f.nome AS nome_filial,
+
+                $pendente AS matricula_pendente
+        " . $escopoAluno;
+
+        $params = $paramsAluno;
+
+        if ($cpf !== '') {
+
+            if (
+                !preg_match('/^[0-9. -]+$/', $cpf) ||
+                strlen($cpf) > 14
+            ) {
+
+                $erroModel = 'Informe um CPF válido.';
+
+                return;
+            }
+
+            $cpfNumeros = preg_replace(
+                '/\D/',
+                '',
+                $cpf
+            );
+
+            if ($cpfNumeros === '') {
+
+                $erroModel = 'Informe os números do CPF.';
+
+                return;
+            }
+
+            $sql .= "
+                AND REPLACE(
+                    REPLACE(
+                        REPLACE(a.cpf, '.', ''),
+                        '-', ''
+                    ),
+                    ' ', ''
+                ) LIKE ?
+            ";
+
+            $params[] = '%' . $cpfNumeros . '%';
+        }
+
+        if ($status === 'Pendente') {
+
+            $sql .= " AND $pendente";
+
+        } elseif (in_array(
+            $status,
+            ['Ativo', 'Inativo'],
+            true
+        )) {
+
+            $sql .= ' AND a.status = ?';
+
+            $params[] = $status;
+        }
+
+        if ($filial_id_filter > 0) {
+
+            $sql .= ' AND a.filial_id = ?';
+
+            $params[] = $filial_id_filter;
+        }
+
+        $alunos = $executarAluno(
+            $sql . ' ORDER BY a.nome, a.id',
+            $params
+        )->fetchAll(PDO::FETCH_ASSOC);
+
+        return;
+    }
+
+    // Buscar ou visualizar aluno.
+
+    if (in_array(
+        $operacao,
+        ['buscar', 'visualizar'],
+        true
+    )) {
+
+        $id = (int) ($id ?? 0);
+
+        $aluno = null;
+        $matricula = false;
+        $contas = [];
+        $planos = [];
+        $contratos = [];
+
+        $aluno = $executarAluno(
+            "SELECT
+                a.*,
+                f.nome AS nome_filial" .
+            $escopoAluno .
+            ' AND a.id = ? LIMIT 1',
+            array_merge(
+                $paramsAluno,
+                [$id]
+            )
+        )->fetch(PDO::FETCH_ASSOC) ?: null;
+
+        if (!$aluno || $operacao === 'buscar') {
+            return;
+        }
+
+        // Dados financeiros individuais apenas para
+        // Admin e Recepção.
+
+        if ($role_logado === 'Professor') {
+            return;
+        }
+
+        $contratos = $executarAluno(
+            "SELECT
+                m.*,
+
+                p.nome AS nome_plano,
+                p.duracao,
+
+                fm.nome AS nome_filial
+            " .
+            $escopoMatricula .
+            ' AND a.id = ?
+              ORDER BY m.id DESC',
+            array_merge(
+                $paramsMatricula,
+                [$id]
+            )
+        )->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($contratos as $registro) {
+
+            if (
+                (int) $registro['ativa'] === 1 ||
+                $registro['status_matricula'] === 'pendente'
+            ) {
+
+                $matricula = $registro;
+
+                break;
+            }
+        }
+
+        $contas = $executarAluno(
+            "SELECT
+                c.*,
+                p.nome AS nome_plano,
+                fm.nome AS nome_filial
+
+             FROM contas c
+
+             INNER JOIN matriculas m
+                ON m.id = c.matricula_id
+                AND m.aluno_id = c.aluno_id
+
+             INNER JOIN alunos a
+                ON a.id = m.aluno_id
+
+             INNER JOIN filiais fa
+                ON fa.id = a.filial_id
+
+             INNER JOIN filiais fm
+                ON fm.id = COALESCE(
+                    m.filial_id,
+                    a.filial_id
+                )
+                AND fm.company_id = fa.company_id
+
+             INNER JOIN planos p
+                ON p.id = m.plano_id
+                AND p.company_id = fa.company_id
+
+             WHERE a.id = ?
+               AND fa.company_id = ?" .
+
+            ($role_logado === 'Recepcao'
+                ? "
+                    AND EXISTS (
+                        SELECT 1
+                        FROM user_filiais uf
+                        WHERE uf.filial_id = fa.id
+                          AND uf.user_id = ?
+                    )
+
+                    AND EXISTS (
+                        SELECT 1
+                        FROM user_filiais uf
+                        WHERE uf.filial_id = fm.id
+                          AND uf.user_id = ?
+                    )
+                  "
+                : '') .
+
+            ' ORDER BY c.vencimento DESC, c.id DESC',
+
+            $role_logado === 'Recepcao'
+                ? [
+                    $id,
+                    $company_id,
+                    $usuario_id,
+                    $usuario_id
+                ]
+                : [
+                    $id,
+                    $company_id
+                ]
+        )->fetchAll(PDO::FETCH_ASSOC);
+
+        return;
+    }
+
+    // Atualização cadastral com campos permitidos.
+
+    if ($operacao === 'atualizar') {
+
+        if (!in_array(
+            $role_logado,
+            ['Admin', 'Recepcao'],
+            true
+        )) {
+            $impedirAluno(
+                'Você não pode editar este cadastro.'
+            );
+        }
+
+        $id = (int) ($id ?? 0);
+
+        $dados = $dados ?? [];
+
+        $normalizar = static fn($v) =>
+            is_string($v) ? trim($v) : '';
+
+        $nome = $normalizar($dados['nome'] ?? '');
+        $rg = $normalizar($dados['rg'] ?? '');
+
+        $telefone = $normalizar(
+            $dados['telefone'] ?? ''
+        );
+
+        $endereco = $normalizar(
+            $dados['endereco'] ?? ''
+        );
+
+        $tamanho = static function (string $v): int {
+
+            $n = preg_match_all('/./us', $v);
+
+            return $n === false
+                ? PHP_INT_MAX
+                : $n;
+        };
+
+        if (
+            $nome === '' ||
+            $tamanho($nome) > 100
+        ) {
+            $impedirAluno(
+                'Informe o nome completo com até 100 caracteres.'
+            );
+        }
+
+        if (
+            $tamanho($rg) > 20 ||
+            (
+                $rg !== '' &&
+                !preg_match(
+                    '/^[0-9A-Za-z.\/ -]+$/',
+                    $rg
+                )
+            )
+        ) {
+            $impedirAluno(
+                'Informe um RG válido com até 20 caracteres.'
+            );
+        }
+
+        $numero = preg_replace(
+            '/\D/',
+            '',
+            $telefone
+        );
+
+        if (
+            !preg_match(
+                '/^[0-9() .-]+$/',
+                $telefone
+            ) ||
+            !in_array(
+                strlen($numero),
+                [10, 11],
+                true
+            )
+        ) {
+            $impedirAluno(
+                'Informe um telefone válido com DDD.'
+            );
+        }
+
+        $telefone =
+            '(' . substr($numero, 0, 2) . ') ' .
+            substr($numero, 2, -4) . '-' .
+            substr($numero, -4);
+
+        if ($tamanho($endereco) > 1000) {
+
+            $impedirAluno(
+                'O endereço deve ter até 1.000 caracteres.'
+            );
+        }
+
         $pdo->beginTransaction();
 
-        // Verifica se já possui matrícula ativa
-        $stmt = $pdo->prepare("SELECT id FROM matriculas WHERE aluno_id = :aluno_id AND ativa = TRUE");
-        $stmt->execute([':aluno_id' => $alunoId]);
-        if ($stmt->fetch()) {
-            throw new Exception('Este aluno já possui matrícula ativa.');
+        $transacaoAluno = true;
+
+        $autorizado = $executarAluno(
+            'SELECT u.id FROM users u
+             WHERE u.id = ?
+               AND u.company_id = ?
+               AND u.role = ?
+             FOR UPDATE',
+            [
+                $usuario_id,
+                $company_id,
+                $role_logado
+            ]
+        )->fetchColumn();
+
+        if (!$autorizado) {
+
+            $impedirAluno(
+                'Sua sessão não está autorizada.'
+            );
         }
 
-        // Busca informações do plano
-        $stmt = $pdo->prepare("SELECT id, valor, duracao FROM planos WHERE id = :plano_id");
-        $stmt->execute([':plano_id' => $planoId]);
-        $plano = $stmt->fetch();
-        if (!$plano) {
-            throw new Exception('Plano não encontrado.');
+        $registro = $executarAluno(
+            'SELECT a.id, a.filial_id' .
+            $escopoAluno .
+            ' AND a.id = ? FOR UPDATE',
+            array_merge(
+                $paramsAluno,
+                [$id]
+            )
+        )->fetch(PDO::FETCH_ASSOC);
+
+        if (!$registro) {
+
+            $impedirAluno(
+                'Aluno não encontrado ou não autorizado.'
+            );
         }
 
-        $meses = match ($plano['duracao']) {
-            '1 Mês'   => 1,
-            '3 Meses' => 3,
-            '6 Meses' => 6,
-            '1 Ano'   => 12,
-            default   => 0
-        };
-        if ($meses === 0) {
-            throw new Exception('Duração do plano inválida.');
+        if ($role_logado === 'Recepcao') {
+
+            $vinculo = $executarAluno(
+                'SELECT filial_id
+                 FROM user_filiais
+                 WHERE user_id = ?
+                   AND filial_id = ?
+                 FOR UPDATE',
+                [
+                    $usuario_id,
+                    $registro['filial_id']
+                ]
+            )->fetchColumn();
+
+            if (!$vinculo) {
+
+                $impedirAluno(
+                    'Você não possui acesso a esta filial.'
+                );
+            }
         }
 
-        $valorFinal = (float) $plano['valor'] - $desconto;
-        if ($valorFinal < 0) {
-            throw new Exception('O desconto não pode ser maior que o valor do plano.');
-        }
+        $executarAluno(
+            "UPDATE alunos
+             SET
+                nome = ?,
+                rg = ?,
+                telefone = ?,
+                endereco = ?
+             WHERE id = ?",
+            [
+                $nome,
+                $rg !== '' ? $rg : null,
+                $telefone,
+                $endereco !== '' ? $endereco : null,
+                $id
+            ]
+        );
 
-        $dataFim = date('Y-m-d', strtotime($dataInicio . " +$meses months"));
-
-        // Insere a matrícula
-        $stmt = $pdo->prepare("
-            INSERT INTO matriculas (aluno_id, plano_id, inicio, fim, valor, desconto, ativa)
-            VALUES (:aluno_id, :plano_id, :inicio, :fim, :valor, :desconto, TRUE)
-        ");
-        $stmt->execute([
-            ':aluno_id' => $alunoId,
-            ':plano_id' => $planoId,
-            ':inicio'   => $dataInicio,
-            ':fim'      => $dataFim,
-            ':valor'    => $valorFinal,
-            ':desconto' => $desconto
-        ]);
-
-        $matriculaId = (int) $pdo->lastInsertId();
-        $valorParcela = floor(($valorFinal / $meses) * 100) / 100;
-
-        // Gera as parcelas financeiras
-        $stmtConta = $pdo->prepare("
-            INSERT INTO contas (aluno_id, matricula_id, vencimento, valor, status) 
-            VALUES (:aluno_id, :matricula_id, :vencimento, :valor, 'Aberto')
-        ");
-
-        for ($i = 0; $i < $meses; $i++) {
-            $valorAtual = ($i === $meses - 1) ? ($valorFinal - ($valorParcela * ($meses - 1))) : $valorParcela;
-            $vencimento = date('Y-m-d', strtotime($dataInicio . " +$i months"));
-
-            $stmtConta->execute([
-                ':aluno_id'     => $alunoId,
-                ':matricula_id' => $matriculaId,
-                ':vencimento'   => $vencimento,
-                ':valor'        => $valorAtual
-            ]);
-        }
+        $executarAluno(
+            "UPDATE users
+             SET
+                name = ?,
+                telefone = ?,
+                endereco = ?
+             WHERE aluno_id = ?
+               AND company_id = ?
+               AND role = 'Aluno'",
+            [
+                $nome,
+                $telefone,
+                $endereco,
+                $id,
+                $company_id
+            ]
+        );
 
         $pdo->commit();
-    } catch (Throwable $e) {
-        if ($pdo->inTransaction()) {
-            $pdo->rollBack();
-        }
-        $erroModel = $e->getMessage();
+
+        $transacaoAluno = false;
+
+        return;
     }
-}
 
-/* 8. REGISTRAR PAGAMENTO */
-elseif ($operacao === 'pagar') {
-    $contaId = (int) ($contaId ?? 0);
-    $alunoId = (int) ($alunoId ?? 0);
+    // Impedir o uso das operações financeiras antigas.
 
-    $stmt = $pdo->prepare("
-        UPDATE contas
-        SET status = 'Pago', forma_pagamento = 'Dinheiro', pago_em = NOW()
-        WHERE id = :conta_id AND aluno_id = :aluno_id AND status = 'Aberto'
-    ");
-    $stmt->execute([':conta_id' => $contaId, ':aluno_id' => $alunoId]);
-    $pagamentoRealizado = $stmt->rowCount() > 0;
-}
+    if (in_array(
+        $operacao,
+        ['cadastrar', 'matricular', 'pagar'],
+        true
+    )) {
 
-/* 9. DADOS DO PORTAL DO ALUNO */
-elseif ($operacao === 'dados_portal_aluno') {
-    $alunoId = (int) ($alunoId ?? 0);
+        $pagamentoRealizado = false;
 
-    // Nome do aluno
-    $stmt = $pdo->prepare("SELECT nome FROM alunos WHERE id = :id");
-    $stmt->execute([':id' => $alunoId]);
-    $aluno = $stmt->fetch();
+        $impedirAluno(
+            'Utilize o fluxo autorizado de matrícula e recebimentos.'
+        );
+    }
 
-    // Matrícula ativa
-    $stmt = $pdo->prepare("
-        SELECT m.fim, p.nome AS nome_plano
-        FROM matriculas m
-        JOIN planos p ON m.plano_id = p.id
-        WHERE m.aluno_id = :aluno_id AND m.ativa = TRUE
-        LIMIT 1
-    ");
-    $stmt->execute([':aluno_id' => $alunoId]);
-    $matricula = $stmt->fetch() ?: false;
+    $impedirAluno('Operação não autorizada.');
 
-    // Frequência no mês
-    $stmt = $pdo->prepare("
-        SELECT COUNT(*) AS total
-        FROM checkins
-        WHERE aluno_id = :aluno_id
-          AND MONTH(data) = MONTH(CURDATE())
-          AND YEAR(data) = YEAR(CURDATE())
-    ");
-    $stmt->execute([':aluno_id' => $alunoId]);
-    $frequencia = (int) $stmt->fetchColumn();
+} catch (Throwable $e) {
 
-    // Faturas em aberto
-    $stmt = $pdo->prepare("SELECT COUNT(*) AS total FROM contas WHERE aluno_id = :aluno_id AND status = 'Aberto'");
-    $stmt->execute([':aluno_id' => $alunoId]);
-    $faturas_abertas = (int) $stmt->fetchColumn();
-}
+    if (
+        $transacaoAluno &&
+        $pdo->inTransaction()
+    ) {
+        $pdo->rollBack();
+    }
 
-/* 10. LISTAR CONTRATOS/MATRÍCULAS DO ALUNO */
-elseif ($operacao === 'listar_contratos') {
-    $alunoId = (int) ($aluno_id ?? 0);
+    if ($mensagemSeguraAluno === '') {
 
-    $stmt = $pdo->prepare("
-        SELECT m.id, m.inicio, m.fim, m.valor, m.desconto, m.ativa, p.nome AS nome_plano, p.categoria, p.duracao 
-        FROM matriculas m
-        JOIN planos p ON m.plano_id = p.id
-        WHERE m.aluno_id = :aluno_id
-        ORDER BY m.inicio DESC
-    ");
-    $stmt->execute([':aluno_id' => $alunoId]);
-    $contratos = $stmt->fetchAll();
-}
+        error_log(
+            '[GymFlow][Aluno] ' .
+            get_class($e) .
+            ' | código ' .
+            $e->getCode() .
+            ' | linha ' .
+            $e->getLine()
+        );
+    }
 
-/* 11. BUSCAR DETALHES DO CONTRATO PARA IMPRESSÃO */
-elseif ($operacao === 'buscar_contrato_impressao') {
-    $alunoId = (int) ($aluno_id ?? 0);
-    $contratoId = (int) ($contrato_id ?? 0);
+    $erroModel = $mensagemSeguraAluno ?:
+        'Não foi possível concluir a operação. Tente novamente.';
 
-    $stmt = $pdo->prepare("
-        SELECT m.*, p.nome AS nome_plano, p.categoria, p.duracao,
-               a.nome AS nome_aluno, a.cpf AS cpf_aluno, a.telefone AS tel_aluno,
-               f.nome AS nome_filial
-        FROM matriculas m
-        JOIN planos p ON m.plano_id = p.id
-        JOIN alunos a ON m.aluno_id = a.id
-        JOIN filiais f ON a.filial_id = f.id
-        WHERE m.aluno_id = :aluno_id AND m.id = :contrato_id
-    ");
-    $stmt->execute([':aluno_id' => $alunoId, ':contrato_id' => $contratoId]);
-    $contrato = $stmt->fetch();
+    if ($operacao !== 'atualizar') {
+
+        $aluno = null;
+        $alunos = [];
+        $filiais = [];
+        $contas = [];
+        $contratos = [];
+        $contrato = false;
+        $matricula = false;
+        $frequencia = 0;
+        $faturas_abertas = 0;
+    }
 }

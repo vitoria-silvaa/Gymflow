@@ -1,108 +1,168 @@
 <?php
-// Se alguém abrir esta página diretamente, redireciona para o controller
-if (!isset($alunos)) {
-    header("Location: " . BASE_URL . "/app/controllers/AlunoController.php?acao=listar");
+// app/views/alunos/index.php
+
+if (!isset($alunos, $baseUrl)) {
+    http_response_code(403);
     exit;
 }
 
+$tituloPagina = 'Alunos';
+
+$cssEspecifico =
+    BASE_URL . '/assets/css/jorge-financeiro.css';
+
+$h = static fn($v) => htmlspecialchars(
+    (string) $v,
+    ENT_QUOTES | ENT_SUBSTITUTE,
+    'UTF-8'
+);
+
+$filiais = $filiais ?? [];
+
+$filial_id_filter = (int) ($filial_id_filter ?? 0);
+
+$recepcao =
+    ($_SESSION['usuario_role'] ?? '') === 'Recepcao';
+
+$urlMatricula = BASE_URL .
+    '/app/controllers/MatriculaController.php' .
+    '?acao=identificacao&modo=interno&novo=1';
+
 include __DIR__ . '/../shared/header.php';
 include __DIR__ . '/../shared/sidebar.php';
-
-// Valores padrão dos filtros
-if (!isset($filiais)) {
-    $filiais = [];
-}
-
-if (!isset($filial_id_filter)) {
-    $filial_id_filter = 0;
-}
 ?>
 
-<link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/jorge-financeiro.css">
-<link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/alunos.css">
+<link
+    rel="stylesheet"
+    href="<?= BASE_URL ?>/assets/css/alunos.css">
 
 <main class="conteudo financeiro-page alunos-page">
 
-    <!-- Título da página e botão de cadastrar -->
     <div class="fin-page-header">
 
         <div class="fin-header-info">
+
             <h1>Alunos</h1>
-            <p>Gerencie todos os alunos cadastrados no sistema.</p>
+
+            <p>
+
+                <?= $recepcao
+                    ? 'Gerencie os alunos das unidades autorizadas.'
+                    : 'Gerencie os alunos cadastrados na empresa.' ?>
+
+            </p>
+
         </div>
 
         <div class="fin-header-actions">
-            <a href="<?= $baseUrl ?>?acao=cadastrar"
-               class="fin-btn fin-btn-primary">
-                + Novo Aluno
+
+            <a
+                href="<?= $h($urlMatricula) ?>"
+                class="fin-btn fin-btn-primary">
+
+                Matricular aluno
+
             </a>
+
         </div>
 
     </div>
 
-    <!-- Filtros de busca -->
+    <?php if (!empty($erro)): ?>
+
+        <div class="fin-alert fin-alert-danger" role="alert">
+
+            <?= $h($erro) ?>
+
+        </div>
+
+    <?php endif; ?>
+
+    <?php if (!empty($sucesso)): ?>
+
+        <div class="fin-alert fin-alert-success" role="status">
+
+            <?= $h($sucesso) ?>
+
+        </div>
+
+    <?php endif; ?>
+
+    <?php if ($recepcao && !$filiais): ?>
+
+        <div class="fin-alert fin-alert-danger">
+
+            Seu usuário não possui filiais vinculadas.
+            Solicite a configuração ao administrador.
+
+        </div>
+
+    <?php endif; ?>
+
     <section class="fin-table-card alunos-filtros-card">
 
-        <form action="<?= $baseUrl ?>"
-              method="GET"
-              class="fin-form-grid alunos-filtros">
+        <form
+            action="<?= $h($baseUrl) ?>"
+            method="GET"
+            class="fin-form-grid alunos-filtros">
 
-            <input type="hidden" name="acao" value="listar">
+            <input
+                type="hidden"
+                name="acao"
+                value="listar">
 
-            <!-- Filtro CPF -->
             <div class="fin-form-group alunos-filtro-campo">
 
-                <label>CPF</label>
+                <label for="cpf">CPF</label>
 
                 <input
                     type="text"
+                    id="cpf"
                     name="cpf"
                     class="fin-input"
                     placeholder="Buscar por CPF"
-                    value="<?= htmlspecialchars($cpf ?? '') ?>"
-                >
+                    maxlength="14"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    value="<?= $h($cpf ?? '') ?>">
 
             </div>
 
-            <!-- Filtro Status -->
             <div class="fin-form-group alunos-filtro-campo">
 
-                <label>Status</label>
+                <label for="status">Status</label>
 
-                <select name="status" class="fin-select">
+                <select
+                    id="status"
+                    name="status"
+                    class="fin-select"
+                    autocomplete="off">
 
-                    <option value="">Todos os status</option>
+                    <option
+                        value=""
+                        <?= ($status ?? '') === ''
+                            ? 'selected'
+                            : '' ?>>
 
-                    <option value="Ativo"
-                        <?= ($status ?? '') == 'Ativo' ? 'selected' : '' ?>>
-                        Ativo
+                        Todos os status
+
                     </option>
 
-                    <option value="Inativo"
-                        <?= ($status ?? '') == 'Inativo' ? 'selected' : '' ?>>
-                        Inativo
-                    </option>
-
-                </select>
-
-            </div>
-
-            <!-- Filtro Filial -->
-            <div class="fin-form-group alunos-filtro-campo">
-
-                <label>Filial</label>
-
-                <select name="filial_id" class="fin-select">
-
-                    <option value="">Todas as filiais</option>
-
-                    <?php foreach ($filiais as $filial): ?>
+                    <?php foreach ([
+                        'Ativo' => 'Ativo',
+                        'Inativo' => 'Inativo',
+                        'Pendente' => 'Matrícula pendente'
+                    ] as $valor => $rotulo): ?>
 
                         <option
-                            value="<?= $filial['id'] ?>"
-                            <?= $filial_id_filter == $filial['id'] ? 'selected' : '' ?>
-                        >
-                            <?= htmlspecialchars($filial['nome']) ?>
+                            value="<?= $h($valor) ?>"
+
+                            <?= ($status ?? '') === $valor
+                                ? 'selected'
+                                : '' ?>>
+
+                            <?= $h($rotulo) ?>
+
                         </option>
 
                     <?php endforeach; ?>
@@ -111,13 +171,70 @@ if (!isset($filial_id_filter)) {
 
             </div>
 
-            <!-- Botão de filtro -->
+            <div class="fin-form-group alunos-filtro-campo">
+
+                <label for="filial_id">Filial</label>
+
+                <select
+                    id="filial_id"
+                    name="filial_id"
+                    class="fin-select"
+                    autocomplete="off">
+
+                    <option
+                        value="0"
+
+                        <?= $filial_id_filter === 0
+                            ? 'selected'
+                            : '' ?>>
+
+                        <?= $recepcao
+                            ? 'Todas as autorizadas'
+                            : 'Todas as filiais' ?>
+
+                    </option>
+
+                    <?php foreach ($filiais as $filial): ?>
+
+                        <option
+                            value="<?= (int) $filial['id'] ?>"
+
+                            <?= $filial_id_filter ===
+                                (int) $filial['id']
+                                ? 'selected'
+                                : '' ?>>
+
+                            <?= $h($filial['nome']) ?>
+
+                            <?= (int) $filial['ativo'] === 0
+                                ? ' (Inativa)'
+                                : '' ?>
+
+                        </option>
+
+                    <?php endforeach; ?>
+
+                </select>
+
+            </div>
+
             <div class="fin-form-group">
 
-                <button type="submit"
-                        class="fin-btn fin-btn-secondary">
+                <button
+                    type="submit"
+                    class="fin-btn fin-btn-secondary">
+
                     Filtrar
+
                 </button>
+
+                <a
+                    href="<?= $h($baseUrl) ?>?acao=listar"
+                    class="fin-btn fin-btn-secondary">
+
+                    Limpar
+
+                </a>
 
             </div>
 
@@ -125,8 +242,17 @@ if (!isset($filial_id_filter)) {
 
     </section>
 
-    <!-- Tabela de alunos -->
     <section class="fin-table-card">
+
+        <div class="fin-table-header">
+
+            <h2>Alunos cadastrados</h2>
+
+            <span>
+                <?= count($alunos) ?> aluno(s)
+            </span>
+
+        </div>
 
         <div class="fin-table-responsive">
 
@@ -135,27 +261,35 @@ if (!isset($filial_id_filter)) {
                 <thead>
 
                     <tr>
-                        <th class="titulo-coluna">Nome</th>
-                        <th class="titulo-coluna">CPF</th>
-                        <th class="titulo-coluna">Filial</th>
-                        <th class="titulo-coluna">Status</th>
 
-                        <th class="titulo-coluna alunos-coluna-acoes">
+                        <th>Nome</th>
+                        <th>CPF</th>
+                        <th>Filial</th>
+                        <th>Status</th>
+                        <th>Matrícula</th>
+
+                        <th class="alunos-coluna-acoes">
                             Ações
                         </th>
+
                     </tr>
 
                 </thead>
 
                 <tbody>
 
-                    <!-- Nenhum aluno encontrado -->
-                    <?php if (count($alunos) == 0): ?>
+                    <?php if (!$alunos): ?>
 
                         <tr>
-                            <td colspan="5" class="alunos-vazio">
+
+                            <td
+                                colspan="6"
+                                class="alunos-vazio">
+
                                 Nenhum aluno encontrado.
+
                             </td>
+
                         </tr>
 
                     <?php endif; ?>
@@ -163,169 +297,126 @@ if (!isset($filial_id_filter)) {
                     <?php foreach ($alunos as $aluno): ?>
 
                         <?php
-                        // Remove caracteres não numéricos do telefone
-                        $numeroWhats = '';
 
-                        if (isset($aluno['telefone'])) {
-                            $numeroWhats = preg_replace(
-                                '/\D/',
-                                '',
-                                $aluno['telefone']
-                            );
-                        }
+                        $numeroWhats = preg_replace(
+                            '/\D/',
+                            '',
+                            (string) ($aluno['telefone'] ?? '')
+                        );
+
+                        $pendente =
+                            !empty($aluno['matricula_pendente']);
+
+                        $alunoAtivo =
+                            $aluno['status'] === 'Ativo';
+
                         ?>
 
                         <tr>
 
-                            <!-- Nome -->
                             <td>
+
                                 <strong>
-                                    <?= htmlspecialchars($aluno['nome']) ?>
+                                    <?= $h($aluno['nome']) ?>
                                 </strong>
+
                             </td>
 
-                            <!-- CPF -->
                             <td>
-                                <?= htmlspecialchars($aluno['cpf']) ?>
+                                <?= $h($aluno['cpf']) ?>
                             </td>
 
-                            <!-- Filial -->
                             <td>
-                                <?= htmlspecialchars($aluno['nome_filial']) ?>
+                                <?= $h($aluno['nome_filial']) ?>
                             </td>
 
- <!-- Status -->
-<td class="<?= $aluno['status'] === 'Ativo' ? 'status-ativo' : 'status-inativo' ?>">
-    <?= htmlspecialchars($aluno['status']) ?>
-</td>
+                            <td class="<?= $alunoAtivo
+                                ? 'status-ativo'
+                                : 'status-inativo' ?>">
 
-                            <!-- Ações -->
+                                <?= $h($aluno['status']) ?>
+
+                            </td>
+
+                            <td>
+
+                                <?php if ($pendente): ?>
+
+                                    <span style="color:var(--fin-warning-dark)">
+
+                                        Aguardando pagamento
+
+                                    </span>
+
+                                <?php else: ?>
+
+                                    <span style="color:var(--fin-text-muted)">
+
+                                        Sem pendência inicial
+
+                                    </span>
+
+                                <?php endif; ?>
+
+                            </td>
+
                             <td class="alunos-coluna-acoes">
 
                                 <div class="fin-actions-dropdown icones-acoes">
 
-                                    <!-- WhatsApp -->
-                                    <?php if ($numeroWhats != ''): ?>
+                                    <?php if (in_array(
+                                        strlen($numeroWhats),
+                                        [10, 11],
+                                        true
+                                    )): ?>
 
                                         <a
-                                            href="https://wa.me/55<?= $numeroWhats ?>"
+                                            href="https://wa.me/55<?= $h($numeroWhats) ?>"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             title="WhatsApp"
                                             aria-label="WhatsApp"
-                                            class="icone icone-whats"
-                                        >
+                                            class="icone icone-whats">
 
-                                            <svg
-                                                width="22"
-                                                height="22"
-                                                viewBox="0 0 24 24"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                stroke-width="2"
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                            >
-                                                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z">
-                                                </path>
-                                            </svg>
+                                            <i data-lucide="message-circle"></i>
 
                                         </a>
 
                                     <?php endif; ?>
 
-                                    <!-- E-mail -->
                                     <?php if (!empty($aluno['email'])): ?>
 
                                         <a
-                                            href="https://mail.google.com/mail/?view=cm&fs=1&to=<?= urlencode($aluno['email']) ?>"
+                                            href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=<?= urlencode($aluno['email']) ?>"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             title="E-mail"
                                             aria-label="E-mail"
-                                            class="icone"
-                                        >
+                                            class="icone">
 
-                                            <svg
-                                                width="22"
-                                                height="22"
-                                                viewBox="0 0 24 24"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                stroke-width="2"
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                            >
-                                                <rect
-                                                    x="2"
-                                                    y="4"
-                                                    width="20"
-                                                    height="16"
-                                                    rx="2"
-                                                ></rect>
-
-                                                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7">
-                                                </path>
-                                            </svg>
+                                            <i data-lucide="mail"></i>
 
                                         </a>
 
                                     <?php endif; ?>
 
-                                    <!-- Visualizar -->
                                     <a
-                                        href="<?= $baseUrl ?>?acao=visualizar&id=<?= $aluno['id'] ?>"
+                                        href="<?= $h($baseUrl) ?>?acao=visualizar&amp;id=<?= (int) $aluno['id'] ?>"
                                         title="Visualizar"
                                         aria-label="Visualizar"
-                                        class="icone"
-                                    >
+                                        class="icone">
 
-                                        <svg
-                                            width="22"
-                                            height="22"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            stroke-width="2"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                        >
-                                            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z">
-                                            </path>
-
-                                            <circle
-                                                cx="12"
-                                                cy="12"
-                                                r="3"
-                                            ></circle>
-                                        </svg>
+                                        <i data-lucide="eye"></i>
 
                                     </a>
 
-                                    <!-- Editar -->
                                     <a
-                                        href="<?= $baseUrl ?>?acao=editar&id=<?= $aluno['id'] ?>"
+                                        href="<?= $h($baseUrl) ?>?acao=editar&amp;id=<?= (int) $aluno['id'] ?>"
                                         title="Editar"
                                         aria-label="Editar"
-                                        class="icone icone-editar"
-                                    >
+                                        class="icone icone-editar">
 
-                                        <svg
-                                            width="22"
-                                            height="22"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            stroke-width="2"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                        >
-                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7">
-                                            </path>
-
-                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z">
-                                            </path>
-                                        </svg>
+                                        <i data-lucide="square-pen"></i>
 
                                     </a>
 
@@ -346,5 +437,30 @@ if (!isset($filial_id_filter)) {
     </section>
 
 </main>
+
+<script>
+(function () {
+
+    const cpf = document.getElementById('cpf');
+
+    if (!cpf) {
+        return;
+    }
+
+    cpf.addEventListener('input', function () {
+
+        const n = cpf.value
+            .replace(/\D/g, '')
+            .slice(0, 11);
+
+        cpf.value =
+            n.slice(0, 3) +
+            (n.length > 3 ? '.' + n.slice(3, 6) : '') +
+            (n.length > 6 ? '.' + n.slice(6, 9) : '') +
+            (n.length > 9 ? '-' + n.slice(9) : '');
+    });
+
+})();
+</script>
 
 <?php include __DIR__ . '/../shared/footer.php'; ?>

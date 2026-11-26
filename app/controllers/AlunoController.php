@@ -1,211 +1,267 @@
 <?php
 // app/controllers/AlunoController.php
 
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
+
 require_once __DIR__ . '/../../config/sessao.php';
+
 verificarRole(['Admin', 'Recepcao']);
 
 $baseUrl = BASE_URL . '/app/controllers/AlunoController.php';
+
+$tituloPagina = 'Alunos';
+
 $acao = $_GET['acao'] ?? 'listar';
 
-/* 1. LISTAR ALUNOS */
-if ($acao === 'listar') {
-    $cpf    = trim($_GET['cpf'] ?? '');
-    $status = trim($_GET['status'] ?? '');
-    $filial_id_filter = (int)($_GET['filial_id'] ?? 0);
+$texto = static fn($valor) =>
+    is_string($valor) ? trim($valor) : '';
 
-    $operacao = 'listar';
-    require __DIR__ . '/../models/Aluno.php';
-    
-    $operacao = 'listar_filiais';
-    require __DIR__ . '/../models/Aluno.php';
+$inteiro = static fn($valor) =>
+    (int) filter_var(
+        $valor,
+        FILTER_VALIDATE_INT,
+        ['options' => ['min_range' => 1]]
+    );
 
-    require __DIR__ . '/../views/alunos/index.php';
+$metodo = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+
+$erro = '';
+$sucesso = '';
+
+if (
+    empty($_SESSION['aluno_csrf']) ||
+    !is_string($_SESSION['aluno_csrf'])
+) {
+    $_SESSION['aluno_csrf'] = bin2hex(random_bytes(32));
 }
 
-/* 2. CADASTRAR ALUNO */
-elseif ($acao === 'cadastrar') {
-    $erro  = '';
-    $dados = $_POST;
+$csrf = $_SESSION['aluno_csrf'];
 
-    if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
-        $dados['nome']        = trim($_POST['nome'] ?? '');
-        $dados['cpf']         = trim($_POST['cpf'] ?? '');
-        $dados['rg']          = trim($_POST['rg'] ?? '');
-        $dados['sexo']        = trim($_POST['sexo'] ?? '');
-        $dados['nascimento']  = trim($_POST['nascimento'] ?? '');
-        $dados['email']       = trim($_POST['email'] ?? '');
-        $dados['telefone']    = trim($_POST['telefone'] ?? '');
-        $dados['endereco']    = trim($_POST['endereco'] ?? '');
-        $dados['filial_id']   = (int) ($_POST['filial_id'] ?? 0);
-        $dados['professor_id'] = !empty($_POST['professor_id']) ? (int) $_POST['professor_id'] : null;
-        $dados['senha']       = $_POST['senha'] ?? '';
+$redirecionar = static function (
+    string $destino
+): void {
 
-        if (
-            $dados['nome'] === '' || $dados['cpf'] === '' || $dados['sexo'] === '' ||
-            $dados['nascimento'] === '' || $dados['email'] === '' || $dados['telefone'] === '' ||
-            $dados['filial_id'] <= 0 || $dados['senha'] === ''
-        ) {
-            $erro = 'Preencha todos os campos obrigatorios.';
-        } elseif (!filter_var($dados['email'], FILTER_VALIDATE_EMAIL)) {
-            $erro = 'Informe um e-mail valido.';
-        } elseif (strlen($dados['senha']) < 6) {
-            $erro = 'A senha deve ter pelo menos 6 caracteres.';
-        } else {
-            $operacao = 'cadastrar';
-            require __DIR__ . '/../models/Aluno.php';
+    header('Location: ' . $destino, true, 303);
+    exit;
+};
 
-            if ($erroModel === '') {
-                header("Location: $baseUrl?acao=visualizar&id=$novoAlunoId&msg=cadastrado");
-                exit;
-            }
-            $erro = $erroModel;
+$flash = $_SESSION['aluno_flash'] ?? [];
+
+unset($_SESSION['aluno_flash']);
+
+$erro = $flash['erro'] ?? '';
+$sucesso = $flash['sucesso'] ?? '';
+
+try {
+
+    // Listagem de alunos.
+
+    if ($acao === 'listar' && $metodo === 'GET') {
+
+        $cpf = $texto($_GET['cpf'] ?? '');
+        $status = $texto($_GET['status'] ?? '');
+
+        $filial_id_filter = $inteiro(
+            $_GET['filial_id'] ?? 0
+        );
+
+        if (!in_array(
+            $status,
+            ['', 'Ativo', 'Inativo', 'Pendente'],
+            true
+        )) {
+            $status = '';
         }
-    }
 
-    $operacao = 'listar_filiais';
-    require __DIR__ . '/../models/Aluno.php';
+        $operacao = 'listar_filiais';
 
-    // LISTAR PROFESSORES PARA ATRIBUIR (apenas da mesma empresa)
-    $stmt_professores = $pdo->prepare("SELECT id, name FROM users WHERE role = 'Professor' AND company_id = ? ORDER BY name");
-    $stmt_professores->execute([$_SESSION['company_id'] ?? 0]);
-    $professores = $stmt_professores->fetchAll();
-
-    require __DIR__ . '/../views/alunos/cadastrar.php';
-}
-
-/* 3. EDITAR ALUNO */
-elseif ($acao === 'editar') {
-    $id = (int) ($_GET['id'] ?? $_POST['id'] ?? 0);
-
-    $operacao = 'buscar';
-    require __DIR__ . '/../models/Aluno.php';
-
-    if (!$aluno) {
-        header("Location: $baseUrl?acao=listar");
-        exit;
-    }
-
-    $erro  = '';
-    $dados = $aluno;
-
-    if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
-        $dados['nome']        = trim($_POST['nome'] ?? '');
-        $dados['cpf']         = trim($_POST['cpf'] ?? '');
-        $dados['rg']          = trim($_POST['rg'] ?? '');
-        $dados['sexo']        = trim($_POST['sexo'] ?? '');
-        $dados['nascimento']  = trim($_POST['nascimento'] ?? '');
-        $dados['email']       = trim($_POST['email'] ?? '');
-        $dados['telefone']    = trim($_POST['telefone'] ?? '');
-        $dados['endereco']    = trim($_POST['endereco'] ?? '');
-        $dados['filial_id']   = (int) ($_POST['filial_id'] ?? 0);
-        $dados['professor_id'] = !empty($_POST['professor_id']) ? (int) $_POST['professor_id'] : null;
-        $dados['status']      = trim($_POST['status'] ?? '');
-        $dados['senha']       = $_POST['senha'] ?? '';
-
-        if (
-            $dados['nome'] === '' || $dados['cpf'] === '' || $dados['sexo'] === '' ||
-            $dados['nascimento'] === '' || $dados['email'] === '' || $dados['telefone'] === '' ||
-            $dados['filial_id'] <= 0 || $dados['status'] === ''
-        ) {
-            $erro = 'Preencha todos os campos obrigatorios.';
-        } elseif (!filter_var($dados['email'], FILTER_VALIDATE_EMAIL)) {
-            $erro = 'Informe um e-mail valido.';
-        } elseif ($dados['senha'] !== '' && strlen($dados['senha']) < 6) {
-            $erro = 'A nova senha deve ter pelo menos 6 caracteres.';
-        } else {
-            $operacao = 'atualizar';
-            require __DIR__ . '/../models/Aluno.php';
-
-            if ($erroModel === '') {
-                header("Location: $baseUrl?acao=visualizar&id=$id&msg=atualizado");
-                exit;
-            }
-            $erro = $erroModel;
-        }
-    }
-
-    $operacao = 'listar_filiais';
-    require __DIR__ . '/../models/Aluno.php';
-
-    // LISTAR PROFESSORES PARA ATRIBUIR (apenas da mesma empresa)
-    $stmt_professores = $pdo->prepare("SELECT id, name FROM users WHERE role = 'Professor' AND company_id = ? ORDER BY name");
-    $stmt_professores->execute([$_SESSION['company_id'] ?? 0]);
-    $professores = $stmt_professores->fetchAll();
-
-    require __DIR__ . '/../views/alunos/editar.php';
-}
-
-/* 4. VISUALIZAR ALUNO */
-elseif ($acao === 'visualizar') {
-    $id = (int) ($_GET['id'] ?? 0);
-
-    $operacao = 'visualizar';
-    require __DIR__ . '/../models/Aluno.php';
-
-    if (!$aluno) {
-        header("Location: $baseUrl?acao=listar");
-        exit;
-    }
-
-    $erro = $_SESSION['erro_aluno'] ?? '';
-    unset($_SESSION['erro_aluno']);
-
-    $sucesso = match ($_GET['msg'] ?? '') {
-        'cadastrado'  => 'Aluno cadastrado com sucesso!',
-        'atualizado'  => 'Aluno atualizado com sucesso!',
-        'matriculado' => 'Matricula realizada com sucesso!',
-        'pago'        => 'Pagamento registrado com sucesso!',
-        default       => ''
-    };
-
-    require __DIR__ . '/../views/alunos/visualizar.php';
-}
-
-/* 5. MATRICULAR ALUNO */
-elseif ($acao === 'matricular') {
-    $alunoId    = (int) ($_POST['aluno_id'] ?? 0);
-    $planoId    = (int) ($_POST['plano_id'] ?? 0);
-    $dataInicio = $_POST['data_inicio'] ?? '';
-    $desconto   = (float) str_replace(',', '.', $_POST['desconto'] ?? '0');
-
-    if ($alunoId <= 0 || $planoId <= 0 || empty($dataInicio) || $desconto < 0) {
-        $_SESSION['erro_aluno'] = 'Preencha corretamente os dados da matricula.';
-    } else {
-        $operacao = 'matricular';
         require __DIR__ . '/../models/Aluno.php';
 
-        if ($erroModel !== '') {
-            $_SESSION['erro_aluno'] = $erroModel;
-        } else {
-            header("Location: $baseUrl?acao=visualizar&id=$alunoId&msg=matriculado");
-            exit;
+        $idsAutorizados = array_map(
+            'intval',
+            array_column($filiais, 'id')
+        );
+
+        if (
+            $filial_id_filter > 0 &&
+            !in_array(
+                $filial_id_filter,
+                $idsAutorizados,
+                true
+            )
+        ) {
+            $_SESSION['aluno_flash'] = [
+                'erro' => 'Você não possui acesso à filial selecionada.'
+            ];
+
+            $redirecionar($baseUrl . '?acao=listar');
         }
-    }
 
-    header("Location: $baseUrl?acao=visualizar&id=$alunoId");
-    exit;
-}
+        $operacao = 'listar';
 
-/* 6. REGISTRAR PAGAMENTO */
-elseif ($acao === 'pagar') {
-    $alunoId = (int) ($_POST['aluno_id'] ?? 0);
-    $contaId = (int) ($_POST['conta_id'] ?? 0);
+        require __DIR__ . '/../models/Aluno.php';
 
-    $operacao = 'pagar';
-    require __DIR__ . '/../models/Aluno.php';
+        if (!empty($erroModel)) {
+            $erro = $erroModel;
+        }
 
-    if (!empty($pagamentoRealizado)) {
-        header("Location: $baseUrl?acao=visualizar&id=$alunoId&msg=pago");
+        require __DIR__ . '/../views/alunos/index.php';
+
         exit;
     }
 
-    $_SESSION['erro_aluno'] = 'A mensalidade nao foi encontrada ou ja esta paga.';
-    header("Location: $baseUrl?acao=visualizar&id=$alunoId");
-    exit;
-}
+    // Visualização individual.
 
-/* REDIRECIONAMENTO PADRAO */
-else {
-    header("Location: $baseUrl?acao=listar");
-    exit;
+    if ($acao === 'visualizar' && $metodo === 'GET') {
+
+        $tituloPagina = 'Dados do aluno';
+
+        $id = $inteiro($_GET['id'] ?? 0);
+
+        $operacao = 'visualizar';
+
+        require __DIR__ . '/../models/Aluno.php';
+
+        if (!$aluno) {
+
+            $_SESSION['aluno_flash'] = [
+                'erro' => $erroModel ?:
+                    'Aluno não encontrado ou não autorizado.'
+            ];
+
+            $redirecionar($baseUrl . '?acao=listar');
+        }
+
+        require __DIR__ . '/../views/alunos/visualizar.php';
+
+        exit;
+    }
+
+    // Edição cadastral.
+
+    if (
+        $acao === 'editar' &&
+        in_array($metodo, ['GET', 'POST'], true)
+    ) {
+
+        $tituloPagina = 'Editar aluno';
+
+        $id = $inteiro($_GET['id'] ?? $_POST['id'] ?? 0);
+
+        $operacao = 'buscar';
+
+        require __DIR__ . '/../models/Aluno.php';
+
+        if (!$aluno) {
+
+            $_SESSION['aluno_flash'] = [
+                'erro' => 'Aluno não encontrado ou não autorizado.'
+            ];
+
+            $redirecionar($baseUrl . '?acao=listar');
+        }
+
+        $dados = $aluno;
+
+        if ($metodo === 'POST') {
+
+            $token = $_POST['csrf'] ?? null;
+
+            if (
+                !is_string($token) ||
+                !hash_equals($csrf, $token)
+            ) {
+
+                $erro =
+                    'A sessão do formulário expirou. Tente novamente.';
+
+            } else {
+
+                foreach ([
+                    'nome',
+                    'rg',
+                    'telefone',
+                    'endereco'
+                ] as $campo) {
+
+                    $dados[$campo] = $texto(
+                        $_POST[$campo] ?? ''
+                    );
+                }
+
+                $operacao = 'atualizar';
+
+                require __DIR__ . '/../models/Aluno.php';
+
+                if ($erroModel === '') {
+
+                    $_SESSION['aluno_flash'] = [
+                        'sucesso' =>
+                            'Dados cadastrais atualizados com sucesso.'
+                    ];
+
+                    $redirecionar(
+                        $baseUrl .
+                        '?acao=visualizar&id=' .
+                        $id
+                    );
+                }
+
+                $erro = $erroModel;
+            }
+        }
+
+        require __DIR__ . '/../views/alunos/editar.php';
+
+        exit;
+    }
+
+    // Bloquear os fluxos antigos de cadastro e matrícula.
+
+    if (in_array(
+        $acao,
+        ['cadastrar', 'matricular'],
+        true
+    )) {
+
+        $_SESSION['aluno_flash'] = [
+            'erro' =>
+                'A matrícula interna está sendo integrada ao novo fluxo.'
+        ];
+
+        $redirecionar($baseUrl . '?acao=listar');
+    }
+
+    // A baixa antiga não pode mais atualizar contas.
+
+    if ($acao === 'pagar') {
+
+        $_SESSION['aluno_flash'] = [
+            'erro' =>
+                'Os pagamentos devem ser confirmados no módulo Recebimentos.'
+        ];
+
+        $redirecionar($baseUrl . '?acao=listar');
+    }
+
+    $redirecionar($baseUrl . '?acao=listar');
+
+} catch (Throwable $e) {
+
+    error_log(
+        '[GymFlow][AlunoController] ' .
+        get_class($e) .
+        ' | código ' .
+        $e->getCode() .
+        ' | linha ' .
+        $e->getLine()
+    );
+
+    http_response_code(500);
+
+    exit(
+        'Não foi possível carregar os dados dos alunos. ' .
+        'Tente novamente.'
+    );
 }

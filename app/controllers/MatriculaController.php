@@ -1,452 +1,855 @@
 <?php
 // app/controllers/MatriculaController.php
 
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
+
 require_once __DIR__ . '/../../config/sessao.php';
 require_once __DIR__ . '/../../config/conexao.php';
-require_once __DIR__ . '/../services/MercadoPagoService.php';
+require_once __DIR__ . '/../models/Database.php';
+require_once __DIR__ . '/../models/Matricula.php';
 
-$baseUrl = BASE_URL . '/app/controllers/MatriculaController.php';
-$acao = $_GET['acao'] ?? 'identificacao';
+$baseUrl = BASE_URL .
+    '/app/controllers/MatriculaController.php';
 
-$acoesPermitidas = [
-    'identificacao',
-    'filial',
-    'pagamento',
-    'sucesso'
-];
+$urlAlunos = BASE_URL .
+    '/app/controllers/AlunoController.php?acao=listar';
 
-if (!in_array($acao, $acoesPermitidas, true)) {
-    header("Location: $baseUrl?acao=identificacao");
+$urlCrm = BASE_URL .
+    '/app/controllers/CrmController.php';
+
+$interno = ($_GET['modo'] ?? '') === 'interno';
+
+$roleMatricula = '';
+$usuarioMatricula = 0;
+$empresaInterna = 0;
+
+if ($interno) {
+
+    verificarRole(['Admin', 'Recepcao']);
+
+    $roleMatricula = $_SESSION['usuario_role'];
+    $usuarioMatricula = (int) $_SESSION['usuario_id'];
+    $empresaInterna = (int) $_SESSION['company_id'];
+}
+
+$identidade = $interno
+    ? $empresaInterna . ':' .
+        $usuarioMatricula . ':' .
+        $roleMatricula
+    : 'publico';
+
+$chave = $interno
+    ? 'matricula_interna'
+    : 'matricula_manual';
+
+$chaveResultado = $chave . '_resultado';
+
+$leadIdAtual = 0;
+
+$rota = static function (
+    string $acao,
+    array $extras = []
+) use (
+    $baseUrl,
+    $interno,
+    &$leadIdAtual
+): string {
+
+    $params = ['acao' => $acao];
+
+    if ($interno) {
+
+        $params['modo'] = 'interno';
+
+        if (
+            !empty($extras['novo']) &&
+            $leadIdAtual > 0
+        ) {
+            $params['lead_id'] = $leadIdAtual;
+        }
+    }
+
+    return $baseUrl . '?' . http_build_query(
+        array_merge($params, $extras)
+    );
+};
+
+function matriculaRedirecionar(string $url): void
+{
+    header('Location: ' . $url, true, 303);
     exit;
 }
 
-// ==================================================
-// FUNÇÃO AUXILIAR: CONFIGURAÇÃO PÚBLICA DA ACADEMIA
-// ==================================================
-
-/**
- * Carrega as informações públicas e a identidade visual
- * da academia configuradas em portfolio_config.
- */
-function carregarConfiguracaoMatricula(PDO $pdo, int $companyId): array
+function matriculaId($valor): int
 {
-    $configPadrao = [
-        'app_name' => 'GymFlow',
-        'primary_color' => '#C9A227',
-        'secondary_color' => '#000000',
-        'logo_url' => '',
-        'contact_email' => '',
-        'contact_phone' => '',
-        'contact_hours' => '',
-        'instagram_url' => '',
-        'facebook_url' => '',
-        'tiktok_url' => '',
-        'whatsapp_url' => '',
+    return is_scalar($valor)
+        ? (int) filter_var(
+            $valor,
+            FILTER_VALIDATE_INT,
+            ['options' => ['min_range' => 1]]
+        )
+        : 0;
+}
+
+$acao = $_GET['acao'] ?? 'identificacao';
+
+$requisicao = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+
+if (!in_array($requisicao, ['GET', 'POST'], true)) {
+    http_response_code(405);
+    exit('Operação não permitida.');
+}
+
+$post = $requisicao === 'POST';
+
+if (!in_array(
+    $acao,
+    ['identificacao', 'filial', 'pagamento', 'sucesso'],
+    true
+)) {
+    matriculaRedirecionar($rota('identificacao'));
+}
+
+$erro = '';
+$erros = [];
+$dados = [];
+$planos = [];
+$filiais = [];
+$plano = null;
+$filial = null;
+$existente = null;
+$leadAtual = null;
+$cobrancas = [];
+$resultado = null;
+
+$salvar = static function (
+    array $estado
+) use ($chave): void {
+
+    $_SESSION[$chave] = $estado;
+};
+
+$novoInterno = static function (
+    int $leadId = 0
+) use (
+    $empresaInterna,
+    $identidade
+): array {
+
+    return [
+        'company_id' => $empresaInterna,
+        'identidade' => $identidade,
+        'csrf' => bin2hex(random_bytes(32)),
+        'plano_id' => 0,
+        'filial_id' => 0,
+        'cpf_consultado' => false,
+        'lead_id' => $leadId
     ];
+};
 
-    if ($companyId <= 0) {
-        return $configPadrao;
-    }
+try {
 
-    try {
-        $stmt = $pdo->prepare('SELECT * FROM portfolio_config WHERE company_id = ? LIMIT 1');
-        $stmt->execute([$companyId]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    // Conclusão.
 
-        if ($row && is_array($row)) {
-            if (empty($row['app_name'])) {
-                $stmtComp = $pdo->prepare('SELECT nome FROM companies WHERE id = ? LIMIT 1');
-                $stmtComp->execute([$companyId]);
-                $compNome = $stmtComp->fetchColumn();
-                if (!empty($compNome)) {
-                    $row['app_name'] = $compNome;
-                }
-            }
-            return array_merge($configPadrao, $row);
-        }
+    if ($acao === 'sucesso') {
 
-        // Caso portfolio_config ainda não tenha sido salvo, utiliza o nome da empresa
-        $stmtComp = $pdo->prepare('SELECT nome FROM companies WHERE id = ? LIMIT 1');
-        $stmtComp->execute([$companyId]);
-        $compNome = $stmtComp->fetchColumn();
-        if (!empty($compNome)) {
-            $configPadrao['app_name'] = $compNome;
-        }
-
-        return $configPadrao;
-    } catch (\Throwable $e) {
-        error_log('[GymFlow][MatriculaController] Erro ao carregar config da empresa: ' . $e->getMessage());
-        return $configPadrao;
-    }
-}
-
-// ==================================================
-// CONTEXTO MULTI-TENANT DA MATRÍCULA
-// ==================================================
-//
-// O company_id chega pelo link do site público (?company_id=... ou ?id=...).
-// Depois, permanece em $_SESSION['matricula'].
-//
-// Este contexto é independente da sessão do
-// usuário autenticado: visitantes também podem
-// iniciar uma matrícula.
-//
-// O model verifica empresa, plano e filial no banco.
-
-$paramEmpresa = $_GET['company_id'] ?? $_GET['id'] ?? null;
-
-if ($paramEmpresa !== null) {
-    $empresaRecebida = filter_var(
-        $paramEmpresa,
-        FILTER_VALIDATE_INT,
-        ['options' => ['min_range' => 1]]
-    );
-
-    if ($empresaRecebida !== false && $empresaRecebida > 0) {
-        $empresaRecebida = (int) $empresaRecebida;
-        $empresaAnterior = (int) ($_SESSION['matricula']['company_id'] ?? 0);
-
-        // Impede reutilizar dados residuais de outra academia.
-        if ($empresaAnterior > 0 && $empresaAnterior !== $empresaRecebida) {
-            unset($_SESSION['matricula']);
-        }
-
-        $_SESSION['matricula']['company_id'] = $empresaRecebida;
-    }
-}
-
-$company_id = (int) ($_SESSION['matricula']['company_id'] ?? 0);
-
-// A tela de sucesso utiliza um resultado gravado após a concretização.
-if ($acao === 'sucesso') {
-    $resultado = $_SESSION['matricula_sucesso'] ?? null;
-
-    if (empty($resultado)) {
-        header('Location: ' . BASE_URL . '/index.php');
-        exit;
-    }
-
-    $company_id = (int) ($resultado['company_id'] ?? $company_id);
-    if ($company_id <= 0) {
-        $company_id = 1;
-    }
-} else {
-    if ($company_id <= 0) {
-        header('Location: ' . BASE_URL . '/index.php');
-        exit;
-    }
-}
-
-// Carrega as configurações públicas da academia (cores, logotipo, dados de contato)
-$config = carregarConfiguracaoMatricula($pdo, $company_id);
-
-// ==================================================
-// ETAPA 1 - IDENTIFICAÇÃO E PLANO
-// ==================================================
-
-if ($acao === 'identificacao') {
-
-    $erro = '';
-    $dados = $_SESSION['matricula'] ?? [];
-
-    if (!empty($_GET['plano_id'])) {
-        $dados['plano_id'] = (int) $_GET['plano_id'];
-    }
-
-    // Lista somente planos da empresa.
-    $operacao = 'listar_planos';
-    require __DIR__ . '/../models/Matricula.php';
-
-    if (!empty($erroModel)) {
-        $erro = $erroModel;
-    }
-
-    $planoSelecionado = null;
-    $planoIdBusca = (int) ($dados['plano_id'] ?? 0);
-
-    if ($planoIdBusca > 0) {
-        $operacao = 'buscar_plano';
-        $plano_id = $planoIdBusca;
-        require __DIR__ . '/../models/Matricula.php';
-
-        $planoSelecionado = $plano;
-
-        if (!$planoSelecionado) {
-            $dados['plano_id'] = 0;
-        }
-    }
-
-    if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
-
-        $dados['company_id'] = $company_id;
-        $dados['plano_id'] = (int) ($_POST['plano_id'] ?? 0);
-        $dados['nome'] = trim($_POST['nome'] ?? '');
-        $dados['cpf'] = trim($_POST['cpf'] ?? '');
-        $dados['rg'] = trim($_POST['rg'] ?? '');
-        $dados['sexo'] = trim($_POST['sexo'] ?? '');
-        $dados['nascimento'] = trim($_POST['nascimento'] ?? '');
-        $dados['email'] = trim($_POST['email'] ?? '');
-        $dados['telefone'] = trim($_POST['telefone'] ?? '');
-        $dados['endereco'] = trim($_POST['endereco'] ?? '');
-        $dados['senha'] = $_POST['senha'] ?? '';
+        $resultado = $_SESSION[$chaveResultado] ?? null;
 
         if (
-            $dados['plano_id'] <= 0 ||
-            $dados['nome'] === '' ||
-            $dados['cpf'] === '' ||
-            $dados['sexo'] === '' ||
-            $dados['nascimento'] === '' ||
-            $dados['email'] === '' ||
-            $dados['telefone'] === '' ||
-            $dados['senha'] === ''
+            !$resultado ||
+            ($resultado['identidade'] ?? '') !== $identidade
         ) {
-            $erro = 'Preencha todos os campos obrigatórios marcados com asterisco (*).';
-        } elseif (!filter_var($dados['email'], FILTER_VALIDATE_EMAIL)) {
-            $erro = 'Informe um endereço de e-mail válido.';
-        } elseif (strlen($dados['senha']) < 6) {
-            $erro = 'A senha deve conter no mínimo 6 caracteres.';
-        } else {
+            matriculaRedirecionar(
+                $interno
+                    ? $urlAlunos
+                    : BASE_URL . '/index.php'
+            );
+        }
 
-            // Confirma que o plano pertence à empresa.
-            $operacao = 'buscar_plano';
-            $plano_id = $dados['plano_id'];
-            require __DIR__ . '/../models/Matricula.php';
+        $company_id = (int) $resultado['company_id'];
 
-            if (empty($plano)) {
-                $erro = 'O plano selecionado não está disponível.';
-            } else {
+        $model = new MatriculaModel(
+            $pdo,
+            $company_id,
+            $usuarioMatricula,
+            $roleMatricula
+        );
 
-                $operacao = 'validar_dados_cadastrais';
-                $cpf = $dados['cpf'];
-                $email = $dados['email'];
+        if (
+            $interno &&
+            (
+                $company_id !== $empresaInterna ||
+                !$model->filial(
+                    (int) $resultado['filial_id']
+                )
+            )
+        ) {
+            matriculaRedirecionar($urlAlunos);
+        }
 
-                require __DIR__ . '/../models/Matricula.php';
+        $config = $interno
+            ? []
+            : $model->configuracao();
 
-                if (!empty($erroModel)) {
-                    $erro = $erroModel;
-                } else {
-                    $_SESSION['matricula'] = $dados;
+        require __DIR__ . '/../views/matricula/sucesso.php';
 
-                    header("Location: $baseUrl?acao=filial");
-                    exit;
+        exit;
+    }
+
+    // Iniciar matrícula interna ou vinda do CRM.
+
+    if (
+        $interno &&
+        !$post &&
+        $acao === 'identificacao' &&
+        (
+            ($_GET['novo'] ?? '') === '1' ||
+            empty($_SESSION[$chave])
+        )
+    ) {
+
+        unset(
+            $_SESSION[$chave],
+            $_SESSION[$chaveResultado]
+        );
+
+        $leadIdAtual = matriculaId(
+            $_GET['lead_id'] ?? 0
+        );
+
+        $dados = $novoInterno($leadIdAtual);
+
+        if ($leadIdAtual > 0) {
+
+            $model = new MatriculaModel(
+                $pdo,
+                $empresaInterna,
+                $usuarioMatricula,
+                $roleMatricula
+            );
+
+            try {
+
+                $leadAtual = $model->lead($leadIdAtual);
+
+                $dados['nome'] = $leadAtual['nome'];
+
+                $dados['telefone'] =
+                    $leadAtual['telefone'];
+
+                $dados['filial_id'] =
+                    (int) $leadAtual['filial_id'];
+
+            } catch (MatriculaErro $e) {
+
+                $_SESSION['crm_flash'] = [
+                    'erro' => $e->getMessage()
+                ];
+
+                matriculaRedirecionar($urlCrm);
+            }
+        }
+
+        $salvar($dados);
+    }
+
+    // Iniciar matrícula pública.
+
+    if (
+        !$interno &&
+        !$post &&
+        $acao === 'identificacao' &&
+        (
+            isset($_GET['company_id']) ||
+            isset($_GET['id'])
+        )
+    ) {
+
+        $empresa = matriculaId(
+            $_GET['company_id'] ?? $_GET['id']
+        );
+
+        if (!$empresa) {
+            matriculaRedirecionar(BASE_URL . '/index.php');
+        }
+
+        unset(
+            $_SESSION[$chave],
+            $_SESSION[$chaveResultado]
+        );
+
+        $salvar([
+            'company_id' => $empresa,
+            'identidade' => $identidade,
+            'plano_id' => matriculaId(
+                $_GET['plano_id'] ?? 0
+            ),
+            'csrf' => bin2hex(random_bytes(32))
+        ]);
+    }
+
+    $dados = $_SESSION[$chave] ?? null;
+
+    if (
+        !$dados ||
+        ($dados['identidade'] ?? '') !== $identidade ||
+        (
+            $interno &&
+            (int) $dados['company_id'] !== $empresaInterna
+        )
+    ) {
+
+        unset($_SESSION[$chave]);
+
+        $ultimo = $_SESSION[$chaveResultado] ?? null;
+
+        if (
+            $post &&
+            $ultimo &&
+            ($ultimo['identidade'] ?? '') === $identidade
+        ) {
+            matriculaRedirecionar($rota('sucesso'));
+        }
+
+        matriculaRedirecionar(
+            $interno
+                ? $urlAlunos
+                : BASE_URL . '/index.php'
+        );
+    }
+
+    $company_id = (int) $dados['company_id'];
+
+    $model = new MatriculaModel(
+        $pdo,
+        $company_id,
+        $usuarioMatricula,
+        $roleMatricula
+    );
+
+    $config = $interno
+        ? []
+        : $model->configuracao();
+
+    $csrf = $dados['csrf'];
+
+    $metodos = $model->metodos();
+
+    $leadIdAtual = $interno
+        ? (int) ($dados['lead_id'] ?? 0)
+        : 0;
+
+    // Revalidar lead em todas as etapas.
+
+    if ($leadIdAtual > 0) {
+
+        try {
+
+            $leadAtual = $model->lead($leadIdAtual);
+
+            if (
+                !empty($dados['cpf_consultado']) &&
+                (int) ($dados['filial_id'] ?? 0) !==
+                    (int) $leadAtual['filial_id']
+            ) {
+                throw new MatriculaErro(
+                    'A unidade do lead foi alterada. Inicie a matrícula novamente.'
+                );
+            }
+
+        } catch (MatriculaErro $e) {
+
+            unset($_SESSION[$chave]);
+
+            $_SESSION['crm_flash'] = [
+                'erro' => $e->getMessage()
+            ];
+
+            matriculaRedirecionar($urlCrm);
+        }
+    }
+
+    $postValido =
+        $post &&
+        is_string($_POST['csrf'] ?? null) &&
+        hash_equals($csrf, $_POST['csrf']);
+
+    if ($post && !$postValido) {
+
+        $erro =
+            'A sessão do formulário expirou. Atualize a página e tente novamente.';
+    }
+
+    if (!empty($dados['erro_flash'])) {
+
+        $erro = $dados['erro_flash'];
+
+        unset($dados['erro_flash']);
+
+        $salvar($dados);
+    }
+
+    if (
+        $acao !== 'identificacao' &&
+        empty($dados['identificacao_ok'])
+    ) {
+        matriculaRedirecionar($rota('identificacao'));
+    }
+
+    // Identificação.
+
+    if ($acao === 'identificacao' && $postValido) {
+
+        $operacao = MatriculaModel::texto(
+            $_POST['operacao'] ?? 'identificar'
+        );
+
+        // Buscar CPF.
+
+        if ($interno && $operacao === 'buscar_cpf') {
+
+            $dados = $novoInterno($leadIdAtual);
+
+            if ($leadAtual) {
+
+                $dados['nome'] = $leadAtual['nome'];
+
+                $dados['telefone'] =
+                    $leadAtual['telefone'];
+
+                $dados['filial_id'] =
+                    (int) $leadAtual['filial_id'];
+            }
+
+            try {
+
+                $cpf = MatriculaModel::normalizarCpf(
+                    MatriculaModel::texto(
+                        $_POST['cpf_busca'] ?? ''
+                    )
+                );
+
+                $cadastro = $model->buscarAlunoCpf($cpf);
+
+                $dados['cpf'] = $cpf;
+
+                if ($cadastro) {
+
+                    $cadastro = $model->validarAlunoExistente(
+                        (int) $cadastro['id']
+                    );
+
+                    if (
+                        $leadAtual &&
+                        (int) $cadastro['filial_id'] !==
+                            (int) $leadAtual['filial_id']
+                    ) {
+                        throw new MatriculaErro(
+                            'O aluno pertence a uma unidade diferente da unidade do lead.'
+                        );
+                    }
+
+                    $dados['aluno_existente_id'] =
+                        (int) $cadastro['id'];
+
+                    $dados['nome'] = $cadastro['nome'];
+
+                    $dados['filial_id'] =
+                        (int) $cadastro['filial_id'];
                 }
+
+                $dados['cpf_consultado'] = true;
+
+            } catch (MatriculaErro $e) {
+
+                $dados['erro_flash'] = $e->getMessage();
             }
+
+            $salvar($dados);
+
+            matriculaRedirecionar($rota('identificacao'));
         }
 
-        if ($dados['plano_id'] > 0) {
-            $operacao = 'buscar_plano';
-            $plano_id = $dados['plano_id'];
+        // Reutilizar cadastro existente.
 
-            require __DIR__ . '/../models/Matricula.php';
+        if ($interno && $operacao === 'usar_existente') {
 
-            $planoSelecionado = $plano;
-        }
-    }
+            try {
 
-    require __DIR__ . '/../views/matricula/identificacao.php';
-}
+                $existente = $model->validarAlunoExistente(
+                    (int) ($dados['aluno_existente_id'] ?? 0)
+                );
 
-// ==================================================
-// ETAPA 2 - SELEÇÃO DE FILIAL
-// ==================================================
+                if (
+                    $leadAtual &&
+                    (int) $existente['filial_id'] !==
+                        (int) $leadAtual['filial_id']
+                ) {
+                    throw new MatriculaErro(
+                        'O aluno deve pertencer à unidade do lead.'
+                    );
+                }
 
-elseif ($acao === 'filial') {
+                $dados['nome'] = $existente['nome'];
 
-    $matriculaTemp = $_SESSION['matricula'] ?? [];
+                $dados['filial_id'] =
+                    (int) $existente['filial_id'];
 
-    if (
-        empty($matriculaTemp['plano_id']) ||
-        empty($matriculaTemp['nome'])
-    ) {
-        header("Location: $baseUrl?acao=identificacao");
-        exit;
-    }
+                $dados['identificacao_ok'] = true;
 
-    $erro = '';
+                unset($dados['oferta']);
 
-    $operacao = 'buscar_plano';
-    $plano_id = (int) $matriculaTemp['plano_id'];
+                $salvar($dados);
 
-    require __DIR__ . '/../models/Matricula.php';
+                matriculaRedirecionar($rota('filial'));
 
-    if (empty($plano)) {
-        header("Location: $baseUrl?acao=identificacao");
-        exit;
-    }
+            } catch (MatriculaErro $e) {
 
-    $operacao = 'listar_filiais';
-    require __DIR__ . '/../models/Matricula.php';
+                $erro = $e->getMessage();
+            }
 
-    if (!empty($erroModel)) {
-        $erro = $erroModel;
-    }
+        } elseif ($operacao === 'identificar') {
 
-    if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
+            if (
+                $interno &&
+                (
+                    empty($dados['cpf_consultado']) ||
+                    !empty($dados['aluno_existente_id'])
+                )
+            ) {
 
-        $filialId = (int) ($_POST['filial_id'] ?? 0);
+                $erro = 'Pesquise o CPF antes de continuar.';
 
-        if ($filialId <= 0) {
-            $erro = 'Selecione uma unidade/filial para treinar.';
+            } else {
+
+                $entrada = $_POST;
+
+                if ($interno) {
+                    $entrada['cpf'] = $dados['cpf'];
+                }
+
+                $entrada = MatriculaModel::validarIdentificacao(
+                    $entrada,
+                    $erros
+                );
+
+                $senha = is_string($_POST['senha'] ?? null)
+                    ? $_POST['senha']
+                    : '';
+
+                $hash = $dados['senha_hash'] ?? '';
+
+                if ($senha !== '' || $hash === '') {
+
+                    $tamanho = preg_match_all('/./us', $senha);
+
+                    if (
+                        $tamanho === false ||
+                        $tamanho < 8 ||
+                        strlen($senha) > 72 ||
+                        str_contains($senha, "\0")
+                    ) {
+
+                        $erros['senha'] =
+                            'Use uma senha com pelo menos 8 caracteres e até 72 bytes.';
+
+                    } else {
+
+                        $hash = password_hash(
+                            $senha,
+                            PASSWORD_DEFAULT
+                        );
+                    }
+                }
+
+                $dados = array_merge($dados, $entrada);
+
+                unset(
+                    $dados['identificacao_ok'],
+                    $dados['oferta']
+                );
+
+                if (!$erros) {
+
+                    try {
+
+                        $model->validarCadastroNovo($entrada);
+
+                        $dados['senha_hash'] = $hash;
+                        $dados['identificacao_ok'] = true;
+
+                        $salvar($dados);
+
+                        matriculaRedirecionar($rota('filial'));
+
+                    } catch (MatriculaErro $e) {
+
+                        $erro = $e->getMessage();
+                    }
+                }
+
+                $salvar($dados);
+            }
+
         } else {
 
-            // Verifica empresa e situação da filial.
-            $operacao = 'buscar_filial';
-            $filial_id = $filialId;
+            $erro = 'Operação não autorizada.';
+        }
+    }
 
-            require __DIR__ . '/../models/Matricula.php';
+    // Revalidar aluno existente.
 
-            if (empty($filial)) {
-                $erro = 'Filial inválida ou indisponível.';
-            } else {
-                $_SESSION['matricula']['filial_id'] = $filialId;
+    if ($interno && !empty($dados['aluno_existente_id'])) {
 
-                header("Location: $baseUrl?acao=pagamento");
-                exit;
+        try {
+
+            $existente = $model->validarAlunoExistente(
+                (int) $dados['aluno_existente_id']
+            );
+
+            if (
+                $leadAtual &&
+                (int) $existente['filial_id'] !==
+                    (int) $leadAtual['filial_id']
+            ) {
+                throw new MatriculaErro(
+                    'A unidade do aluno não corresponde à do lead.'
+                );
+            }
+
+            $dados['nome'] = $existente['nome'];
+
+            $dados['filial_id'] =
+                (int) $existente['filial_id'];
+
+            $salvar($dados);
+
+        } catch (MatriculaErro $e) {
+
+            $dados = $novoInterno($leadIdAtual);
+
+            if ($leadAtual) {
+
+                $dados['nome'] = $leadAtual['nome'];
+
+                $dados['telefone'] =
+                    $leadAtual['telefone'];
+
+                $dados['filial_id'] =
+                    (int) $leadAtual['filial_id'];
+            }
+
+            $dados['erro_flash'] = $e->getMessage();
+
+            $salvar($dados);
+
+            matriculaRedirecionar($rota('identificacao'));
+        }
+    }
+
+    // Unidade e plano.
+
+    if ($acao === 'filial') {
+
+        $planos = $model->planos();
+        $filiais = $model->filiais();
+
+        $filialObrigatoria = $leadAtual
+            ? (int) $leadAtual['filial_id']
+            : (
+                $existente
+                    ? (int) $existente['filial_id']
+                    : 0
+            );
+
+        if ($filialObrigatoria) {
+
+            $filiais = array_values(array_filter(
+                $filiais,
+                static fn($f) =>
+                    (int) $f['id'] === $filialObrigatoria
+            ));
+
+            $dados['filial_id'] = $filialObrigatoria;
+
+            $salvar($dados);
+        }
+
+        if ($postValido) {
+
+            $planoEscolhido = matriculaId(
+                $_POST['plano_id'] ?? 0
+            );
+
+            $filialEscolhida = matriculaId(
+                $_POST['filial_id'] ?? 0
+            );
+
+            if (!in_array(
+                $planoEscolhido,
+                array_map('intval', array_column($planos, 'id')),
+                true
+            )) {
+                $erros['plano_id'] =
+                    'Selecione um plano disponível.';
+            }
+
+            if (!in_array(
+                $filialEscolhida,
+                array_map('intval', array_column($filiais, 'id')),
+                true
+            )) {
+                $erros['filial_id'] =
+                    'Selecione uma unidade autorizada.';
+            }
+
+            $dados['plano_id'] = $planoEscolhido;
+
+            if (!isset($erros['filial_id'])) {
+                $dados['filial_id'] = $filialEscolhida;
+            }
+
+            unset($dados['oferta']);
+
+            $salvar($dados);
+
+            if (!$erros) {
+                matriculaRedirecionar($rota('pagamento'));
             }
         }
     }
 
-    require __DIR__ . '/../views/matricula/filial.php';
-}
+    // Pagamento.
 
-// ==================================================
-// ETAPA 3 - PAGAMENTO
-// ==================================================
+    if ($acao === 'pagamento') {
 
-elseif ($acao === 'pagamento') {
+        $plano = $model->plano(
+            (int) ($dados['plano_id'] ?? 0)
+        );
 
-    $matriculaTemp = $_SESSION['matricula'] ?? [];
+        $filial = $model->filial(
+            (int) ($dados['filial_id'] ?? 0)
+        );
 
-    if (
-        empty($matriculaTemp['plano_id']) ||
-        empty($matriculaTemp['filial_id'])
-    ) {
-        header("Location: $baseUrl?acao=filial");
-        exit;
-    }
+        if (
+            !$plano ||
+            !$filial ||
+            (
+                $existente &&
+                (int) $filial['id'] !==
+                    (int) $existente['filial_id']
+            ) ||
+            (
+                $leadAtual &&
+                (int) $filial['id'] !==
+                    (int) $leadAtual['filial_id']
+            )
+        ) {
 
-    $erro = '';
+            $dados['erro_flash'] =
+                'O plano ou a unidade não está disponível.';
 
-    // Revalida plano dentro da empresa.
-    $operacao = 'buscar_plano';
-    $plano_id = (int) $matriculaTemp['plano_id'];
+            $salvar($dados);
 
-    require __DIR__ . '/../models/Matricula.php';
-
-    if (empty($plano)) {
-        header("Location: $baseUrl?acao=identificacao");
-        exit;
-    }
-
-    // Revalida filial dentro da empresa.
-    $operacao = 'buscar_filial';
-    $filial_id = (int) $matriculaTemp['filial_id'];
-
-    require __DIR__ . '/../models/Matricula.php';
-
-    if (empty($filial)) {
-        header("Location: $baseUrl?acao=filial");
-        exit;
-    }
-
-    // Mantém o serviço já utilizado pelo projeto.
-    $mpService = new MercadoPagoService();
-
-    $publicKeyMP = $mpService->getPublicKey();
-    $isConfiguredMP = $mpService->isConfigured();
-
-    if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
-
-        $metodo = strtolower(trim($_POST['metodo'] ?? 'pix'));
-
-        if (!in_array($metodo, ['pix', 'cartao'], true)) {
-            $metodo = 'pix';
+            matriculaRedirecionar($rota('filial'));
         }
 
         try {
-            $respPagamento = $mpService->processarPagamento([
-                'matricula_id' => time(),
-                'metodo' => $metodo,
-                'valor' => (float) $plano['valor'],
-                'aluno' => [
-                    'nome' => $matriculaTemp['nome'],
-                    'email' => $matriculaTemp['email'],
-                    'cpf' => $matriculaTemp['cpf']
-                ],
-                'token_cartao' => $_POST['token_cartao'] ?? null,
-                'parcelas' => (int) ($_POST['parcelas'] ?? 1)
-            ]);
 
-            if (!is_array($respPagamento)) {
-                throw new RuntimeException('Resposta de pagamento inválida.');
-            }
+            $cobrancas = MatriculaModel::cobrancas($plano);
 
-            $statusPagamento = $respPagamento['status'] ?? 'pendente';
+        } catch (MatriculaErro $e) {
 
-            // Concretização: o model valida a propriedade da filial e do plano.
-            $operacao = 'concretizar_matricula';
+            $dados['erro_flash'] = $e->getMessage();
 
-            $dados = [
-                'aluno' => [
-                    'filial_id' => $filial['id'],
-                    'company_id' => $company_id,
-                    'nome' => $matriculaTemp['nome'],
-                    'cpf' => $matriculaTemp['cpf'],
-                    'rg' => $matriculaTemp['rg'] ?? null,
-                    'sexo' => $matriculaTemp['sexo'],
-                    'nascimento' => $matriculaTemp['nascimento'],
-                    'email' => $matriculaTemp['email'],
-                    'telefone' => $matriculaTemp['telefone'],
-                    'endereco' => $matriculaTemp['endereco'] ?? null,
-                    'senha' => $matriculaTemp['senha']
-                ],
-                'plano' => [
-                    'id' => $plano['id'],
-                    'nome' => $plano['nome'],
-                    'valor' => $plano['valor'],
-                    'duracao' => $plano['duracao']
-                ],
-                'pagamento' => [
-                    'metodo' => $metodo,
-                    'status' => $statusPagamento,
-                    'mercado_pago_id' => $respPagamento['mercado_pago_id'] ?? null
-                ]
-            ];
+            $salvar($dados);
 
-            require __DIR__ . '/../models/Matricula.php';
-
-            if (!empty($erroModel)) {
-                $erro = 'Falha ao concretizar a matrícula: ' . $erroModel;
-            } elseif (!empty($matriculaConcretizada)) {
-
-                $_SESSION['matricula_sucesso'] = array_merge(
-                    $matriculaConcretizada,
-                    [
-                        'pix_copia_cola' => $respPagamento['pix_copia_cola'] ?? null,
-                        'company_id' => $company_id
-                    ]
-                );
-
-                unset($_SESSION['matricula']);
-
-                header("Location: $baseUrl?acao=sucesso");
-                exit;
-            } else {
-                $erro = 'Não foi possível concluir a matrícula.';
-            }
-        } catch (Throwable $e) {
-            error_log('[GymFlow][MatriculaController] ' . $e->getMessage());
-            $erro = 'Não foi possível processar sua solicitação. Tente novamente mais tarde.';
+            matriculaRedirecionar($rota('filial'));
         }
+
+        $ofertaAtual = [
+            'plano_id' => (int) $plano['id'],
+            'filial_id' => (int) $filial['id'],
+            'duracao' => $plano['duracao'],
+            'total' => $cobrancas['total']
+        ];
+
+        if ($postValido) {
+
+            $metodoEscolhido = MatriculaModel::texto(
+                $_POST['metodo'] ?? ''
+            );
+
+            if (!isset($metodos[$metodoEscolhido])) {
+
+                $erro = 'Selecione uma forma de pagamento autorizada.';
+
+            } elseif (
+                ($dados['oferta'] ?? null) !== $ofertaAtual
+            ) {
+
+                $erro =
+                    'Confira as condições atualizadas antes de finalizar.';
+
+            } else {
+
+                $dados['metodo'] = $metodoEscolhido;
+
+                try {
+
+                    $resultado = $model->criarPendente(
+                        $dados,
+                        $ofertaAtual
+                    );
+
+                    $resultado['identidade'] = $identidade;
+
+                    $_SESSION[$chaveResultado] = $resultado;
+
+                    unset($_SESSION[$chave]);
+
+                    matriculaRedirecionar($rota('sucesso'));
+
+                } catch (MatriculaErro $e) {
+
+                    $erro = $e->getMessage();
+
+                } catch (Throwable $e) {
+
+                    error_log(
+                        '[GymFlow][Matricula] ' .
+                        get_class($e) .
+                        ' | código ' . $e->getCode() .
+                        ' | linha ' . $e->getLine()
+                    );
+
+                    $erro =
+                        'Não foi possível concluir a matrícula. Tente novamente.';
+                }
+            }
+        }
+
+        $dados['oferta'] = $ofertaAtual;
+
+        $salvar($dados);
     }
 
-    require __DIR__ . '/../views/matricula/pagamento.php';
-}
+    require __DIR__ .
+        '/../views/matricula/' .
+        $acao .
+        '.php';
 
-// ==================================================
-// ETAPA 4 - RESULTADO / CONCLUSÃO
-// ==================================================
+} catch (Throwable $e) {
 
-elseif ($acao === 'sucesso') {
-    require __DIR__ . '/../views/matricula/sucesso.php';
+    error_log(
+        '[GymFlow][MatriculaController] ' .
+        get_class($e) .
+        ' | código ' . $e->getCode() .
+        ' | linha ' . $e->getLine()
+    );
+
+    http_response_code(503);
+
+    echo 'Não foi possível carregar a matrícula. Tente novamente mais tarde.';
 }

@@ -1,220 +1,49 @@
 <?php
-// ============================================
-// GYMFLOW - MODEL FINANCEIRO
 // app/models/Financeiro.php
-// ============================================
 
 require_once __DIR__ . '/Database.php';
 
 $operacao = $operacao ?? '';
-$company_id = $_SESSION['company_id'] ?? 0;
+$erroModel = '';
 
-// ============================================
-// 1. LISTAR CONTAS
-// ============================================
+$company_id = (int) ($_SESSION['company_id'] ?? 0);
+$usuario_id = (int) ($_SESSION['usuario_id'] ?? 0);
+$roleFinanceiro = $_SESSION['usuario_role'] ?? '';
 
-if ($operacao === 'listar_contas') {
+$executarFinanceiro = static function (
+    string $sql,
+    array $params = []
+) use ($pdo): PDOStatement {
 
-    $stmt = $pdo->prepare("
-        SELECT
-            c.id,
-            c.aluno_id,
-            c.matricula_id,
-            c.vencimento,
-            c.valor,
-            c.status,
-            c.forma_pagamento,
-            c.pago_em,
-            a.nome AS aluno_nome
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
 
-        FROM contas c
+    return $stmt;
+};
 
-        INNER JOIN alunos a
-            ON a.id = c.aluno_id
+try {
 
-        INNER JOIN filiais f
-            ON f.id = a.filial_id
+    // Faturas e recibos do Portal do Aluno.
 
-        WHERE f.company_id = :company_id
-
-        ORDER BY c.vencimento ASC
-    ");
-
-    $stmt->execute([
-        ':company_id' => $company_id
-    ]);
-
-    $contas = $stmt->fetchAll();
-
-    // TOTAL EM ABERTO
-
-    $stmt = $pdo->prepare("
-        SELECT COALESCE(SUM(c.valor), 0) AS total
-
-        FROM contas c
-
-        INNER JOIN alunos a
-            ON a.id = c.aluno_id
-
-        INNER JOIN filiais f
-            ON f.id = a.filial_id
-
-        WHERE c.status != 'Pago'
-          AND f.company_id = ?
-    ");
-
-    $stmt->execute([$company_id]);
-
-    $totalAberto = $stmt->fetch()['total'];
-
-    // TOTAL RECEBIDO
-
-    $stmt = $pdo->prepare("
-        SELECT COALESCE(SUM(c.valor), 0) AS total
-
-        FROM contas c
-
-        INNER JOIN alunos a
-            ON a.id = c.aluno_id
-
-        INNER JOIN filiais f
-            ON f.id = a.filial_id
-
-        WHERE c.status = 'Pago'
-          AND f.company_id = ?
-    ");
-
-    $stmt->execute([$company_id]);
-
-    $totalRecebido = $stmt->fetch()['total'];
-}
-
-// ============================================
-// 2. BUSCAR CONTA
-// ============================================
-
-elseif ($operacao === 'buscar_conta') {
-
-    $conta_id = (int) ($conta_id ?? 0);
-
-    $stmt = $pdo->prepare("
-        SELECT
-            c.id,
-            c.aluno_id,
-            c.matricula_id,
-            c.vencimento,
-            c.valor,
-            c.status,
-            c.forma_pagamento,
-            c.pago_em,
-            a.nome AS aluno_nome
-
-        FROM contas c
-
-        INNER JOIN alunos a
-            ON a.id = c.aluno_id
-
-        INNER JOIN filiais f
-            ON f.id = a.filial_id
-
-        WHERE c.id = :id
-          AND f.company_id = :company_id
-
-        LIMIT 1
-    ");
-
-    $stmt->execute([
-        ':id' => $conta_id,
-        ':company_id' => $company_id
-    ]);
-
-    $conta = $stmt->fetch() ?: null;
-}
-
-// ============================================
-// 3. CONFIRMAR PAGAMENTO
-// ============================================
-
-elseif ($operacao === 'baixar_pagamento') {
-
-    $conta_id = (int) ($conta_id ?? 0);
-
-    $forma_pagamento = trim(
-        $forma_pagamento ?? ''
-    );
-
-    if (
-        $conta_id > 0 &&
-        $forma_pagamento !== ''
-    ) {
-
-        $stmt = $pdo->prepare("
-            UPDATE contas c
-
-            INNER JOIN alunos a
-                ON a.id = c.aluno_id
-
-            INNER JOIN filiais f
-                ON f.id = a.filial_id
-
-            SET
-                c.status = 'Pago',
-                c.forma_pagamento = :forma_pagamento,
-                c.pago_em = CURRENT_TIMESTAMP
-
-            WHERE c.id = :id
-              AND c.status != 'Pago'
-              AND f.company_id = :company_id
-        ");
-
-        $stmt->execute([
-            ':forma_pagamento' => $forma_pagamento,
-            ':id' => $conta_id,
-            ':company_id' => $company_id
-        ]);
-    }
-}
-
-// ============================================
-// 4. PORTAL DO ALUNO
-// FATURAS E RECIBOS
-// ============================================
-
-elseif (
-    in_array(
+    if (in_array(
         $operacao,
-        [
-            'listar_faturas_aluno',
-            'buscar_recibo_aluno'
-        ],
+        ['listar_faturas_aluno', 'buscar_recibo_aluno'],
         true
-    )
-) {
+    )) {
 
-    // Utiliza exclusivamente os dados da sessão.
+        $todas_contas = [];
+        $recibo = null;
 
-    $usuario_id = (int) (
-        $_SESSION['usuario_id'] ?? 0
-    );
+        $aluno_id = (int) ($_SESSION['aluno_id'] ?? 0);
 
-    $aluno_id = (int) (
-        $_SESSION['aluno_id'] ?? 0
-    );
-
-    $company_id = (int) (
-        $_SESSION['company_id'] ?? 0
-    );
-
-    $todas_contas = [];
-
-    $recibo = null;
-
-    if (
-        $usuario_id > 0 &&
-        $aluno_id > 0 &&
-        $company_id > 0 &&
-        ($_SESSION['usuario_role'] ?? '') === 'Aluno'
-    ) {
+        if (
+            $roleFinanceiro !== 'Aluno' ||
+            $company_id <= 0 ||
+            $usuario_id <= 0 ||
+            $aluno_id <= 0
+        ) {
+            return;
+        }
 
         $sql = "
             SELECT
@@ -228,9 +57,7 @@ elseif (
                 c.pago_em,
 
                 a.nome AS nome_aluno,
-
                 p.nome AS nome_plano,
-
                 f.nome AS nome_filial,
                 f.cnpj AS cnpj_filial,
 
@@ -246,86 +73,410 @@ elseif (
             INNER JOIN alunos a
                 ON a.id = c.aluno_id
 
-            INNER JOIN filiais f
-                ON f.id = a.filial_id
-
-            INNER JOIN users u
-                ON u.aluno_id = a.id
-                AND u.company_id = f.company_id
-
             INNER JOIN matriculas m
                 ON m.id = c.matricula_id
                 AND m.aluno_id = a.id
+
+            INNER JOIN filiais fa
+                ON fa.id = a.filial_id
+
+            INNER JOIN filiais f
+                ON f.id = COALESCE(
+                    m.filial_id,
+                    a.filial_id
+                )
+                AND f.company_id = fa.company_id
 
             INNER JOIN planos p
                 ON p.id = m.plano_id
                 AND p.company_id = f.company_id
 
-            WHERE u.id = :usuario_id
+            INNER JOIN users u
+                ON u.aluno_id = a.id
+                AND u.company_id = f.company_id
+
+            WHERE u.id = ?
               AND u.role = 'Aluno'
-              AND a.id = :aluno_id
-              AND f.company_id = :company_id
+              AND a.id = ?
+              AND f.company_id = ?
         ";
 
-        $parametros = [
-
-            ':usuario_id' => $usuario_id,
-
-            ':aluno_id' => $aluno_id,
-
-            ':company_id' => $company_id
+        $params = [
+            $usuario_id,
+            $aluno_id,
+            $company_id
         ];
-
-        // ====================================
-        // CONSULTAR RECIBO ESPECÍFICO
-        // ====================================
 
         if ($operacao === 'buscar_recibo_aluno') {
 
-            $conta_id = (int) ($conta_id ?? 0);
-
             $sql .= "
-                AND c.id = :conta_id
+                AND c.id = ?
                 AND c.status = 'Pago'
                 LIMIT 1
             ";
 
-            $parametros[':conta_id'] = $conta_id;
+            $params[] = (int) ($conta_id ?? 0);
 
-            $stmt = $pdo->prepare($sql);
+            $recibo = $executarFinanceiro(
+                $sql,
+                $params
+            )->fetch(PDO::FETCH_ASSOC) ?: null;
 
-            $stmt->execute($parametros);
+        } else {
 
-            $recibo = $stmt->fetch(
-                PDO::FETCH_ASSOC
-            ) ?: null;
-
-            if (
-                $recibo &&
-                $recibo['status'] !== 'Pago'
-            ) {
-
-                $recibo = null;
-            }
+            $todas_contas = $executarFinanceiro(
+                $sql . ' ORDER BY c.vencimento, c.id',
+                $params
+            )->fetchAll(PDO::FETCH_ASSOC);
         }
 
-        // ====================================
-        // LISTAR TODAS AS FATURAS
-        // ====================================
+        return;
+    }
 
-        else {
+    // Financeiro administrativo.
 
-            $sql .= "
-                ORDER BY c.vencimento ASC, c.id ASC
+    $contas = [];
+    $filiais = [];
+
+    $totais = [
+        'aberto' => 0,
+        'dinheiro' => 0,
+        'digital' => 0,
+        'outros' => 0
+    ];
+
+    $totalRecebido = 0;
+
+    if (
+        $operacao !== 'listar_contas' ||
+        $roleFinanceiro !== 'Admin' ||
+        $company_id <= 0 ||
+        $usuario_id <= 0
+    ) {
+        $erroModel = 'Acesso não autorizado.';
+        return;
+    }
+
+    $autorizado = $executarFinanceiro(
+        "SELECT id
+         FROM users
+         WHERE id = ?
+           AND company_id = ?
+           AND role = 'Admin'",
+        [$usuario_id, $company_id]
+    )->fetchColumn();
+
+    if (!$autorizado) {
+        $erroModel = 'Acesso não autorizado.';
+        return;
+    }
+
+    $filiais = $executarFinanceiro(
+        'SELECT id, nome
+         FROM filiais
+         WHERE company_id = ?
+         ORDER BY nome',
+        [$company_id]
+    )->fetchAll(PDO::FETCH_ASSOC);
+
+    if (!($filtroValido ?? true)) {
+        return;
+    }
+
+    $filtro = $filtro ?? 'nenhum';
+    $filial_id = (int) ($filial_id ?? 0);
+    $busca = $busca ?? '';
+
+    if (
+        $filtro === 'filial' &&
+        $filial_id > 0 &&
+        !in_array(
+            $filial_id,
+            array_map(
+                'intval',
+                array_column($filiais, 'id')
+            ),
+            true
+        )
+    ) {
+        $erroModel = 'Filial não autorizada.';
+        return;
+    }
+
+    // Classificação dos recebimentos.
+
+    $forma = "
+        LOWER(TRIM(COALESCE(
+            NULLIF(c.forma_pagamento, ''),
+            pg.metodo,
+            ''
+        )))
+    ";
+
+    $grupo = "
+        CASE
+
+            WHEN c.status <> 'Pago'
+                THEN 'aberto'
+
+            WHEN $forma = 'dinheiro'
+                THEN 'dinheiro'
+
+            WHEN $forma IN (
+                'pix',
+                'credito',
+                'crédito',
+                'debito',
+                'débito',
+                'cartao de credito',
+                'cartão de crédito',
+                'cartao de debito',
+                'cartão de débito',
+                'cartao',
+                'cartão'
+            )
+                THEN 'digital'
+
+            ELSE 'outros'
+
+        END
+    ";
+
+    // Consulta principal.
+    // Cada cobrança é contabilizada uma única vez.
+
+    $sql = "
+        SELECT
+            c.id,
+            c.aluno_id,
+            c.matricula_id,
+            c.vencimento,
+            c.valor,
+            c.status,
+            c.pago_em,
+
+            COALESCE(
+                NULLIF(c.forma_pagamento, ''),
+                pg.metodo
+            ) AS forma_pagamento,
+
+            a.nome AS aluno_nome,
+            a.cpf,
+
+            f.nome AS filial_nome,
+            p.nome AS plano_nome,
+
+            m.origem,
+
+            u.name AS recebido_nome,
+
+            pg.referencia,
+            pg.confirmado_em,
+
+            $grupo AS grupo
+
+        FROM contas c
+
+        INNER JOIN alunos a
+            ON a.id = c.aluno_id
+
+        INNER JOIN matriculas m
+            ON m.id = c.matricula_id
+            AND m.aluno_id = a.id
+
+        INNER JOIN filiais fa
+            ON fa.id = a.filial_id
+
+        INNER JOIN filiais f
+            ON f.id = COALESCE(
+                m.filial_id,
+                a.filial_id
+            )
+            AND f.company_id = fa.company_id
+
+        INNER JOIN planos p
+            ON p.id = m.plano_id
+            AND p.company_id = f.company_id
+
+        LEFT JOIN pagamentos pg
+            ON pg.conta_id = c.id
+            AND pg.matricula_id = m.id
+            AND pg.status = 'aprovado'
+
+        LEFT JOIN users u
+            ON u.id = pg.recebido_por
+            AND u.company_id = f.company_id
+
+        WHERE f.company_id = ?
+
+          AND c.status IN (
+              'Aberto',
+              'Vencido',
+              'Atrasado',
+              'Pago'
+          )
+    ";
+
+    $params = [$company_id];
+
+    // Aplicar exclusivamente o filtro selecionado.
+
+    switch ($filtro) {
+
+        case 'nome':
+
+            if ($busca !== '') {
+
+                $sql .= ' AND LOCATE(?, a.nome) > 0';
+
+                $params[] = $busca;
+            }
+
+            break;
+
+        case 'cpf':
+
+            if ($busca !== '') {
+
+                $cpf = preg_replace('/\D/', '', $busca);
+
+                $sql .= "
+                    AND REPLACE(
+                        REPLACE(
+                            REPLACE(a.cpf, '.', ''),
+                            '-', ''
+                        ),
+                        ' ', ''
+                    ) = ?
+                ";
+
+                $params[] = $cpf;
+            }
+
+            break;
+
+        case 'matricula':
+
+            if ($busca !== '') {
+
+                $sql .= ' AND c.matricula_id = ?';
+
+                $params[] = (int) ltrim($busca, '#');
+            }
+
+            break;
+
+        case 'filial':
+
+            if ($filial_id > 0) {
+
+                $sql .= ' AND f.id = ?';
+
+                $params[] = $filial_id;
+            }
+
+            break;
+
+        case 'periodo':
+
+            $dataReferencia = "
+                CASE
+                    WHEN c.status = 'Pago'
+                        THEN c.pago_em
+                    ELSE c.vencimento
+                END
             ";
 
-            $stmt = $pdo->prepare($sql);
+            if (!empty($inicio)) {
 
-            $stmt->execute($parametros);
+                $sql .= " AND $dataReferencia >= ?";
 
-            $todas_contas = $stmt->fetchAll(
-                PDO::FETCH_ASSOC
-            );
-        }
+                $params[] = $inicio;
+            }
+
+            if (!empty($fim)) {
+
+                $sql .= "
+                    AND $dataReferencia <
+                        DATE_ADD(?, INTERVAL 1 DAY)
+                ";
+
+                $params[] = $fim;
+            }
+
+            break;
     }
+
+    // Resumo financeiro dos registros filtrados.
+
+    $resumo = $executarFinanceiro(
+        "SELECT
+            grupo,
+            COALESCE(SUM(valor), 0) AS total
+
+         FROM ($sql) AS financeiro
+
+         GROUP BY grupo",
+        $params
+    )->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($resumo as $registro) {
+
+        $totais[$registro['grupo']] =
+            $registro['total'];
+    }
+
+    $totalRecebido =
+        (float) $totais['dinheiro'] +
+        (float) $totais['digital'] +
+        (float) $totais['outros'];
+
+    // Listagem da aba atual.
+
+    $params[] = $aba ?? 'aberto';
+
+    $contas = $executarFinanceiro(
+        "SELECT *
+         FROM ($sql) AS financeiro
+
+         WHERE grupo = ?
+
+         ORDER BY
+
+            CASE
+                WHEN status = 'Pago' THEN pago_em
+                ELSE vencimento
+            END DESC,
+
+            id DESC
+
+         LIMIT 500",
+        $params
+    )->fetchAll(PDO::FETCH_ASSOC);
+
+} catch (Throwable $e) {
+
+    error_log(
+        '[GymFlow][Financeiro] ' .
+        get_class($e) .
+        ' | código ' . $e->getCode()
+    );
+
+    $erroModel =
+        'Não foi possível consultar os dados financeiros.';
+
+    $contas = [];
+    $filiais = $filiais ?? [];
+
+    $todas_contas = [];
+    $recibo = null;
+
+    $totais = [
+        'aberto' => 0,
+        'dinheiro' => 0,
+        'digital' => 0,
+        'outros' => 0
+    ];
+
+    $totalRecebido = 0;
 }
