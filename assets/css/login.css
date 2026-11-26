@@ -3,33 +3,29 @@
    Design System / White Label
    ========================================== */
 
-/* ==========================================
-   1. VARIÁVEIS DO LOGIN
-   ========================================== */
+/* VARIÁVEIS */
 
 .login-page {
-    /*
-     * As variáveis --portfolio-primary e
-     * --portfolio-secondary podem ser definidas
-     * dinamicamente pelo PHP da academia.
-     */
-
     --login-primaria: var(--portfolio-primary,
-            var(--cor-primaria, #ffb000));
+        var(--cor-primaria, #ffb000));
 
     --login-secundaria: var(--portfolio-secondary,
-            #0b0b0b);
+        #0b0b0b);
 
     --login-sobre-primaria: var(--portfolio-on-primary,
-            #111827);
+        #111827);
 
-    --login-primaria-hover: color-mix(in srgb,
-            var(--login-primaria) 85%,
-            #000000);
+    --login-primaria-hover: color-mix(
+        in srgb,
+        var(--login-primaria) 85%,
+        #000000
+    );
 
-    --login-primaria-suave: color-mix(in srgb,
-            var(--login-primaria) 10%,
-            transparent);
+    --login-primaria-suave: color-mix(
+        in srgb,
+        var(--login-primaria) 10%,
+        transparent
+    );
 
     --login-fundo-esquerdo: #050505;
     --login-fundo-direito: #101010;
@@ -60,44 +56,69 @@
     color: var(--login-texto);
 }
 
-/* ==========================================
-   2. CONTAINER PRINCIPAL
-   ========================================== */
+/* ESTRUTURA PRINCIPAL */
+
+body {
+    margin: 0;
+}
+
+main.login-page {
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
 
 .login-page .login-container {
+    display: flex;
+
     width: 100%;
     min-height: 100vh;
 
-    display: flex;
     overflow: hidden;
 
     background-color: var(--login-secundaria);
 }
 
-/* ==========================================
-   3. COLUNA ESQUERDA
-   ========================================== */
+/* COLUNA ESQUERDA */
 
 .login-page .login-first-column {
-    background-color: var(--login-secundaria, #0b0b0b);
+    position: relative;
+
+    flex: 0 0 50%;
+    width: 50%;
+    min-width: 0;
+    min-height: 100vh;
+
+    padding: 60px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    box-sizing: border-box;
+
+    background-color: var(--login-secundaria);
 
     background-image:
-        radial-gradient(circle at 15% 85%,
-            color-mix(in srgb,
-                var(--login-primaria, #ffb000) 9%,
-                transparent),
-            transparent 55%);
+        radial-gradient(
+            circle at 15% 85%,
+            color-mix(
+                in srgb,
+                var(--login-primaria) 9%,
+                transparent
+            ),
+            transparent 55%
+        );
 }
 
-/* ==========================================
-   4. MARCA
-   ========================================== */
+/* MARCA */
 
 .login-page .login-brand {
     position: absolute;
+
     top: 38px;
     left: 60px;
-
     z-index: 2;
 
     color: var(--login-texto);
@@ -118,52 +139,52 @@
 
     width: 100%;
     max-width: 620px;
+    margin: 0;
 }
 
-/* ==========================================
-   5. VOLTAR AO SITE
-   ========================================== */
+/* VOLTAR AO SITE */
 
 .login-page .login-back-link {
+    position: static;
+
     display: inline-flex;
     align-items: center;
-    justify-content: center;
 
-    gap: 8px;
-
+    width: fit-content;
     min-height: 38px;
+
     margin-bottom: 35px;
-    padding: 0 15px;
+    padding: 0;
 
-    color: var(--login-texto);
-    background-color: rgba(0, 0, 0, 0.25);
+    color: var(--login-texto-suave);
+    background: transparent;
 
-    border: 1px solid rgba(255, 255, 255, 0.30);
-    border-radius: 6px;
+    border: 0;
+    border-radius: 0;
 
+    font-family: inherit;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 500;
+
     text-decoration: none;
+    text-underline-offset: 4px;
 
-    transition:
-        background-color var(--login-transicao),
-        color var(--login-transicao),
-        border-color var(--login-transicao);
+    transition: color var(--login-transicao);
 }
 
-.login-page .login-back-link:hover {
-    color: var(--login-sobre-primaria);
-    background-color: var(--login-primaria);
-    border-color: var(--login-primaria);
+.login-page .login-back-link:hover,
+.login-page .login-back-link:focus-visible {
+    color: var(--login-texto);
+    background: transparent;
+    text-decoration: underline;
 }
 
-.login-page .back-arrow {
-    font-size: 16px;
+.login-page .login-back-link:focus-visible {
+    outline: 2px solid var(--login-primaria);
+    outline-offset: 4px;
 }
 
-/* ==========================================
-   6. TÍTULO E DESCRIÇÃO
-   ========================================== */
+/* TÍTULO E DESCRIÇÃO */
 
 .login-page .login-title-line {
     width: 45px;
@@ -175,7 +196,7 @@
 }
 
 .login-page .login-title {
-    max-width: 600px;
+    max-width: 100%;
     margin: 0 0 20px;
 
     color: var(--login-texto);
@@ -192,7 +213,7 @@
 }
 
 .login-page .login-description {
-    max-width: 520px;
+    max-width: 100%;
     margin: 0;
 
     color: var(--login-texto-suave);
@@ -201,13 +222,11 @@
     line-height: 1.7;
 }
 
-/* ==========================================
-   7. BENEFÍCIOS
-   ========================================== */
+/* BENEFÍCIOS */
 
 .login-page .login-features {
     display: flex;
-    align-items: center;
+    align-items: stretch;
 
     margin-top: 40px;
 }
@@ -216,7 +235,6 @@
     display: flex;
     align-items: center;
 
-    gap: 10px;
     padding: 0 20px;
 
     border-right: 1px solid rgba(255, 255, 255, 0.15);
@@ -230,13 +248,9 @@
     border-right: none;
 }
 
-.login-page .feature-icon {
-    color: var(--login-primaria);
-    font-size: 17px;
-}
-
 .login-page .login-feature strong {
     display: block;
+
     margin-bottom: 3px;
 
     color: var(--login-texto);
@@ -248,18 +262,20 @@
 .login-page .login-feature span {
     display: block;
 
-    color: #8f8f8f;
+    color: var(--login-texto-suave);
+
     font-size: 11px;
+    line-height: 1.5;
 }
 
-/* ==========================================
-   8. COLUNA DIREITA
-   ========================================== */
+/* COLUNA DIREITA */
 
 .login-page .login-second-column {
     position: relative;
 
+    flex: 0 0 50%;
     width: 50%;
+    min-width: 0;
     min-height: 100vh;
 
     padding: 60px;
@@ -285,6 +301,7 @@
     transform: translate(-50%, -50%);
 
     border-radius: 50%;
+
     background-color: var(--login-primaria-suave);
 
     filter: blur(80px);
@@ -293,9 +310,7 @@
     pointer-events: none;
 }
 
-/* ==========================================
-   9. CARD DO FORMULÁRIO
-   ========================================== */
+/* CONTAINER DO FORMULÁRIO */
 
 .login-page .login-form-container {
     position: relative;
@@ -339,9 +354,7 @@
     letter-spacing: 2px;
 }
 
-/* ==========================================
-   10. CABEÇALHO DO FORMULÁRIO
-   ========================================== */
+/* CABEÇALHO DO FORMULÁRIO */
 
 .login-page .login-header {
     margin-bottom: 30px;
@@ -366,9 +379,7 @@
     line-height: 1.6;
 }
 
-/* ==========================================
-   11. ESTRUTURA DO FORMULÁRIO
-   ========================================== */
+/* FORMULÁRIO */
 
 .login-page .login-form {
     display: flex;
@@ -407,16 +418,13 @@
 .login-page .input-icon {
     position: absolute;
     left: 15px;
-
     z-index: 2;
 
     color: #777777;
     font-size: 14px;
 }
 
-/* ==========================================
-   12. CAMPOS DO LOGIN
-   ========================================== */
+/* CAMPOS */
 
 .login-page .form-input {
     width: 100%;
@@ -464,9 +472,7 @@
     padding-right: 48px;
 }
 
-/* ==========================================
-   13. MOSTRAR / OCULTAR SENHA
-   ========================================== */
+/* MOSTRAR E OCULTAR SENHA */
 
 .login-page .password-toggle {
     position: absolute;
@@ -478,7 +484,6 @@
 
     width: 32px;
     height: 32px;
-
     padding: 0;
 
     color: #999999;
@@ -500,9 +505,7 @@
     background-color: var(--login-primaria-suave);
 }
 
-/* ==========================================
-   14. OPÇÕES DE LOGIN
-   ========================================== */
+/* OPÇÕES DE LOGIN */
 
 .login-page .login-options {
     display: flex;
@@ -545,6 +548,7 @@
     font-weight: 600;
 
     text-decoration: none;
+
     transition: color var(--login-transicao);
 }
 
@@ -552,9 +556,7 @@
     color: var(--login-texto);
 }
 
-/* ==========================================
-   15. BOTÃO ENTRAR
-   ========================================== */
+/* BOTÃO ENTRAR */
 
 .login-page .login-submit-button {
     display: flex;
@@ -564,7 +566,6 @@
     width: 100%;
     min-height: 48px;
 
-    gap: 10px;
     margin-top: 5px;
     padding: 0 20px;
 
@@ -608,18 +609,7 @@
     outline-offset: 3px;
 }
 
-.login-page .button-arrow {
-    font-size: 16px;
-    transition: transform var(--login-transicao);
-}
-
-.login-page .login-submit-button:hover .button-arrow {
-    transform: translateX(3px);
-}
-
-/* ==========================================
-   16. ALERTAS DE ERRO
-   ========================================== */
+/* ALERTAS */
 
 .login-page .login-alert-error {
     width: 100%;
@@ -637,9 +627,7 @@
     line-height: 1.5;
 }
 
-/* ==========================================
-   17. RODAPÉ DO FORMULÁRIO
-   ========================================== */
+/* RODAPÉ DO FORMULÁRIO */
 
 .login-page .login-footer {
     display: flex;
@@ -670,9 +658,7 @@
     color: var(--login-texto);
 }
 
-/* ==========================================
-   18. ANIMAÇÃO
-   ========================================== */
+/* ANIMAÇÃO */
 
 @keyframes loginEntrada {
     from {
@@ -686,9 +672,7 @@
     }
 }
 
-/* ==========================================
-   19. TABLETS
-   ========================================== */
+/* TABLETS */
 
 @media (max-width: 1000px) {
 
@@ -710,18 +694,19 @@
     }
 }
 
-/* ==========================================
-   20. TABLETS MENORES
-   ========================================== */
+/* TABLETS MENORES */
 
 @media (max-width: 800px) {
+
     .login-page .login-container {
         flex-direction: column;
     }
 
     .login-page .login-first-column,
     .login-page .login-second-column {
+        flex: none;
         width: 100%;
+        min-height: auto;
     }
 
     .login-page .login-first-column {
@@ -730,7 +715,6 @@
     }
 
     .login-page .login-second-column {
-        min-height: auto;
         padding: 60px 45px;
     }
 
@@ -738,17 +722,12 @@
         top: 30px;
         left: 45px;
     }
-
-    .login-page .login-left-content {
-        margin-top: 35px;
-    }
 }
 
-/* ==========================================
-   21. CELULARES
-   ========================================== */
+/* CELULARES */
 
 @media (max-width: 600px) {
+
     .login-page .login-first-column {
         min-height: 430px;
         padding: 35px 25px;
@@ -795,13 +774,12 @@
     }
 }
 
-/* ==========================================
-   22. CELULARES PEQUENOS
-   ========================================== */
+/* CELULARES PEQUENOS */
 
 @media (max-width: 400px) {
+
     .login-page .login-first-column {
-        min-height: 400px;
+        min-height: 430px;
         padding: 30px 20px;
     }
 
@@ -827,17 +805,15 @@
     }
 }
 
-/* ==========================================
-   23. ACESSIBILIDADE
-   ========================================== */
+/* ACESSIBILIDADE */
 
 @media (prefers-reduced-motion: reduce) {
+
     .login-page .login-form-container {
         animation: none;
     }
 
     .login-page .login-submit-button,
-    .login-page .button-arrow,
     .login-page .login-back-link,
     .login-page .form-input {
         transition: none;
@@ -845,150 +821,5 @@
 
     .login-page .login-submit-button:hover {
         transform: none;
-    }
-}
-
-
-/* ==========================================
-   GYMFLOW - CORREÇÃO DO LAYOUT DO LOGIN
-   ========================================== */
-
-/* Remove interferências do layout administrativo */
-body {
-    margin: 0;
-}
-
-main.login-page {
-    width: 100%;
-    min-height: 100vh;
-    margin: 0;
-    padding: 0;
-}
-
-/* Mantém a divisão equilibrada */
-.login-page .login-container {
-    display: flex;
-    width: 100%;
-    min-height: 100vh;
-}
-
-/* Restaura o espaçamento da coluna esquerda */
-.login-page .login-first-column {
-    position: relative;
-    flex: 0 0 50%;
-    width: 50%;
-    min-width: 0;
-    min-height: 100vh;
-    padding: 60px;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-
-    box-sizing: border-box;
-}
-
-/* Posicionamento correto da marca */
-.login-page .login-brand {
-    position: absolute;
-    top: 38px;
-    left: 60px;
-}
-
-/* Conteúdo centralizado verticalmente */
-.login-page .login-left-content {
-    position: relative;
-    width: 100%;
-    max-width: 620px;
-    margin: 0;
-}
-
-/* Botão Voltar volta ao fluxo normal */
-.login-page .login-back-link {
-    position: static;
-    display: inline-flex;
-    width: fit-content;
-    margin-bottom: 35px;
-}
-
-/* Coluna direita mantém metade da tela */
-.login-page .login-second-column {
-    flex: 0 0 50%;
-    width: 50%;
-    min-width: 0;
-    padding: 60px;
-}
-
-/* Evita textos encostados nas bordas */
-.login-page .login-title,
-.login-page .login-description {
-    max-width: 100%;
-}
-
-/* Tablets e celulares */
-@media (max-width: 1000px) {
-
-    .login-page .login-first-column,
-    .login-page .login-second-column {
-        padding: 45px;
-    }
-
-    .login-page .login-brand {
-        left: 45px;
-    }
-}
-
-@media (max-width: 800px) {
-    .login-page .login-container {
-        flex-direction: column;
-    }
-
-    .login-page .login-first-column,
-    .login-page .login-second-column {
-        flex: none;
-        width: 100%;
-        min-height: auto;
-    }
-
-    .login-page .login-first-column {
-        min-height: 480px;
-        padding: 45px;
-    }
-
-    .login-page .login-second-column {
-        padding: 60px 45px;
-    }
-
-    .login-page .login-brand {
-        left: 45px;
-    }
-}
-
-@media (max-width: 600px) {
-    .login-page .login-first-column {
-        min-height: 430px;
-        padding: 35px 25px;
-    }
-
-    .login-page .login-second-column {
-        padding: 45px 25px;
-    }
-
-    .login-page .login-brand {
-        left: 25px;
-    }
-}
-
-@media (max-width: 400px) {
-    .login-page .login-first-column {
-        padding: 30px 20px;
-    }
-
-    .login-page .login-second-column {
-        padding: 35px 20px;
-    }
-
-    .login-page .login-brand {
-        left: 20px;
     }
 }

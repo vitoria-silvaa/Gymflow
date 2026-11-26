@@ -1,13 +1,11 @@
 <?php
-// =============================================
 // GYMFLOW - TELA DE LOGIN
 // app/views/login/index.php
-// =============================================
 
 if (!isset($erro)) {
     header(
         'Location: ' . BASE_URL .
-            '/app/controllers/LoginController.php?acao=login'
+        '/app/controllers/LoginController.php?acao=login'
     );
     exit;
 }
@@ -15,7 +13,6 @@ if (!isset($erro)) {
 $erro = $erro ?? '';
 $email = $email ?? '';
 
-// Configurações visuais existentes.
 $loginCorPrimaria = $loginCorPrimaria ?? '#ffb000';
 $loginCorSecundaria = $loginCorSecundaria ?? '#0b0b0b';
 $loginNomeAcademia = $loginNomeAcademia ?? '';
@@ -65,13 +62,7 @@ $contrasteLogin = static function ($hex) {
 
 $loginTextoPrimaria = $contrasteLogin($loginCorPrimaria);
 
-// =============================================
-// IDENTIFICAÇÃO DO PORTFÓLIO DE ORIGEM
-// =============================================
-
-// A URL do site será construída somente com
-// um ID numérico válido. Nunca usamos uma
-// URL arbitrária enviada pelo visitante.
+// Identificação do portfólio de origem.
 
 $empresaInformada =
     $_GET['empresa']
@@ -84,8 +75,6 @@ $empresaId = filter_var(
     ['options' => ['min_range' => 1]]
 );
 
-// Se o usuário não informou a academia,
-// tentamos recuperar o ID da sessão.
 if ($empresaId === false || $empresaId === null) {
     $empresaId = filter_var(
         $_SESSION['company_id'] ?? null,
@@ -94,8 +83,6 @@ if ($empresaId === false || $empresaId === null) {
     );
 }
 
-// Recupera a academia de um link vindo
-// diretamente do site público, quando possível.
 if ($empresaId === false || $empresaId === null) {
 
     $referencia = $_SERVER['HTTP_REFERER'] ?? '';
@@ -114,7 +101,6 @@ if ($empresaId === false || $empresaId === null) {
         $hostReferencia = strtolower($hostReferencia);
 
         $caminhoReferencia = $partes['path'] ?? '';
-
         $caminhoEsperado = BASE_URL . '/index.php';
 
         if (
@@ -122,6 +108,7 @@ if ($empresaId === false || $empresaId === null) {
             $hostReferencia === $hostAtual &&
             $caminhoReferencia === $caminhoEsperado
         ) {
+
             parse_str(
                 $partes['query'] ?? '',
                 $parametrosReferencia
@@ -136,11 +123,8 @@ if ($empresaId === false || $empresaId === null) {
     }
 }
 
-// Endereço original quando não há empresa.
 $siteUrl = BASE_URL . '/index.php';
 
-// Endereço específico quando a academia
-// está identificada.
 if ($empresaId !== false && $empresaId !== null) {
     $siteUrl .= '?id=' . (int) $empresaId;
 }
@@ -158,12 +142,14 @@ $loginCssPath = __DIR__ . '/../../../assets/css/login.css';
 $loginCssVersao = is_file($loginCssPath)
     ? filemtime($loginCssPath)
     : '1';
+
 ?>
 
 <!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -226,11 +212,15 @@ $loginCssVersao = is_file($loginCssPath)
             background-color: var(--login-secundaria);
 
             background-image:
-                radial-gradient(circle at 15% 85%,
-                    color-mix(in srgb,
+                radial-gradient(
+                    circle at 15% 85%,
+                    color-mix(
+                        in srgb,
                         var(--login-primaria) 9%,
-                        transparent),
-                    transparent 55%);
+                        transparent
+                    ),
+                    transparent 55%
+                );
         }
 
         .login-page .password-toggle {
@@ -255,6 +245,7 @@ $loginCssVersao = is_file($loginCssPath)
         <div class="login-container">
 
             <!-- COLUNA ESQUERDA -->
+
             <section class="login-first-column">
 
                 <div class="login-brand">
@@ -263,12 +254,12 @@ $loginCssVersao = is_file($loginCssPath)
 
                 <div class="login-left-content">
 
-                    <!-- VOLTAR PARA O PORTFÓLIO -->
                     <a
                         href="<?= $escaparLogin($siteUrl) ?>"
                         class="login-back-link">
-                        <span class="back-arrow">←</span>
-                        Voltar para o site
+
+                        Voltar ao site
+
                     </a>
 
                     <div class="login-title-line"></div>
@@ -278,29 +269,39 @@ $loginCssVersao = is_file($loginCssPath)
                         <?php if ($loginNomeAcademia !== ''): ?>
 
                             <h1 class="login-title">
+
                                 Bem-vindo à
+
                                 <span>
                                     <?= $escaparLogin($loginNomeAcademia) ?>
                                 </span>
+
                             </h1>
 
                             <p class="login-description">
+
                                 Entre na sua conta para acompanhar
                                 suas atividades e acessar os serviços
                                 disponíveis na sua academia.
+
                             </p>
 
                         <?php else: ?>
 
                             <h1 class="login-title">
+
                                 Seu espaço de
+
                                 <span>gestão e evolução.</span>
+
                             </h1>
 
                             <p class="login-description">
+
                                 Uma plataforma integrada para
                                 administradores, colaboradores e alunos.
                                 Acesse sua conta para continuar.
+
                             </p>
 
                         <?php endif; ?>
@@ -310,44 +311,40 @@ $loginCssVersao = is_file($loginCssPath)
                     <div class="login-features">
 
                         <div class="login-feature">
-                            <div class="feature-icon">◈</div>
 
                             <div>
                                 <strong>Organização</strong>
-                                <span>
-                                    Informações centralizadas
-                                </span>
+                                <span>Informações centralizadas</span>
                             </div>
+
                         </div>
 
                         <div class="login-feature">
-                            <div class="feature-icon">◇</div>
 
                             <div>
                                 <strong>Segurança</strong>
-                                <span>
-                                    Acesso individual
-                                </span>
+                                <span>Acesso individual</span>
                             </div>
+
                         </div>
 
                         <div class="login-feature">
-                            <div class="feature-icon">✓</div>
 
                             <div>
                                 <strong>Praticidade</strong>
-                                <span>
-                                    Tudo em um só lugar
-                                </span>
+                                <span>Tudo em um só lugar</span>
                             </div>
+
                         </div>
 
                     </div>
+
                 </div>
 
             </section>
 
             <!-- COLUNA DIREITA -->
+
             <section class="login-second-column">
 
                 <div
@@ -382,12 +379,15 @@ $loginCssVersao = is_file($loginCssPath)
                         <div
                             class="login-alert login-alert-error"
                             role="alert">
+
                             <?= $escaparLogin($erro) ?>
+
                         </div>
 
                     <?php endif; ?>
 
-                    <!-- FORMULÁRIO DE LOGIN -->
+                    <!-- FORMULÁRIO -->
+
                     <form
                         action=""
                         method="POST"
@@ -397,19 +397,24 @@ $loginCssVersao = is_file($loginCssPath)
                             $empresaId !== false &&
                             $empresaId !== null
                         ): ?>
+
                             <input
                                 type="hidden"
                                 name="empresa"
                                 value="<?= (int) $empresaId ?>">
+
                         <?php endif; ?>
 
                         <!-- E-MAIL -->
+
                         <div class="form-group">
 
                             <label
                                 for="email"
                                 class="form-label">
+
                                 E-mail
+
                             </label>
 
                             <div class="input-wrapper">
@@ -426,15 +431,19 @@ $loginCssVersao = is_file($loginCssPath)
                                     required>
 
                             </div>
+
                         </div>
 
                         <!-- SENHA -->
+
                         <div class="form-group">
 
                             <label
                                 for="senha"
                                 class="form-label">
+
                                 Senha
+
                             </label>
 
                             <div class="input-wrapper">
@@ -454,17 +463,21 @@ $loginCssVersao = is_file($loginCssPath)
                                     id="passwordToggle"
                                     aria-label="Mostrar senha"
                                     aria-pressed="false">
+
                                     <span
                                         id="password-icon"
                                         aria-hidden="true">
                                         ◉
                                     </span>
+
                                 </button>
 
                             </div>
+
                         </div>
 
                         <!-- OPÇÕES -->
+
                         <div class="login-options">
 
                             <label class="remember-me">
@@ -475,27 +488,27 @@ $loginCssVersao = is_file($loginCssPath)
                                     value="1">
 
                                 <span>Lembrar de mim</span>
+
                             </label>
 
                             <a
                                 href="<?= BASE_URL ?>/app/controllers/LoginController.php?acao=esqueci_senha"
                                 class="forgot-password">
+
                                 Esqueceu sua senha?
+
                             </a>
 
                         </div>
 
                         <!-- ENTRAR -->
+
                         <button
                             type="submit"
                             class="login-submit-button">
+
                             <span>Entrar</span>
 
-                            <span
-                                class="button-arrow"
-                                aria-hidden="true">
-                                →
-                            </span>
                         </button>
 
                     </form>
@@ -506,8 +519,7 @@ $loginCssVersao = is_file($loginCssPath)
                             Precisa de ajuda com seu acesso?
                         </span>
 
-                        <a
-                            href="<?= $escaparLogin($siteUrl) ?>#contato">
+                        <a href="<?= $escaparLogin($siteUrl) ?>#contato">
                             Entre em contato
                         </a>
 
@@ -522,7 +534,7 @@ $loginCssVersao = is_file($loginCssPath)
     </main>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
 
             const campoSenha = document.getElementById('senha');
             const botaoSenha = document.getElementById('passwordToggle');
@@ -532,21 +544,23 @@ $loginCssVersao = is_file($loginCssPath)
                 return;
             }
 
-            botaoSenha.addEventListener('click', function() {
+            botaoSenha.addEventListener('click', function () {
 
                 const mostrando = campoSenha.type === 'text';
 
-                campoSenha.type = mostrando ?
-                    'password' :
-                    'text';
+                campoSenha.type = mostrando
+                    ? 'password'
+                    : 'text';
 
-                iconeSenha.textContent = mostrando ?
-                    '◉' :
-                    '○';
+                iconeSenha.textContent = mostrando
+                    ? '◉'
+                    : '○';
 
                 botaoSenha.setAttribute(
                     'aria-label',
-                    mostrando ? 'Mostrar senha' : 'Ocultar senha'
+                    mostrando
+                        ? 'Mostrar senha'
+                        : 'Ocultar senha'
                 );
 
                 botaoSenha.setAttribute(

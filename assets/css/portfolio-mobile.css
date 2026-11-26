@@ -1,0 +1,381 @@
+/* GYMFLOW - PORTFÓLIO MOBILE PREMIUM */
+
+.gf-mobile-bar,
+.gf-mobile-menu {
+    display: none;
+}
+
+@media (max-width: 900px) {
+
+    /* CABEÇALHO */
+
+    body.gf-premium .portfolio-header {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        min-height: 68px;
+        padding: 0 16px;
+        gap: 0;
+        flex-wrap: nowrap;
+        position: sticky;
+        top: 0;
+        z-index: 9999;
+    }
+
+    body.gf-premium .portfolio-header > :not(.gf-mobile-bar) {
+        display: none !important;
+    }
+
+    .gf-mobile-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        width: 100%;
+        min-height: 68px;
+        box-sizing: border-box;
+    }
+
+    .gf-mobile-brand {
+        display: flex;
+        align-items: center;
+        flex: 1;
+        min-width: 0;
+        gap: 9px;
+        text-decoration: none;
+    }
+
+    .gf-mobile-brand img {
+        width: 38px;
+        height: 38px;
+        flex-shrink: 0;
+        object-fit: contain;
+    }
+
+    .gf-mobile-brand span {
+        color: var(--portfolio-primary);
+        font-size: 15px;
+        font-weight: 750;
+        line-height: 1.2;
+        overflow-wrap: anywhere;
+    }
+
+    .gf-mobile-actions {
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+        gap: 10px;
+    }
+
+    .gf-mobile-login {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 0 4px;
+        color: var(--gf-mobile-text, #ffffff);
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    .gf-mobile-toggle,
+    .gf-mobile-close {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        color: var(--gf-mobile-text, #ffffff);
+        background: transparent;
+        border: 0;
+        border-radius: 6px;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .gf-mobile-toggle svg,
+    .gf-mobile-close svg {
+        width: 23px;
+        height: 23px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .gf-mobile-toggle:hover,
+    .gf-mobile-close:hover,
+    .gf-mobile-login:hover {
+        color: var(--portfolio-primary);
+    }
+
+    /* MENU LATERAL */
+
+    .gf-mobile-menu[open] {
+        display: block;
+        position: fixed;
+        inset: 0 0 0 auto;
+        width: min(84vw, 340px);
+        max-width: 100%;
+        height: 100%;
+        height: 100dvh;
+        max-height: none;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: var(--portfolio-secondary);
+        color: var(--gf-mobile-text, #ffffff);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        box-shadow: -12px 0 40px rgba(0, 0, 0, .25);
+        animation: gfMenuEntrada .25s ease-out;
+    }
+
+    .gf-mobile-menu::backdrop {
+        background: rgba(0, 0, 0, .65);
+        animation: gfFundoEntrada .2s ease-out;
+    }
+
+    html.gf-menu-aberto,
+    html.gf-menu-aberto body {
+        overflow: hidden;
+    }
+
+    .gf-mobile-menu-content {
+        min-height: 100%;
+        padding: 20px 24px 32px;
+        padding-top: max(20px, env(safe-area-inset-top));
+        padding-bottom: max(32px, env(safe-area-inset-bottom));
+        box-sizing: border-box;
+    }
+
+    .gf-mobile-menu-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding-bottom: 26px;
+    }
+
+    .gf-mobile-menu-header .gf-mobile-brand {
+        max-width: 240px;
+    }
+
+    .gf-mobile-menu-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .gf-mobile-menu-nav a,
+    .gf-mobile-menu-actions a {
+        display: flex;
+        align-items: center;
+        min-height: 48px;
+        padding: 8px 0;
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 1.5;
+        color: var(--gf-mobile-text, #ffffff);
+        text-decoration: none;
+        box-sizing: border-box;
+    }
+
+    .gf-mobile-menu-nav a:hover,
+    .gf-mobile-menu-actions a:hover {
+        color: var(--portfolio-primary);
+    }
+
+    .gf-mobile-menu-actions {
+        display: flex;
+        flex-direction: column;
+        margin-top: 20px;
+        padding-top: 18px;
+        border-top: 1px solid
+            color-mix(
+                in srgb,
+                var(--gf-mobile-text, #ffffff) 17%,
+                transparent
+            );
+    }
+
+    .gf-mobile-menu-actions a {
+        font-weight: 600;
+    }
+
+    .gf-mobile-bar :focus-visible,
+    .gf-mobile-menu :focus-visible {
+        outline: 2px solid var(--portfolio-primary);
+        outline-offset: 3px;
+    }
+
+    /* HERO E CARROSSEL */
+
+    body.gf-premium .portfolio-hero {
+        position: relative;
+        display: flex;
+        align-items: flex-end;
+        min-height: clamp(480px, 76vh, 650px);
+        min-height: clamp(480px, 76svh, 650px);
+        height: auto;
+        padding: 110px 22px 76px;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+    body.gf-premium .hero-slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+    }
+
+    body.gf-premium .hero-overlay {
+        background: linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, .12) 0%,
+            rgba(0, 0, 0, .22) 25%,
+            rgba(0, 0, 0, .72) 58%,
+            rgba(0, 0, 0, .94) 100%
+        );
+    }
+
+    body.gf-premium .hero-conteudo {
+        width: 100%;
+        max-width: 500px;
+        min-width: 0;
+        margin: 0;
+        padding: 0;
+        text-align: left;
+    }
+
+    body.gf-premium .hero-conteudo h1 {
+        margin: 0 0 14px;
+        font-size: clamp(30px, 8.5vw, 48px);
+        font-weight: 800;
+        line-height: 1.1;
+        letter-spacing: -.8px;
+        color: #ffffff;
+        overflow-wrap: anywhere;
+    }
+
+    body.gf-premium .hero-subtitulo {
+        max-width: 100%;
+        margin: 0 0 24px;
+        font-size: 15px;
+        line-height: 1.6;
+        color: #e5e5e5;
+        overflow-wrap: anywhere;
+    }
+
+    body.gf-premium .hero-acoes {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        max-width: 420px;
+        gap: 10px;
+    }
+
+    body.gf-premium .hero-btn {
+        width: 100%;
+        min-height: 48px;
+        padding: 12px 16px;
+        font-size: 14px;
+        font-weight: 650;
+        line-height: 1.4;
+        text-align: center;
+        border-radius: 6px;
+        box-sizing: border-box;
+    }
+
+    body.gf-premium .hero-btn-principal {
+        background: var(--portfolio-primary);
+        color: var(--gf-on-primary, #000000);
+    }
+
+    body.gf-premium .hero-btn-secundario {
+        color: #ffffff;
+        border: 1px solid var(--portfolio-primary);
+        background: rgba(0, 0, 0, .22);
+    }
+
+    body.gf-premium .hero-seta {
+        display: none;
+    }
+
+    body.gf-premium .hero-indicadores {
+        bottom: 24px;
+        max-width: 90%;
+    }
+
+    body.gf-premium main section[id] {
+        scroll-margin-top: 80px;
+    }
+}
+
+/* CELULARES MENORES */
+
+@media (max-width: 360px) {
+
+    body.gf-premium .portfolio-header {
+        padding: 0 12px;
+    }
+
+    .gf-mobile-bar,
+    .gf-mobile-actions {
+        gap: 6px;
+    }
+
+    .gf-mobile-brand span {
+        font-size: 13px;
+    }
+
+    .gf-mobile-brand img {
+        width: 30px;
+        height: 30px;
+    }
+
+    body.gf-premium .portfolio-hero {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+    body.gf-premium .hero-conteudo h1 {
+        font-size: 30px;
+    }
+}
+
+/* ANIMAÇÃO EXCLUSIVA DO MENU */
+
+@keyframes gfMenuEntrada {
+    from {
+        transform: translateX(100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes gfFundoEntrada {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gf-mobile-menu,
+    .gf-mobile-menu::backdrop {
+        animation: none !important;
+    }
+}

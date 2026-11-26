@@ -352,6 +352,8 @@ if (
             }
         }
     </style>
+<link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/portfolio-mobile.css?v=1">
+<script src="<?= BASE_URL ?>/assets/js/portfolio-mobile.js?v=1" defer></script>
 </head>
 
 <body>
