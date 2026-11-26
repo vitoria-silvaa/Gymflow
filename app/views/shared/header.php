@@ -194,7 +194,8 @@ $acoesPortal = [
     'faturas',
     'contratos',
     'avaliacao',
-    'meus_dados'
+    'meus_dados',
+    'minhas_medidas'
 ];
 
 if (!in_array(

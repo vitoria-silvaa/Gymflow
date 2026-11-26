@@ -102,10 +102,6 @@ require __DIR__ . '/../shared/sidebar.php';
 
     <header class="faturas-header">
 
-        <span class="portal-eyebrow">
-            PORTAL DO ALUNO
-        </span>
-
         <h1>Minhas Faturas</h1>
 
         <p>

@@ -1,0 +1,762 @@
+/* ================================================
+   GYMFLOW - AVALIAÇÕES FÍSICAS
+   assets/css/avaliacao-fisica.css
+================================================ */
+
+/* ================================================
+   1. VARIÁVEIS DO MÓDULO
+================================================ */
+
+.avaliacao-fisica-page {
+    --af-card: var(--ui-fundo-card, #ffffff);
+    --af-texto: var(--ui-texto, #111827);
+    --af-suave: var(--ui-texto-suave, #64748b);
+    --af-borda: var(--ui-borda, #e2e8f0);
+    --af-fundo: var(--ui-fundo-pagina, #f8fafc);
+
+    --af-primaria: var(--cor-primaria, #c9a227);
+    --af-contraste: var(--cor-sobre-primaria, #111827);
+
+    --af-destaque: var(--cor-primaria, #c9a227);
+    --af-primaria-suave: rgba(128, 128, 128, 0.10);
+
+    --af-verde: #15803d;
+    --af-vermelho: #b91c1c;
+
+    --af-fundo-sucesso: rgba(22, 163, 74, 0.12);
+    --af-fundo-erro: rgba(220, 38, 38, 0.12);
+
+    min-width: 0;
+    color: var(--af-texto, #111827);
+}
+
+.avaliacao-fisica-page * {
+    box-sizing: border-box;
+}
+
+/* ================================================
+   2. TEMA ESCURO
+================================================ */
+
+[data-theme="dark"] .avaliacao-fisica-page {
+    --af-card: var(--ui-fundo-card, #1c1c1c);
+    --af-texto: var(--ui-texto, #f8fafc);
+    --af-suave: var(--ui-texto-suave, #a3a3a3);
+    --af-borda: var(--ui-borda, #333333);
+    --af-fundo: var(--ui-fundo-pagina, #111111);
+
+    --af-verde: #86efac;
+    --af-vermelho: #fca5a5;
+
+    --af-primaria-suave: rgba(255, 255, 255, 0.06);
+
+    --af-fundo-sucesso: rgba(22, 163, 74, 0.15);
+    --af-fundo-erro: rgba(220, 38, 38, 0.15);
+
+    color-scheme: dark;
+}
+
+/* ================================================
+   3. CABEÇALHO
+================================================ */
+
+.avaliacao-fisica-page .af-header {
+    margin-bottom: 26px;
+}
+
+.avaliacao-fisica-page .af-etiqueta {
+    display: block;
+    margin-bottom: 8px;
+
+    color: var(--af-destaque, #c9a227);
+
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+.avaliacao-fisica-page .af-header h1 {
+    margin: 0 0 8px;
+
+    color: var(--af-texto, #111827);
+
+    font-size: 30px;
+    font-weight: 750;
+    line-height: 1.3;
+}
+
+.avaliacao-fisica-page .af-header p {
+    margin: 0;
+
+    color: var(--af-suave, #64748b);
+
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* ================================================
+   4. CARDS
+================================================ */
+
+.avaliacao-fisica-page .af-card {
+    min-width: 0;
+
+    padding: 24px;
+    margin-bottom: 20px;
+
+    background: var(--af-card, #ffffff);
+
+    border: 1px solid var(--af-borda, #e2e8f0);
+    border-radius: 14px;
+}
+
+.avaliacao-fisica-page .af-card-header {
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.avaliacao-fisica-page .af-card-header h2 {
+    margin: 0 0 5px;
+
+    color: var(--af-texto, #111827);
+
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.avaliacao-fisica-page .af-card-header p {
+    margin: 0;
+
+    color: var(--af-suave, #64748b);
+
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.avaliacao-fisica-page .af-icone {
+    display: grid;
+    place-items: center;
+
+    width: 44px;
+    height: 44px;
+
+    flex-shrink: 0;
+
+    color: var(--af-destaque, #c9a227);
+    background: var(--af-primaria-suave,
+            rgba(128, 128, 128, 0.10));
+
+    border-radius: 10px;
+}
+
+/* ================================================
+   5. SELEÇÃO DO ALUNO
+================================================ */
+
+.avaliacao-fisica-page .af-selecao {
+    display: flex;
+    align-items: flex-end;
+
+    gap: 15px;
+}
+
+.avaliacao-fisica-page .af-selecao .af-campo {
+    flex: 1;
+}
+
+/* ================================================
+   6. IDENTIFICAÇÃO DO ALUNO
+================================================ */
+
+.avaliacao-fisica-page .af-aluno {
+    display: flex;
+    align-items: center;
+
+    gap: 18px;
+}
+
+.avaliacao-fisica-page .af-avatar {
+    display: grid;
+    place-items: center;
+
+    width: 62px;
+    height: 62px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: var(--af-primaria-suave,
+            rgba(128, 128, 128, 0.10));
+
+    color: var(--af-destaque, #c9a227);
+}
+
+.avaliacao-fisica-page .af-avatar svg {
+    width: 28px;
+    height: 28px;
+}
+
+.avaliacao-fisica-page .af-aluno-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.avaliacao-fisica-page .af-aluno-info h2 {
+    margin: 0 0 6px;
+
+    color: var(--af-texto, #111827);
+
+    font-size: 20px;
+
+    overflow-wrap: anywhere;
+}
+
+.avaliacao-fisica-page .af-aluno-info p {
+    margin: 0;
+
+    color: var(--af-suave, #64748b);
+
+    font-size: 13px;
+}
+
+.avaliacao-fisica-page .af-total {
+    display: flex;
+    flex-direction: column;
+
+    gap: 4px;
+
+    text-align: right;
+}
+
+.avaliacao-fisica-page .af-total strong {
+    color: var(--af-destaque, #c9a227);
+
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.avaliacao-fisica-page .af-total span {
+    color: var(--af-suave, #64748b);
+
+    font-size: 12px;
+}
+
+/* ================================================
+   7. FORMULÁRIO
+================================================ */
+
+.avaliacao-fisica-page .af-form {
+    display: flex;
+    flex-direction: column;
+
+    gap: 22px;
+}
+
+.avaliacao-fisica-page .af-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 18px;
+}
+
+.avaliacao-fisica-page .af-campo {
+    display: flex;
+    flex-direction: column;
+
+    min-width: 0;
+    gap: 8px;
+}
+
+.avaliacao-fisica-page .af-campo label {
+    color: var(--af-texto, #111827);
+
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.avaliacao-fisica-page .af-campo input,
+.avaliacao-fisica-page .af-campo select {
+    display: block;
+
+    width: 100%;
+    min-width: 0;
+    min-height: 46px;
+
+    padding: 12px;
+
+    color: var(--af-texto, #111827);
+    background: var(--af-fundo, #f8fafc);
+
+    border: 1px solid var(--af-borda, #e2e8f0);
+    border-radius: 8px;
+
+    font: inherit;
+    font-size: 14px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.avaliacao-fisica-page .af-campo input::placeholder {
+    color: var(--af-suave, #64748b);
+}
+
+.avaliacao-fisica-page .af-campo select option {
+    background: var(--af-card, #ffffff);
+    color: var(--af-texto, #111827);
+}
+
+.avaliacao-fisica-page .af-campo input:focus,
+.avaliacao-fisica-page .af-campo select:focus {
+    border-color: var(--af-primaria, #c9a227);
+
+    box-shadow: 0 0 0 3px var(--af-primaria-suave,
+            rgba(128, 128, 128, 0.10));
+}
+
+.avaliacao-fisica-page .af-campo-data {
+    max-width: 250px;
+}
+
+.avaliacao-fisica-page .af-secao-titulo {
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+    padding-bottom: 12px;
+
+    border-bottom: 1px solid var(--af-borda,
+            #e2e8f0);
+}
+
+.avaliacao-fisica-page .af-secao-titulo h3 {
+    margin: 0;
+
+    color: var(--af-texto, #111827);
+
+    font-size: 15px;
+    font-weight: 650;
+}
+
+.avaliacao-fisica-page .af-secao-titulo svg {
+    color: var(--af-destaque, #c9a227);
+
+    width: 19px;
+    height: 19px;
+}
+
+/* ================================================
+   8. BOTÕES
+================================================ */
+
+.avaliacao-fisica-page .af-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 9px;
+
+    min-height: 46px;
+    padding: 12px 18px;
+
+    background: var(--af-primaria, #c9a227);
+    color: var(--af-contraste, #111827);
+
+    border: none;
+    border-radius: 8px;
+
+    font: inherit;
+    font-size: 13px;
+    font-weight: 650;
+
+    cursor: pointer;
+
+    transition: filter 0.2s ease;
+}
+
+.avaliacao-fisica-page .af-btn:hover {
+    background: var(--af-primaria, #c9a227);
+    color: var(--af-contraste, #111827);
+
+    filter: brightness(0.92);
+}
+
+.avaliacao-fisica-page .af-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.avaliacao-fisica-page .af-btn svg {
+    width: 18px;
+    height: 18px;
+
+    flex-shrink: 0;
+}
+
+.avaliacao-fisica-page .af-acoes {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* ================================================
+   9. AVISOS
+================================================ */
+
+.avaliacao-fisica-page .af-aviso {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+    margin: 0;
+
+    color: var(--af-suave, #64748b);
+
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.avaliacao-fisica-page .af-aviso svg {
+    flex-shrink: 0;
+
+    width: 17px;
+    height: 17px;
+}
+
+/* ================================================
+   10. HISTÓRICO DE AVALIAÇÕES
+================================================ */
+
+.avaliacao-fisica-page .af-historico {
+    display: flex;
+    flex-direction: column;
+
+    gap: 12px;
+}
+
+.avaliacao-fisica-page .af-registro {
+    border: 1px solid var(--af-borda, #e2e8f0);
+    border-radius: 10px;
+
+    overflow: hidden;
+}
+
+.avaliacao-fisica-page .af-registro summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+    padding: 17px;
+
+    background: var(--af-fundo, #f8fafc);
+
+    cursor: pointer;
+    list-style: none;
+}
+
+.avaliacao-fisica-page .af-registro summary::-webkit-details-marker {
+    display: none;
+}
+
+.avaliacao-fisica-page .af-registro-data {
+    display: flex;
+    align-items: center;
+
+    gap: 13px;
+}
+
+.avaliacao-fisica-page .af-registro-data>svg {
+    color: var(--af-destaque, #c9a227);
+
+    flex-shrink: 0;
+}
+
+.avaliacao-fisica-page .af-registro-data div {
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+.avaliacao-fisica-page .af-registro-data strong {
+    color: var(--af-texto, #111827);
+
+    font-size: 14px;
+    font-weight: 650;
+}
+
+.avaliacao-fisica-page .af-registro-data span {
+    color: var(--af-suave, #64748b);
+
+    font-size: 11px;
+}
+
+.avaliacao-fisica-page .af-registro-resumo {
+    display: flex;
+    align-items: center;
+
+    gap: 15px;
+
+    color: var(--af-texto, #111827);
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.avaliacao-fisica-page .af-registro-resumo svg {
+    color: var(--af-suave, #64748b);
+
+    flex-shrink: 0;
+
+    transition: transform 0.2s ease;
+}
+
+.avaliacao-fisica-page .af-registro[open] .af-registro-resumo svg {
+    transform: rotate(180deg);
+}
+
+.avaliacao-fisica-page .af-registro-conteudo {
+    padding: 20px;
+
+    border-top: 1px solid var(--af-borda,
+            #e2e8f0);
+}
+
+/* ================================================
+   11. MEDIDAS REGISTRADAS
+================================================ */
+
+.avaliacao-fisica-page .af-medida {
+    display: flex;
+    flex-direction: column;
+
+    min-width: 0;
+
+    gap: 8px;
+    padding: 14px;
+
+    background: var(--af-fundo, #f8fafc);
+
+    border: 1px solid var(--af-borda, #e2e8f0);
+    border-radius: 8px;
+}
+
+.avaliacao-fisica-page .af-medida span {
+    color: var(--af-suave, #64748b);
+
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.avaliacao-fisica-page .af-medida strong {
+    color: var(--af-texto, #111827);
+
+    font-size: 17px;
+    font-weight: 650;
+
+    overflow-wrap: anywhere;
+}
+
+/* ================================================
+   12. ESTADOS VAZIOS
+================================================ */
+
+.avaliacao-fisica-page .af-vazio {
+    padding: 32px 15px;
+
+    color: var(--af-suave, #64748b);
+
+    text-align: center;
+}
+
+.avaliacao-fisica-page .af-vazio svg {
+    width: 38px;
+    height: 38px;
+
+    color: var(--af-destaque, #c9a227);
+}
+
+.avaliacao-fisica-page .af-vazio h3 {
+    margin: 15px 0 7px;
+
+    color: var(--af-texto, #111827);
+
+    font-size: 16px;
+    font-weight: 650;
+}
+
+.avaliacao-fisica-page .af-vazio p {
+    margin: 0;
+
+    color: var(--af-suave, #64748b);
+
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+/* ================================================
+   13. MENSAGENS DO SISTEMA
+================================================ */
+
+.avaliacao-fisica-page .af-alerta {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 15px;
+    margin-bottom: 20px;
+
+    border-radius: 9px;
+
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.avaliacao-fisica-page .af-alerta svg {
+    flex-shrink: 0;
+}
+
+.avaliacao-fisica-page .af-alerta-sucesso {
+    background: var(--af-fundo-sucesso,
+            rgba(22, 163, 74, 0.12));
+
+    color: var(--af-verde, #15803d);
+
+    border: 1px solid rgba(22, 163, 74, 0.20);
+}
+
+.avaliacao-fisica-page .af-alerta-erro {
+    background: var(--af-fundo-erro,
+            rgba(220, 38, 38, 0.12));
+
+    color: var(--af-vermelho, #b91c1c);
+
+    border: 1px solid rgba(220, 38, 38, 0.20);
+}
+
+/* ================================================
+   14. ACESSIBILIDADE
+================================================ */
+
+.avaliacao-fisica-page button:focus-visible,
+.avaliacao-fisica-page summary:focus-visible {
+    outline: 2px solid var(--af-primaria,
+            #c9a227);
+
+    outline-offset: 3px;
+}
+
+/* ================================================
+   15. RESPONSIVIDADE - TABLETS
+================================================ */
+
+@media (max-width: 1100px) {
+
+    .avaliacao-fisica-page .af-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* ================================================
+   16. RESPONSIVIDADE - CELULARES
+================================================ */
+
+@media (max-width: 650px) {
+
+    .avaliacao-fisica-page .af-header h1 {
+        font-size: 25px;
+    }
+
+    .avaliacao-fisica-page .af-card {
+        padding: 18px;
+    }
+
+    .avaliacao-fisica-page .af-selecao {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .avaliacao-fisica-page .af-aluno {
+        flex-wrap: wrap;
+    }
+
+    .avaliacao-fisica-page .af-total {
+        width: 100%;
+
+        padding-top: 15px;
+
+        border-top: 1px solid var(--af-borda,
+                #e2e8f0);
+
+        text-align: left;
+    }
+
+    .avaliacao-fisica-page .af-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 12px;
+    }
+
+    .avaliacao-fisica-page .af-btn {
+        width: 100%;
+    }
+
+    .avaliacao-fisica-page .af-campo-data {
+        max-width: 100%;
+    }
+
+    .avaliacao-fisica-page .af-registro summary {
+        padding: 13px;
+        gap: 8px;
+    }
+
+    .avaliacao-fisica-page .af-registro-resumo {
+        gap: 8px;
+    }
+
+    .avaliacao-fisica-page .af-registro-conteudo {
+        padding: 12px;
+    }
+}
+
+@media (max-width: 380px) {
+
+    .avaliacao-fisica-page .af-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .avaliacao-fisica-page .af-card {
+        padding: 15px;
+    }
+
+    .avaliacao-fisica-page .af-registro summary {
+        flex-wrap: wrap;
+    }
+}
+
+/* ================================================
+   17. REDUÇÃO DE MOVIMENTOS
+================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .avaliacao-fisica-page *,
+    .avaliacao-fisica-page *::before,
+    .avaliacao-fisica-page *::after {
+        transition: none !important;
+    }
+}

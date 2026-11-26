@@ -98,6 +98,11 @@ if ($role === 'Aluno') {
         ],
 
         [
+            'titulo' => 'Minhas Medidas',
+            'icone' => 'ruler',
+            'rota' => $portal . '?acao=minhas_medidas'
+        ],
+        [
             'titulo' => 'Faturas',
             'icone' => 'credit-card',
             'rota' => $portal . '?acao=faturas'
@@ -114,6 +119,7 @@ if ($role === 'Aluno') {
             'icone' => 'user-round',
             'rota' => $portal . '?acao=meus_dados'
         ],
+
 
         [
             'titulo' => 'Avaliar Academia',
@@ -337,7 +343,25 @@ if ($companyId > 0) {
                 </li>
 
             <?php endforeach; ?>
+            <?php if ($role === 'Professor'): ?>
 
+                <li>
+                    <a
+                        href="<?= BASE_URL ?>/app/controllers/AvaliacaoFisicaController.php"
+                        title="Avaliações físicas">
+
+                        <span class="menu-icon">
+                            <i data-lucide="clipboard-check"></i>
+                        </span>
+
+                        <span class="menu-text">
+                            Avaliações físicas
+                        </span>
+
+                    </a>
+                </li>
+
+            <?php endif; ?>
         </ul>
 
     </nav>

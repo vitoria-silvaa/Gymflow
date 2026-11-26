@@ -108,11 +108,6 @@ require __DIR__ . '/../shared/sidebar.php';
     <!-- CABEÇALHO -->
 
     <header class="md-header">
-
-        <span class="md-eyebrow">
-            PORTAL DO ALUNO
-        </span>
-
         <h1>Meus Dados</h1>
 
         <p>

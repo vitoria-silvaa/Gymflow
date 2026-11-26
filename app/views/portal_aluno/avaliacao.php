@@ -72,7 +72,7 @@ include __DIR__ . '/../shared/sidebar.php';
 
     <header class="portal-header avaliacao-cabecalho">
         <div>
-            <span class="portal-eyebrow">PORTAL DO ALUNO</span>
+
             <h1>Avaliar Academia</h1>
             <p>
                 Sua opinião nos ajuda a melhorar

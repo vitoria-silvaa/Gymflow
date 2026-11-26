@@ -171,12 +171,6 @@ require __DIR__ . '/../shared/sidebar.php';
 
         <div>
 
-            <span class="inicio-eyebrow">
-
-                PORTAL DO ALUNO
-
-            </span>
-
             <h1>
 
                 Olá, <?= $escInicio(

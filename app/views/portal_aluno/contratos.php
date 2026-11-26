@@ -59,9 +59,6 @@ require __DIR__ . '/../shared/sidebar.php';
 
     <header class="contratos-header">
 
-        <span class="contratos-eyebrow">
-            PORTAL DO ALUNO
-        </span>
 
         <h1>Meus Contratos</h1>
 
