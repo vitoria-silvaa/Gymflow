@@ -74,7 +74,8 @@ $acoesPermitidas = [
     'treinos',
     'faturas',
     'contratos',
-    'avaliacao'
+    'avaliacao',
+    'meus_dados'
 ];
 
 $acaoRetorno = $_POST['acao_retorno'] ?? 'aluno';

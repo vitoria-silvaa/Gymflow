@@ -131,9 +131,13 @@ $nota = filter_var(
     FILTER_VALIDATE_INT
 );
 
-$mensagem = trim(
-    (string) ($_POST['mensagem'] ?? '')
-);
+$mensagemBruta = $_POST['mensagem'] ?? '';
+
+if (!is_string($mensagemBruta)) {
+    $redirecionar('dados_invalidos');
+}
+
+$mensagem = trim($mensagemBruta);
 
 $tamanhoMensagem = function_exists('mb_strlen')
     ? mb_strlen($mensagem, 'UTF-8')

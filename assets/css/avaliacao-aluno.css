@@ -4,11 +4,38 @@
    ============================================= */
 
 .avaliacao-aluno-page {
-    --avaliacao-cor: var(--cor-primaria, #ffb000);
-    --avaliacao-texto: #111827;
-    --avaliacao-suave: #64748b;
-    --avaliacao-borda: #e5e7eb;
-    --avaliacao-fundo: #f8fafc;
+
+    --avaliacao-cor:
+        var(--portal-destaque,
+            var(--cor-primaria, #ffb000));
+
+    --avaliacao-texto:
+        var(--portal-texto,
+            var(--ui-texto, #111827));
+
+    --avaliacao-suave:
+        var(--portal-texto-suave,
+            var(--ui-texto-suave, #64748b));
+
+    --avaliacao-borda:
+        var(--portal-borda,
+            var(--ui-borda, #e5e7eb));
+
+    --avaliacao-fundo:
+        var(--portal-superficie,
+            var(--ui-fundo-pagina, #f8fafc));
+
+    --avaliacao-card:
+        var(--portal-card,
+            var(--ui-fundo-card, #ffffff));
+
+    --avaliacao-destaque-legivel:
+        var(--portal-destaque-legivel,
+            var(--cor-primaria, #ffb000));
+
+    --avaliacao-sobre-destaque:
+        var(--portal-destaque-texto,
+            var(--cor-sobre-primaria, #111827));
 }
 
 /* CABEÇALHO */
@@ -440,6 +467,130 @@
 .avaliacao-aluno-page .avaliacao-voltar:focus-visible {
     outline: 2px solid var(--cor-primaria, #ffb000);
     outline-offset: 3px;
+}
+
+/* =============================================
+   PADRONIZAÇÃO DA IDENTIDADE DO PORTAL
+============================================= */
+
+.avaliacao-aluno-page .avaliacao-unidade-icone {
+    background: var(--avaliacao-card);
+    color: var(--avaliacao-destaque-legivel);
+}
+
+.avaliacao-aluno-page .avaliacao-formulario textarea {
+    background: var(--avaliacao-card);
+    color: var(--avaliacao-texto);
+    border-color: var(--avaliacao-borda);
+}
+
+.avaliacao-aluno-page .avaliacao-formulario textarea::placeholder {
+    color: var(--avaliacao-suave);
+}
+
+.avaliacao-aluno-page .avaliacao-btn-salvar {
+    background: var(--avaliacao-cor);
+    color: var(--avaliacao-sobre-destaque);
+    border: none;
+    cursor: pointer;
+}
+
+.avaliacao-aluno-page .avaliacao-btn-salvar:hover {
+    color: var(--avaliacao-sobre-destaque);
+    filter: brightness(.93);
+}
+
+.avaliacao-aluno-page .avaliacao-btn-salvar:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+}
+
+/* =============================================
+   MENSAGENS DO SISTEMA
+============================================= */
+
+.avaliacao-aluno-page .avaliacao-mensagem {
+    padding: 15px 18px;
+    margin-bottom: 22px;
+
+    border: 1px solid transparent;
+    border-radius: 12px;
+
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.avaliacao-aluno-page .avaliacao-mensagem-sucesso {
+    background: rgba(22, 163, 74, .12);
+    color: #166534;
+    border-color: rgba(22, 163, 74, .25);
+}
+
+.avaliacao-aluno-page .avaliacao-mensagem-erro {
+    background: rgba(220, 38, 38, .12);
+    color: #991b1b;
+    border-color: rgba(220, 38, 38, .25);
+}
+
+/* =============================================
+   MODO ESCURO
+============================================= */
+
+[data-theme="dark"] .avaliacao-aluno-page .avaliacao-aviso {
+    background: rgba(59, 130, 246, .10);
+    border-color: rgba(59, 130, 246, .25);
+}
+
+[data-theme="dark"] .avaliacao-aluno-page .avaliacao-aviso strong {
+    color: #93c5fd;
+}
+
+[data-theme="dark"] .avaliacao-aluno-page .avaliacao-aviso p {
+    color: var(--avaliacao-suave);
+}
+
+[data-theme="dark"] .avaliacao-aluno-page .avaliacao-status-publicada {
+    background: rgba(22, 163, 74, .15);
+    color: #86efac;
+}
+
+[data-theme="dark"] .avaliacao-aluno-page .avaliacao-status-pendente {
+    background: rgba(234, 179, 8, .12);
+    color: #fde047;
+}
+
+[data-theme="dark"] .avaliacao-aluno-page .avaliacao-info-icone {
+    background: rgba(234, 179, 8, .12);
+    color: #fde047;
+}
+
+[data-theme="dark"] .avaliacao-aluno-page .avaliacao-estrela {
+    color: #64748b;
+}
+
+[data-theme="dark"] .avaliacao-aluno-page .avaliacao-estrela.selecionada,
+[data-theme="dark"] .avaliacao-aluno-page .avaliacao-estrela:hover {
+    color: #eab308;
+}
+
+[data-theme="dark"] .avaliacao-aluno-page .avaliacao-mensagem-sucesso {
+    color: #86efac;
+}
+
+[data-theme="dark"] .avaliacao-aluno-page .avaliacao-mensagem-erro {
+    color: #fca5a5;
+}
+
+/* =============================================
+   ACESSIBILIDADE
+============================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .avaliacao-aluno-page * {
+        transition: none !important;
+    }
 }
 
 @media (max-width: 640px) {

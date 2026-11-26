@@ -1,0 +1,500 @@
+/* =============================================
+   GYMFLOW - MEUS DADOS
+   assets/css/meus-dados.css
+============================================= */
+
+.meus-dados-page {
+    --md-texto: var(--portal-texto, var(--ui-texto, #222));
+    --md-suave: var(--portal-texto-suave, var(--ui-texto-suave, #64748b));
+    --md-card: var(--portal-card, var(--ui-fundo-card, #fff));
+    --md-borda: var(--portal-borda, var(--ui-borda, #e2e8f0));
+    --md-superficie: var(--portal-superficie, var(--ui-fundo-pagina, #f8fafc));
+
+    --md-destaque: var(--portal-destaque, var(--cor-primaria, #c9a227));
+    --md-legivel: var(--portal-destaque-legivel, var(--cor-primaria, #c9a227));
+    --md-sobre-destaque: var(--portal-destaque-texto, var(--cor-sobre-primaria, #171717));
+    --md-destaque-suave: var(--portal-destaque-suave, var(--cor-primaria-suave, #c9a22720));
+
+    --md-verde: #15803d;
+    --md-vermelho: #dc2626;
+
+    width: 100%;
+    max-width: 1100px;
+    min-width: 0;
+
+    margin: 0 auto;
+    padding: 28px;
+
+    color: var(--md-texto);
+    box-sizing: border-box;
+}
+
+.meus-dados-page * {
+    box-sizing: border-box;
+}
+
+/* =============================================
+   CABEÇALHO
+============================================= */
+
+.meus-dados-page .md-header {
+    margin-bottom: 25px;
+}
+
+.meus-dados-page .md-eyebrow {
+    display: block;
+    margin-bottom: 8px;
+
+    color: var(--md-legivel);
+
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+.meus-dados-page .md-header h1 {
+    margin: 0 0 8px;
+
+    color: var(--md-texto);
+
+    font-size: 30px;
+    font-weight: 750;
+}
+
+.meus-dados-page .md-header p {
+    margin: 0;
+
+    color: var(--md-suave);
+
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* =============================================
+   CARDS
+============================================= */
+
+.meus-dados-page .md-card {
+    min-width: 0;
+    padding: 24px;
+    margin-bottom: 18px;
+
+    background: var(--md-card);
+
+    border: 1px solid var(--md-borda);
+    border-radius: 14px;
+}
+
+.meus-dados-page .md-card-header {
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.meus-dados-page .md-card-header h2 {
+    margin: 0 0 5px;
+
+    color: var(--md-texto);
+
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.meus-dados-page .md-card-header p {
+    margin: 0;
+
+    color: var(--md-suave);
+
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.meus-dados-page .md-card-icon {
+    display: grid;
+    place-items: center;
+
+    width: 42px;
+    height: 42px;
+
+    flex-shrink: 0;
+
+    background: var(--md-destaque-suave);
+    color: var(--md-legivel);
+
+    border-radius: 9px;
+}
+
+/* =============================================
+   PERFIL
+============================================= */
+
+.meus-dados-page .md-perfil {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.meus-dados-page .md-avatar {
+    display: grid;
+    place-items: center;
+
+    width: 75px;
+    height: 75px;
+
+    flex-shrink: 0;
+
+    background: var(--md-destaque-suave);
+    color: var(--md-legivel);
+
+    border-radius: 50%;
+
+    font-size: 25px;
+    font-weight: 750;
+}
+
+.meus-dados-page .md-perfil-info {
+    min-width: 0;
+}
+
+.meus-dados-page .md-perfil-info h2 {
+    margin: 0 0 6px;
+
+    color: var(--md-texto);
+
+    font-size: 21px;
+
+    overflow-wrap: anywhere;
+}
+
+.meus-dados-page .md-perfil-info p {
+    margin: 0 0 9px;
+
+    color: var(--md-suave);
+
+    font-size: 13px;
+}
+
+.meus-dados-page .md-status {
+    display: inline-block;
+
+    padding: 5px 9px;
+
+    border-radius: 6px;
+
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.meus-dados-page .md-status-ativo {
+    color: var(--md-verde);
+    background: rgba(22, 163, 74, .12);
+}
+
+.meus-dados-page .md-status-inativo {
+    color: var(--md-vermelho);
+    background: rgba(220, 38, 38, .12);
+}
+
+/* =============================================
+   CAMPOS
+============================================= */
+
+.meus-dados-page .md-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 18px;
+}
+
+.meus-dados-page .md-campo {
+    display: flex;
+    flex-direction: column;
+
+    min-width: 0;
+    gap: 7px;
+}
+
+.meus-dados-page .md-campo label,
+.meus-dados-page .md-campo>span,
+.meus-dados-page .md-campo-rotulo {
+    color: var(--md-suave);
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.meus-dados-page .md-campo-rotulo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 8px;
+}
+
+.meus-dados-page .md-campo-rotulo svg {
+    width: 13px;
+    height: 13px;
+}
+
+.meus-dados-page .md-readonly {
+    display: flex;
+    align-items: center;
+
+    min-height: 44px;
+
+    padding: 12px;
+
+    color: var(--md-texto);
+    background: var(--md-superficie);
+
+    border: 1px solid var(--md-borda);
+    border-radius: 8px;
+
+    font-size: 13px;
+
+    overflow-wrap: anywhere;
+}
+
+.meus-dados-page .md-form {
+    display: flex;
+    flex-direction: column;
+
+    gap: 18px;
+}
+
+.meus-dados-page .md-form input:not([type="hidden"]),
+.meus-dados-page .md-form textarea {
+    display: block;
+
+    width: 100%;
+    min-height: 44px;
+
+    padding: 12px;
+
+    color: var(--md-texto);
+    background: var(--md-card);
+
+    border: 1px solid var(--md-borda);
+    border-radius: 8px;
+
+    font-family: inherit;
+    font-size: 14px;
+
+    outline: none;
+}
+
+.meus-dados-page .md-form textarea {
+    resize: vertical;
+    min-height: 90px;
+}
+
+.meus-dados-page .md-form input:focus,
+.meus-dados-page .md-form textarea:focus {
+    border-color: var(--md-destaque);
+    box-shadow: 0 0 0 3px var(--md-destaque-suave);
+}
+
+/* =============================================
+   BOTÕES
+============================================= */
+
+.meus-dados-page .md-acoes {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.meus-dados-page .md-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 44px;
+
+    gap: 8px;
+    padding: 11px 18px;
+
+    background: var(--md-destaque);
+    color: var(--md-sobre-destaque);
+
+    border: 0;
+    border-radius: 8px;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 650;
+
+    cursor: pointer;
+
+    transition: filter .2s ease;
+}
+
+.meus-dados-page .md-btn:hover {
+    filter: brightness(.92);
+}
+
+.meus-dados-page .md-btn svg {
+    width: 17px;
+    height: 17px;
+}
+
+/* =============================================
+   AVISOS E MENSAGENS
+============================================= */
+
+.meus-dados-page .md-aviso {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    margin: 18px 0 0;
+
+    color: var(--md-suave);
+
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.meus-dados-page .md-aviso svg {
+    width: 16px;
+    height: 16px;
+
+    flex-shrink: 0;
+}
+
+.meus-dados-page .md-mensagem {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 14px;
+    margin-bottom: 18px;
+
+    border-radius: 9px;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.meus-dados-page .md-mensagem-sucesso {
+    background: rgba(22, 163, 74, .12);
+    color: var(--md-verde);
+}
+
+.meus-dados-page .md-mensagem-erro {
+    background: rgba(220, 38, 38, .12);
+    color: var(--md-vermelho);
+}
+
+/* =============================================
+   SEGURANÇA DA CONTA
+============================================= */
+
+.meus-dados-page .md-seguranca {
+    border: 1px solid var(--md-borda);
+    border-radius: 10px;
+}
+
+.meus-dados-page .md-seguranca summary {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+    padding: 16px;
+
+    color: var(--md-texto);
+
+    font-size: 14px;
+    font-weight: 600;
+
+    list-style: none;
+    cursor: pointer;
+}
+
+.meus-dados-page .md-seguranca summary::-webkit-details-marker {
+    display: none;
+}
+
+.meus-dados-page .md-seguranca summary svg {
+    color: var(--md-legivel);
+}
+
+.meus-dados-page .md-seguranca .md-seta {
+    margin-left: auto;
+    transition: transform .2s ease;
+}
+
+.meus-dados-page .md-seguranca[open] .md-seta {
+    transform: rotate(180deg);
+}
+
+.meus-dados-page .md-seguranca .md-form {
+    padding: 20px;
+
+    border-top: 1px solid var(--md-borda);
+}
+
+.meus-dados-page .md-seguranca .md-aviso {
+    margin: 0;
+}
+
+/* =============================================
+   MODO ESCURO
+============================================= */
+
+[data-theme="dark"] .meus-dados-page {
+    --md-verde: #86efac;
+    --md-vermelho: #fca5a5;
+}
+
+/* =============================================
+   ACESSIBILIDADE
+============================================= */
+
+.meus-dados-page button:focus-visible,
+.meus-dados-page summary:focus-visible {
+    outline: 2px solid var(--md-legivel);
+    outline-offset: 3px;
+}
+
+/* =============================================
+   RESPONSIVIDADE
+============================================= */
+
+@media (max-width: 700px) {
+
+    .meus-dados-page {
+        padding: 18px;
+    }
+
+    .meus-dados-page .md-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .meus-dados-page .md-card {
+        padding: 18px;
+    }
+
+    .meus-dados-page .md-btn {
+        width: 100%;
+    }
+
+    .meus-dados-page .md-avatar {
+        width: 58px;
+        height: 58px;
+
+        font-size: 20px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .meus-dados-page * {
+        transition: none !important;
+    }
+}

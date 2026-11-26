@@ -193,7 +193,8 @@ $acoesPortal = [
     'treinos',
     'faturas',
     'contratos',
-    'avaliacao'
+    'avaliacao',
+    'meus_dados'
 ];
 
 if (!in_array(

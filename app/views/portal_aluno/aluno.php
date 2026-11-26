@@ -1,239 +1,565 @@
 <?php
-if (!isset($aluno)) {
-    header(
-        "Location: " . BASE_URL .
-            "/app/controllers/PortalAlunoController.php?acao=aluno"
-    );
-    exit;
+// ============================================
+// GYMFLOW - INÍCIO DO PORTAL DO ALUNO
+// app/views/portal_aluno/aluno.php
+// ============================================
+
+if (!isset($inicioPortal)) {
+
+    http_response_code(403);
+
+    exit('Acesso negado.');
 }
 
-/** @var array $aluno */
-/** @var array|false $matricula */
-/** @var int $frequencia */
-/** @var int $faturas_abertas */
+$tituloPagina = 'Portal do Aluno';
 
-$matricula = $matricula ?? false;
-$frequencia = $frequencia ?? 0;
-$faturas_abertas = $faturas_abertas ?? 0;
+$cssEspecifico = BASE_URL .
+    '/assets/css/portal-inicio.css';
 
-$tituloPagina = "Portal do Aluno";
+// ============================================
+// DADOS DA PÁGINA
+// ============================================
 
-include __DIR__ . '/../shared/header.php';
-include __DIR__ . '/../shared/sidebar.php';
+$aluno = $inicioPortal['aluno'];
+
+$matricula = $inicioPortal['matricula'];
+
+$statusPlano = $inicioPortal['status_plano'];
+
+$diasCompletos = $inicioPortal['dias_completos'];
+
+$diasParciais = $inicioPortal['dias_parciais'];
+
+$faturasAbertas = $inicioPortal['faturas_abertas'];
+
+$faturasAtrasadas = $inicioPortal['faturas_atrasadas'];
+
+$mesAtual = $inicioPortal['mes_atual'];
+
+$anoAtual = $inicioPortal['ano_atual'];
+
+// ============================================
+// FUNÇÕES AUXILIARES
+// ============================================
+
+$escInicio = static function ($valor) {
+
+    return htmlspecialchars(
+
+        (string) ($valor ?? ''),
+
+        ENT_QUOTES,
+
+        'UTF-8'
+    );
+};
+
+$formatarDataInicio = static function ($valor) {
+
+    if (empty($valor)) {
+
+        return 'Não informado';
+    }
+
+    $timestamp = strtotime($valor);
+
+    return $timestamp !== false
+
+        ? date('d/m/Y', $timestamp)
+
+        : 'Não informado';
+};
+
+// ============================================
+// ROTAS DO PORTAL
+// ============================================
+
+$urlInicio = BASE_URL .
+    '/app/controllers/PortalAlunoController.php';
+
+$urlTreinos = $urlInicio . '?acao=treinos';
+
+$urlFrequencia = $urlTreinos .
+    '&visualizacao=frequencia';
+
+$urlFaturas = $urlInicio . '?acao=faturas';
+
+$urlContratos = $urlInicio . '?acao=contratos';
+
+$urlAvaliacao = $urlInicio . '?acao=avaliacao';
+
+$urlFaturaPendente = $urlFaturas;
+
+if ($faturasAtrasadas > 0) {
+
+    $urlFaturaPendente .= '&aba=atraso';
+}
+
+// ============================================
+// STATUS DA MATRÍCULA
+// ============================================
+
+$statusLabels = [
+
+    'ativo' => 'Plano ativo',
+
+    'vencido' => 'Plano vencido',
+
+    'futuro' => 'Aguardando início',
+
+    'sem_plano' => 'Sem matrícula ativa'
+];
+
+$labelPlano = $statusLabels[$statusPlano]
+    ?? 'Não informado';
+
+// ============================================
+// AÇÕES RÁPIDAS
+// ============================================
+
+$acoesRapidas = [
+
+    [
+        'titulo' => 'Meus treinos',
+        'descricao' => 'Acesse suas fichas de treinamento.',
+        'icone' => 'dumbbell',
+        'url' => $urlTreinos
+    ],
+
+    [
+        'titulo' => 'Minha frequência',
+        'descricao' => 'Consulte seu calendário de treinos.',
+        'icone' => 'calendar-days',
+        'url' => $urlFrequencia
+    ],
+
+    [
+        'titulo' => 'Minhas faturas',
+        'descricao' => 'Consulte pagamentos e recibos.',
+        'icone' => 'credit-card',
+        'url' => $urlFaturas
+    ],
+
+    [
+        'titulo' => 'Meus contratos',
+        'descricao' => 'Consulte e baixe seus contratos.',
+        'icone' => 'file-text',
+        'url' => $urlContratos
+    ],
+
+    [
+        'titulo' => 'Avaliar Academia',
+        'descricao' => 'Avalie sua experiência na academia.',
+        'icone' => 'star',
+        'url' => $urlAvaliacao
+    ]
+];
+
+require __DIR__ . '/../shared/header.php';
+
+require __DIR__ . '/../shared/sidebar.php';
+
 ?>
 
-<main class="portal-aluno">
+<main class="portal-aluno inicio-aluno">
 
-    <!-- CABEÇALHO -->
-    <header class="portal-header">
+    <!-- ====================================
+         CABEÇALHO
+    ===================================== -->
+
+    <header class="inicio-header">
+
         <div>
-            <span class="portal-eyebrow">
+
+            <span class="inicio-eyebrow">
+
                 PORTAL DO ALUNO
+
             </span>
 
             <h1>
-                Olá, <?= htmlspecialchars(
-                            $aluno['nome'] ?? 'Aluno',
-                            ENT_QUOTES,
-                            'UTF-8'
+
+                Olá, <?= $escInicio(
+                            $aluno['nome'] ?? 'Aluno'
                         ) ?>!
+
             </h1>
 
-            <p>Pronto para o treino de hoje?</p>
+            <p>
+
+                Acompanhe seus treinos e sua rotina
+                na academia.
+
+            </p>
+
         </div>
-    </header>
 
-    <!-- RESUMO -->
-    <section class="portal-grid">
+        <div class="inicio-unidade">
 
-        <!-- PLANO -->
-        <article class="portal-card plano-card">
+            <i data-lucide="map-pin"></i>
 
-            <div class="card-top">
-                <div>
-                    <span class="card-label">
-                        MEU PLANO
-                    </span>
+            <div>
 
-                    <?php if (!empty($matricula)): ?>
+                <span>Minha unidade</span>
 
-                        <h2>
-                            <?= htmlspecialchars(
-                                $matricula['nome_plano'] ?? '',
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>
-                        </h2>
+                <strong>
 
-                        <span class="status status-ativo">
-                            Plano ativo
-                        </span>
+                    <?= $escInicio(
+                        $aluno['nome_filial'] ?? ''
+                    ) ?>
 
-                    <?php else: ?>
+                </strong>
 
-                        <h2>Nenhum plano</h2>
-
-                        <span class="status status-pendente">
-                            Sem matrícula ativa
-                        </span>
-
-                    <?php endif; ?>
-                </div>
             </div>
 
-            <?php if (!empty($matricula)): ?>
+        </div>
 
-                <div class="plano-info">
+    </header>
+
+    <!-- ====================================
+         RESUMO PRINCIPAL
+    ===================================== -->
+
+    <section class="inicio-grid">
+
+        <!-- PLANO -->
+
+        <article class="inicio-card inicio-plano">
+
+            <div class="inicio-card-topo">
+
+                <div class="inicio-icone">
+
+                    <i data-lucide="badge-check"></i>
+
+                </div>
+
+                <span class="inicio-status inicio-status-<?= $escInicio($statusPlano) ?>">
+
+                    <?= $escInicio($labelPlano) ?>
+
+                </span>
+
+            </div>
+
+            <span class="inicio-label">
+
+                MEU PLANO
+
+            </span>
+
+            <h2 class="inicio-plano-nome">
+
+                <?= $escInicio(
+                    $matricula['nome_plano']
+                        ?? 'Nenhum plano ativo'
+                ) ?>
+
+            </h2>
+
+            <?php if ($matricula): ?>
+
+                <div class="inicio-plano-info">
+
                     <div>
+
+                        <span>Início</span>
+
+                        <strong>
+
+                            <?= $formatarDataInicio(
+                                $matricula['inicio']
+                            ) ?>
+
+                        </strong>
+
+                    </div>
+
+                    <div>
+
                         <span>Validade</span>
 
                         <strong>
-                            <?= !empty($matricula['fim'])
-                                ? date(
-                                    'd/m/Y',
-                                    strtotime($matricula['fim'])
-                                )
-                                : 'Não informada' ?>
-                        </strong>
-                    </div>
-                </div>
 
-                <a
-                    href="<?= BASE_URL ?>/app/controllers/PortalAlunoController.php?acao=treinos"
-                    class="portal-btn">
-                    Treinar agora
-                    <span>→</span>
-                </a>
+                            <?= $formatarDataInicio(
+                                $matricula['fim']
+                            ) ?>
+
+                        </strong>
+
+                    </div>
+
+                </div>
 
             <?php else: ?>
 
-                <p class="card-description">
+                <p class="inicio-descricao">
+
                     Procure a recepção para realizar
-                    sua matrícula.
+                    ou renovar sua matrícula.
+
                 </p>
 
             <?php endif; ?>
 
-        </article>
+            <div class="inicio-card-acoes">
 
-        <!-- FREQUÊNCIA -->
-        <article class="portal-card frequencia-card">
+                <?php if ($statusPlano === 'ativo'): ?>
 
-            <div class="card-icon">
-                ✓
-            </div>
+                    <a
+                        href="<?= $escInicio($urlTreinos) ?>"
+                        class="inicio-btn">
 
-            <div class="card-content">
+                        <i data-lucide="dumbbell"></i>
 
-                <span class="card-label">
-                    FREQUÊNCIA DO MÊS
-                </span>
+                        Treinar agora
 
-                <strong class="metric">
-                    <?= (int) $frequencia ?>
+                        <i
+                            class="inicio-seta"
+                            data-lucide="arrow-right">
+                        </i>
 
-                    <small>
-                        dia<?= $frequencia != 1 ? 's' : '' ?>
-                    </small>
-                </strong>
-
-                <p>
-                    Treinados em <?= date('F') ?>
-                </p>
-
-            </div>
-        </article>
-
-        <!-- FATURAS -->
-        <article class="portal-card fatura-card">
-
-            <div class="card-icon">
-                $
-            </div>
-
-            <div class="card-content">
-
-                <span class="card-label">
-                    MINHAS FATURAS
-                </span>
-
-                <?php if ($faturas_abertas > 0): ?>
-
-                    <strong class="metric">
-                        <?= (int) $faturas_abertas ?>
-
-                        <small>em aberto</small>
-                    </strong>
-
-                    <p class="texto-alerta">
-                        Existem pagamentos pendentes.
-                    </p>
+                    </a>
 
                 <?php else: ?>
 
-                    <strong class="metric">
-                        0
-                        <small>pendentes</small>
-                    </strong>
+                    <a
+                        href="<?= $escInicio($urlContratos) ?>"
+                        class="inicio-btn">
 
-                    <p class="texto-sucesso">
-                        Tudo em dia!
-                    </p>
+                        Consultar contratos
+
+                        <i
+                            class="inicio-seta"
+                            data-lucide="arrow-right">
+                        </i>
+
+                    </a>
 
                 <?php endif; ?>
 
             </div>
 
-            <a
-                href="<?= BASE_URL ?>/app/controllers/PortalAlunoController.php?acao=faturas"
-                class="card-link">
-                Ver faturas →
-            </a>
+        </article>
+
+        <!-- FREQUÊNCIA -->
+
+        <article class="inicio-card">
+
+            <div class="inicio-card-topo">
+
+                <div class="inicio-icone inicio-icone-verde">
+
+                    <i data-lucide="calendar-check"></i>
+
+                </div>
+
+            </div>
+
+            <span class="inicio-label">
+
+                FREQUÊNCIA DO MÊS
+
+            </span>
+
+            <strong class="inicio-metrica">
+
+                <?= (int) $diasCompletos ?>
+
+                <small>
+
+                    <?= $diasCompletos === 1
+                        ? 'dia completo'
+                        : 'dias completos' ?>
+
+                </small>
+
+            </strong>
+
+            <p class="inicio-descricao">
+
+                <?= $escInicio($mesAtual) ?>
+
+                de
+
+                <?= $escInicio($anoAtual) ?>
+
+            </p>
+
+            <div class="inicio-frequencia-parcial">
+
+                <span class="inicio-ponto-amarelo"></span>
+
+                <?= (int) $diasParciais ?>
+
+                <?= $diasParciais === 1
+                    ? 'dia parcial'
+                    : 'dias parciais' ?>
+
+            </div>
+
+            <div class="inicio-card-acoes">
+
+                <a
+                    href="<?= $escInicio($urlFrequencia) ?>"
+                    class="inicio-link">
+
+                    Ver calendário
+
+                    <i data-lucide="arrow-right"></i>
+
+                </a>
+
+            </div>
+
+        </article>
+
+        <!-- FATURAS -->
+
+        <article class="inicio-card">
+
+            <div class="inicio-card-topo">
+
+                <div class="inicio-icone <?= $faturasAtrasadas > 0
+                                                ? 'inicio-icone-vermelho'
+                                                : '' ?>">
+
+                    <i data-lucide="wallet"></i>
+
+                </div>
+
+            </div>
+
+            <span class="inicio-label">
+
+                MINHAS FATURAS
+
+            </span>
+
+            <strong class="inicio-metrica">
+
+                <?= (int) $faturasAbertas ?>
+
+                <small>
+
+                    <?= $faturasAbertas === 1
+                        ? 'pendente'
+                        : 'pendentes' ?>
+
+                </small>
+
+            </strong>
+
+            <?php if ($faturasAtrasadas > 0): ?>
+
+                <p class="inicio-texto-alerta">
+
+                    <?= (int) $faturasAtrasadas ?>
+
+                    <?= $faturasAtrasadas === 1
+                        ? 'fatura em atraso'
+                        : 'faturas em atraso' ?>
+
+                </p>
+
+            <?php elseif ($faturasAbertas > 0): ?>
+
+                <p class="inicio-descricao">
+
+                    Pagamentos a vencer.
+
+                </p>
+
+            <?php else: ?>
+
+                <p class="inicio-texto-sucesso">
+
+                    Seus pagamentos estão em dia!
+
+                </p>
+
+            <?php endif; ?>
+
+            <div class="inicio-card-acoes">
+
+                <a
+                    href="<?= $escInicio($urlFaturaPendente) ?>"
+                    class="inicio-link">
+
+                    Ver faturas
+
+                    <i data-lucide="arrow-right"></i>
+
+                </a>
+
+            </div>
 
         </article>
 
     </section>
 
-    <!-- ÁREA INFERIOR -->
-    <section class="portal-bottom">
+    <!-- ====================================
+         ACESSOS RÁPIDOS
+    ===================================== -->
 
-        <div class="section-heading">
-            <div>
-                <span class="portal-eyebrow">
-                    ACESSO RÁPIDO
-                </span>
+    <section class="inicio-acessos">
 
-                <h2>O que você deseja fazer?</h2>
-            </div>
-        </div>
+        <header class="inicio-section-header">
 
-        <div class="quick-actions">
+            <span class="inicio-eyebrow">
 
-            <!-- TREINOS -->
-            <a
-                href="<?= BASE_URL ?>/app/controllers/PortalAlunoController.php?acao=treinos"
-                class="quick-action">
-                <strong>Meus treinos</strong>
-                <span>Visualizar seus treinos →</span>
-            </a>
+                ACESSO RÁPIDO
 
-            <!-- FINANCEIRO -->
-            <a
-                href="<?= BASE_URL ?>/app/controllers/PortalAlunoController.php?acao=faturas"
-                class="quick-action">
-                <strong>Financeiro</strong>
-                <span>Consultar pagamentos →</span>
-            </a>
+            </span>
 
-            <!-- MINHA AVALIAÇÃO -->
-            <a
-                href="<?= BASE_URL ?>/app/controllers/PortalAlunoController.php?acao=avaliacao"
-                class="quick-action">
-                <strong>Minha Avaliação</strong>
-                <span>
-                    Avaliar minha academia →
-                </span>
-            </a>
+            <h2>O que você deseja fazer?</h2>
+
+        </header>
+
+        <div class="inicio-acessos-grid">
+
+            <?php foreach ($acoesRapidas as $acaoRapida): ?>
+
+                <a
+                    href="<?= $escInicio($acaoRapida['url']) ?>"
+                    class="inicio-atalho">
+
+                    <div class="inicio-atalho-icone">
+
+                        <i data-lucide="<?= $escInicio(
+                                            $acaoRapida['icone']
+                                        ) ?>"></i>
+
+                    </div>
+
+                    <div class="inicio-atalho-texto">
+
+                        <strong>
+
+                            <?= $escInicio(
+                                $acaoRapida['titulo']
+                            ) ?>
+
+                        </strong>
+
+                        <span>
+
+                            <?= $escInicio(
+                                $acaoRapida['descricao']
+                            ) ?>
+
+                        </span>
+
+                    </div>
+
+                    <i
+                        class="inicio-atalho-seta"
+                        data-lucide="chevron-right">
+                    </i>
+
+                </a>
+
+            <?php endforeach; ?>
 
         </div>
 
@@ -241,4 +567,4 @@ include __DIR__ . '/../shared/sidebar.php';
 
 </main>
 
-<?php include __DIR__ . '/../shared/footer.php'; ?>
+<?php require __DIR__ . '/../shared/footer.php'; ?>

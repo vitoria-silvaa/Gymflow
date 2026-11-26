@@ -110,7 +110,13 @@ if ($role === 'Aluno') {
         ],
 
         [
-            'titulo' => 'Minha Avaliação',
+            'titulo' => 'Meus Dados',
+            'icone' => 'user-round',
+            'rota' => $portal . '?acao=meus_dados'
+        ],
+
+        [
+            'titulo' => 'Avaliar Academia',
             'icone' => 'star',
             'rota' => $portal . '?acao=avaliacao'
         ]

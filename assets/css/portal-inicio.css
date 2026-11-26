@@ -1,0 +1,694 @@
+/* ============================================
+   GYMFLOW - INÍCIO DO PORTAL DO ALUNO
+   assets/css/portal-inicio.css
+============================================ */
+
+.portal-aluno.inicio-aluno {
+
+    --in-texto: var(--portal-texto, var(--ui-texto, #222));
+    --in-suave: var(--portal-texto-suave, var(--ui-texto-suave, #64748b));
+    --in-card: var(--portal-card, var(--ui-fundo-card, #fff));
+    --in-borda: var(--portal-borda, var(--ui-borda, #e2e8f0));
+    --in-superficie: var(--portal-superficie, var(--ui-fundo-pagina, #f8fafc));
+
+    --in-destaque: var(--portal-destaque, var(--cor-primaria, #c9a227));
+    --in-legivel: var(--portal-destaque-legivel, var(--cor-primaria, #c9a227));
+    --in-sobre-destaque: var(--portal-destaque-texto, var(--cor-sobre-primaria, #171717));
+    --in-destaque-suave: var(--portal-destaque-suave, var(--cor-primaria-suave, #c9a22720));
+
+    --in-verde: #15803d;
+    --in-vermelho: #dc2626;
+    --in-amarelo: #a16207;
+
+    width: 100%;
+    min-width: 0;
+    max-width: 1500px;
+
+    margin: 0 auto;
+    padding: 28px;
+
+    color: var(--in-texto);
+}
+
+.inicio-aluno *,
+.inicio-aluno *::before,
+.inicio-aluno *::after {
+
+    box-sizing: border-box;
+}
+
+/* ============================================
+   CABEÇALHO
+============================================ */
+
+.inicio-aluno .inicio-header {
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    flex-wrap: wrap;
+
+    gap: 20px;
+
+    margin-bottom: 28px;
+}
+
+.inicio-aluno .inicio-eyebrow {
+
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: var(--in-legivel);
+
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.6px;
+}
+
+.inicio-aluno .inicio-header h1 {
+
+    margin: 0 0 8px;
+
+    color: var(--in-texto);
+
+    font-size: clamp(25px, 3vw, 32px);
+    font-weight: 750;
+
+    overflow-wrap: anywhere;
+}
+
+.inicio-aluno .inicio-header p {
+
+    margin: 0;
+
+    color: var(--in-suave);
+
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* UNIDADE */
+
+.inicio-aluno .inicio-unidade {
+
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    max-width: 100%;
+
+    padding: 12px 16px;
+
+    background: var(--in-card);
+
+    border: 1px solid var(--in-borda);
+    border-radius: 10px;
+}
+
+.inicio-aluno .inicio-unidade>svg {
+
+    color: var(--in-legivel);
+
+    width: 21px;
+    height: 21px;
+
+    flex-shrink: 0;
+}
+
+.inicio-aluno .inicio-unidade span {
+
+    display: block;
+
+    color: var(--in-suave);
+
+    font-size: 11px;
+
+    margin-bottom: 4px;
+}
+
+.inicio-aluno .inicio-unidade strong {
+
+    color: var(--in-texto);
+
+    font-size: 13px;
+
+    overflow-wrap: anywhere;
+}
+
+/* ============================================
+   GRID PRINCIPAL
+============================================ */
+
+.inicio-aluno .inicio-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr);
+
+    gap: 16px;
+
+    margin-bottom: 32px;
+}
+
+/* ============================================
+   CARDS
+============================================ */
+
+.inicio-aluno .inicio-card {
+
+    display: flex;
+    flex-direction: column;
+
+    min-width: 0;
+
+    min-height: 260px;
+
+    padding: 20px;
+
+    background: var(--in-card);
+
+    border: 1px solid var(--in-borda);
+    border-radius: 14px;
+}
+
+.inicio-aluno .inicio-card-topo {
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-bottom: 18px;
+}
+
+.inicio-aluno .inicio-icone {
+
+    display: grid;
+    place-items: center;
+
+    flex-shrink: 0;
+
+    width: 44px;
+    height: 44px;
+
+    background: var(--in-destaque-suave);
+
+    color: var(--in-legivel);
+
+    border-radius: 10px;
+}
+
+.inicio-aluno .inicio-icone-verde {
+
+    background: rgba(22, 163, 74, .12);
+
+    color: var(--in-verde);
+}
+
+.inicio-aluno .inicio-icone-vermelho {
+
+    background: rgba(220, 38, 38, .10);
+
+    color: var(--in-vermelho);
+}
+
+.inicio-aluno .inicio-label {
+
+    display: block;
+
+    margin-bottom: 10px;
+
+    color: var(--in-suave);
+
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .8px;
+}
+
+/* ============================================
+   PLANO
+============================================ */
+
+.inicio-aluno .inicio-plano-nome {
+
+    margin: 0 0 14px;
+
+    color: var(--in-texto);
+
+    font-size: 21px;
+    font-weight: 700;
+
+    overflow-wrap: anywhere;
+}
+
+.inicio-aluno .inicio-status {
+
+    display: inline-flex;
+
+    padding: 5px 8px;
+
+    border-radius: 6px;
+
+    font-size: 10px;
+    font-weight: 650;
+}
+
+.inicio-aluno .inicio-status-ativo {
+
+    background: rgba(22, 163, 74, .12);
+
+    color: var(--in-verde);
+}
+
+.inicio-aluno .inicio-status-vencido {
+
+    background: rgba(220, 38, 38, .10);
+
+    color: var(--in-vermelho);
+}
+
+.inicio-aluno .inicio-status-futuro,
+
+.inicio-aluno .inicio-status-sem_plano {
+
+    background: rgba(202, 138, 4, .12);
+
+    color: var(--in-amarelo);
+}
+
+.inicio-aluno .inicio-plano-info {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 12px;
+
+    margin-bottom: 18px;
+
+    padding-top: 15px;
+
+    border-top: 1px solid var(--in-borda);
+}
+
+.inicio-aluno .inicio-plano-info span {
+
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: var(--in-suave);
+
+    font-size: 12px;
+}
+
+.inicio-aluno .inicio-plano-info strong {
+
+    color: var(--in-texto);
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* ============================================
+   MÉTRICAS
+============================================ */
+
+.inicio-aluno .inicio-metrica {
+
+    display: flex;
+    align-items: baseline;
+
+    flex-wrap: wrap;
+
+    gap: 7px;
+
+    color: var(--in-texto);
+
+    font-size: 36px;
+    font-weight: 750;
+
+    line-height: 1.2;
+}
+
+.inicio-aluno .inicio-metrica small {
+
+    color: var(--in-suave);
+
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.inicio-aluno .inicio-descricao {
+
+    margin: 10px 0;
+
+    color: var(--in-suave);
+
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.inicio-aluno .inicio-frequencia-parcial {
+
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+
+    margin-top: 3px;
+
+    color: var(--in-amarelo);
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.inicio-aluno .inicio-ponto-amarelo {
+
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: #ca8a04;
+}
+
+.inicio-aluno .inicio-texto-alerta {
+
+    color: var(--in-vermelho);
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.inicio-aluno .inicio-texto-sucesso {
+
+    color: var(--in-verde);
+
+    font-size: 13px;
+}
+
+/* ============================================
+   BOTÕES DOS CARDS
+============================================ */
+
+.inicio-aluno .inicio-card-acoes {
+
+    margin-top: auto;
+
+    padding-top: 16px;
+}
+
+.inicio-aluno .inicio-btn {
+
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+
+    min-height: 44px;
+
+    width: 100%;
+
+    padding: 11px 13px;
+
+    background: var(--in-destaque);
+
+    color: var(--in-sobre-destaque);
+
+    border-radius: 8px;
+
+    font-size: 13px;
+    font-weight: 650;
+
+    text-decoration: none;
+
+    transition: filter .2s ease;
+}
+
+.inicio-aluno .inicio-btn:hover {
+
+    filter: brightness(.92);
+
+    color: var(--in-sobre-destaque);
+}
+
+.inicio-aluno .inicio-btn svg {
+
+    width: 17px;
+    height: 17px;
+
+    flex-shrink: 0;
+}
+
+.inicio-aluno .inicio-seta {
+
+    margin-left: auto;
+}
+
+.inicio-aluno .inicio-link {
+
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+
+    color: var(--in-legivel);
+
+    font-size: 13px;
+    font-weight: 650;
+
+    text-decoration: none;
+}
+
+.inicio-aluno .inicio-link svg {
+
+    width: 16px;
+    height: 16px;
+}
+
+.inicio-aluno .inicio-link:hover {
+
+    text-decoration: underline;
+}
+
+/* ============================================
+   ACESSOS RÁPIDOS
+============================================ */
+
+.inicio-aluno .inicio-section-header {
+
+    margin-bottom: 17px;
+}
+
+.inicio-aluno .inicio-section-header h2 {
+
+    margin: 0;
+
+    color: var(--in-texto);
+
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.inicio-aluno .inicio-acessos-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 13px;
+}
+
+.inicio-aluno .inicio-atalho {
+
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+
+    min-width: 0;
+
+    padding: 17px;
+
+    background: var(--in-card);
+
+    border: 1px solid var(--in-borda);
+    border-radius: 12px;
+
+    text-decoration: none;
+
+    transition:
+        border-color .2s ease,
+        background .2s ease;
+}
+
+.inicio-aluno .inicio-atalho:hover {
+
+    border-color: var(--in-destaque);
+}
+
+.inicio-aluno .inicio-atalho-icone {
+
+    display: grid;
+    place-items: center;
+
+    width: 44px;
+    height: 44px;
+
+    flex-shrink: 0;
+
+    background: var(--in-destaque-suave);
+
+    color: var(--in-legivel);
+
+    border-radius: 9px;
+}
+
+.inicio-aluno .inicio-atalho-icone svg {
+
+    width: 21px;
+    height: 21px;
+}
+
+.inicio-aluno .inicio-atalho-texto {
+
+    flex: 1;
+
+    min-width: 0;
+}
+
+.inicio-aluno .inicio-atalho-texto strong {
+
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: var(--in-texto);
+
+    font-size: 14px;
+    font-weight: 650;
+}
+
+.inicio-aluno .inicio-atalho-texto span {
+
+    display: block;
+
+    color: var(--in-suave);
+
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.inicio-aluno .inicio-atalho-seta {
+
+    width: 18px;
+    height: 18px;
+
+    flex-shrink: 0;
+
+    color: var(--in-suave);
+}
+
+/* ============================================
+   ACESSIBILIDADE
+============================================ */
+
+.inicio-aluno a:focus-visible {
+
+    outline: 2px solid var(--in-legivel);
+
+    outline-offset: 3px;
+}
+
+/* ============================================
+   MODO ESCURO
+============================================ */
+
+[data-theme="dark"] .portal-aluno.inicio-aluno {
+
+    --in-verde: #86efac;
+
+    --in-vermelho: #fca5a5;
+
+    --in-amarelo: #fde047;
+}
+
+/* ============================================
+   RESPONSIVIDADE
+============================================ */
+
+@media (max-width: 1100px) {
+
+    .inicio-aluno .inicio-grid {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .inicio-aluno .inicio-plano {
+
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 700px) {
+
+    .portal-aluno.inicio-aluno {
+
+        padding: 18px;
+    }
+
+    .inicio-aluno .inicio-grid,
+
+    .inicio-aluno .inicio-acessos-grid {
+
+        grid-template-columns: 1fr;
+    }
+
+    .inicio-aluno .inicio-card {
+
+        min-height: 220px;
+    }
+
+    .inicio-aluno .inicio-header {
+
+        align-items: flex-start;
+    }
+
+    .inicio-aluno .inicio-unidade {
+
+        width: 100%;
+    }
+}
+
+@media (max-width: 400px) {
+
+    .portal-aluno.inicio-aluno {
+
+        padding: 12px;
+    }
+
+    .inicio-aluno .inicio-card,
+
+    .inicio-aluno .inicio-atalho {
+
+        padding: 15px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .inicio-aluno * {
+
+        transition: none !important;
+    }
+}

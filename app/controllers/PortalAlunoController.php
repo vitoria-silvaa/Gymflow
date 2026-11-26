@@ -44,13 +44,74 @@ $aluno_id = (int) $aluno_id;
 
 if ($acao === 'aluno') {
 
-    $alunoId = $aluno_id;
+    $usuarioId = (int) (
+        $_SESSION['usuario_id'] ?? 0
+    );
 
-    $operacao = 'dados_portal_aluno';
+    $empresaId = (int) (
+        $_SESSION['company_id'] ?? 0
+    );
 
-    require __DIR__ . '/../models/Aluno.php';
+    if (
+        $usuarioId <= 0 ||
+        $empresaId <= 0
+    ) {
 
-    require __DIR__ . '/../views/portal_aluno/aluno.php';
+        http_response_code(403);
+
+        exit('Sessão inválida.');
+    }
+
+    header('Cache-Control: no-store, private');
+
+    try {
+
+        require_once __DIR__ .
+            '/../models/InicioAluno.php';
+
+        $inicioPortal = consultarInicioAluno(
+
+            $pdo,
+
+            $usuarioId,
+
+            $aluno_id,
+
+            $empresaId
+        );
+
+        if (!$inicioPortal) {
+
+            http_response_code(403);
+
+            exit('Não foi possível validar seu vínculo ' .
+                'com esta academia.');
+        }
+
+        require __DIR__ .
+            '/../views/portal_aluno/aluno.php';
+
+        exit;
+    } catch (Throwable $e) {
+
+        error_log(
+            '[GymFlow][InicioAluno] ' .
+                $e->getMessage()
+        );
+
+        http_response_code(500);
+
+        exit('Não foi possível carregar o portal. ' .
+            'Tente novamente.');
+    }
+}
+// =============================================
+// MEUS DADOS
+// =============================================
+
+elseif ($acao === 'meus_dados') {
+
+    require __DIR__ . '/MeusDadosAlunoController.php';
 
     exit;
 }

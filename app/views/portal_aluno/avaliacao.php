@@ -20,7 +20,7 @@ if (
     $_SESSION['feedback_csrf_token'] = bin2hex(random_bytes(32));
 }
 
-$tituloPagina = "Minha Avaliação";
+$tituloPagina = "Avaliar Academia";
 $cssEspecifico = BASE_URL . '/assets/css/avaliacao-aluno.css';
 
 $minhaAvaliacao = $minhaAvaliacao ?? null;
@@ -73,7 +73,7 @@ include __DIR__ . '/../shared/sidebar.php';
     <header class="portal-header avaliacao-cabecalho">
         <div>
             <span class="portal-eyebrow">PORTAL DO ALUNO</span>
-            <h1>Minha Avaliação</h1>
+            <h1>Avaliar Academia</h1>
             <p>
                 Sua opinião nos ajuda a melhorar
                 a experiência de todos.
@@ -88,30 +88,23 @@ include __DIR__ . '/../shared/sidebar.php';
     </header>
 
     <?php if ($mensagemSistema !== ''): ?>
+
         <div
-            role="<?= $tipoMensagem === 'erro' ? 'alert' : 'status' ?>"
-            style="
-                padding: 15px 18px;
-                margin-bottom: 22px;
-                border-radius: 12px;
-                border: 1px solid <?= $tipoMensagem === 'sucesso'
-                                        ? '#bbf7d0'
-                                        : '#fecaca' ?>;
-                background: <?= $tipoMensagem === 'sucesso'
-                                ? '#f0fdf4'
-                                : '#fef2f2' ?>;
-                color: <?= $tipoMensagem === 'sucesso'
-                            ? '#166534'
-                            : '#991b1b' ?>;
-                font-size: 14px;
-                font-weight: 600;
-            ">
+            class="avaliacao-mensagem avaliacao-mensagem-<?= $tipoMensagem === 'sucesso'
+                                                                ? 'sucesso'
+                                                                : 'erro' ?>"
+            role="<?= $tipoMensagem === 'erro'
+                        ? 'alert'
+                        : 'status' ?>">
+
             <?= htmlspecialchars(
                 $mensagemSistema,
                 ENT_QUOTES,
                 'UTF-8'
             ) ?>
+
         </div>
+
     <?php endif; ?>
 
     <section class="avaliacao-conteudo">
@@ -282,11 +275,12 @@ include __DIR__ . '/../shared/sidebar.php';
                             </strong>
 
                             <p>
-                                Sua avaliação será analisada
-                                antes de aparecer no site público.
-                                Se você atualizar seu comentário,
-                                ele voltará para aprovação.
+                                Após aprovação, seu nome, nota e comentário
+                                poderão aparecer no site público da academia.
+                                Caso você atualize sua avaliação, ela voltará
+                                para aprovação.
                             </p>
+
                         </div>
                     </div>
 
@@ -377,75 +371,9 @@ include __DIR__ . '/../shared/sidebar.php';
 
 </main>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const formulario = document.getElementById('formMinhaAvaliacao');
-        const estrelas = document.querySelectorAll('.avaliacao-estrela');
-        const notaInput = document.getElementById('avaliacaoNota');
-        const notaTexto = document.getElementById('avaliacaoNotaTexto');
-        const textarea = document.getElementById('avaliacaoMensagem');
-        const contador = document.getElementById('avaliacaoCaracteres');
-        const botaoSalvar = document.getElementById('avaliacaoBotaoSalvar');
-
-        function atualizarEstrelas(nota) {
-            estrelas.forEach(function(estrela) {
-                const valor = Number(estrela.dataset.nota);
-
-                estrela.classList.toggle(
-                    'selecionada',
-                    valor <= nota
-                );
-
-                estrela.setAttribute(
-                    'aria-pressed',
-                    String(valor === nota)
-                );
-            });
-
-            notaInput.value = nota;
-
-            notaTexto.textContent = nota > 0 ?
-                nota + ' de 5 estrelas' :
-                'Nenhuma nota selecionada';
-        }
-
-        estrelas.forEach(function(estrela) {
-            estrela.addEventListener('click', function() {
-                atualizarEstrelas(Number(this.dataset.nota));
-            });
-        });
-
-        function atualizarContador() {
-            contador.textContent =
-                textarea.value.length + '/1000';
-        }
-
-        textarea.addEventListener('input', atualizarContador);
-
-        formulario.addEventListener('submit', function(event) {
-            const nota = Number(notaInput.value);
-            const mensagem = textarea.value.trim();
-
-            if (nota < 1 || nota > 5) {
-                event.preventDefault();
-                alert('Selecione uma nota de 1 a 5 estrelas.');
-                return;
-            }
-
-            if (mensagem.length === 0 || mensagem.length > 1000) {
-                event.preventDefault();
-                alert('Escreva um comentário de até 1000 caracteres.');
-                textarea.focus();
-                return;
-            }
-
-            botaoSalvar.disabled = true;
-            botaoSalvar.setAttribute('aria-busy', 'true');
-        });
-
-        atualizarEstrelas(Number(notaInput.value) || 0);
-        atualizarContador();
-    });
+<script
+    src="<?= BASE_URL ?>/assets/js/avaliacao-aluno.js"
+    defer>
 </script>
 
 <?php include __DIR__ . '/../shared/footer.php'; ?>
