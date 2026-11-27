@@ -127,3 +127,133 @@
     font-size: 10px;
     font-weight: 700;
 }
+
+
+/* INICIO - COMPATIBILIDADE MINHA MARCA */
+
+:root[data-theme="light"] .biblioteca-page {
+    --bib-campo-fundo: #ffffff;
+    --bib-campo-texto: #111827;
+    --bib-superficie: #f1f5f9;
+    --bib-texto: #111827;
+    --bib-suave: #475569;
+    --bib-borda: #cbd5e1;
+    --bib-hover: #e2e8f0;
+    --bib-perigo-fundo: #fef2f2;
+    --bib-perigo-texto: #b91c1c;
+    --bib-perigo-borda: #fecaca;
+    --bib-perigo-hover: #fee2e2;
+    color-scheme: light;
+}
+
+:root[data-theme="dark"] .biblioteca-page {
+    --bib-campo-fundo: #111827;
+    --bib-campo-texto: #f8fafc;
+    --bib-superficie: #253143;
+    --bib-texto: #f8fafc;
+    --bib-suave: #b0bfd1;
+    --bib-borda: #334155;
+    --bib-hover: #334155;
+    --bib-perigo-fundo: #3f2027;
+    --bib-perigo-texto: #fca5a5;
+    --bib-perigo-borda: #7f3540;
+    --bib-perigo-hover: #57272f;
+    color-scheme: dark;
+}
+
+/* Campos de pesquisa */
+
+:root[data-theme] body .biblioteca-page .biblioteca-campo input,
+:root[data-theme] body .biblioteca-page .biblioteca-campo select {
+    background: var(--bib-campo-fundo) !important;
+    color: var(--bib-campo-texto) !important;
+    border-color: var(--bib-borda) !important;
+    -webkit-text-fill-color: var(--bib-campo-texto) !important;
+    box-shadow: none;
+}
+
+:root[data-theme] body .biblioteca-page .biblioteca-campo input::placeholder {
+    color: var(--bib-suave) !important;
+    -webkit-text-fill-color: var(--bib-suave) !important;
+    opacity: 1;
+}
+
+:root[data-theme] body .biblioteca-page .biblioteca-campo select option {
+    background-color: var(--bib-campo-fundo) !important;
+    color: var(--bib-campo-texto) !important;
+}
+
+:root[data-theme] body .biblioteca-page .biblioteca-campo input:focus,
+:root[data-theme] body .biblioteca-page .biblioteca-campo select:focus {
+    border-color: var(--cor-primaria) !important;
+    outline: 2px solid var(--cor-primaria);
+    outline-offset: 1px;
+}
+
+/* Botoes principais: respeitam Minha Marca */
+
+:root[data-theme] body .biblioteca-page .biblioteca-btn-primary {
+    background: var(--cor-primaria) !important;
+    color: var(--cor-sobre-primaria) !important;
+    border-color: var(--cor-primaria) !important;
+    -webkit-text-fill-color: var(--cor-sobre-primaria) !important;
+}
+
+:root[data-theme] body .biblioteca-page .biblioteca-btn-primary:hover {
+    box-shadow: inset 0 0 0 2px var(--cor-sobre-primaria);
+}
+
+/* Botoes Limpar e Editar */
+
+:root[data-theme] body .biblioteca-page .biblioteca-btn-secondary,
+:root[data-theme] body .biblioteca-page .exercicio-acoes .exercicio-btn-editar {
+    background: var(--bib-superficie) !important;
+    color: var(--bib-texto) !important;
+    border-color: var(--bib-borda) !important;
+    -webkit-text-fill-color: var(--bib-texto) !important;
+    opacity: 1;
+}
+
+:root[data-theme] body .biblioteca-page .biblioteca-btn-secondary:hover,
+:root[data-theme] body .biblioteca-page .exercicio-acoes .exercicio-btn-editar:hover {
+    background: var(--bib-hover) !important;
+    color: var(--bib-texto) !important;
+    border-color: var(--cor-primaria) !important;
+}
+
+/* Botao Excluir */
+
+:root[data-theme] body .biblioteca-page .exercicio-acoes .exercicio-btn-excluir {
+    background: var(--bib-perigo-fundo) !important;
+    color: var(--bib-perigo-texto) !important;
+    border-color: var(--bib-perigo-borda) !important;
+    -webkit-text-fill-color: var(--bib-perigo-texto) !important;
+}
+
+:root[data-theme] body .biblioteca-page .exercicio-acoes .exercicio-btn-excluir:hover {
+    background: var(--bib-perigo-hover) !important;
+}
+
+/* Grupo muscular e formato da midia */
+
+:root[data-theme] body .biblioteca-page .exercicio-grupo,
+:root[data-theme] body .biblioteca-page .exercicio-formato {
+    background: var(--bib-superficie) !important;
+    color: var(--bib-suave) !important;
+    border: 1px solid var(--bib-borda) !important;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 12px;
+}
+
+:root[data-theme] body .biblioteca-page .exercicio-midia {
+    background: var(--bib-superficie) !important;
+}
+
+/* Respeitar elementos ocultos */
+
+.biblioteca-page [hidden] {
+    display: none !important;
+}
+
+/* FIM - COMPATIBILIDADE MINHA MARCA */

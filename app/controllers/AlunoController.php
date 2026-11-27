@@ -24,6 +24,27 @@ $inteiro = static fn($valor) =>
         ['options' => ['min_range' => 1]]
     );
 
+// Padronização visual do CPF.
+$formatarCpf = static function ($valor): string {
+
+    $original = trim((string) $valor);
+
+    if (!preg_match('/^[0-9.\- ]+$/', $original)) {
+        return $original;
+    }
+
+    $cpf = preg_replace('/\D/', '', $original);
+
+    if (strlen($cpf) !== 11) {
+        return $original;
+    }
+
+    return substr($cpf, 0, 3) . '.' .
+           substr($cpf, 3, 3) . '.' .
+           substr($cpf, 6, 3) . '-' .
+           substr($cpf, 9, 2);
+};
+
 $metodo = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
 $erro = '';
@@ -106,6 +127,17 @@ try {
             $erro = $erroModel;
         }
 
+        // Padroniza os CPFs apresentados na tabela.
+
+        foreach ($alunos as $indice => $registro) {
+
+            $alunos[$indice]['cpf'] = $formatarCpf(
+                $registro['cpf'] ?? ''
+            );
+        }
+
+        $cpf = $formatarCpf($cpf);
+
         require __DIR__ . '/../views/alunos/index.php';
 
         exit;
@@ -132,6 +164,12 @@ try {
 
             $redirecionar($baseUrl . '?acao=listar');
         }
+
+        // Padroniza o CPF nos dados cadastrais.
+
+        $aluno['cpf'] = $formatarCpf(
+            $aluno['cpf'] ?? ''
+        );
 
         require __DIR__ . '/../views/alunos/visualizar.php';
 
@@ -211,6 +249,14 @@ try {
                 $erro = $erroModel;
             }
         }
+
+        // Padroniza o CPF somente para exibição.
+
+        $aluno['cpf'] = $formatarCpf(
+            $aluno['cpf'] ?? ''
+        );
+
+        $dados['cpf'] = $aluno['cpf'];
 
         require __DIR__ . '/../views/alunos/editar.php';
 

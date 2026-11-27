@@ -812,7 +812,6 @@ include __DIR__ . '/../shared/portfolio_header.php';
                 <?php else: ?>
 
                     <div class="sobre-imagem-vazia">
-                        Adicione uma imagem no Admin
                     </div>
 
                 <?php endif; ?>
@@ -929,7 +928,6 @@ include __DIR__ . '/../shared/portfolio_header.php';
                     <?php else: ?>
 
                         <div class="contato-imagem-vazia">
-                            Adicione uma imagem no Admin
                         </div>
 
                     <?php endif; ?>
@@ -1447,7 +1445,6 @@ include __DIR__ . '/../shared/portfolio_header.php';
                 <?php else: ?>
 
                     <div class="feedback-imagem-vazia">
-                        Adicione uma imagem no Admin
                     </div>
 
                 <?php endif; ?>

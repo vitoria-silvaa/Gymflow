@@ -1,43 +1,38 @@
 <?php
 // app/views/dashboard/index.php
 
-if (!isset($tituloPagina)) {
-    header(
-        "Location: " . BASE_URL .
-            "/app/controllers/DashboardController.php"
-    );
+if (!isset($tituloPagina, $cards, $baseUrl)) {
+    http_response_code(403);
     exit;
 }
 
-$tituloPagina = "Dashboard";
+$tituloPagina = 'Dashboard';
 
 $cssEspecifico =
     BASE_URL . '/assets/css/dashboard-v2.css';
 
 $role = $_SESSION['usuario_role'] ?? '';
-$anoAtual = date('Y');
+
+$h = static fn($valor) => htmlspecialchars(
+    (string) $valor,
+    ENT_QUOTES | ENT_SUBSTITUTE,
+    'UTF-8'
+);
 
 $subtitulo = match ($role) {
-    'Admin' => 'Acompanhe o desempenho da sua rede.',
-    'Recepcao' => 'Acompanhe a rotina das suas unidades.',
-    'Professor' => 'Acompanhe seus alunos e atividades.',
-    default => 'Acompanhe os indicadores da academia.'
+
+    'Admin' =>
+        'Acompanhe o desempenho da sua rede.',
+
+    'Recepcao' =>
+        'Acompanhe a rotina das suas unidades.',
+
+    'Professor' =>
+        'Acompanhe seus alunos e atividades.',
+
+    default =>
+        'Acompanhe os indicadores da academia.'
 };
-
-// Prepara os 12 meses do gráfico.
-$valoresGrafico = array_fill(0, 12, 0);
-
-foreach ($dadosGraficoNovosAlunos ?? [] as $item) {
-
-    $mes = (int) ($item['mes'] ?? 0);
-
-    if ($mes >= 1 && $mes <= 12) {
-        $valoresGrafico[$mes - 1] =
-            (int) ($item['total'] ?? 0);
-    }
-}
-
-$totalNovosAno = array_sum($valoresGrafico);
 
 include __DIR__ . '/../shared/header.php';
 include __DIR__ . '/../shared/sidebar.php';
@@ -45,71 +40,180 @@ include __DIR__ . '/../shared/sidebar.php';
 
 <main class="conteudo dashboard-page">
 
-    <!-- CABEÇALHO -->
     <header class="dashboard-topo">
 
-        <div>
-            <span class="dashboard-etiqueta">
-                VISÃO GERAL
-            </span>
+        <div class="dashboard-titulo">
 
             <h1>Dashboard</h1>
 
-            <p>
-                <?= htmlspecialchars(
-                    $subtitulo,
-                    ENT_QUOTES,
-                    'UTF-8'
-                ) ?>
-            </p>
+            <p><?= $h($subtitulo) ?></p>
+
         </div>
 
-        <div class="dashboard-data">
-            <span>Atualizado em</span>
+        <div class="dashboard-controles">
 
-            <strong>
-                <?= date('d/m/Y') ?>
-            </strong>
+            <form
+                method="GET"
+                action="<?= $h($baseUrl) ?>"
+                class="dashboard-filtro"
+                id="dashboardFiltro">
+
+                <div class="dashboard-campo">
+
+                    <label for="periodo">
+                        Período
+                    </label>
+
+                    <select
+                        name="periodo"
+                        id="periodo">
+
+                        <?php foreach ($periodos as $valor => $rotulo): ?>
+
+                            <option
+                                value="<?= $h($valor) ?>"
+                                <?= $periodo === $valor
+                                    ? 'selected'
+                                    : '' ?>>
+
+                                <?= $h($rotulo) ?>
+
+                            </option>
+
+                        <?php endforeach; ?>
+
+                    </select>
+
+                </div>
+
+                <div
+                    class="dashboard-datas"
+                    id="dashboardDatas"
+                    <?= $periodo !== 'personalizado'
+                        ? 'hidden'
+                        : '' ?>>
+
+                    <div class="dashboard-campo">
+
+                        <label for="data_inicio">
+                            De
+                        </label>
+
+                        <input
+                            type="date"
+                            name="data_inicio"
+                            id="data_inicio"
+                            value="<?= $h($dataInicio) ?>"
+                            <?= $periodo === 'personalizado'
+                                ? 'required'
+                                : 'disabled' ?>>
+
+                    </div>
+
+                    <div class="dashboard-campo">
+
+                        <label for="data_fim">
+                            Até
+                        </label>
+
+                        <input
+                            type="date"
+                            name="data_fim"
+                            id="data_fim"
+                            value="<?= $h($dataFim) ?>"
+                            min="<?= $h($dataInicio) ?>"
+                            <?= $periodo === 'personalizado'
+                                ? 'required'
+                                : 'disabled' ?>>
+
+                    </div>
+
+                </div>
+
+                <button
+                    type="submit"
+                    class="dashboard-aplicar">
+
+                    Aplicar
+
+                </button>
+
+            </form>
+
+            <div class="dashboard-data">
+
+                <span>Atualizado em</span>
+
+                <strong>
+                    <?= $h($hoje->format('d/m/Y')) ?>
+                </strong>
+
+            </div>
+
         </div>
 
     </header>
 
-    <!-- CARDS -->
+    <?php if ($erroFiltro !== ''): ?>
+
+        <div
+            class="dashboard-alerta"
+            role="alert">
+
+            <?= $h($erroFiltro) ?>
+
+        </div>
+
+    <?php endif; ?>
+
+    <p class="dashboard-periodo-atual">
+
+        Período de consulta:
+        <strong><?= $h($periodoDescricao) ?></strong>
+
+    </p>
+
     <section
         class="dashboard-indicadores"
-        aria-label="Indicadores principais"
-    >
+        data-quantidade="<?= count($cards) ?>"
+        aria-label="Indicadores principais">
 
-        <?php foreach ($cards ?? [] as $indice => $card): ?>
+        <?php foreach ($cards as $card): ?>
 
             <article class="dashboard-indicador">
 
                 <div class="dashboard-indicador-topo">
 
                     <span class="dashboard-indicador-label">
-                        <?= htmlspecialchars(
-                            $card['titulo'] ?? '',
-                            ENT_QUOTES,
-                            'UTF-8'
-                        ) ?>
+
+                        <?= $h($card['titulo']) ?>
+
                     </span>
 
                 </div>
 
-                <strong class="dashboard-indicador-valor">
-                    <?= htmlspecialchars(
-                        (string) ($card['valor'] ?? '0'),
-                        ENT_QUOTES,
-                        'UTF-8'
-                    ) ?>
-                </strong>
+                <div class="dashboard-indicador-centro">
+
+                    <strong class="dashboard-indicador-valor">
+
+                        <?= $h($card['valor']) ?>
+
+                    </strong>
+
+                    <span
+                        class="dashboard-indicador-icone"
+                        aria-hidden="true">
+
+                        <i data-lucide="<?= $h($card['icone']) ?>"></i>
+
+                    </span>
+
+                </div>
 
                 <p class="dashboard-indicador-info">
-                    <?= htmlspecialchars(
-                        $card['info'] ?? '',
-                        ENT_QUOTES,
-                        'UTF-8'
-                    ) ?>
+
+                    <?= $h($card['info']) ?>
+
                 </p>
 
             </article>
@@ -118,56 +222,75 @@ include __DIR__ . '/../shared/sidebar.php';
 
     </section>
 
-    <!-- GRÁFICO -->
     <section class="dashboard-grafico-card">
 
         <div class="dashboard-grafico-topo">
 
             <div>
-                <span class="dashboard-etiqueta">
-                    ACOMPANHAMENTO
-                </span>
 
-                <h2>
-                    Crescimento de alunos
-                </h2>
+                <h2>Crescimento de alunos</h2>
 
                 <p>
-                    Novos alunos cadastrados ao longo
-                    de <?= $anoAtual ?>.
+                    Novos alunos cadastrados no período selecionado.
                 </p>
+
             </div>
 
             <div class="dashboard-grafico-total">
 
-                <span>
-                    Total no ano
-                </span>
+                <div class="dashboard-total-icone" aria-hidden="true">
 
-                <strong>
-                    <?= number_format(
-                        $totalNovosAno,
-                        0,
-                        ',',
-                        '.'
-                    ) ?>
-                </strong>
+                    <i data-lucide="users"></i>
 
-                <small>
-                    novos cadastros
-                </small>
+                </div>
+
+                <div class="dashboard-total-info">
+
+                    <span>Total no período</span>
+
+                    <strong>
+
+                        <?= number_format(
+                            $totalNovosPeriodo,
+                            0,
+                            ',',
+                            '.'
+                        ) ?>
+
+                    </strong>
+
+                    <small>novos cadastros</small>
+
+                </div>
 
             </div>
 
         </div>
 
         <div class="dashboard-grafico-area">
-            <canvas id="graficoAlunos"></canvas>
+
+            <canvas
+                id="graficoAlunos"
+                role="img"
+                aria-label="Gráfico de novos alunos no período selecionado">
+            </canvas>
+
         </div>
 
+        <p
+            id="dashboardGraficoErro"
+            class="dashboard-grafico-rodape"
+            role="status"
+            hidden>
+
+            Não foi possível carregar o gráfico.
+
+        </p>
+
         <p class="dashboard-grafico-rodape">
-            Os indicadores respeitam as permissões
-            do seu perfil.
+
+            Os indicadores respeitam as permissões do seu perfil.
+
         </p>
 
     </section>
@@ -177,150 +300,233 @@ include __DIR__ . '/../shared/sidebar.php';
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
 
-        const canvas = document.getElementById('graficoAlunos');
+    // Controle de período personalizado.
 
-        if (!canvas || typeof Chart === 'undefined') {
-            return;
+    const periodo = document.getElementById('periodo');
+
+    const datas = document.getElementById('dashboardDatas');
+
+    const inicio = document.getElementById('data_inicio');
+
+    const fim = document.getElementById('data_fim');
+
+    function atualizarPeriodo() {
+
+        const personalizado =
+            periodo.value === 'personalizado';
+
+        datas.hidden = !personalizado;
+
+        inicio.disabled = !personalizado;
+        fim.disabled = !personalizado;
+
+        inicio.required = personalizado;
+        fim.required = personalizado;
+    }
+
+    function atualizarLimites() {
+
+        fim.min = inicio.value;
+
+        if (
+            inicio.value &&
+            fim.value &&
+            fim.value < inicio.value
+        ) {
+            fim.value = inicio.value;
         }
+    }
 
-        const meses = [
-            'Jan',
-            'Fev',
-            'Mar',
-            'Abr',
-            'Mai',
-            'Jun',
-            'Jul',
-            'Ago',
-            'Set',
-            'Out',
-            'Nov',
-            'Dez'
-        ];
+    periodo.addEventListener(
+        'change',
+        atualizarPeriodo
+    );
 
-        const valores = <?= json_encode(
-                            $valoresGrafico,
-                            JSON_NUMERIC_CHECK
-                        ) ?>;
+    inicio.addEventListener(
+        'change',
+        atualizarLimites
+    );
 
-        const contexto = canvas.getContext('2d');
+    atualizarPeriodo();
+    atualizarLimites();
 
-        const corPrimaria = getComputedStyle(
-            document.documentElement
-        ).getPropertyValue('--cor-primaria').trim() || '#10b981';
+    // Gráfico.
 
-        const gradiente = contexto.createLinearGradient(
-            0,
-            0,
-            0,
-            340
-        );
+    const canvas =
+        document.getElementById('graficoAlunos');
 
-        gradiente.addColorStop(
-            0,
-            corPrimaria + '38'
-        );
+    const pagina =
+        document.querySelector('.dashboard-page');
 
-        gradiente.addColorStop(
-            1,
-            corPrimaria + '00'
-        );
+    if (!canvas || !pagina) {
+        return;
+    }
 
-        new Chart(contexto, {
+    if (typeof Chart === 'undefined') {
 
-            type: 'line',
+        document.getElementById(
+            'dashboardGraficoErro'
+        ).hidden = false;
 
-            data: {
+        return;
+    }
 
-                labels: meses,
+    const labels = <?= json_encode(
+        $labelsGrafico,
+        JSON_HEX_TAG |
+        JSON_HEX_AMP |
+        JSON_HEX_APOS |
+        JSON_HEX_QUOT
+    ) ?>;
 
-                datasets: [{
-                    label: 'Novos alunos',
+    const valores = <?= json_encode(
+        $valoresGrafico,
+        JSON_NUMERIC_CHECK
+    ) ?>;
 
-                    data: valores,
+    const estilos = getComputedStyle(pagina);
 
-                    borderColor: corPrimaria,
+    const obterCor = (variavel, padrao) =>
+        estilos.getPropertyValue(variavel).trim() ||
+        padrao;
 
-                    backgroundColor: gradiente,
+    const primaria = obterCor(
+        '--cor-primaria',
+        '#ffb000'
+    );
 
-                    fill: true,
+    const texto = obterCor(
+        '--cor-texto',
+        '#111827'
+    );
 
-                    borderWidth: 3,
+    const textoSuave = obterCor(
+        '--cor-texto-secundario',
+        '#64748b'
+    );
 
-                    tension: 0.35,
+    const borda = obterCor(
+        '--cor-borda',
+        '#e2e8f0'
+    );
 
-                    pointRadius: 4,
+    const superficie = obterCor(
+        '--cor-superficie',
+        '#ffffff'
+    );
 
-                    pointHoverRadius: 7,
+    const fundoGrafico =
+        /^#[0-9a-f]{6}$/i.test(primaria)
+            ? primaria + '18'
+            : 'rgba(100, 116, 139, 0.10)';
 
-                    pointBackgroundColor: '#ffffff',
+    new Chart(canvas, {
 
-                    pointBorderColor: corPrimaria,
+        type: 'line',
 
-                    pointBorderWidth: 2
-                }]
+        data: {
+
+            labels: labels,
+
+            datasets: [{
+                label: 'Novos alunos',
+                data: valores,
+
+                borderColor: primaria,
+                backgroundColor: fundoGrafico,
+
+                fill: true,
+                borderWidth: 2,
+                tension: 0,
+
+                pointRadius: valores.length > 31 ? 2 : 3,
+                pointHoverRadius: 5,
+
+                pointBackgroundColor: superficie,
+                pointBorderColor: primaria,
+                pointBorderWidth: 2
+            }]
+        },
+
+        options: {
+
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+            animation: false,
+
+            interaction: {
+                mode: 'index',
+                intersect: false
             },
 
-            options: {
+            plugins: {
 
-                responsive: true,
+                legend: {
+                    display: false
+                },
 
-                maintainAspectRatio: false,
+                tooltip: {
 
-                plugins: {
+                    backgroundColor: superficie,
 
-                    legend: {
+                    titleColor: texto,
+                    bodyColor: texto,
+
+                    borderColor: borda,
+                    borderWidth: 1,
+
+                    padding: 10,
+                    cornerRadius: 6
+                }
+            },
+
+            scales: {
+
+                x: {
+
+                    border: {
+                        color: borda
+                    },
+
+                    grid: {
                         display: false
                     },
 
-                    tooltip: {
-
-                        backgroundColor: '#181818',
-
-                        titleColor: '#ffffff',
-
-                        bodyColor: '#ffffff',
-
-                        padding: 14,
-
-                        cornerRadius: 10
+                    ticks: {
+                        color: textoSuave,
+                        autoSkip: true,
+                        maxRotation: 0,
+                        maxTicksLimit: 12
                     }
                 },
 
-                scales: {
+                y: {
 
-                    x: {
+                    beginAtZero: true,
+                    suggestedMax: 1,
 
-                        grid: {
-                            display: false
-                        },
-
-                        ticks: {
-                            color: '#858585'
-                        }
+                    border: {
+                        color: borda
                     },
 
-                    y: {
+                    ticks: {
+                        precision: 0,
+                        color: textoSuave
+                    },
 
-                        beginAtZero: true,
-
-                        ticks: {
-
-                            precision: 0,
-
-                            color: '#858585'
-                        },
-
-                        grid: {
-                            color: '#eeeeee'
-                        }
+                    grid: {
+                        color: borda
                     }
                 }
             }
-        });
+        }
     });
+
+});
 </script>
 
 <?php include __DIR__ . '/../shared/footer.php'; ?>

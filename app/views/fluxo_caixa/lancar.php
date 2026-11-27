@@ -22,40 +22,53 @@ include __DIR__ . '/../shared/sidebar.php';
         </div>
 
         <div class="fin-header-actions">
-            <a href="<?= BASE_URL ?>/app/controllers/FluxoCaixaController.php" class="fin-btn fin-btn-secondary fin-btn-sm">
+            <a href="<?= BASE_URL ?>/app/controllers/FluxoCaixaController.php"
+               class="fin-btn fin-btn-secondary fin-btn-sm">
                 ← Voltar ao Fluxo
             </a>
         </div>
     </div>
 
     <section class="fin-form-card">
+
         <h2>Novo Lançamento</h2>
-        <p class="subtitle">Preencha as informações detalhadas da despesa operacional.</p>
+
+        <p class="subtitle">
+            Preencha as informações detalhadas da despesa operacional.
+        </p>
 
         <form
+            id="form-lancar-custo"
             method="POST"
             action="<?= BASE_URL ?>/app/controllers/FluxoCaixaController.php?acao=confirmar_lancamento"
         >
+
             <div class="fin-form-grid">
 
                 <div class="fin-form-group col-span-2">
                     <label for="descricao" class="fin-form-label">
-                        Descrição da Despesa <span class="required">*</span>
+                        Descrição da Despesa
+                        <span class="required">*</span>
                     </label>
+
                     <input
                         type="text"
                         name="descricao"
                         id="descricao"
                         class="fin-form-input"
                         placeholder="Ex: Manutenção de esteiras, Compra de anilhas, Aluguel"
+                        maxlength="255"
                         required
                     >
                 </div>
 
                 <div class="fin-form-group">
+
                     <label for="categoria" class="fin-form-label">
-                        Categoria <span class="required">*</span>
+                        Categoria
+                        <span class="required">*</span>
                     </label>
+
                     <select
                         name="categoria"
                         id="categoria"
@@ -69,12 +82,16 @@ include __DIR__ . '/../shared/sidebar.php';
                         <option value="Marketing">Marketing & Divulgação</option>
                         <option value="Outros">Outros</option>
                     </select>
+
                 </div>
 
                 <div class="fin-form-group">
+
                     <label for="valor" class="fin-form-label">
-                        Valor (R$) <span class="required">*</span>
+                        Valor (R$)
+                        <span class="required">*</span>
                     </label>
+
                     <input
                         type="number"
                         name="valor"
@@ -82,15 +99,20 @@ include __DIR__ . '/../shared/sidebar.php';
                         class="fin-form-input"
                         step="0.01"
                         min="0.01"
+                        max="99999999.99"
                         placeholder="0,00"
                         required
                     >
+
                 </div>
 
                 <div class="fin-form-group col-span-2">
+
                     <label for="data" class="fin-form-label">
-                        Data do Pagamento / Lançamento <span class="required">*</span>
+                        Data do Pagamento / Lançamento
+                        <span class="required">*</span>
                     </label>
+
                     <input
                         type="date"
                         name="data"
@@ -99,23 +121,59 @@ include __DIR__ . '/../shared/sidebar.php';
                         value="<?= date('Y-m-d') ?>"
                         required
                     >
+
                 </div>
 
             </div>
 
             <div class="fin-form-actions">
+
                 <button type="submit" class="fin-btn fin-btn-primary">
-                    ✓ Registrar Custo
+                    Registrar Custo
                 </button>
 
-                <a href="<?= BASE_URL ?>/app/controllers/FluxoCaixaController.php" class="fin-btn fin-btn-secondary">
+                <a href="<?= BASE_URL ?>/app/controllers/FluxoCaixaController.php"
+                   class="fin-btn fin-btn-secondary">
                     Cancelar
                 </a>
+
             </div>
+
         </form>
 
     </section>
 
 </main>
+
+<script>
+document.getElementById('form-lancar-custo')
+    .addEventListener('submit', function (event) {
+
+        const descricao = document.getElementById('descricao').value.trim();
+        const categoria = document.getElementById('categoria').value;
+        const valor = Number(document.getElementById('valor').value);
+        const data = document.getElementById('data').value;
+
+        const valorFormatado = valor.toLocaleString('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        });
+
+        const dataFormatada = data.split('-').reverse().join('/');
+
+        const mensagem =
+            'Deseja realmente registrar este custo?\n\n' +
+            'Descrição: ' + descricao + '\n' +
+            'Categoria: ' + categoria + '\n' +
+            'Valor: ' + valorFormatado + '\n' +
+            'Data: ' + dataFormatada + '\n\n' +
+            'ATENÇÃO: após o registro, o lançamento não poderá ser editado pelo sistema.';
+
+        if (!window.confirm(mensagem)) {
+            event.preventDefault();
+        }
+
+    });
+</script>
 
 <?php include __DIR__ . '/../shared/footer.php'; ?>

@@ -346,7 +346,9 @@ try {
         ';
 
         if (!$administrativo) {
-            $sqlSlides .= ' AND ativo = 1';
+            $sqlSlides .= " AND ativo = 1
+                         AND image_url IS NOT NULL
+                         AND TRIM(image_url) <> ''";
         }
 
         $sqlSlides .= ' ORDER BY ordem ASC, id ASC';
@@ -740,6 +742,27 @@ try {
 
                     // Verifica a propriedade da filial
                     // antes de associar a imagem.
+
+                    /* Remover somente a imagem da filial */
+                    if (
+                        $imageUrl === '' &&
+                        array_key_exists('image_url', $data)
+                    ) {
+                        portfolioExecutar(
+                            $pdo,
+                            'DELETE pfi
+                             FROM portfolio_filial_images pfi
+                             INNER JOIN filiais f
+                                ON f.id = pfi.filial_id
+                                AND f.company_id = pfi.company_id
+                             WHERE pfi.company_id = ?
+                               AND pfi.filial_id = ?',
+                            [
+                                $company_id,
+                                $filialId
+                            ]
+                        );
+                    }
 
                     if ($imageUrl !== '') {
                         $filialPermitida = portfolioConsultar(

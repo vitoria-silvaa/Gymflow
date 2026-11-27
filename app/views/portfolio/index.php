@@ -873,4 +873,219 @@
        }
    </script>
 
-   <?php include __DIR__ . '/../shared/footer.php'; ?>
+
+<!-- INICIO - REMOCAO INDIVIDUAL DE IMAGENS -->
+
+<style>
+
+.portfolio-admin-page .portfolio-imagem-acoes {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.portfolio-admin-page .portfolio-imagem-status {
+    color: var(--ui-texto-suave);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.portfolio-admin-page .portfolio-imagem-remover {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    min-height: 34px;
+    padding: 7px 12px;
+
+    background: transparent;
+    color: #b91c1c;
+
+    border: 1px solid #fecaca;
+    border-radius: var(--ui-raio-sm, 6px);
+
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: none;
+}
+
+.portfolio-admin-page .portfolio-imagem-remover:hover {
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+:root[data-theme="dark"]
+.portfolio-admin-page .portfolio-imagem-remover {
+    background: transparent;
+    color: #fca5a5;
+    border-color: #7f3540;
+}
+
+:root[data-theme="dark"]
+.portfolio-admin-page .portfolio-imagem-remover:hover {
+    background: #3f2027;
+    color: #fecaca;
+}
+
+.portfolio-admin-page .portfolio-imagem-acoes [hidden],
+.portfolio-admin-page .portfolio-imagem-previa[hidden] {
+    display: none !important;
+}
+
+</style>
+
+<script>
+(function () {
+
+    const form = document.getElementById('portfolioForm');
+
+    if (!form) return;
+
+    const configurados = new WeakSet();
+
+    function configurarImagem(arquivo) {
+
+        if (configurados.has(arquivo)) {
+            return;
+        }
+
+        const campo = arquivo.parentElement;
+
+        const url = Array.from(campo.children).find(
+            elemento => elemento.matches(
+                'input[type="hidden"]'
+            )
+        );
+
+        if (!url) return;
+
+        configurados.add(arquivo);
+
+        const previa = Array.from(campo.children).find(
+            elemento =>
+                elemento.tagName === 'DIV' &&
+                elemento.querySelector('img')
+        );
+
+        if (previa) {
+            previa.classList.add(
+                'portfolio-imagem-previa'
+            );
+        }
+
+        const acoes = document.createElement('div');
+
+        acoes.className = 'portfolio-imagem-acoes';
+
+        const status = document.createElement('small');
+
+        status.className = 'portfolio-imagem-status';
+
+        status.setAttribute('role', 'status');
+
+        const remover = document.createElement('button');
+
+        remover.type = 'button';
+
+        remover.className = 'portfolio-imagem-remover';
+
+        remover.textContent = 'Remover imagem';
+
+        let imagemRemovida = false;
+
+        function atualizarEstado() {
+
+            const novoArquivo =
+                arquivo.files && arquivo.files.length > 0;
+
+            const possuiImagem =
+                url.value.trim() !== '';
+
+            remover.hidden =
+                !possuiImagem && !novoArquivo;
+
+            if (previa) {
+                previa.hidden =
+                    !possuiImagem || novoArquivo;
+            }
+
+            if (novoArquivo) {
+
+                status.textContent =
+                    'Nova imagem selecionada. Salve para publicar.';
+
+            } else if (imagemRemovida) {
+
+                status.textContent = arquivo.required
+                    ? 'Selecione outra imagem ou cancele o novo slide.'
+                    : 'A imagem sera removida ao salvar as alteracoes.';
+
+            } else if (possuiImagem) {
+
+                status.textContent = 'Imagem cadastrada.';
+
+            } else {
+
+                status.textContent = 'Nenhuma imagem cadastrada.';
+            }
+        }
+
+        remover.addEventListener('click', function () {
+
+            const confirmar = window.confirm(
+                'Deseja remover esta imagem? ' +
+                'A alteracao sera aplicada ao salvar.'
+            );
+
+            if (!confirmar) return;
+
+            arquivo.value = '';
+            url.value = '';
+
+            imagemRemovida = true;
+
+            atualizarEstado();
+        });
+
+        arquivo.addEventListener(
+            'change',
+            atualizarEstado
+        );
+
+        acoes.appendChild(remover);
+        acoes.appendChild(status);
+
+        campo.appendChild(acoes);
+
+        atualizarEstado();
+    }
+
+    function configurarCampos() {
+
+        form.querySelectorAll(
+            'input[type="file"]'
+        ).forEach(configurarImagem);
+    }
+
+    configurarCampos();
+
+    // Tambem configura os itens adicionados dinamicamente.
+
+    const observador = new MutationObserver(
+        configurarCampos
+    );
+
+    observador.observe(form, {
+        childList: true,
+        subtree: true
+    });
+
+})();
+</script>
+
+<!-- FIM - REMOCAO INDIVIDUAL DE IMAGENS -->
+
+<?php include __DIR__ . '/../shared/footer.php'; ?>
