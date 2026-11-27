@@ -7,6 +7,7 @@
 
 require_once __DIR__ . '/../../config/sessao.php';
 require_once __DIR__ . '/../models/Database.php';
+require_once __DIR__ . '/../models/Feedback.php';
 
 // ================================================
 // 1. ROTAS DE RETORNO
@@ -170,37 +171,10 @@ try {
     // - estar vinculado a um cadastro de aluno;
     // - ter uma filial da mesma empresa.
 
-    $stmtUsuario = $pdo->prepare("
-        SELECT
-            u.id,
-            u.name,
-            u.aluno_id,
-            u.company_id
-
-        FROM users u
-
-        INNER JOIN alunos a
-            ON a.id = u.aluno_id
-
-        INNER JOIN filiais f
-            ON f.id = a.filial_id
-
-        WHERE u.id = :usuario_id
-          AND u.company_id = :company_id
-          AND f.company_id = :filial_company_id
-          AND u.role = 'Aluno'
-
-        LIMIT 1
-    ");
-
-    $stmtUsuario->execute([
-        ':usuario_id'       => $usuarioId,
-        ':company_id'       => $companyId,
-        ':filial_company_id' => $companyId
-    ]);
-
-    $usuario = $stmtUsuario->fetch(
-        PDO::FETCH_ASSOC
+    $usuario = feedbackBuscarAlunoAutorizado(
+        $pdo,
+        $usuarioId,
+        $companyId
     );
 
     if (!$usuario) {
@@ -241,52 +215,15 @@ try {
     // ============================================
     // 7. INSERIR OU ATUALIZAR A AVALIAÇÃO
     // ============================================
-    //
-    // UNIQUE(company_id, user_id) garante:
-    //
-    // - Uma avaliação por aluno/academia.
-    // - Nova avaliação: INSERT.
-    // - Avaliação existente: UPDATE.
-    //
-    // ativo = 0:
-    // Toda avaliação nova ou editada
-    // retorna para moderação.
-    //
-    // A coluna nome é atualizada com o nome
-    // atual do cadastro do usuário.
 
-    $stmtSalvar = $pdo->prepare("
-        INSERT INTO portfolio_feedbacks (
-            company_id,
-            user_id,
-            nome,
-            nota,
-            mensagem,
-            ativo
-        )
-        VALUES (
-            :company_id,
-            :user_id,
-            :nome,
-            :nota,
-            :mensagem,
-            0
-        )
-
-        ON DUPLICATE KEY UPDATE
-            nome = VALUES(nome),
-            nota = VALUES(nota),
-            mensagem = VALUES(mensagem),
-            ativo = 0
-    ");
-
-    $stmtSalvar->execute([
-        ':company_id' => $companyId,
-        ':user_id'    => $usuarioId,
-        ':nome'       => $nome,
-        ':nota'       => $nota,
-        ':mensagem'   => $mensagem
-    ]);
+    feedbackSalvarAvaliacao(
+        $pdo,
+        $companyId,
+        $usuarioId,
+        $nome,
+        $nota,
+        $mensagem
+    );
 
     // ============================================
     // 8. REDIRECIONAR PARA A ORIGEM

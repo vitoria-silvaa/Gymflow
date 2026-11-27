@@ -1,4 +1,4 @@
-﻿/* ========================================
+/* ========================================
    GYMFLOW - PORTAL DO ALUNO
    TREINOS - PADRONIZAÇÃO VISUAL
    ======================================== */
@@ -712,4 +712,20 @@
     .treinos-page .btn-pausa {
         transition: none;
     }
+}
+
+/* Meta diária de frequência (Portal do Aluno - Treinos) */
+#tgFrequencyCount {
+    font-size: 24px;
+}
+
+#tgFrequencyProgress {
+    width: 100%;
+    height: 8px;
+    accent-color: #d97706;
+}
+
+#tgFrequencyMessage {
+    font-size: 12px;
+    margin-bottom: 0;
 }

@@ -93,15 +93,11 @@ include __DIR__ . '/../shared/sidebar.php';
 
     <?php endif; ?>
 
-    <section
-        class="fin-form-card"
-        style="max-width:none">
+    <section class="fin-form-card ui-card-full">
 
         <h2>Dados cadastrais</h2>
 
-        <div
-            class="fin-form-grid"
-            style="margin-top:24px">
+        <div class="fin-form-grid ui-mt-24">
 
             <?php foreach ([
                 'Nome completo' => $aluno['nome'],
@@ -206,19 +202,19 @@ include __DIR__ . '/../shared/sidebar.php';
 
                             $situacao = 'Encerrada';
 
-                            $cor = 'var(--fin-text-muted)';
+                            $classeCor = 'ui-texto-suave';
 
                         } elseif ((int) $m['ativa'] === 1) {
 
                             $situacao = 'Ativa';
 
-                            $cor = 'var(--fin-success)';
+                            $classeCor = 'ui-texto-sucesso';
 
                         } else {
 
                             $situacao = 'Inativa';
 
-                            $cor = 'var(--fin-text-muted)';
+                            $classeCor = 'ui-texto-suave';
                         }
 
                         ?>
@@ -249,7 +245,7 @@ include __DIR__ . '/../shared/sidebar.php';
                                 <?= $h($moeda($m['valor'])) ?>
                             </td>
 
-                            <td style="color:<?= $cor ?>">
+                            <td class="<?= $classeCor ?? 'ui-texto-aviso' ?>">
 
                                 <?= $h($situacao) ?>
 
@@ -340,9 +336,9 @@ include __DIR__ . '/../shared/sidebar.php';
                                 <?= $h($moeda($c['valor'])) ?>
                             </td>
 
-                            <td style="color:<?= $c['status'] === 'Pago'
-                                ? 'var(--fin-success)'
-                                : 'var(--fin-warning-dark)' ?>">
+                            <td class="<?= $c['status'] === 'Pago'
+                                ? 'ui-texto-sucesso'
+                                : 'ui-texto-aviso' ?>">
 
                                 <?= $h($c['status']) ?>
 

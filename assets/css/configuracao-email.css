@@ -1,0 +1,268 @@
+/* ==========================================
+   GYMFLOW - CONFIGURAÇÕES DE E-MAIL
+   assets/css/configuracao-email.css
+========================================== */
+
+.config-email-page {
+    width: 100%;
+    min-width: 0;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px;
+    color: var(--ui-texto);
+}
+
+.config-email-page .config-email-topo {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 26px;
+}
+
+.config-email-page .config-email-icone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+    background-color: var(--cor-primaria-suave);
+    color: var(--cor-primaria);
+    font-size: 26px;
+    flex-shrink: 0;
+}
+
+.config-email-page .config-email-topo h1 {
+    margin: 0 0 6px;
+    color: var(--ui-texto);
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.config-email-page .config-email-topo p {
+    margin: 0;
+    color: var(--ui-texto-suave);
+}
+
+.config-email-page .config-email-card {
+    padding: 28px;
+    margin-bottom: 22px;
+    background-color: var(--ui-fundo-card);
+    color: var(--ui-texto);
+    border: 1px solid var(--ui-borda);
+    border-radius: 14px;
+    box-shadow: var(--ui-sombra-card);
+}
+
+.config-email-page .config-email-card h2 {
+    margin: 0 0 8px;
+    color: var(--ui-texto);
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.config-email-page .config-email-descricao {
+    margin-bottom: 24px;
+    color: var(--ui-texto-suave);
+    line-height: 1.6;
+}
+
+.config-email-page .config-email-ativacao {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    margin-bottom: 26px;
+    background-color: var(--cor-primaria-suave);
+    border: 1px solid var(--cor-primaria-borda);
+    border-radius: var(--ui-raio-md);
+}
+
+.config-email-page .config-email-ativacao input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    flex-shrink: 0;
+    accent-color: var(--cor-primaria);
+    cursor: pointer;
+}
+
+.config-email-page .config-email-ativacao label {
+    margin: 0;
+    color: var(--ui-texto);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.config-email-page .config-email-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.config-email-page .config-email-campo {
+    min-width: 0;
+}
+
+.config-email-page .config-email-campo label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--ui-texto);
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.config-email-page .config-email-campo input,
+.config-email-page .config-email-campo select {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    padding: 10px 12px;
+    background-color: var(--ui-input-fundo);
+    color: var(--ui-input-texto);
+    border: 1px solid var(--ui-input-borda);
+    border-radius: 8px;
+    font: inherit;
+    transition: border-color var(--ui-transicao), box-shadow var(--ui-transicao);
+}
+
+.config-email-page .config-email-campo input::placeholder {
+    color: var(--ui-texto-suave);
+}
+
+.config-email-page .config-email-campo select option {
+    background-color: var(--ui-input-fundo);
+    color: var(--ui-input-texto);
+}
+
+.config-email-page .config-email-campo input:hover:not(:disabled),
+.config-email-page .config-email-campo select:hover:not(:disabled) {
+    border-color: var(--cor-borda-forte);
+}
+
+.config-email-page .config-email-campo input:focus,
+.config-email-page .config-email-campo select:focus {
+    border-color: var(--ui-input-foco);
+    outline: 2px solid var(--ui-input-foco);
+    outline-offset: 1px;
+}
+
+.config-email-page .config-email-campo input[type="color"] {
+    height: 48px;
+    padding: 4px;
+    cursor: pointer;
+}
+
+.config-email-page .config-email-campo input:disabled,
+.config-email-page .config-email-campo select:disabled {
+    background-color: var(--cor-superficie-secundaria);
+    color: var(--ui-texto-suave);
+    border-color: var(--ui-borda);
+    cursor: not-allowed;
+    opacity: 1;
+}
+
+.config-email-page .config-email-ajuda {
+    display: block;
+    margin-top: 6px;
+    color: var(--ui-texto-suave);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.config-email-page .config-email-separador {
+    margin: 28px 0 22px;
+    border: 0;
+    border-top: 1px solid var(--ui-borda);
+}
+
+.config-email-page .config-email-nota {
+    padding: 14px 16px;
+    margin: 18px 0 0;
+    background-color: var(--ui-fundo-pagina);
+    color: var(--ui-texto-suave);
+    border: 1px solid var(--ui-borda);
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.config-email-page .config-email-acoes {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 28px;
+    padding-top: 22px;
+    border-top: 1px solid var(--ui-borda);
+}
+
+.config-email-page .config-email-salvar {
+    min-height: 44px;
+    padding: 12px 22px;
+    background-color: var(--ui-botao-fundo);
+    color: var(--ui-botao-texto);
+    border: none;
+    border-radius: 8px;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color var(--ui-transicao);
+}
+
+.config-email-page .config-email-salvar:hover {
+    background-color: var(--ui-botao-fundo-hover);
+    color: var(--ui-botao-texto);
+}
+
+.config-email-page .config-email-salvar:focus-visible {
+    outline: 2px solid var(--cor-primaria);
+    outline-offset: 3px;
+}
+
+.config-email-page .config-email-sucesso {
+    padding: 14px 18px;
+    margin-bottom: 22px;
+    background-color: var(--cor-sucesso-fundo);
+    color: #047857;
+    border: 1px solid #a7f3d0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+:root[data-theme="dark"] .config-email-page .config-email-sucesso {
+    background-color: #15372a;
+    color: #86efac;
+    border-color: #286344;
+}
+
+.config-email-page [hidden] {
+    display: none !important;
+}
+
+@media (max-width: 700px) {
+    .config-email-page {
+        padding: 18px;
+    }
+
+    .config-email-page .config-email-card {
+        padding: 20px;
+    }
+
+    .config-email-page .config-email-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .config-email-page .config-email-topo h1 {
+        font-size: 22px;
+    }
+
+    .config-email-page .config-email-acoes {
+        justify-content: stretch;
+    }
+
+    .config-email-page .config-email-salvar {
+        width: 100%;
+    }
+}

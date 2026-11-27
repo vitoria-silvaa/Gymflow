@@ -23,73 +23,10 @@ include __DIR__ . '/../shared/sidebar.php';
     rel="stylesheet"
     href="<?= BASE_URL ?>/assets/css/jorge-financeiro.css"
 >
-
-<style>
-    /* ========================================
-       STATUS DAS FILIAIS
-       ======================================== */
-
-    .card-filial .badge {
-        display: inline;
-
-        margin: 0;
-        padding: 0 !important;
-
-        background: none !important;
-        background-color: transparent !important;
-        background-image: none !important;
-
-        border: 0 !important;
-        border-radius: 0 !important;
-
-        box-shadow: none !important;
-
-        font-family: inherit !important;
-        font-size: 14px !important;
-        font-style: normal !important;
-        font-weight: 500 !important;
-        line-height: normal !important;
-
-        letter-spacing: normal !important;
-        text-transform: none !important;
-
-        filter: none !important;
-        outline: none !important;
-    }
-
-    /* Remove bolinhas, ícones ou detalhes automáticos */
-    .card-filial .badge::before,
-    .card-filial .badge::after {
-        content: none !important;
-        display: none !important;
-    }
-
-    /* FILIAL ATIVA */
-    .card-filial .badge.ativa {
-        color: #16835f !important;
-
-        background: none !important;
-        background-color: transparent !important;
-
-        border: 0 !important;
-        border-radius: 0 !important;
-
-        box-shadow: none !important;
-    }
-
-    /* FILIAL INATIVA */
-    .card-filial .badge.inativa {
-        color: #7a8694 !important;
-
-        background: none !important;
-        background-color: transparent !important;
-
-        border: 0 !important;
-        border-radius: 0 !important;
-
-        box-shadow: none !important;
-    }
-</style>
+<link
+    rel="stylesheet"
+    href="<?= BASE_URL ?>/assets/css/filiais.css"
+>
 
 <main class="filiais-page">
 
@@ -107,24 +44,6 @@ include __DIR__ . '/../shared/sidebar.php';
 
     <?php endif; ?>
 
-    <script>
-        setTimeout(function () {
-
-            const mensagem =
-                document.querySelector('.mensagem-sucesso');
-
-            if (mensagem) {
-
-                mensagem.style.opacity = '0';
-
-                setTimeout(function () {
-                    mensagem.remove();
-                }, 300);
-            }
-
-        }, 3000);
-    </script>
-
     <div class="filiais-topo">
 
         <div class="filiais-titulo">
@@ -139,14 +58,7 @@ include __DIR__ . '/../shared/sidebar.php';
 
         </div>
 
-        <div
-            class="filiais-acoes"
-            style="
-                display: flex;
-                gap: 12px;
-                align-items: center;
-            "
-        >
+        <div class="filiais-acoes">
 
             <form
                 method="GET"
@@ -161,9 +73,8 @@ include __DIR__ . '/../shared/sidebar.php';
 
                 <select
                     name="status"
-                    class="fin-select"
+                    class="fin-select filiais-filtro-select"
                     onchange="this.form.submit()"
-                    style="padding: 8px 12px;"
                 >
 
                     <option
@@ -339,20 +250,10 @@ include __DIR__ . '/../shared/sidebar.php';
 
                     </div>
 
-                    <div
-                        class="card-footer"
-                        style="
-                            display: flex;
-                            gap: 8px;
-                        "
-                    >
+                    <div class="card-footer">
 
                         <a
                             class="fin-btn fin-btn-secondary"
-                            style="
-                                flex: 1;
-                                text-align: center;
-                            "
                             href="<?= BASE_URL ?>/app/controllers/FilialController.php?acao=editar&id=<?= $filial['id'] ?>"
                         >
                             Editar
@@ -361,17 +262,9 @@ include __DIR__ . '/../shared/sidebar.php';
                         <a
                             href="<?= BASE_URL ?>/app/controllers/FilialController.php?acao=alternar_status&id=<?= $filial['id'] ?>"
                             class="fin-btn <?= $filial['ativo']
-                                ? 'fin-btn-danger'
+                                ? 'fin-btn-danger fin-btn-inativar'
                                 : 'fin-btn-primary'
                             ?>"
-                            style="
-                                flex: 1;
-                                text-align: center;
-                                <?= $filial['ativo']
-                                    ? 'background: #EA4335; color: white;'
-                                    : ''
-                                ?>
-                            "
                         >
                             <?= $filial['ativo']
                                 ? 'Inativar'
@@ -390,6 +283,8 @@ include __DIR__ . '/../shared/sidebar.php';
     </div>
 
 </main>
+
+<script src="<?= BASE_URL ?>/assets/js/filiais.js" defer></script>
 
 <?php
 include __DIR__ . '/../shared/footer.php';

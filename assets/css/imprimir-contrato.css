@@ -1,0 +1,128 @@
+/* ==========================================
+   GYMFLOW - IMPRESSÃO DE CONTRATO
+   assets/css/imprimir-contrato.css
+========================================== */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+.page {
+    max-width: 800px;
+    margin: 2rem auto;
+    background: #fff;
+    padding: 2rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+    text-align: center;
+    border-bottom: 2px solid #333;
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 20px;
+    text-transform: uppercase;
+}
+
+.header p {
+    margin: 5px 0 0 0;
+    color: #666;
+}
+
+.section-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    background: #eee;
+    padding: 5px 10px;
+    border-left: 4px solid #333;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.info-item strong {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
+}
+
+.info-item span {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.terms {
+    font-size: 12px;
+    text-align: justify;
+    margin-bottom: 2rem;
+}
+
+.terms p {
+    margin-bottom: 8px;
+}
+
+.signatures {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 3rem;
+    page-break-inside: avoid;
+}
+
+.signature-box {
+    text-align: center;
+    width: 45%;
+}
+
+.signature-line {
+    border-bottom: 1px solid #000;
+    height: 30px;
+    margin-bottom: 5px;
+}
+
+.contrato-rodape-eletronico {
+    text-align: center;
+    margin-top: 3rem;
+    font-size: 12px;
+    color: #999;
+}
+
+@page {
+    size: A4;
+    margin: 1.5cm;
+}
+
+@media print {
+    body {
+        background-color: #fff;
+    }
+
+    .page {
+        box-shadow: none;
+        margin: 0;
+        padding: 0;
+        max-width: 100%;
+        width: 100%;
+    }
+}

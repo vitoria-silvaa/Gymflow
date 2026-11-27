@@ -3163,3 +3163,190 @@ html {
     border-radius: 12px;
     overflow: hidden;
 }
+
+/* ==========================================
+   CABEÇALHO E MENU MOBILE DO PORTFÓLIO
+========================================== */
+
+.portfolio-header {
+    position: sticky;
+    top: 0;
+    z-index: 9999;
+}
+
+.portfolio-header .portfolio-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+    min-width: 0;
+}
+
+.portfolio-header .portfolio-header-logo {
+    display: block;
+    width: 65px;
+    height: 65px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.portfolio-header .portfolio-logo h1 {
+    margin: 0;
+    line-height: 1.2;
+}
+
+.portfolio-link-sair {
+    margin-left: 10px;
+}
+
+.portfolio-menu-toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 44px;
+    height: 44px;
+    padding: 9px;
+    background: transparent;
+    border: 1px solid var(--portfolio-primary);
+    border-radius: 8px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.portfolio-menu-toggle span {
+    display: block;
+    width: 100%;
+    height: 2px;
+    margin: 3px 0;
+    background: var(--portfolio-primary);
+    border-radius: 3px;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+@media (max-width: 600px) {
+    .portfolio-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 5%;
+        position: sticky;
+        top: 0;
+        z-index: 9999;
+    }
+
+    .portfolio-header .portfolio-logo {
+        width: auto;
+        flex: 1;
+        flex-basis: auto;
+        min-width: 0;
+        gap: 8px;
+    }
+
+    .portfolio-header .portfolio-header-logo {
+        width: 38px;
+        height: 38px;
+    }
+
+    .portfolio-header .portfolio-logo h1 {
+        font-size: 17px;
+        white-space: normal;
+    }
+
+    .portfolio-menu-toggle {
+        display: flex;
+        order: 2;
+    }
+
+    .portfolio-header .portfolio-acoes {
+        order: 3;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        width: 100%;
+        margin: 0;
+    }
+
+    .portfolio-header .portfolio-acoes a {
+        box-sizing: border-box;
+        width: 100%;
+        margin-left: 0 !important;
+        text-align: center;
+    }
+
+    .portfolio-header .portfolio-nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 10px 5% 18px;
+        background: var(--portfolio-secondary);
+        border-top: 1px solid color-mix(in srgb, var(--portfolio-primary) 30%, transparent);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+        z-index: 9998;
+    }
+
+    .portfolio-header.menu-aberto .portfolio-nav {
+        display: block;
+    }
+
+    .portfolio-header .portfolio-nav ul {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        gap: 0;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        overflow: visible;
+    }
+
+    .portfolio-header .portfolio-nav li {
+        width: 100%;
+        margin: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .portfolio-header .portfolio-nav a {
+        display: block;
+        padding: 14px 5px;
+        font-size: 15px;
+        color: #ffffff;
+        white-space: normal;
+    }
+
+    .portfolio-header .portfolio-nav a:hover {
+        color: var(--portfolio-primary);
+    }
+
+    .portfolio-header.menu-aberto .portfolio-menu-toggle span:nth-child(1) {
+        transform: translateY(8px) rotate(45deg);
+    }
+
+    .portfolio-header.menu-aberto .portfolio-menu-toggle span:nth-child(2) {
+        opacity: 0;
+    }
+
+    .portfolio-header.menu-aberto .portfolio-menu-toggle span:nth-child(3) {
+        transform: translateY(-8px) rotate(-45deg);
+    }
+}
+
+@media (max-width: 380px) {
+    .portfolio-header .portfolio-logo h1 {
+        font-size: 15px;
+    }
+
+    .portfolio-menu-toggle {
+        width: 40px;
+        height: 40px;
+    }
+
+    .portfolio-header .portfolio-acoes {
+        grid-template-columns: 1fr;
+    }
+}

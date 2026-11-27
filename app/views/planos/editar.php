@@ -33,7 +33,7 @@ include __DIR__ . '/../shared/sidebar.php';
 
     <?php if (!empty($erro)): ?>
 
-        <div style="background-color: #fee2e2; color: #b91c1c; padding: 14px 18px; border-radius: 8px; margin-bottom: 24px; font-weight: 600; border: 1px solid #fecaca;">
+        <div class="ui-alerta-erro-box">
             ⚠️ <?= htmlspecialchars($erro); ?>
         </div>
 
@@ -41,11 +41,11 @@ include __DIR__ . '/../shared/sidebar.php';
 
     <!-- CARD DO FORMULÁRIO -->
 
-    <section class="fin-table-card" style="padding: 28px;">
+    <section class="fin-table-card ui-card-pad-28">
 
         <form action="<?= BASE_URL ?>/app/controllers/PlanoController.php?acao=editar&id=<?= $plano['id'] ?>" method="POST">
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-bottom: 24px;">
+            <div class="ui-grid-auto">
 
                 <!-- Nome do plano -->
 
@@ -129,7 +129,7 @@ include __DIR__ . '/../shared/sidebar.php';
 
             <!-- BOTÕES DO FORMULÁRIO -->
 
-            <div style="display: flex; gap: 12px; justify-content: flex-end; padding-top: 16px; border-top: 1px solid #e2e8f0;">
+            <div class="ui-acoes-direita-borda">
 
                 <a href="<?= BASE_URL ?>/app/controllers/PlanoController.php?acao=listar" class="fin-btn fin-btn-secondary">
                     Cancelar

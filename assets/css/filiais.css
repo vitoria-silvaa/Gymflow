@@ -1,0 +1,79 @@
+/* ==========================================
+   GYMFLOW - FILIAIS
+   assets/css/filiais.css
+========================================== */
+
+.card-filial .badge {
+    display: inline;
+    margin: 0;
+    padding: 0 !important;
+    background: none !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    font-family: inherit !important;
+    font-size: 14px !important;
+    font-style: normal !important;
+    font-weight: 500 !important;
+    line-height: normal !important;
+    letter-spacing: normal !important;
+    text-transform: none !important;
+    filter: none !important;
+    outline: none !important;
+}
+
+.card-filial .badge::before,
+.card-filial .badge::after {
+    content: none !important;
+    display: none !important;
+}
+
+.card-filial .badge.ativa {
+    color: #16835f !important;
+    background: none !important;
+    background-color: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+.card-filial .badge.inativa {
+    color: #7a8694 !important;
+    background: none !important;
+    background-color: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+.filiais-acoes {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.filiais-filtro-select {
+    padding: 8px 12px;
+}
+
+.card-filial .card-footer {
+    display: flex;
+    gap: 8px;
+}
+
+.card-filial .card-footer .fin-btn {
+    flex: 1;
+    text-align: center;
+}
+
+.card-filial .card-footer .fin-btn-inativar {
+    background: #EA4335;
+    color: #ffffff;
+}
+
+.mensagem-sucesso.ocultando {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}

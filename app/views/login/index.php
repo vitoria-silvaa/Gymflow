@@ -172,68 +172,6 @@ $loginCssVersao = is_file($loginCssPath)
             --portfolio-secondary: <?= $loginCorSecundaria ?>;
             --portfolio-on-primary: <?= $loginTextoPrimaria ?>;
         }
-
-        .login-page .login-form input.form-input {
-            width: 100%;
-            min-height: 48px;
-            padding: 12px 15px;
-
-            color: #ffffff;
-            background-color: #080808;
-
-            border: 1px solid rgba(255, 255, 255, 0.20);
-            border-radius: 7px;
-
-            font-family: inherit;
-            font-size: 14px;
-            box-shadow: none;
-        }
-
-        .login-page .login-form input.form-input::placeholder {
-            color: #929292;
-            opacity: 1;
-        }
-
-        .login-page .login-form input.form-input:focus,
-        .login-page .login-form input.form-input:focus-visible {
-            outline: none;
-            background-color: #101010;
-            border-color: var(--login-primaria);
-
-            box-shadow:
-                0 0 0 3px var(--login-primaria-suave);
-        }
-
-        .login-page .login-form input.password-input {
-            padding-right: 48px;
-        }
-
-        .login-page .login-first-column {
-            background-color: var(--login-secundaria);
-
-            background-image:
-                radial-gradient(
-                    circle at 15% 85%,
-                    color-mix(
-                        in srgb,
-                        var(--login-primaria) 9%,
-                        transparent
-                    ),
-                    transparent 55%
-                );
-        }
-
-        .login-page .password-toggle {
-            background-color: transparent;
-            color: #a3a3a3;
-            border: 0;
-            padding: 0;
-        }
-
-        .login-page .password-toggle:hover {
-            background-color: var(--login-primaria-suave);
-            color: var(--login-primaria);
-        }
     </style>
 
 </head>
@@ -533,45 +471,7 @@ $loginCssVersao = is_file($loginCssPath)
 
     </main>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-
-            const campoSenha = document.getElementById('senha');
-            const botaoSenha = document.getElementById('passwordToggle');
-            const iconeSenha = document.getElementById('password-icon');
-
-            if (!campoSenha || !botaoSenha || !iconeSenha) {
-                return;
-            }
-
-            botaoSenha.addEventListener('click', function () {
-
-                const mostrando = campoSenha.type === 'text';
-
-                campoSenha.type = mostrando
-                    ? 'password'
-                    : 'text';
-
-                iconeSenha.textContent = mostrando
-                    ? '◉'
-                    : '○';
-
-                botaoSenha.setAttribute(
-                    'aria-label',
-                    mostrando
-                        ? 'Mostrar senha'
-                        : 'Ocultar senha'
-                );
-
-                botaoSenha.setAttribute(
-                    'aria-pressed',
-                    String(!mostrando)
-                );
-
-            });
-
-        });
-    </script>
+    <script src="<?= BASE_URL ?>/assets/js/login.js" defer></script>
 
 </body>
 

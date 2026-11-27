@@ -691,3 +691,87 @@ elseif (in_array(
         throw $e;
     }
 }
+
+// LISTAR ALUNOS PARA TREINO
+
+elseif ($operacao === 'listar_alunos_treino') {
+
+    $alunos = [];
+
+    if ($company_id > 0 && $usuario_id > 0 && in_array($usuario_role, ['Admin', 'Professor'], true)) {
+
+        $sqlAlunos = "
+            SELECT a.id, a.nome
+            FROM alunos a
+            INNER JOIN filiais f
+                ON f.id = a.filial_id
+            WHERE f.company_id = :company_id
+            $escopoFilial
+            ORDER BY a.nome ASC
+        ";
+
+        $stmtAlunos = $pdo->prepare($sqlAlunos);
+        $stmtAlunos->execute(array_merge([
+            ':company_id' => $company_id
+        ], $paramsFilial));
+
+        $alunos = $stmtAlunos->fetchAll(PDO::FETCH_ASSOC);
+    }
+}
+
+// LISTAR PROFESSORES PARA TREINO
+
+elseif ($operacao === 'listar_professores_treino') {
+
+    $professores = [];
+
+    if ($company_id > 0 && $usuario_id > 0 && in_array($usuario_role, ['Admin', 'Professor'], true)) {
+
+        $sqlProfessores = "
+            SELECT id, name
+            FROM users
+            WHERE company_id = :company_id
+              AND role = 'Professor'
+        ";
+
+        $paramsProfessores = [
+            ':company_id' => $company_id
+        ];
+
+        if ($usuario_role === 'Professor') {
+            $sqlProfessores .= " AND id = :usuario_id";
+            $paramsProfessores[':usuario_id'] = $usuario_id;
+        }
+
+        $sqlProfessores .= " ORDER BY name ASC";
+
+        $stmtProfessores = $pdo->prepare($sqlProfessores);
+        $stmtProfessores->execute($paramsProfessores);
+
+        $professores = $stmtProfessores->fetchAll(PDO::FETCH_ASSOC);
+    }
+}
+
+// LISTAR EXERCÍCIOS ATIVOS PARA TREINO
+
+elseif ($operacao === 'listar_exercicios_ativos') {
+
+    $exercicios = [];
+
+    if ($company_id > 0 && in_array($usuario_role, ['Admin', 'Professor'], true)) {
+
+        $stmtExercicios = $pdo->prepare("
+            SELECT id, nome
+            FROM exercicios
+            WHERE company_id = :company_id
+              AND ativo = 1
+            ORDER BY nome ASC
+        ");
+
+        $stmtExercicios->execute([
+            ':company_id' => $company_id
+        ]);
+
+        $exercicios = $stmtExercicios->fetchAll(PDO::FETCH_ASSOC);
+    }
+}

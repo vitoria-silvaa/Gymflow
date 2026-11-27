@@ -48,7 +48,7 @@ include __DIR__ . '/../shared/sidebar.php';
 
     <?php if (!$conta): ?>
 
-        <section class="fin-form-card" style="max-width:none">
+        <section class="fin-form-card ui-card-full">
 
             <form method="POST" action="<?= $h($baseUrl) ?>">
 
@@ -268,7 +268,7 @@ include __DIR__ . '/../shared/sidebar.php';
 
                 <div class="fin-form-group">
 
-                    <label style="display:flex;gap:10px;align-items:center">
+                    <label class="ui-check-label">
 
                         <input type="checkbox"
                                name="confirmado"
@@ -297,7 +297,7 @@ include __DIR__ . '/../shared/sidebar.php';
 
             <form method="POST"
                   action="<?= $h($baseUrl) ?>"
-                  style="margin-top:12px">
+                  class="ui-mt-12">
 
                 <input type="hidden" name="csrf"
                        value="<?= $h($csrf) ?>">

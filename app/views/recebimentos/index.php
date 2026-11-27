@@ -83,7 +83,7 @@ include __DIR__ . '/../shared/sidebar.php';
 
     <?php if (!$conta): ?>
 
-        <section class="fin-form-card" style="max-width:none">
+        <section class="fin-form-card ui-card-full">
 
             <form method="POST" action="<?= $h($url) ?>">
 
@@ -369,7 +369,7 @@ include __DIR__ . '/../shared/sidebar.php';
                 <input type="hidden" name="conta_id"
                        value="<?= (int) $conta['id'] ?>">
 
-                <div class="fin-form-group" style="margin-bottom:18px">
+                <div class="fin-form-group ui-mb-18">
 
                     <label class="fin-form-label" for="metodo">
                         Forma de pagamento
@@ -408,7 +408,7 @@ include __DIR__ . '/../shared/sidebar.php';
                         data-aberto="<?= $conta['caixa_aberto']
                             ? '1'
                             : '0' ?>"
-                        style="display:none;margin-bottom:18px">
+                        class="ui-hidden ui-mb-18">
 
                         <?php if ($conta['caixa_aberto']): ?>
 
@@ -441,9 +441,8 @@ include __DIR__ . '/../shared/sidebar.php';
                 <?php endif; ?>
 
                 <div
-                    class="fin-form-group"
-                    id="grupo-referencia"
-                    style="margin-bottom:18px">
+                    class="fin-form-group ui-mb-18"
+                    id="grupo-referencia">
 
                     <label
                         class="fin-form-label"
@@ -469,7 +468,7 @@ include __DIR__ . '/../shared/sidebar.php';
 
                 <div class="fin-form-group">
 
-                    <label style="display:flex;gap:10px;align-items:flex-start">
+                    <label class="ui-check-label-top">
 
                         <input
                             type="checkbox"
@@ -505,7 +504,7 @@ include __DIR__ . '/../shared/sidebar.php';
             <form
                 method="POST"
                 action="<?= $h($url) ?>"
-                style="margin-top:12px">
+                class="ui-mt-12">
 
                 <input type="hidden" name="csrf"
                        value="<?= $h($csrf) ?>">

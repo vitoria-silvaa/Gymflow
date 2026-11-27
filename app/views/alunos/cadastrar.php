@@ -44,97 +44,7 @@ include __DIR__ . '/../shared/sidebar.php';
 ?>
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/jorge-financeiro.css">
-
-<!-- Estilos só desta página -->
-<style>
-    .caixa-erro {
-        background-color: #fee2e2;
-        color: #b91c1c;
-        padding: 14px 18px;
-        border-radius: 8px;
-        margin-bottom: 24px;
-        font-weight: 600;
-        border: 1px solid #fecaca;
-    }
-
-    .secao {
-        margin-bottom: 28px;
-    }
-
-    .titulo-secao {
-        font-size: 16px;
-        font-weight: 700;
-        color: #1e293b;
-        margin-bottom: 16px;
-        border-bottom: 2px solid #f1f5f9;
-        padding-bottom: 10px;
-    }
-
-    /* Grade que coloca os campos lado a lado e se ajusta ao tamanho da tela */
-    .grade {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 18px;
-    }
-
-    .linha-cep {
-        display: grid;
-        grid-template-columns: 160px 1fr;
-        gap: 18px;
-        margin-bottom: 16px;
-    }
-
-    .linha-numero {
-        display: grid;
-        grid-template-columns: 120px 1fr 1fr;
-        gap: 18px;
-        margin-bottom: 16px;
-    }
-
-    .caixa-condominio {
-        display: flex;
-        align-items: center;
-        margin-bottom: 16px;
-        background-color: #f8fafc;
-        padding: 10px 14px;
-        border-radius: 8px;
-        border: 1px solid #e2e8f0;
-    }
-
-    .caixa-condominio input {
-        width: 18px;
-        height: 18px;
-        margin: 0 10px 0 0;
-        cursor: pointer;
-    }
-
-    .caixa-condominio label {
-        margin: 0;
-        cursor: pointer;
-        font-weight: 600;
-        color: #334155;
-    }
-
-    /* Começa escondido. O JavaScript mostra quando marcar "É prédio / condomínio?" */
-    #div_condominio {
-        grid-template-columns: 1fr 1fr;
-        gap: 18px;
-        margin-bottom: 16px;
-    }
-
-    .campo-endereco {
-        background-color: #f1f5f9;
-        font-weight: 500;
-    }
-
-    .botoes-form {
-        display: flex;
-        gap: 12px;
-        justify-content: flex-end;
-        padding-top: 16px;
-        border-top: 1px solid #e2e8f0;
-    }
-</style>
+<link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/alunos-form.css">
 
 <main class="conteudo financeiro-page">
 
@@ -154,7 +64,7 @@ include __DIR__ . '/../shared/sidebar.php';
         <div class="caixa-erro"><?= htmlspecialchars($erro) ?></div>
     <?php endif; ?>
 
-    <section class="fin-table-card" style="padding: 28px;">
+    <section class="fin-table-card aluno-form-card">
 
         <form action="<?= $baseUrl ?>?acao=cadastrar" method="POST">
 
@@ -327,7 +237,7 @@ include __DIR__ . '/../shared/sidebar.php';
                     <label for="is_condominio">É prédio / condomínio?</label>
                 </div>
 
-                <div id="div_condominio" style="display: none;">
+                <div id="div_condominio">
                     <div class="fin-form-group">
                         <label>Bloco / Torre</label>
                         <input type="text" id="bloco" class="fin-input" maxlength="50" placeholder="Bloco A" oninput="atualizarEndereco()">
@@ -345,7 +255,7 @@ include __DIR__ . '/../shared/sidebar.php';
             </div>
 
             <!-- PARTE 4: FILIAL E PROFESSOR -->
-            <div class="secao" style="margin-bottom: 32px;">
+            <div class="secao secao-vinculo">
                 <h3 class="titulo-secao">Vínculo na Academia</h3>
 
                 <div class="grade">
@@ -390,101 +300,6 @@ include __DIR__ . '/../shared/sidebar.php';
 
 </main>
 
-<script>
-    // Mostra ou esconde os campos de bloco e apartamento
-    function toggleCondominio() {
-        var marcado = document.getElementById('is_condominio').checked;
-
-        if (marcado) {
-            document.getElementById('div_condominio').style.display = 'grid';
-        } else {
-            document.getElementById('div_condominio').style.display = 'none';
-        }
-
-        atualizarEndereco();
-    }
-
-    // Junta rua, número, bloco, apto, bairro e cidade no campo "Endereço Completo"
-    // Exemplo: "Rua A, 10 - Bloco 2 - Apto 31 - Centro - São Paulo/SP"
-    function atualizarEndereco() {
-        var rua = document.getElementById('rua').value;
-        var numero = document.getElementById('numero').value;
-        var bairro = document.getElementById('bairro').value;
-        var cidade = document.getElementById('cidade_uf').value;
-        var condominio = document.getElementById('is_condominio').checked;
-        var bloco = document.getElementById('bloco').value;
-        var apto = document.getElementById('apto').value;
-
-        // Lista com as partes do endereço que foram preenchidas
-        var partes = [];
-
-        if (rua != '') {
-            if (numero != '') {
-                partes.push(rua + ', ' + numero);
-            } else {
-                partes.push(rua);
-            }
-        }
-
-        if (condominio) {
-            if (bloco != '') {
-                partes.push('Bloco ' + bloco);
-            }
-            if (apto != '') {
-                partes.push('Apto ' + apto);
-            }
-        }
-
-        if (bairro != '') {
-            partes.push(bairro);
-        }
-
-        if (cidade != '') {
-            partes.push(cidade);
-        }
-
-        // Só troca o endereço se tiver alguma coisa preenchida
-        if (partes.length > 0) {
-            document.getElementById('endereco').value = partes.join(' - ');
-        }
-    }
-
-    // Busca o endereço no site ViaCEP e preenche os campos sozinho
-    function buscarCep(cep) {
-        // Tira tudo que não for número (ex: "01001-000" vira "01001000")
-        cep = cep.replace(/\D/g, '');
-
-        // CEP precisa ter 8 números
-        if (cep.length != 8) {
-            return;
-        }
-
-        var campoEndereco = document.getElementById('endereco');
-        campoEndereco.value = 'Buscando CEP...';
-
-        fetch('https://viacep.com.br/ws/' + cep + '/json/')
-            .then(function(resposta) {
-                return resposta.json();
-            })
-            .then(function(resultado) {
-                if (resultado.erro) {
-                    alert('CEP não encontrado!');
-                    campoEndereco.value = '';
-                    return;
-                }
-
-                // O "|| ''" usa texto vazio caso o ViaCEP não mande aquela informação
-                document.getElementById('rua').value = resultado.logradouro || '';
-                document.getElementById('bairro').value = resultado.bairro || '';
-                document.getElementById('cidade_uf').value = (resultado.localidade || '') + '/' + (resultado.uf || '');
-
-                atualizarEndereco();
-            })
-            .catch(function() {
-                alert('Erro ao buscar o CEP.');
-                campoEndereco.value = '';
-            });
-    }
-</script>
+<script src="<?= BASE_URL ?>/assets/js/alunos-form.js" defer></script>
 
 <?php include __DIR__ . '/../shared/footer.php'; ?>

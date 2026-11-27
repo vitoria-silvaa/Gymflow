@@ -435,50 +435,15 @@ if (!empty($cssEspecifico)) {
 
     <style>
         :root {
-
             --cor-primaria: <?= $corPrimaria ?>;
-
             --cor-secundaria: <?= $corSecundaria ?>;
-
-            --cor-sobre-primaria:
-                <?= $textoSobrePrimaria ?>;
-
-            --cor-sobre-secundaria:
-                <?= $textoSobreSecundaria ?>;
-
+            --cor-sobre-primaria: <?= $textoSobrePrimaria ?>;
+            --cor-sobre-secundaria: <?= $textoSobreSecundaria ?>;
             --header-fundo: <?= $corFundoHeader ?>;
-
             --header-texto: <?= $corTextoHeader ?>;
-
             --header-borda: <?= $corBordaHeader ?>;
-
             --fin-primary: var(--cor-primaria);
-
-            --fin-primary-dark:
-                var(--cor-primaria-hover);
-        }
-
-        body {
-            background-color: var(--ui-fundo-pagina);
-            color: var(--ui-texto);
-        }
-
-        body>.header {
-            background-color: var(--header-fundo);
-            color: var(--header-texto);
-            border-bottom: 1px solid var(--header-borda);
-        }
-
-        body>.header h1,
-        body>.header .header-direita,
-        body>.header .header-direita span,
-        body>.header .mobile-toggle {
-            color: var(--header-texto);
-        }
-
-        body>#appSidebar {
-            background-color: var(--cor-secundaria);
-            color: var(--cor-sobre-secundaria);
+            --fin-primary-dark: var(--cor-primaria-hover);
         }
     </style>
 

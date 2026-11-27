@@ -77,9 +77,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (unidadesComCoordenadas.length === 0) {
         mapaElemento.textContent = 'Nenhuma unidade possui coordenadas cadastradas.';
-        mapaElemento.style.display = 'flex';
-        mapaElemento.style.alignItems = 'center';
-        mapaElemento.style.justifyContent = 'center';
+        mapaElemento.classList.add('mapa-sem-coordenadas');
         return;
     }
 
@@ -142,17 +140,8 @@ document.addEventListener('DOMContentLoaded', function () {
         btnMaps.href = 'https://www.google.com/maps/search/?api=1&query=' + latitude + ',' + longitude;
         btnMaps.target = '_blank';
         btnMaps.rel = 'noopener noreferrer';
-        btnMaps.rel = 'noopener noreferrer';
         btnMaps.textContent = ' Abrir no Google Maps';
-        btnMaps.style.display = 'inline-block';
-        btnMaps.style.marginTop = '10px';
-        btnMaps.style.padding = '4px 8px';
-        btnMaps.style.background = '#4285F4';
-        btnMaps.style.color = 'white';
-        btnMaps.style.textDecoration = 'none';
-        btnMaps.style.borderRadius = '4px';
-        btnMaps.style.fontSize = '12px';
-        btnMaps.style.fontWeight = 'bold';
+        btnMaps.className = 'mapa-btn-google';
         popup.appendChild(btnMaps);
 
         marcador.bindPopup(popup);
@@ -274,15 +263,7 @@ document.addEventListener('DOMContentLoaded', function () {
             btnMaps.target = '_blank';
             btnMaps.rel = 'noopener noreferrer';
             btnMaps.textContent = ' Abrir no Google Maps';
-            btnMaps.style.display = 'inline-block';
-            btnMaps.style.marginTop = '10px';
-            btnMaps.style.padding = '4px 8px';
-            btnMaps.style.background = '#4285F4';
-            btnMaps.style.color = 'white';
-            btnMaps.style.textDecoration = 'none';
-            btnMaps.style.borderRadius = '4px';
-            btnMaps.style.fontSize = '12px';
-            btnMaps.style.fontWeight = 'bold';
+            btnMaps.className = 'mapa-btn-google';
             popup.appendChild(btnMaps);
 
             marcador.bindPopup(popup);
@@ -730,4 +711,35 @@ document.addEventListener('DOMContentLoaded', function () {
     calcularPaginas();
 
 });
+
+/* =========================================
+   FORMULÁRIO DE CONTATO -> WHATSAPP
+========================================= */
+
+function enviarWhatsApp(event, telefoneZap) {
+    event.preventDefault();
+
+    if (!telefoneZap) {
+        alert('O número de WhatsApp da academia ainda não foi configurado.');
+        return;
+    }
+
+    const nome = document.getElementById('contato-nome').value;
+    const email = document.getElementById('contato-email').value;
+    const fone = document.getElementById('contato-telefone').value;
+    const unidadeSelect = document.getElementById('contato-unidade');
+
+    let unidadeNome = 'Nenhuma específica';
+
+    if (unidadeSelect && unidadeSelect.selectedIndex > 0) {
+        unidadeNome = unidadeSelect.options[unidadeSelect.selectedIndex].text.trim();
+    }
+
+    const mensagem = document.getElementById('contato-mensagem').value;
+    const textoZap = `Olá! Meu nome é *${nome}*.\nE-mail: ${email}\nTelefone de Contato: ${fone}\nUnidade de interesse: *${unidadeNome}*\n\nMensagem: ${mensagem}`;
+    const url = `https://wa.me/55${telefoneZap}?text=${encodeURIComponent(textoZap)}`;
+
+    window.open(url, '_blank', 'noopener,noreferrer');
+}
+
 

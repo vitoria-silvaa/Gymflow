@@ -823,3 +823,46 @@ main.login-page {
         transform: none;
     }
 }
+
+/* REFINAMENTOS DE INPUTS E BOTÃO DE SENHA */
+.login-page .login-form input.form-input {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 15px;
+    color: #ffffff;
+    background-color: #080808;
+    border: 1px solid rgba(255, 255, 255, 0.20);
+    border-radius: 7px;
+    font-family: inherit;
+    font-size: 14px;
+    box-shadow: none;
+}
+
+.login-page .login-form input.form-input::placeholder {
+    color: #929292;
+    opacity: 1;
+}
+
+.login-page .login-form input.form-input:focus,
+.login-page .login-form input.form-input:focus-visible {
+    outline: none;
+    background-color: #101010;
+    border-color: var(--login-primaria);
+    box-shadow: 0 0 0 3px var(--login-primaria-suave);
+}
+
+.login-page .login-form input.password-input {
+    padding-right: 48px;
+}
+
+.login-page .password-toggle {
+    background-color: transparent;
+    color: #a3a3a3;
+    border: 0;
+    padding: 0;
+}
+
+.login-page .password-toggle:hover {
+    background-color: var(--login-primaria-suave);
+    color: var(--login-primaria);
+}

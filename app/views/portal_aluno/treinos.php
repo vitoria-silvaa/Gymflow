@@ -186,9 +186,7 @@ require __DIR__ . '/../shared/sidebar.php';
 
             </div>
 
-            <strong
-                id="tgFrequencyCount"
-                style="font-size: 24px;">
+            <strong id="tgFrequencyCount">
 
                 0/4
 
@@ -200,18 +198,10 @@ require __DIR__ . '/../shared/sidebar.php';
             id="tgFrequencyProgress"
             value="0"
             max="4"
-            aria-label="Meta diária de exercícios"
-            style="
-            width: 100%;
-            height: 8px;
-            accent-color: #d97706;
-        ">
+            aria-label="Meta diária de exercícios">
         </progress>
 
-        <p
-            id="tgFrequencyMessage"
-            style="font-size: 12px; margin-bottom: 0;">
-        </p>
+        <p id="tgFrequencyMessage"></p>
 
     </section>
 

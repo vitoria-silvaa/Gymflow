@@ -342,7 +342,7 @@ include __DIR__ . '/../shared/sidebar.php';
 
                                 <?php if ($pendente): ?>
 
-                                    <span style="color:var(--fin-warning-dark)">
+                                    <span class="ui-texto-aviso">
 
                                         Aguardando pagamento
 
@@ -350,7 +350,7 @@ include __DIR__ . '/../shared/sidebar.php';
 
                                 <?php else: ?>
 
-                                    <span style="color:var(--fin-text-muted)">
+                                    <span class="ui-texto-suave">
 
                                         Sem pendência inicial
 

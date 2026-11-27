@@ -42,38 +42,8 @@ $texto = static function ($valor) {
 
 // ALUNOS
 
-$sqlAlunos = "
-    SELECT a.id, a.nome
-    FROM alunos a
-    INNER JOIN filiais f
-        ON f.id = a.filial_id
-    WHERE f.company_id = :company_id
-";
-
-$paramsAlunos = [
-    ':company_id' => $company_id
-];
-
-if ($perfilProfessor) {
-
-    $sqlAlunos .= "
-        AND EXISTS (
-            SELECT 1
-            FROM user_filiais uf
-            WHERE uf.user_id = :usuario_id
-              AND uf.filial_id = a.filial_id
-        )
-    ";
-
-    $paramsAlunos[':usuario_id'] = $usuario_id;
-}
-
-$sqlAlunos .= " ORDER BY a.nome ASC";
-
-$stmtAlunos = $pdo->prepare($sqlAlunos);
-$stmtAlunos->execute($paramsAlunos);
-
-$alunos = $stmtAlunos->fetchAll(PDO::FETCH_ASSOC);
+$operacao = 'listar_alunos_treino';
+require __DIR__ . '/../models/Treino.php';
 
 $idsAlunos = array_map(
     'intval',
@@ -342,48 +312,14 @@ if (
 
 // PROFESSORES
 
-$sqlProfessores = "
-    SELECT id, name
-    FROM users
-    WHERE company_id = :company_id
-      AND role = 'Professor'
-";
-
-$paramsProfessores = [
-    ':company_id' => $company_id
-];
-
-if ($perfilProfessor) {
-
-    $sqlProfessores .= " AND id = :usuario_id";
-
-    $paramsProfessores[':usuario_id'] = $usuario_id;
-}
-
-$sqlProfessores .= " ORDER BY name ASC";
-
-$stmtProfessores = $pdo->prepare($sqlProfessores);
-
-$stmtProfessores->execute($paramsProfessores);
-
-$professores = $stmtProfessores->fetchAll(PDO::FETCH_ASSOC);
+$operacao = 'listar_professores_treino';
+require __DIR__ . '/../models/Treino.php';
 
 // BIBLIOTECA DE EXERCÍCIOS
 // Somente consulta. Nenhuma alteração na biblioteca.
 
-$stmtExercicios = $pdo->prepare("
-    SELECT id, nome
-    FROM exercicios
-    WHERE company_id = :company_id
-      AND ativo = 1
-    ORDER BY nome ASC
-");
-
-$stmtExercicios->execute([
-    ':company_id' => $company_id
-]);
-
-$exercicios = $stmtExercicios->fetchAll(PDO::FETCH_ASSOC);
+$operacao = 'listar_exercicios_ativos';
+require __DIR__ . '/../models/Treino.php';
 
 // VIEW
 

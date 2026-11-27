@@ -1,0 +1,112 @@
+/* ==========================================
+   GYMFLOW - MATRÍCULA UNIFICADA
+   assets/css/matricula-unificada.css
+========================================== */
+
+.matricula-unificada .matricula-campo-erro {
+    color: var(--fin-danger-dark, #ef4444);
+    display: block;
+    margin-top: 5px;
+    font-size: 13px;
+}
+
+.matricula-unificada [aria-invalid="true"] {
+    border-color: var(--fin-danger, #ef4444);
+}
+
+.matricula-unificada .matricula-header-secao {
+    text-align: left;
+}
+
+.matricula-unificada button:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.matricula-unificada .matricula-resumo {
+    margin: 0 0 24px;
+    padding: 0;
+    list-style: none;
+}
+
+.matricula-unificada .matricula-resumo li {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--ui-borda, rgba(128, 128, 128, .2));
+}
+
+.matricula-unificada .matricula-resumo strong {
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+.matricula-unificada .matricula-nota {
+    margin: 18px 0;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+.matricula-unificada .matricula-opcoes-pagamento {
+    display: grid;
+    gap: 10px;
+    margin: 12px 0 20px;
+}
+
+.matricula-unificada .matricula-opcao-pagamento {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid var(--ui-borda, rgba(128, 128, 128, .3));
+    border-radius: 8px;
+    padding: 14px;
+    cursor: pointer;
+}
+
+.matricula-unificada .matricula-opcao-pagamento input {
+    accent-color: var(--cor-primaria, var(--mat-primary));
+}
+
+.matricula-unificada .matricula-opcao-pagamento:has(input:checked) {
+    border-color: var(--cor-primaria, var(--mat-primary));
+}
+
+.matricula-wrapper .matricula-container {
+    max-width: 820px;
+}
+
+.matricula-interna .fin-form-card {
+    max-width: none;
+    margin: 0;
+}
+
+.matricula-interna .fin-form-group {
+    margin-bottom: 18px;
+}
+
+.matricula-interna .fin-form-grid {
+    margin-bottom: 0;
+}
+
+.matricula-interna .matricula-opcao-pagamento {
+    background: var(--ui-input-fundo);
+}
+
+.matricula-interna .matricula-container {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+@media (max-width: 600px) {
+    .matricula-interna .fin-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .matricula-unificada .matricula-resumo li {
+        flex-wrap: wrap;
+    }
+}

@@ -690,3 +690,23 @@ main,
         transform: none;
     }
 }
+
+/* 16. IDENTIDADE VISUAL DINÂMICA (HEADER E SIDEBAR) */
+
+body > .header {
+    background-color: var(--header-fundo);
+    color: var(--header-texto);
+    border-bottom: 1px solid var(--header-borda);
+}
+
+body > .header h1,
+body > .header .header-direita,
+body > .header .header-direita span,
+body > .header .mobile-toggle {
+    color: var(--header-texto);
+}
+
+body > #appSidebar {
+    background-color: var(--cor-secundaria);
+    color: var(--cor-sobre-secundaria);
+}

@@ -3,6 +3,7 @@
 // app/controllers/LoginController.php
 
 require_once __DIR__ . '/../../config/sessao.php';
+require_once __DIR__ . '/../models/Login.php';
 
 $baseUrl = BASE_URL . '/app/controllers/LoginController.php';
 $acao = $_GET['acao'] ?? 'login';
@@ -131,16 +132,11 @@ if ($acao === 'login') {
 
                     $token = bin2hex(random_bytes(32));
 
-                    $stmtToken = $pdo->prepare(
-                        "UPDATE users
-                         SET remember_token = ?
-                         WHERE id = ?"
+                    loginSalvarRememberToken(
+                        $pdo,
+                        (int) $usuario['id'],
+                        $token
                     );
-
-                    $stmtToken->execute([
-                        $token,
-                        $usuario['id']
-                    ]);
 
 
                     $https = !empty($_SERVER['HTTPS'])
@@ -235,25 +231,9 @@ if ($acao === 'login') {
             require_once __DIR__ .
                 '/../../config/conexao.php';
 
-            $stmtMarca = $pdo->prepare("
-                SELECT
-                    c.id,
-                    pc.app_name,
-                    pc.primary_color,
-                    pc.secondary_color
-                FROM companies c
-                LEFT JOIN portfolio_config pc
-                    ON pc.company_id = c.id
-                WHERE c.id = ?
-                LIMIT 1
-            ");
-
-            $stmtMarca->execute([
+            $marca = loginBuscarMarcaEmpresa(
+                $pdo,
                 (int) $loginEmpresaId
-            ]);
-
-            $marca = $stmtMarca->fetch(
-                PDO::FETCH_ASSOC
             );
 
             if ($marca) {
@@ -339,14 +319,7 @@ if ($acao === 'login') {
                 require_once __DIR__ . '/../../config/conexao.php';
 
                 // Obtém a empresa associada à conta, sem depender da sessão.
-                $stmt = $pdo->prepare(
-                    "SELECT id, email, company_id
-                    FROM users
-                    WHERE email = ?
-                    LIMIT 1"
-                );
-                $stmt->execute([$email]);
-                $user = $stmt->fetch(PDO::FETCH_ASSOC);
+                $user = loginBuscarUsuarioPorEmailRecuperacao($pdo, $email);
 
                 if ($user) {
 
@@ -366,25 +339,7 @@ if ($acao === 'login') {
 
                     if ($empresaId > 0) {
                         try {
-                            $stmtCores = $pdo->prepare("
-                                SELECT
-                                    ce.modo_cores_email,
-                                    ce.cor_email_fundo,
-                                    ce.cor_email_cartao,
-                                    ce.cor_email_destaque,
-                                    ce.cor_email_botao,
-                                    ce.cor_email_texto_botao,
-                                    p.cor_primaria,
-                                    p.cor_secundaria
-                                FROM configuracoes_email ce
-                                LEFT JOIN preferencias_usuario p
-                                    ON p.user_id = ce.atualizado_por
-                                WHERE ce.company_id = ?
-                                LIMIT 1
-                            ");
-
-                            $stmtCores->execute([$empresaId]);
-                            $configCores = $stmtCores->fetch(PDO::FETCH_ASSOC);
+                            $configCores = loginBuscarCoresEmail($pdo, $empresaId);
 
                             if ($configCores) {
                                 $modoCores = $configCores['modo_cores_email'] ?? 'personalizado';
@@ -454,16 +409,12 @@ if ($acao === 'login') {
                         strtotime('+1 hour')
                     );
 
-                    $stmtToken = $pdo->prepare(
-                        "UPDATE users
-                        SET reset_token = ?, reset_token_expires_at = ?
-                        WHERE id = ?"
-                    );
-                    $stmtToken->execute([
+                    loginSalvarResetToken(
+                        $pdo,
+                        (int) $user['id'],
                         $token,
-                        $expires,
-                        $user['id']
-                    ]);
+                        $expires
+                    );
 
                     try {
                         // Carrega o PHPMailer instalado no projeto.
@@ -513,14 +464,10 @@ if ($acao === 'login') {
                             $configEmpresa &&
                             (int) ($configEmpresa['usar_personalizado'] ?? 0) === 1
                         ) {
-                            $stmtSenhaSmtp = $pdo->prepare(
-                                'SELECT smtp_senha_criptografada
-                                 FROM configuracoes_email
-                                 WHERE company_id = ?
-                                 LIMIT 1'
+                            $senhaCriptografada = loginBuscarSenhaSmtpCriptografada(
+                                $pdo,
+                                $empresaId
                             );
-                            $stmtSenhaSmtp->execute([$empresaId]);
-                            $senhaCriptografada = $stmtSenhaSmtp->fetchColumn();
 
                             if (
                                 !is_string($senhaCriptografada) ||
@@ -640,138 +587,9 @@ if ($acao === 'login') {
                         $corBotao = htmlspecialchars($coresEmail['botao'], ENT_QUOTES, 'UTF-8');
                         $corTextoBotao = htmlspecialchars($coresEmail['texto_botao'], ENT_QUOTES, 'UTF-8');
 
-                        $mail->Body = <<<HTML
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recuperação de senha - {$nomeAcademiaHtml}</title>
-</head>
-<body style="margin:0; padding:0; background-color:{$corFundo}; font-family:Arial,Helvetica,sans-serif; color:#f5f5f5;">
-
-    <div style="display:none; max-height:0; overflow:hidden; opacity:0;">
-        Recupere seu acesso à {$nomeAcademiaHtml} de forma segura.
-    </div>
-
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-        style="width:100%; background-color:{$corFundo};">
-        <tr>
-            <td align="center" style="padding:36px 14px;">
-
-                <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"
-                    style="width:100%; max-width:600px; background-color:{$corCartao}; border:1px solid #303030; border-radius:14px;">
-
-                    <tr>
-                        <td style="height:5px; background-color:{$corDestaque}; font-size:0; line-height:0;">
-                            &nbsp;
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td align="center" style="padding:34px 24px 22px;">
-                            <p style="margin:0; font-size:30px; font-weight:bold; letter-spacing:1px; color:#ffffff;">
-                                {$nomeAcademiaHtml}
-                            </p>
-                            <p style="margin:10px 0 0; font-size:11px; letter-spacing:2px; color:#a3a3a3;">
-                                RECUPERAÇÃO DE ACESSO
-                            </p>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td style="padding:12px 30px 34px;">
-
-                            <h1 style="margin:0 0 18px; font-size:25px; line-height:1.3; color:#ffffff; text-align:center;">
-                                Vamos recuperar seu acesso?
-                            </h1>
-
-                            <p style="margin:0 0 16px; font-size:15px; line-height:1.8; color:#d1d1d1;">
-                                Olá!
-                            </p>
-
-                            <p style="margin:0; font-size:15px; line-height:1.8; color:#d1d1d1;">
-                                Recebemos uma solicitação para redefinir sua senha na
-                                {$nomeAcademiaHtml}. Clique no botão abaixo para criar
-                                uma nova senha e voltar a acessar sua conta.
-                            </p>
-
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                                <tr>
-                                    <td height="18" style="height:18px; font-size:0; line-height:18px;">
-                                        &nbsp;
-                                    </td>
-                                </tr>
-                            </table>
-
-                            <table role="presentation" align="center" cellpadding="0" cellspacing="0" border="0">
-                                <tr>
-                                    <td align="center" bgcolor="{$corBotao}" style="border-radius:8px;">
-                                        <a href="{$linkSeguro}"
-                                            style="display:inline-block; padding:16px 28px; font-size:15px; font-weight:bold; color:{$corTextoBotao}; text-decoration:none; border-radius:8px;">
-                                            REDEFINIR MINHA SENHA
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
-
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                                <tr>
-                                    <td height="18" style="height:18px; font-size:0; line-height:18px;">
-                                        &nbsp;
-                                    </td>
-                                </tr>
-                            </table>
-
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-                                style="background-color:{$corCartao}; border:1px solid #353535; border-radius:8px;">
-                                <tr>
-                                    <td style="padding:16px;">
-                                        <p style="margin:0; font-size:13px; line-height:1.8; color:#f0f0f0;">
-                                            <strong style="color:{$corDestaque};">ATENÇÃO</strong><br>
-                                            Este link expira em 1 hora por segurança.
-                                        </p>
-                                    </td>
-                                </tr>
-                            </table>
-
-                            <p style="margin:24px 0 0; font-size:13px; line-height:1.8; color:#a3a3a3;">
-                                Se você não solicitou a recuperação de senha, basta ignorar este e-mail.
-                                Sua senha atual não será alterada por esta mensagem.
-                            </p>
-
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td align="center"
-                            style="padding:22px 20px; border-top:1px solid #303030; background-color:{$corFundo}; border-radius:0 0 14px 14px;">
-
-                            <p style="margin:0 0 8px; font-size:13px; font-weight:bold; color:{$corDestaque};">
-                                {$nomeAcademiaHtml}
-                            </p>
-
-                            <p style="margin:0; font-size:11px; line-height:1.8; color:#888888;">
-                                Este é um e-mail automático. Por favor, não responda.<br>
-                                Sua segurança é importante para nós.
-                            </p>
-
-                        </td>
-                    </tr>
-
-                </table>
-
-                <p style="margin:18px 0 0; font-size:11px; color:#777777; text-align:center;">
-                    {$nomeAcademiaHtml} &copy; Todos os direitos reservados.
-                </p>
-
-            </td>
-        </tr>
-    </table>
-
-</body>
-</html>
-HTML;
+                        ob_start();
+                        require __DIR__ . '/../views/emails/recuperar_senha.php';
+                        $mail->Body = (string) ob_get_clean();
 
                         // Versão em texto simples para clientes que não exibem HTML.
                         $mail->AltBody = "Olá!\n\n"
@@ -787,13 +605,7 @@ HTML;
                     } catch (\Throwable $e) {
                         // Se o envio falhar, invalida o token que não foi entregue.
                         try {
-                            $stmtInvalidar = $pdo->prepare(
-                                "UPDATE users
-                                SET reset_token = NULL,
-                                    reset_token_expires_at = NULL
-                                WHERE id = ?"
-                            );
-                            $stmtInvalidar->execute([$user['id']]);
+                            loginInvalidarResetToken($pdo, (int) $user['id']);
                         } catch (\Throwable $erroInvalidacao) {
                             error_log(
                                 'GymFlow: falha ao invalidar token de recuperação.'
@@ -831,14 +643,7 @@ HTML;
     require_once __DIR__ . '/../../config/conexao.php';
 
     // Confere o token e sua validade.
-    $stmt = $pdo->prepare(
-        "SELECT id
-        FROM users
-        WHERE reset_token = ?
-        AND reset_token_expires_at > NOW()"
-    );
-    $stmt->execute([$token]);
-    $user = $stmt->fetch();
+    $user = loginBuscarUsuarioPorResetToken($pdo, $token);
 
     if (!$user) {
         $erro = "Link de recuperação inválido ou expirado.";
@@ -856,17 +661,7 @@ HTML;
             $hash = password_hash($nova_senha, PASSWORD_DEFAULT);
 
             // Salva a nova senha e invalida o token usado.
-            $stmtUpdate = $pdo->prepare(
-                "UPDATE users
-                SET password = ?,
-                    reset_token = NULL,
-                    reset_token_expires_at = NULL
-                WHERE id = ?"
-            );
-            $stmtUpdate->execute([
-                $hash,
-                $user['id']
-            ]);
+            loginAtualizarSenhaReset($pdo, (int) $user['id'], $hash);
 
             $sucesso = "Senha redefinida com sucesso! "
                 . "<a href='" . BASE_URL

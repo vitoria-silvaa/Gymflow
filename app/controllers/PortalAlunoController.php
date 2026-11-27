@@ -505,48 +505,16 @@ elseif ($acao === 'avaliacao') {
     $company_id = (int) $company_id;
 
     require_once __DIR__ . '/../models/Database.php';
+    require_once __DIR__ . '/../models/Feedback.php';
 
     try {
 
-        $stmtAluno = $pdo->prepare("
-            SELECT
-                u.id AS usuario_id,
-                u.name AS nome_usuario,
-                u.company_id,
-                a.id AS aluno_id,
-                f.id AS filial_id,
-                f.nome AS nome_filial
-
-            FROM users u
-
-            INNER JOIN alunos a
-                ON a.id = u.aluno_id
-
-            INNER JOIN filiais f
-                ON f.id = a.filial_id
-
-            WHERE u.id = :usuario_id
-              AND u.aluno_id = :aluno_id
-              AND u.company_id = :company_id
-              AND f.company_id = :company_id_filial
-              AND u.role = 'Aluno'
-
-            LIMIT 1
-        ");
-
-        $stmtAluno->execute([
-
-            ':usuario_id' => $usuario_id,
-
-            ':aluno_id' => $aluno_id,
-
-            ':company_id' => $company_id,
-
-            ':company_id_filial' => $company_id
-        ]);
-
-        $dadosAlunoAvaliacao =
-            $stmtAluno->fetch(PDO::FETCH_ASSOC);
+        $dadosAlunoAvaliacao = feedbackBuscarAlunoAutorizado(
+            $pdo,
+            $usuario_id,
+            $company_id,
+            $aluno_id
+        );
 
         if (!$dadosAlunoAvaliacao) {
 
@@ -556,32 +524,11 @@ elseif ($acao === 'avaliacao') {
                 'com esta academia.');
         }
 
-        $stmtAvaliacao = $pdo->prepare("
-            SELECT
-                id,
-                nome,
-                nota,
-                mensagem,
-                criado_em,
-                ativo
-
-            FROM portfolio_feedbacks
-
-            WHERE user_id = :usuario_id
-              AND company_id = :company_id
-
-            LIMIT 1
-        ");
-
-        $stmtAvaliacao->execute([
-
-            ':usuario_id' => $usuario_id,
-
-            ':company_id' => $company_id
-        ]);
-
-        $minhaAvaliacao =
-            $stmtAvaliacao->fetch(PDO::FETCH_ASSOC) ?: null;
+        $minhaAvaliacao = feedbackBuscarDoUsuario(
+            $pdo,
+            $usuario_id,
+            $company_id
+        );
 
         $tituloPagina = 'Minha Avaliação';
 

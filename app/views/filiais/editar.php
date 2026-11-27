@@ -86,19 +86,18 @@ include __DIR__ . '/../shared/sidebar.php';
                     value="<?= htmlspecialchars($filial['email'] ?? '') ?>">
             </div>
             
-            <h3 style="margin-top: 24px; margin-bottom: 16px; font-size: 16px; color: #1e293b; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; width: 100%;">Endereço</h3>
+            <h3 class="ui-secao-titulo-topo">Endereço</h3>
 
-            <div style="display: flex; gap: 16px; width: 100%; align-items: flex-end; margin-bottom: 16px;">
-                <div class="campo-editar-filial" style="flex: 1;">
+            <div class="ui-flex-linha-mb">
+                <div class="campo-editar-filial ui-flex-1">
                     <label>CEP</label>
-                    <div style="display: flex; gap: 8px;">
+                    <div class="ui-cep-grupo">
                         <input type="text" id="cep" maxlength="9" placeholder="00000-000">
-                   <button type="button" class="fin-btn fin-btn-secondary" onclick="buscarCep()" style="padding: 8px 12px; color: #ffffff;">Buscar</button>
-
+                        <button type="button" class="fin-btn fin-btn-secondary ui-btn-cep" onclick="buscarCep()">Buscar</button>
                     </div>
                 </div>
                 
-                <div class="campo-editar-filial" style="flex: 3;">
+                <div class="campo-editar-filial ui-flex-3">
                     <label for="endereco">Endereço (Rua, Avenida, etc.)</label>
                     <input
                         type="text"
@@ -109,8 +108,8 @@ include __DIR__ . '/../shared/sidebar.php';
                 </div>
             </div>
 
-            <div style="display: flex; gap: 16px; width: 100%; align-items: flex-end;">
-                <div class="campo-editar-filial" style="flex: 1;">
+            <div class="ui-flex-linha">
+                <div class="campo-editar-filial ui-flex-1">
                     <label for="numero">Número</label>
                     <input
                         type="text"
@@ -120,7 +119,7 @@ include __DIR__ . '/../shared/sidebar.php';
                         placeholder="Ex: 123">
                 </div>
                 
-                <div class="campo-editar-filial" style="flex: 3;">
+                <div class="campo-editar-filial ui-flex-3">
                     <label for="complemento">Complemento (Bloco, Apto, Sala, etc.)</label>
                     <input
                         type="text"

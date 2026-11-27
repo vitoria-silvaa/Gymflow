@@ -224,15 +224,15 @@ include __DIR__ . '/../shared/sidebar.php';
 
                             </div>
 
-                            <div style="margin:12px 0">
+                            <div class="crm-lead-info">
 
-                                <p style="font-size:13px">
+                                <p>
                                     <?= $h($lead['nome_filial']) ?>
                                 </p>
 
                                 <?php if (!empty($lead['objetivo'])): ?>
 
-                                    <p style="font-size:13px">
+                                    <p>
                                         Objetivo:
                                         <?= $h($lead['objetivo']) ?>
                                     </p>
@@ -241,7 +241,7 @@ include __DIR__ . '/../shared/sidebar.php';
 
                                 <?php if (!empty($lead['campanha'])): ?>
 
-                                    <p style="font-size:13px">
+                                    <p>
                                         Origem:
                                         <?= $h($lead['campanha']) ?>
                                     </p>
@@ -250,7 +250,7 @@ include __DIR__ . '/../shared/sidebar.php';
 
                                 <?php if ($matriculaId): ?>
 
-                                    <p style="font-size:13px">
+                                    <p>
                                         Matrícula #<?= $matriculaId ?>
                                     </p>
 
@@ -260,14 +260,12 @@ include __DIR__ . '/../shared/sidebar.php';
 
                             <?php if (!$protegido): ?>
 
-                                <div
-                                    class="crm-rodape-simples"
-                                    style="flex-wrap:wrap;gap:10px">
+                                <div class="crm-rodape-simples">
 
                                     <form
                                         method="POST"
                                         action="<?= $h($baseUrl) ?>?acao=atualizar_status"
-                                        style="margin:0">
+                                        class="ui-m-0">
 
                                         <input
                                             type="hidden"
@@ -306,7 +304,7 @@ include __DIR__ . '/../shared/sidebar.php';
 
                                     </form>
 
-                                    <div style="display:flex;gap:12px;align-items:center">
+                                    <div class="crm-lead-acoes">
 
                                         <a
                                             href="<?= $h($baseUrl) ?>?acao=editar&amp;id=<?= $leadId ?>"
@@ -324,7 +322,7 @@ include __DIR__ . '/../shared/sidebar.php';
                                                 method="POST"
                                                 action="<?= $h($baseUrl) ?>?acao=excluir"
                                                 onsubmit="return confirm('Deseja excluir este lead?')"
-                                                style="margin:0">
+                                                class="ui-m-0">
 
                                                 <input
                                                     type="hidden"
@@ -338,10 +336,9 @@ include __DIR__ . '/../shared/sidebar.php';
 
                                                 <button
                                                     type="submit"
-                                                    class="crm-icon-btn"
+                                                    class="crm-icon-btn crm-icon-btn-submit"
                                                     title="Excluir"
-                                                    aria-label="Excluir"
-                                                    style="background:none;border:0;cursor:pointer">
+                                                    aria-label="Excluir">
 
                                                     <i data-lucide="trash-2"></i>
 
@@ -361,8 +358,7 @@ include __DIR__ . '/../shared/sidebar.php';
 
                                 <a
                                     href="<?= $h($urlMatricula) ?>"
-                                    class="fin-btn fin-btn-primary fin-btn-sm"
-                                    style="margin-top:12px;width:100%;justify-content:center">
+                                    class="fin-btn fin-btn-primary fin-btn-sm crm-btn-matricular">
 
                                     Matricular
 
@@ -372,8 +368,7 @@ include __DIR__ . '/../shared/sidebar.php';
                                 $lead['status'] === 'Aguardando pagamento'
                             ): ?>
 
-                                <p
-                                    style="margin-top:12px;font-size:13px;color:var(--fin-warning-dark)">
+                                <p class="crm-status-aviso">
 
                                     Aguardando confirmação do recebimento.
 
@@ -398,7 +393,7 @@ include __DIR__ . '/../shared/sidebar.php';
                                 $lead['status'] === 'Convertido'
                             ): ?>
 
-                                <p style="margin-top:12px;font-size:13px">
+                                <p class="crm-status-nota">
 
                                     <?= $matriculaId
                                         ? 'Matrícula vinculada ao lead.'

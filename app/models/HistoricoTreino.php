@@ -626,3 +626,53 @@ function registrarExercicioHistorico(
         throw $erro;
     }
 }
+
+// =============================================
+// FREQUÊNCIA MENSAL
+// =============================================
+
+function obterFrequenciaMensal(
+    PDO $pdo,
+    int $empresa,
+    int $aluno,
+    DateTimeImmutable $inicio,
+    DateTimeImmutable $fim
+): array {
+    $stmt = $pdo->prepare("
+        SELECT
+            DATE(e.concluido_em) AS dia,
+            e.exercicio_origem_id AS exercicio_id,
+            MAX(e.nome_exercicio) AS nome,
+            COUNT(*) AS execucoes
+        FROM treino_sessao_exercicios e
+        INNER JOIN treino_sessoes s
+            ON s.id = e.sessao_id
+        WHERE s.company_id = ?
+          AND s.aluno_id = ?
+          AND e.concluido_em >= ?
+          AND e.concluido_em < ?
+          AND e.exercicio_origem_id IS NOT NULL
+        GROUP BY
+            DATE(e.concluido_em),
+            e.exercicio_origem_id
+        ORDER BY dia ASC, nome ASC
+    ");
+
+    $stmt->execute([
+        $empresa,
+        $aluno,
+        $inicio->format('Y-m-d H:i:s'),
+        $fim->format('Y-m-d H:i:s'),
+    ]);
+
+    $dias = [];
+
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+        $dias[$r['dia']][] = [
+            'nome'      => $r['nome'],
+            'execucoes' => (int) $r['execucoes'],
+        ];
+    }
+
+    return $dias;
+}

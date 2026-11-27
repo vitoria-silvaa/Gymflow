@@ -54,22 +54,22 @@ if (!empty($funcionario['telefone'])) {
             <h1>Detalhes do Funcionário</h1>
             <p>Visualizando informações de <?= htmlspecialchars($funcionario['name']) ?></p>
         </div>
-        <div class="fin-header-actions" style="display: flex; gap: 8px;">
+        <div class="fin-header-actions func-header-actions">
             <a href="<?= $controller ?>?acao=listar" class="fin-btn fin-btn-secondary">Voltar</a>
             <a href="<?= $controller ?>?acao=editar&id=<?= $funcionario['id'] ?>" class="fin-btn fin-btn-primary">Editar Cadastro</a>
         </div>
     </div>
 
-    <div class="fin-table-card" style="padding: 24px;">
+    <div class="fin-table-card ui-card-pad-24">
 
         <!-- Nome, cargo e botões de contato -->
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
+        <div class="func-detalhe-topo">
             <div>
-                <h2 style="margin: 0 0 4px 0; color: #1e293b;"><?= htmlspecialchars($funcionario['name']) ?></h2>
+                <h2 class="func-detalhe-nome"><?= htmlspecialchars($funcionario['name']) ?></h2>
                 <span class="fin-status-badge fin-status-ativo"><?= htmlspecialchars($funcionario['role']) ?></span>
             </div>
 
-            <div style="display: flex; gap: 16px; align-items: center;">
+            <div class="func-detalhe-contatos">
 
                 <!-- WhatsApp (só aparece se tiver telefone) -->
                 <?php if ($numeroWhats != ''): ?>
@@ -102,7 +102,7 @@ if (!empty($funcionario['telefone'])) {
         </div>
 
         <!-- Duas colunas: contato e informações do sistema -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding-top: 24px; border-top: 1px solid #e2e8f0;">
+        <div class="func-detalhe-grid">
 
             <div>
                 <h3 class="titulo-bloco">Contato</h3>
@@ -138,7 +138,7 @@ if (!empty($funcionario['telefone'])) {
                             <?= htmlspecialchars($filial_vinculada['nome']) ?>
 
                             <?php if (!empty($filial_vinculada['cnpj'])): ?>
-                                <br><small style="color: #64748b;">CNPJ: <?= htmlspecialchars($filial_vinculada['cnpj']) ?></small>
+                                <br><small class="func-detalhe-cnpj">CNPJ: <?= htmlspecialchars($filial_vinculada['cnpj']) ?></small>
                             <?php endif; ?>
                         <?php else: ?>
                             Nenhuma

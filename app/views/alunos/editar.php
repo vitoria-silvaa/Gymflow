@@ -65,9 +65,7 @@ include __DIR__ . '/../shared/sidebar.php';
 
     <?php endif; ?>
 
-    <section
-        class="fin-form-card"
-        style="max-width:900px">
+    <section class="fin-form-card ui-card-lg">
 
         <form
             method="POST"
@@ -85,9 +83,7 @@ include __DIR__ . '/../shared/sidebar.php';
 
             <h2>Dados pessoais</h2>
 
-            <div
-                class="fin-form-grid"
-                style="margin-top:24px">
+            <div class="fin-form-grid ui-mt-24">
 
                 <div class="fin-form-group col-span-2">
 
@@ -218,9 +214,7 @@ include __DIR__ . '/../shared/sidebar.php';
 
             <h2>Vínculo com a academia</h2>
 
-            <div
-                class="fin-form-grid"
-                style="margin-top:24px">
+            <div class="fin-form-grid ui-mt-24">
 
                 <div class="fin-form-group">
 
